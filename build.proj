@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+  DefaultTargets="Clean;BuildWin32Debug;BuildWin32Release;Buildx64Debug;Buildx64Release">
+  
+  <ItemGroup>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" />
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" />
+  </ItemGroup>
+  
+  <Target Name="Clean">
+    <!-- Clean the solutions -->
+    <Message Importance="high" Text="Cleaning the projects..." ContinueOnError="true" />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Clean"
+      Properties="Configuration=Debug;Platform=Win32"
+      BuildInParallel="true" />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Clean"
+      Properties="Configuration=Release;Platform=Win32"
+      BuildInParallel="true" />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Clean"
+      Properties="Configuration=Debug;Platform=x64"
+      BuildInParallel="true" />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Clean"
+      Properties="Configuration=Release;Platform=x64"
+      BuildInParallel="true" />
+  </Target>
+  
+  <Target Name="BuildWin32Release">
+    <Message Importance="high" Text="Building Win32 release version of the projects..." />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Build"
+      Properties="Configuration=Release;Platform=Win32"
+      BuildInParallel="true" />
+  </Target>
+
+  <Target Name="BuildWin32Debug">
+    <Message Importance="high" Text="Building Win32 debug version the projects..." />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Build"
+      Properties="Configuration=Debug;Platform=Win32"
+      BuildInParallel="true" />
+  </Target>
+  
+  <Target Name="Buildx64Release">
+    <Message Importance="high" Text="Building x64 release version of the projects..." />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Build"
+      Properties="Configuration=Release;Platform=x64"
+      BuildInParallel="true" />
+  </Target>
+
+  <Target Name="Buildx64Debug">
+    <Message Importance="high" Text="Building x64 debug version the projects..." />
+    <MSBuild
+      Projects="@(StorageSln)"
+      Targets="Build"
+      Properties="Configuration=Debug;Platform=x64"
+      BuildInParallel="true" />
+  </Target>
+</Project>

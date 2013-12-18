@@ -1,0 +1,644 @@
+// -----------------------------------------------------------------------------------------
+// <copyright file="protocol_xml.h" company="Microsoft">
+//    Copyright 2013 Microsoft Corporation
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+// </copyright>
+// -----------------------------------------------------------------------------------------
+
+#pragma once
+
+#include "wascore/basic_types.h"
+#include "was/blob.h"
+#include "was/queue.h"
+#include "wascore/xmlhelpers.h"
+
+namespace wa { namespace storage { namespace protocol {
+
+    class storage_error_reader : public core::xml::xml_reader
+    {
+    public:
+
+        storage_error_reader(concurrency::streams::istream error_response)
+            : xml_reader(error_response)
+        {
+        }
+
+        utility::string_t extract_error_code()
+        {
+            parse();
+            return std::move(m_error_code);
+        }
+
+        utility::string_t extract_error_message()
+        {
+            parse();
+            return std::move(m_error_message);
+        }
+
+    protected:
+
+        virtual void handle_element(const utility::string_t& element_name);
+
+        utility::string_t m_error_code;
+        utility::string_t m_error_message;
+    };
+
+    class cloud_blob_container_list_item
+    {
+    public:
+
+        cloud_blob_container_list_item(web::http::uri uri, utility::string_t name, cloud_metadata metadata, cloud_blob_container_properties properties)
+            : m_uri(std::move(uri)), m_name(std::move(name)), m_metadata(std::move(metadata)), m_properties(std::move(properties))
+        {
+        }
+
+        web::http::uri uri()
+        {
+            return std::move(m_uri);
+        }
+
+        utility::string_t name()
+        {
+            return std::move(m_name);
+        }
+
+        cloud_metadata metadata()
+        {
+            return std::move(m_metadata);
+        }
+
+        cloud_blob_container_properties properties()
+        {
+            return std::move(m_properties);
+        }
+
+    private:
+
+        web::http::uri m_uri;
+        utility::string_t m_name;
+        cloud_metadata m_metadata;
+        cloud_blob_container_properties m_properties;
+    };
+
+    class list_containers_reader : public core::xml::xml_reader
+    {
+    public:
+
+        list_containers_reader(concurrency::streams::istream stream)
+            : xml_reader(stream)
+        {
+        }
+
+        std::vector<cloud_blob_container_list_item> extract_items()
+        {
+            parse();
+            return std::move(m_items);
+        }
+
+        utility::string_t extract_next_marker()
+        {
+            parse();
+            return std::move(m_next_marker);
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<cloud_blob_container_list_item> m_items;
+        utility::string_t m_next_marker;
+        web::http::uri m_service_uri;
+
+        utility::string_t m_name;
+        web::http::uri m_uri;
+        cloud_metadata m_metadata;
+        cloud_blob_container_properties m_properties;
+    };
+
+    class cloud_blob_list_item
+    {
+    public:
+
+        cloud_blob_list_item(web::http::uri uri, utility::string_t name, utility::string_t snapshot_time, cloud_metadata metadata, cloud_blob_properties properties, copy_state copy_state)
+            : m_uri(std::move(uri)), m_name(std::move(name)), m_snapshot_time(std::move(snapshot_time)), m_metadata(std::move(metadata)), m_properties(std::move(properties)), m_copy_state(std::move(copy_state))
+        {
+        }
+
+        web::http::uri uri()
+        {
+            return std::move(m_uri);
+        }
+
+        utility::string_t name()
+        {
+            return std::move(m_name);
+        }
+
+        utility::string_t snapshot_time()
+        {
+            return std::move(m_snapshot_time);
+        }
+
+        cloud_metadata metadata()
+        {
+            return std::move(m_metadata);
+        }
+
+        cloud_blob_properties properties()
+        {
+            return std::move(m_properties);
+        }
+
+        copy_state copy_state()
+        {
+            return std::move(m_copy_state);
+        }
+
+    private:
+
+        web::http::uri m_uri;
+        utility::string_t m_name;
+        utility::string_t m_snapshot_time;
+        cloud_metadata m_metadata;
+        cloud_blob_properties m_properties;
+        wa::storage::copy_state m_copy_state;
+    };
+
+    class cloud_blob_prefix_list_item
+    {
+    public:
+
+        cloud_blob_prefix_list_item(web::http::uri uri, utility::string_t name)
+            : m_uri(std::move(uri)), m_name(std::move(name))
+        {
+        }
+
+        web::http::uri uri()
+        {
+            return std::move(m_uri);
+        }
+
+        utility::string_t name()
+        {
+            return std::move(m_name);
+        }
+
+    private:
+
+        web::http::uri m_uri;
+        utility::string_t m_name;
+    };
+
+    class list_blobs_reader : public core::xml::xml_reader
+    {
+    public:
+
+        list_blobs_reader(concurrency::streams::istream stream)
+            : xml_reader(stream)
+        {
+        }
+
+        std::vector<cloud_blob_list_item> extract_blob_items()
+        {
+            parse();
+            return std::move(m_blob_items);
+        }
+
+        std::vector<cloud_blob_prefix_list_item> extract_blob_prefix_items()
+        {
+            parse();
+            return std::move(m_blob_prefix_items);
+        }
+
+        utility::string_t extract_next_marker()
+        {
+            parse();
+            return std::move(m_next_marker);
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<cloud_blob_list_item> m_blob_items;
+        std::vector<cloud_blob_prefix_list_item> m_blob_prefix_items;
+        utility::string_t m_next_marker;
+        web::http::uri m_service_uri;
+
+        utility::string_t m_name;
+        web::http::uri m_uri;
+        utility::string_t m_snapshot_time;
+        cloud_metadata m_metadata;
+        cloud_blob_properties m_properties;
+        copy_state m_copy_state;
+    };
+
+    class page_list_reader : public core::xml::xml_reader
+    {
+    public:
+
+        page_list_reader(concurrency::streams::istream stream)
+            : xml_reader(stream), m_start(-1), m_end(-1)
+        {
+        }
+
+        // Extracts the result. This method can only be called once on this reader
+        std::vector<page_range> extract_result()
+        {
+            parse();
+            return std::move(m_page_list);
+        }
+
+    protected:
+
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<page_range> m_page_list;
+        int64_t m_start;
+        int64_t m_end;
+    };
+
+    class block_list_reader : public core::xml::xml_reader
+    {
+    public:
+
+        block_list_reader(concurrency::streams::istream stream)
+            : xml_reader(stream), m_handling_what(0), m_size(-1)
+        {
+        }
+
+        // Extracts the result. This method can only be called once on this reader
+        std::vector<block_list_item> extract_result()
+        {
+            parse();
+            return std::move(m_block_list);
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<block_list_item> m_block_list;
+
+        // 0 -> nothing, 1 -> committed, 2 -> uncommitted
+        int m_handling_what;
+
+        size_t m_size;
+        utility::string_t m_name;
+    };
+
+    class block_list_writer : public core::xml::xml_writer
+    {
+    public:
+
+        block_list_writer()
+        {
+        }
+
+        std::string write(const std::vector<block_list_item>& blocks);
+    };
+
+    template<typename Policy>
+    class access_policy_reader : public core::xml::xml_reader
+    {
+    public:
+
+        access_policy_reader(concurrency::streams::istream stream)
+            : xml_reader(stream)
+        {
+        }
+
+        shared_access_policies<Policy> extract_policies()
+        {
+            parse();
+            return std::move(m_policies);
+        }
+
+    protected:
+
+        virtual void handle_element(const utility::string_t& element_name)
+        {
+            if (element_name == xml_signed_id)
+            {
+                m_current_identifier = get_current_element_text();
+            }
+            else if (element_name == xml_access_policy_start)
+            {
+                m_current_policy.set_start(utility::datetime::from_string(get_current_element_text(), utility::datetime::ISO_8601));
+            }
+            else if (element_name == xml_access_policy_expiry)
+            {
+                m_current_policy.set_expiry(utility::datetime::from_string(get_current_element_text(), utility::datetime::ISO_8601));
+            }
+            else if (element_name == xml_access_policy_permissions)
+            {
+                m_current_policy.set_permissions_from_string(get_current_element_text());
+            }
+        }
+
+        virtual void handle_end_element(const utility::string_t& element_name)
+        {
+            if (element_name == xml_signed_identifier)
+            {
+                m_policies[m_current_identifier] = m_current_policy;
+                m_current_policy.set_permissions(0);
+                m_current_policy.set_start(utility::datetime());
+                m_current_policy.set_expiry(utility::datetime());
+            }
+        }
+
+    private:
+
+        shared_access_policies<Policy> m_policies;
+        utility::string_t m_current_identifier;
+        Policy m_current_policy;
+    };
+
+    template<typename Policy>
+    class access_policy_writer : public core::xml::xml_writer
+    {
+    public:
+
+        access_policy_writer()
+        {
+        }
+
+        std::string write(const shared_access_policies<Policy>& policies)
+        {
+            std::ostringstream outstream;
+            initialize(outstream);
+
+            write_start_element(xml_signed_identifiers);
+
+            for (auto it = policies.cbegin(); it != policies.cend(); ++it)
+            {
+                write_start_element(xml_signed_identifier);
+                write_element(xml_signed_id, it->first);
+                auto& policy = it->second;
+                write_start_element(xml_access_policy);
+
+                if (policy.start().is_initialized())
+                {
+                    write_element(xml_access_policy_start, policy.start().to_string(utility::datetime::ISO_8601));
+                }
+
+                if (policy.expiry().is_initialized())
+                {
+                    write_element(xml_access_policy_expiry, policy.expiry().to_string(utility::datetime::ISO_8601));
+                }
+
+                if (policy.permission() != 0)
+                {
+                    write_element(xml_access_policy_permissions, policy.permissions_to_string());
+                }
+
+                write_end_element();
+                write_end_element();
+            }
+
+            finalize();
+            return outstream.str();
+        }
+    };
+
+    class cloud_queue_list_item
+    {
+    public:
+
+        cloud_queue_list_item(utility::string_t name, cloud_metadata metadata)
+            : m_name(std::move(name)), m_metadata(std::move(metadata))
+        {
+        }
+
+        /*
+        cloud_queue_list_item(utility::string_t name, web::http::uri uri, cloud_metadata metadata)
+            : m_name(std::move(name)), m_uri(std::move(uri)), m_metadata(std::move(metadata))
+        {
+        }
+        */
+
+        utility::string_t name() const
+        {
+            return std::move(m_name);
+        }
+
+        /*
+        web::http::uri uri() const
+        {
+            return std::move(m_uri);
+        }
+        */
+
+        cloud_metadata metadata() const
+        {
+            return std::move(m_metadata);
+        }
+
+    private:
+
+        utility::string_t m_name;
+        //web::http::uri m_uri;
+        cloud_metadata m_metadata;
+    };
+
+    class list_queues_reader : public core::xml::xml_reader
+    {
+    public:
+
+        list_queues_reader(Concurrency::streams::istream stream)
+            : xml_reader(stream)
+        {
+        }
+
+        std::vector<cloud_queue_list_item> extract_items()
+        {
+            parse();
+            return std::move(m_items);
+        }
+
+        utility::string_t extract_next_marker()
+        {
+            parse();
+            return std::move(m_next_marker);
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<cloud_queue_list_item> m_items;
+        utility::string_t m_next_marker;
+
+        utility::string_t m_name;
+        //web::http::uri m_uri;
+        cloud_metadata m_metadata;
+    };
+
+    class cloud_message_list_item
+    {
+    public:
+
+        cloud_message_list_item(utility::string_t content, utility::string_t id, utility::string_t pop_receipt, utility::datetime insertion_time, utility::datetime expiration_time, utility::datetime next_visible_time, int dequeue_count)
+            : m_content(std::move(content)), m_id(std::move(id)), m_pop_receipt(std::move(pop_receipt)), m_insertion_time(std::move(insertion_time)), m_expiration_time(std::move(expiration_time)), m_next_visible_time(std::move(next_visible_time)), m_dequeue_count(dequeue_count)
+        {
+        }
+
+        utility::string_t content() const
+        {
+            return std::move(m_content);
+        }
+
+        utility::string_t id() const
+        {
+            return std::move(m_id);
+        }
+
+        utility::string_t pop_receipt() const
+        {
+            return std::move(m_pop_receipt);
+        }
+
+        utility::datetime insertion_time() const
+        {
+            return std::move(m_insertion_time);
+        }
+
+        utility::datetime expiration_time() const
+        {
+            return std::move(m_expiration_time);
+        }
+
+        utility::datetime next_visible_time() const
+        {
+            return std::move(m_next_visible_time);
+        }
+
+        int dequeue_count() const
+        {
+            return std::move(m_dequeue_count);
+        }
+
+    private:
+
+        utility::string_t m_content;
+        utility::string_t m_id;
+        utility::string_t m_pop_receipt;
+        utility::datetime m_insertion_time;
+        utility::datetime m_expiration_time;
+        utility::datetime m_next_visible_time;
+        int m_dequeue_count;
+    };
+
+    class message_reader : public core::xml::xml_reader
+    {
+    public:
+
+        message_reader(Concurrency::streams::istream stream)
+            : xml_reader(stream)
+        {
+        }
+
+        std::vector<cloud_message_list_item> extract_items()
+        {
+            parse();
+            return std::move(m_items);
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<cloud_message_list_item> m_items;
+
+        utility::string_t m_content;
+        utility::string_t m_id;
+        utility::string_t m_pop_receipt;
+        utility::datetime m_insertion_time;
+        utility::datetime m_expiration_time;
+        utility::datetime m_next_visible_time;
+        int m_dequeue_count;
+    };
+
+    class message_writer : public core::xml::xml_writer
+    {
+    public:
+
+        message_writer()
+        {
+        }
+
+        std::string write(const cloud_queue_message& message);
+    };
+
+    class service_properties_reader : public core::xml::xml_reader
+    {
+    public:
+
+        service_properties_reader(concurrency::streams::istream stream)
+            : xml_reader(stream), m_current_retention_policy_days(0)
+        {
+        }
+
+        service_properties extract_properties()
+        {
+            parse();
+            return std::move(m_service_properties);
+        }
+
+    protected:
+
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        service_properties m_service_properties;
+        service_properties::cors_rule m_current_cors_rule;
+        bool m_current_retention_policy_enabled;
+        int m_current_retention_policy_days;
+
+    private:
+
+        void handle_logging(const utility::string_t& element_name);
+        void handle_metrics(service_properties::metrics_properties& metrics, const utility::string_t& element_name);
+        void handle_cors_rule(const utility::string_t& element_name);
+    };
+
+    class service_properties_writer : public core::xml::xml_writer
+    {
+    public:
+
+        service_properties_writer()
+        {
+        }
+
+        std::string write(const service_properties& properties, const service_properties_includes& includes);
+
+    private:
+
+        void write_logging(const service_properties::logging_properties& logging, std::ostringstream& output);
+        void write_metrics(const service_properties::metrics_properties& metrics, std::ostringstream& output);
+        void write_cors_rule(const service_properties::cors_rule& rule, std::ostringstream& output);
+        void write_retention_policy(bool enabled, int days, std::ostringstream& output);
+    };
+
+}}} // namespace wa::storage::protocol

@@ -54,7 +54,7 @@ cd azure-storage-cpp
 To get the binaries of this library as distributed by Microsoft, ready for use
 within your project you can also have them installed by the package manager [NuGet](http://www.nuget.org/).
 
-`Install-Package wastorage`
+`Install-Package wastorage -Pre`
 
 ## Code Samples
 

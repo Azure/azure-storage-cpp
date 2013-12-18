@@ -1,0 +1,716 @@
+// -----------------------------------------------------------------------------------------
+// <copyright file="executor.h" company="Microsoft">
+//    Copyright 2013 Microsoft Corporation
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+// </copyright>
+// -----------------------------------------------------------------------------------------
+
+#pragma once
+
+#include "cpprest/http_client.h"
+
+#include "basic_types.h"
+#include "logging.h"
+#include "util.h"
+#include "streams.h"
+#include "was/auth.h"
+
+namespace wa { namespace storage { namespace core {
+
+    class istream_descriptor
+    {
+    public:
+        istream_descriptor() {}
+        
+        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = protocol::invalid_size64_t)
+        {
+            if (length == protocol::invalid_size64_t)
+            {
+                length = get_remaining_stream_length(stream);
+            }
+
+            if (!calculate_md5 && stream.can_seek())
+            {
+                return pplx::task_from_result(istream_descriptor(stream, length, utility::string_t()));
+            }
+
+            concurrency::streams::container_buffer<std::vector<uint8_t>> temp_buffer;
+            concurrency::streams::ostream temp_stream;
+            hash_streambuf hash_buffer;
+
+            if (calculate_md5)
+            {
+                // If MD5 is needed, a splitter_streambuf will act as a proxy to forward incoming data to
+                // a hash_md5_streambuf and the in-memory container_buffer
+                hash_buffer = hash_md5_streambuf();
+                temp_stream = splitter_streambuf<concurrency::streams::ostream::traits::char_type>(temp_buffer, hash_buffer).create_ostream();
+            }
+            else
+            {
+                temp_stream = temp_buffer.create_ostream();
+            }
+
+            return stream_copy_async(stream, temp_stream, length).then([temp_buffer, hash_buffer] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
+            {
+                utility::string_t md5;
+                if (hash_buffer)
+                {
+                    hash_buffer.close().wait();
+                    md5 = utility::conversions::to_base64(hash_buffer.hash());
+                }
+
+                return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(temp_buffer.collection())), buffer_task.get(), md5);
+            });
+        }
+
+        bool is_valid() const
+        {
+            return m_stream.is_valid();
+        }
+
+        concurrency::streams::istream stream() const
+        {
+            return m_stream;
+        }
+
+        utility::size64_t length() const
+        {
+            return m_length;
+        }
+
+        const utility::string_t& content_md5() const
+        {
+            return m_content_md5;
+        }
+
+        void rewind()
+        {
+            m_stream.seek(m_offset);
+        }
+
+    private:
+        
+        istream_descriptor(concurrency::streams::istream stream, utility::size64_t length, utility::string_t content_md5)
+            : m_stream(stream), m_offset(stream.tell()), m_length(length), m_content_md5(std::move(content_md5))
+        {
+        }
+
+        concurrency::streams::istream m_stream;
+        concurrency::streams::istream::pos_type m_offset;
+        utility::string_t m_content_md5;
+        utility::size64_t m_length;
+    };
+
+    class ostream_descriptor
+    {
+    public:
+        ostream_descriptor()
+        {
+        }
+
+        ostream_descriptor(utility::size64_t length, utility::string_t content_md5)
+            : m_length(length), m_content_md5(std::move(content_md5))
+        {
+        }
+
+        utility::size64_t length() const
+        {
+            return m_length;
+        }
+
+        const utility::string_t& content_md5() const
+        {
+            return m_content_md5;
+        }
+
+    private:
+        
+        utility::string_t m_content_md5;
+        utility::size64_t m_length;
+    };
+
+    enum class command_location_mode
+    {
+        primary_only,
+        secondary_only,
+        primary_or_secondary,
+    };
+
+    template<typename T>
+    class executor;
+
+    template<typename T>
+    class storage_command
+    {
+    public:
+        storage_command(const storage_uri& request_uri)
+            : m_request_uri(request_uri), m_location_mode(command_location_mode::primary_only)
+        {
+        }
+
+        void set_request_body(istream_descriptor value)
+        {
+            m_request_body = value;
+        }
+
+        void set_destination_stream(concurrency::streams::ostream value)
+        {
+            m_destination_stream = value;
+        }
+
+        void set_calculate_response_body_md5(bool value)
+        {
+            m_calculate_response_body_md5 = value;
+        }
+
+        void set_build_request(std::function<web::http::http_request (web::http::uri_builder, const std::chrono::seconds&, operation_context)> value)
+        {
+            m_build_request = value;
+        }
+
+        void set_custom_sign_request(std::function<void (web::http::http_request &, operation_context)> value)
+        {
+            m_sign_request = value;
+        }
+
+        void set_authentication_handler(std::shared_ptr<protocol::authentication_handler> handler)
+        {
+            set_custom_sign_request(std::bind(&protocol::authentication_handler::sign_request, handler, std::placeholders::_1, std::placeholders::_2));
+        }
+
+        void set_recover_request(std::function<bool (operation_context)> value)
+        {
+            m_recover_request = value;
+        }
+
+        void set_preprocess_response(std::function<T (const web::http::http_response &, operation_context)> value)
+        {
+            m_preprocess_response = value;
+        }
+
+        void set_postprocess_response(std::function<pplx::task<T> (const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> value)
+        {
+            m_postprocess_response = value;
+        }
+        
+        void set_location_mode(command_location_mode value, storage_location lock_location = storage_location::unspecified)
+        {
+            switch (lock_location)
+            {
+            case storage_location::primary:
+                if (value == command_location_mode::secondary_only)
+                {
+                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_secondary_only_command), false);
+                }
+
+                m_location_mode = command_location_mode::primary_only;
+                break;
+
+            case storage_location::secondary:
+                if (value == command_location_mode::primary_only)
+                {
+                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_primary_only_command), false);
+                }
+
+                m_location_mode = command_location_mode::secondary_only;
+                break;
+
+            default:
+                m_location_mode = value;
+                break;
+            }
+        }
+
+    private:
+
+        storage_uri m_request_uri;
+        istream_descriptor m_request_body;
+        concurrency::streams::ostream m_destination_stream;
+        bool m_calculate_response_body_md5;
+        command_location_mode m_location_mode;
+
+        std::function<web::http::http_request (web::http::uri_builder, const std::chrono::seconds&, operation_context)> m_build_request;
+        std::function<void(web::http::http_request &, operation_context)> m_sign_request;
+        std::function<bool (operation_context)> m_recover_request;
+        std::function<T (const web::http::http_response &, operation_context)> m_preprocess_response;
+        std::function<pplx::task<T> (const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> m_postprocess_response;
+
+        friend class executor<T>;
+    };
+
+    template<typename T>
+    class executor
+    {
+    public:
+
+        executor(std::shared_ptr<storage_command<T>> command, const request_options& options, operation_context context)
+            : m_command(command), m_request_options(options), m_context(context),
+            m_retry_count(0), m_current_location(get_first_location(options.location_mode())),
+            m_current_location_mode(options.location_mode()), m_retry_policy(options.retry_policy().clone())
+        {
+        }
+
+        static pplx::task<T> execute_async(std::shared_ptr<storage_command<T>> command, const request_options& options, operation_context context)
+        {
+            if (!context.start_time().is_initialized())
+            {
+                context.set_start_time(utility::datetime::utc_now());
+            }
+
+            auto instance = std::make_shared<executor<T>>(command, options, context);
+            return pplx::details::do_while([instance] () -> pplx::task<bool>
+            {
+                // 0. Begin request 
+                instance->validate_location_mode();
+
+                // 1. Build request
+                instance->m_start_time = utility::datetime::utc_now();
+                instance->m_uri_builder = web::http::uri_builder(instance->m_command->m_request_uri.get_location_uri(instance->m_current_location));
+                instance->m_request = instance->m_command->m_build_request(instance->m_uri_builder, instance->m_request_options.server_timeout(), instance->m_context);
+                instance->m_request_result = request_result(instance->m_start_time, instance->m_current_location);
+
+                if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                {
+                    utility::ostringstream_t str;
+                    str << U("Starting ") << instance->m_request.method() << U(" request to ") << instance->m_request.request_uri().to_string();
+                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                }
+
+                // 2. Set Headers
+                auto& client_request_id = instance->m_context.client_request_id();
+                if (!client_request_id.empty())
+                {
+                    instance->m_request.headers().add(protocol::ms_header_client_request_id, client_request_id);
+                }
+
+                auto& user_headers = instance->m_context.user_headers();
+                for (auto iter = user_headers.begin(); iter != user_headers.end(); ++iter)
+                {
+                    instance->m_request.headers().add(iter->first, iter->second);
+                }
+
+                // If the command provided a request body, set it on the http_request object
+                if (instance->m_command->m_request_body.is_valid())
+                {
+                    instance->m_command->m_request_body.rewind();
+                    instance->m_request.set_body(instance->m_command->m_request_body.stream(), instance->m_command->m_request_body.length(), utility::string_t());
+                }
+
+                // If the command wants to copy the response body to a stream, set it
+                // on the http_request object
+                if (instance->m_command->m_destination_stream)
+                {
+                    // If MD5 is needed, a splitter_streambuf will act as a proxy to forward incoming data to
+                    // a hash_md5_streambuf and the destination stream provided by the command
+                    if (instance->m_command->m_calculate_response_body_md5)
+                    {
+                        instance->m_hash_streambuf = hash_md5_streambuf();
+                        instance->m_response_streambuf = splitter_streambuf<concurrency::streams::ostream::traits::char_type>(instance->m_command->m_destination_stream.streambuf(), instance->m_hash_streambuf);
+                    }
+                    else
+                    {
+                        instance->m_hash_streambuf = hash_streambuf();
+                        instance->m_response_streambuf = splitter_streambuf<concurrency::streams::ostream::traits::char_type>(instance->m_command->m_destination_stream.streambuf(), null_streambuf<concurrency::streams::ostream::traits::char_type>());
+                    }
+
+                    instance->m_request.set_response_stream(instance->m_response_streambuf.create_ostream());
+                }
+
+                // Let the user know we are ready to send
+                auto sending_request = instance->m_context._get_impl()->sending_request();
+                if (sending_request)
+                {
+                    sending_request(instance->m_request, instance->m_context);
+                }
+
+                // 3. Sign Request
+                instance->m_command->m_sign_request(instance->m_request, instance->m_context);
+
+                // 4. Set timeout
+                web::http::client::http_client_config config;
+                config.set_timeout(instance->remaining_time());
+
+                // 5-6. Potentially upload data and get response
+                web::http::client::http_client client(instance->m_request.request_uri().authority(), config);
+                return client.request(instance->m_request).then([instance] (pplx::task<web::http::http_response> get_headers_task) -> pplx::task<web::http::http_response>
+                {
+                    // Headers are ready. It should be noted that http_client will
+                    // continue to download the response body in parallel.
+                    auto response = get_headers_task.get();
+
+                    if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                    {
+                        utility::ostringstream_t str;
+                        str << U("Response received. Status code = ") << response.status_code() << U(". Reason = ") << response.reason_phrase();
+                        logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                    }
+
+                    try
+                    {
+                        // Let the user know we received response
+                        auto response_received = instance->m_context._get_impl()->response_received();
+                        if (response_received)
+                        {
+                            response_received(instance->m_request, response, instance->m_context);
+                        }
+
+                        // 7. Do Response parsing (headers etc, no stream available here)
+                        // This is when the status code will be checked and m_preprocess_response
+                        // will throw a storage_exception if it is not expected.
+                        instance->m_result = instance->m_command->m_preprocess_response(response, instance->m_context);
+                        instance->m_request_result = request_result(instance->m_start_time, instance->m_current_location, response, false);
+
+                        if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                        {
+                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Successful request ID = ") + instance->m_request_result.service_request_id());
+                        }
+
+                        // 8. Potentially download data
+                        return response.content_ready();
+                    }
+                    catch (const storage_exception& e)
+                    {
+                        // If the exception already contains an error message, the issue is not with
+                        // the response, so rethrowing is the right thing.
+                        if (e.what() != NULL && e.what()[0] != '\0')
+                        {
+                            throw;
+                        }
+
+                        // Otherwise, response body might contain an error coming from the Storage service.
+                        // However, if the command has a destination stream, there is no guarantee that it
+                        // is seekable and thus it cannot be read back to parse the error.
+                        if (!instance->m_command->m_destination_stream)
+                        {
+                            return response.content_ready().then([instance] (pplx::task<web::http::http_response> get_error_body_task) -> web::http::http_response
+                            {
+                                auto response = get_error_body_task.get();
+                                instance->m_request_result = request_result(instance->m_start_time, instance->m_current_location, response, true);
+
+                                if (logger::instance().should_log(instance->m_context, client_log_level::log_level_warning))
+                                {
+                                    logger::instance().log(instance->m_context, client_log_level::log_level_warning, U("Failed request ID = ") + instance->m_request_result.service_request_id());
+                                }
+
+                                throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
+                            });
+                        }
+
+                        // In the worst case, storage_exception will just contain the HTTP error message
+                        throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
+                    }
+                }).then([instance] (pplx::task<web::http::http_response> get_body_task) -> pplx::task<void>
+                {
+                    // 9. Evaluate response & parse results
+                    auto response = get_body_task.get();
+
+                    // If the command asked for post-processing, it is now time to call m_postprocess_response
+                    if (instance->m_command->m_postprocess_response)
+                    {
+                        if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                        {
+                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Processing response body"));
+                        }
+
+                        // Get the MD5 hash if MD5 was calculated.
+                        utility::string_t md5;
+                        if (instance->m_hash_streambuf)
+                        {
+                            // It is ok to wait this call, as all hash_streambuf implementations are synchronous anyway.
+                            instance->m_hash_streambuf.close().wait();
+                            md5 = utility::conversions::to_base64(instance->m_hash_streambuf.hash());
+                        }
+
+                        ostream_descriptor descriptor;
+                        if (instance->m_response_streambuf)
+                        {
+                            descriptor = ostream_descriptor(instance->m_response_streambuf.total_written(), md5);
+                        }
+
+                        return instance->m_command->m_postprocess_response(response, instance->m_request_result, descriptor, instance->m_context).then([instance] (T result)
+                        {
+                            instance->m_result = result;
+                        });
+                    }
+                    else
+                    {
+                        return pplx::task_from_result();
+                    }
+                }).then([instance] (pplx::task<void> final_task) -> pplx::task<bool>
+                {
+                    bool retryable_exception = true;
+                    instance->m_context._get_impl()->add_request_result(instance->m_request_result);
+
+                    try
+                    {
+                        try
+                        {
+                            final_task.wait();
+                        }
+                        catch (const storage_exception& e)
+                        {
+                            retryable_exception = e.retryable();
+                            throw;
+                        }
+                    }
+                    catch (const std::exception& e)
+                    {
+                        if (logger::instance().should_log(instance->m_context, client_log_level::log_level_warning))
+                        {
+                            logger::instance().log(instance->m_context, client_log_level::log_level_warning, U("Exception thrown while processing response: ") + utility::conversions::to_string_t(e.what()));
+                        }
+
+                        if (!retryable_exception)
+                        {
+                            if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
+                            {
+                                logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Exception was not retryable: ") + utility::conversions::to_string_t(e.what()));
+                            }
+
+                            throw storage_exception(e.what(), instance->m_request_result, false);
+                        }
+
+                        // An exception occured and thus the request might be retried. Ask the retry policy.
+                        retry_context context(instance->m_retry_count++, instance->m_request_result, instance->get_next_location(), instance->m_current_location_mode);
+                        retry_info retry(instance->m_retry_policy.evaluate(context, instance->m_context));
+                        if (!retry.should_retry())
+                        {
+                            if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
+                            {
+                                logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Retry policy did not allow for a retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
+                            }
+
+                            throw storage_exception(e.what(), instance->m_request_result, false);
+                        }
+
+                        instance->m_current_location = retry.target_location();
+                        instance->m_current_location_mode = retry.updated_location_mode();
+
+                        // Try to recover the request. If it cannot be recovered, it cannot be retried
+                        // even if the retry policy allowed for a retry.
+                        if (instance->m_command->m_recover_request &&
+                            !instance->m_command->m_recover_request(instance->m_context))
+                        {
+                            if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
+                            {
+                                logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Cannot recover request for retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
+                            }
+
+                            throw storage_exception(e.what(), instance->m_request_result, false);
+                        }
+
+                        if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                        {
+                            utility::ostringstream_t str;
+                            str << U("Retrying failed operation, number of retries: ") << instance->m_retry_count;
+                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                        }
+
+                        return complete_after(retry.retry_interval()).then([] () -> bool
+                        {
+                            // Returning true here will tell the outer do_while loop to loop one more time.
+                            return true;
+                        });
+                    }
+
+                    // Returning false here will cause do_while to exit.
+                    return pplx::task_from_result<bool>(false);
+                });
+            }).then([instance] (pplx::task<bool> loop_task) -> T
+            {
+                instance->m_context.set_end_time(utility::datetime::utc_now());
+                loop_task.wait();
+
+                if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                {
+                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Operation completed successfully"));
+                }
+
+                return instance->m_result;
+            });
+        }
+
+    private:
+
+        std::chrono::seconds remaining_time() const
+        {
+            if (m_request_options.operation_expiry_time().is_initialized())
+            {
+                auto now = utility::datetime::utc_now();
+                if (m_request_options.operation_expiry_time().to_interval() > now.to_interval())
+                {
+                    return std::chrono::seconds(m_request_options.operation_expiry_time() - now);
+                }
+                else
+                {
+                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_client_timeout), false);
+                }
+            }
+
+            return std::chrono::seconds();
+        }
+
+        static storage_location get_first_location(location_mode mode)
+        {
+            switch (mode)
+            {
+            case location_mode::primary_only:
+            case location_mode::primary_then_secondary:
+                return storage_location::primary;
+
+            case location_mode::secondary_only:
+            case location_mode::secondary_then_primary:
+                return storage_location::secondary;
+            }
+
+            throw std::invalid_argument("mode");
+        }
+
+        storage_location get_next_location() const
+        {
+            switch (m_current_location_mode)
+            {
+            case location_mode::primary_only:
+                return storage_location::primary;
+
+            case location_mode::secondary_only:
+                return storage_location::secondary;
+
+            case location_mode::primary_then_secondary:
+            case location_mode::secondary_then_primary:
+                return m_current_location == storage_location::primary ?
+                    storage_location::secondary :
+                    storage_location::primary;
+            }
+
+            throw std::invalid_argument("mode");
+        }
+
+        void validate_location_mode()
+        {
+            bool is_valid;
+            switch (m_current_location_mode)
+            {
+            case location_mode::primary_only:
+                is_valid = !m_command->m_request_uri.primary_uri().is_empty();
+                break;
+
+            case location_mode::secondary_only:
+                is_valid = !m_command->m_request_uri.secondary_uri().is_empty();
+                break;
+
+            default:
+                is_valid = !m_command->m_request_uri.primary_uri().is_empty() &&
+                    !m_command->m_request_uri.secondary_uri().is_empty();
+                break;
+            }
+
+            if (!is_valid)
+            {
+                throw storage_exception(utility::conversions::to_utf8string(protocol::error_uri_missing_location), false);
+            }
+
+            switch (m_command->m_location_mode)
+            {
+            case command_location_mode::primary_only:
+                if (m_current_location_mode == location_mode::secondary_only)
+                {
+                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_primary_only_command), false);
+                }
+            
+                if (logger::instance().should_log(m_context, client_log_level::log_level_verbose))
+                {
+                    logger::instance().log(m_context, client_log_level::log_level_verbose, protocol::error_primary_only_command);
+                }
+
+                m_current_location_mode = location_mode::primary_only;
+                m_current_location = storage_location::primary;
+                break;
+
+            case command_location_mode::secondary_only:
+                if (m_current_location_mode == location_mode::primary_only)
+                {
+                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_secondary_only_command), false);
+                }
+
+                if (logger::instance().should_log(m_context, client_log_level::log_level_verbose))
+                {
+                    logger::instance().log(m_context, client_log_level::log_level_verbose, protocol::error_secondary_only_command);
+                }
+
+                m_current_location_mode = location_mode::secondary_only;
+                m_current_location = storage_location::secondary;
+                break;
+            }
+        }
+
+        std::shared_ptr<storage_command<T>> m_command;
+        request_options m_request_options;
+        operation_context m_context;
+        utility::datetime m_start_time;
+        web::http::uri_builder m_uri_builder;
+        web::http::http_request m_request;
+        request_result m_request_result;
+        hash_streambuf m_hash_streambuf;
+        splitter_streambuf<concurrency::streams::ostream::traits::char_type> m_response_streambuf;
+        retry_policy m_retry_policy;
+        int m_retry_count;
+        storage_location m_current_location;
+        location_mode m_current_location_mode;
+        T m_result;
+    };
+
+    typedef char void_command_type;
+    const void_command_type VOID_COMMAND_RESULT = 0;
+
+    template<>
+    class storage_command<void> : public storage_command<void_command_type>
+    {
+    public:
+        storage_command(const storage_uri& request_uri)
+            : storage_command<void_command_type>(request_uri)
+        {
+        }
+
+        void set_preprocess_response(std::function<void (const web::http::http_response &, operation_context)> value)
+        {
+            storage_command<void_command_type>::set_preprocess_response([value] (const web::http::http_response& response, operation_context context) -> void_command_type
+            {
+                value(response, context);
+                return VOID_COMMAND_RESULT;
+            });
+        }
+
+        void set_postprocess_response(std::function<pplx::task<void> (const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> value)
+        {
+            storage_command<void_command_type>::set_postprocess_response([value] (const web::http::http_response& response, const request_result& result, const ostream_descriptor& descriptor, operation_context context) -> pplx::task<void_command_type>
+            {
+                return value(response, result, descriptor, context).then([] () -> void_command_type
+                {
+                    return VOID_COMMAND_RESULT;
+                });
+            });
+        }
+    };
+
+    template<>
+    class executor<void>
+    {
+    public:
+        static pplx::task<void> execute_async(std::shared_ptr<storage_command<void>> command, const request_options& options, operation_context context)
+        {
+            return executor<void_command_type>::execute_async(command, options, context).then([] (void_command_type result) {});
+        }
+    };
+
+}}} // namespace wa::storage::core

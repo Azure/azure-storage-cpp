@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.v120", "Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj", "{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Debug|Win32.Build.0 = Debug|Win32
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Debug|x64.ActiveCfg = Debug|x64
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Debug|x64.Build.0 = Debug|x64
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Release|Win32.ActiveCfg = Release|Win32
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Release|Win32.Build.0 = Release|Win32
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Release|x64.ActiveCfg = Release|x64
+		{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,15 @@
+{
+	"target": "production",
+	"tenants": [
+		{
+			"name": "devstore",
+			"type": "devstore",
+			"connection_string": "UseDevelopmentStorage=true"
+		},
+		{
+			"name": "production",
+			"type": "cloud",
+			"connection_string": "DefaultEndpointsProtocol=https;AccountName=myaccountname;AccountKey=myaccountkey"
+		}
+	]
+}

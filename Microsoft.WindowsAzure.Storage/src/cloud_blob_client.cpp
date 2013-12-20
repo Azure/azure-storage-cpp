@@ -1,0 +1,135 @@
+// -----------------------------------------------------------------------------------------
+// <copyright file="cloud_blob_client.cpp" company="Microsoft">
+//    Copyright 2013 Microsoft Corporation
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+// </copyright>
+// -----------------------------------------------------------------------------------------
+
+#include "stdafx.h"
+#include "was/blob.h"
+#include "wascore/protocol.h"
+#include "wascore/protocol_xml.h"
+
+namespace wa { namespace storage {
+
+    pplx::task<container_result_segment> cloud_blob_client::list_containers_segmented_async(const utility::string_t& prefix, const container_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
+
+        auto client = *this;
+
+        auto command = std::make_shared<core::storage_command<container_result_segment>>(base_uri());
+        command->set_build_request(std::bind(protocol::list_containers, prefix, includes, max_results, current_token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(authentication_handler());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary, current_token.target_location());
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<container_result_segment>, container_result_segment(), std::placeholders::_1, std::placeholders::_2));
+        command->set_postprocess_response([client] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<container_result_segment>
+        {
+            protocol::list_containers_reader reader(response.body());
+
+            std::vector<protocol::cloud_blob_container_list_item> items(std::move(reader.extract_items()));
+            std::vector<cloud_blob_container> results;
+            for (auto iter = items.begin(); iter != items.end(); ++iter)
+            {
+                results.push_back(cloud_blob_container(std::move(iter->name()), client, std::move(iter->properties()), std::move(iter->metadata())));
+            }
+
+            continuation_token token(std::move(reader.extract_next_marker()));
+            token.set_target_location(result.target_location());
+            return pplx::task_from_result(container_result_segment(std::move(results), token));
+        });
+        return core::executor<container_result_segment>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<blob_result_segment> cloud_blob_client::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
+
+        utility::string_t container_name;
+        utility::string_t actual_prefix;
+
+        auto first_slash = prefix.find(U('/'));
+        if (first_slash == prefix.npos)
+        {
+            actual_prefix = prefix;
+        }
+        else
+        {
+            container_name = prefix.substr(0, first_slash);
+            actual_prefix = prefix.substr(first_slash + 1);
+        }
+
+        auto container = container_name.empty() ? get_root_container_reference() : get_container_reference(container_name);
+        return container.list_blobs_segmented_async(actual_prefix, use_flat_blob_listing, includes, max_results, current_token, modified_options, context);
+    }
+
+    pplx::task<service_properties> cloud_blob_client::download_service_properties_async(const blob_request_options& options, operation_context context) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
+
+        return download_service_properties_base_async(modified_options, context);
+    }
+
+    pplx::task<void> cloud_blob_client::upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes, const blob_request_options& options, operation_context context) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
+
+        return upload_service_properties_base_async(properties, includes, modified_options, context);
+    }
+
+    cloud_blob_container cloud_blob_client::get_root_container_reference() const
+    {
+        return get_container_reference(protocol::root_container);
+    }
+
+    cloud_blob_container cloud_blob_client::get_container_reference(const utility::string_t& container_name) const
+    {
+        return cloud_blob_container(container_name, *this);
+    }
+
+    void cloud_blob_client::set_authentication_scheme(wa::storage::authentication_scheme value)
+    {
+        cloud_client::set_authentication_scheme(value);
+
+        // TODO: Refactor authentication code to share common functionality among all services
+        // TODO: Make authentication handlers and canonicalizers singletons
+
+        storage_credentials creds = credentials();
+        if (creds.is_shared_key())
+        {
+            switch (authentication_scheme())
+            {
+            case wa::storage::authentication_scheme::shared_key_lite:
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_lite_blob_queue_canonicalizer>(creds.account_name()), creds));
+                break;
+
+            default: // wa::storage::authentication_scheme::shared_key
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_blob_queue_canonicalizer>(creds.account_name()), creds));
+                break;
+            }
+        }
+        else if (creds.is_sas())
+        {
+            set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(creds));
+        }
+        else
+        {
+            set_authentication_handler(std::make_shared<protocol::authentication_handler>());
+        }
+    }
+
+}} // namespace wa::storage

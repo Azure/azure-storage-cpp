@@ -38,7 +38,6 @@ We gladly accept community contributions.
 
 For general suggestions about Windows Azure please use our [UserVoice forum](http://www.mygreatwindowsazureidea.com/forums/34192-windows-azure-feature-voting).
 
-
 ## Download & Install
 
 ### Via Git
@@ -55,4 +54,8 @@ cd azure-storage-cpp
 To get the binaries of this library as distributed by Microsoft, ready for use
 within your project you can also have them installed by the package manager [NuGet](http://www.nuget.org/).
 
-`Install-Package wastorage`
+`Install-Package wastorage -Pre`
+
+## Code Samples
+
+How-Tos focused around accomplishing specific tasks are available in the [samples folder](Microsoft.WindowsAzure.Storage/samples/).

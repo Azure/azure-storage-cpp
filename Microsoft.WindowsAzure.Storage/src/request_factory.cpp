@@ -1,0 +1,79 @@
+// -----------------------------------------------------------------------------------------
+// <copyright file="request_factory.cpp" company="Microsoft">
+//    Copyright 2013 Microsoft Corporation
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+// </copyright>
+// -----------------------------------------------------------------------------------------
+
+#include "stdafx.h"
+#include "wascore/protocol.h"
+#include "wascore/constants.h"
+
+namespace wa { namespace storage { namespace protocol {
+
+    web::http::http_request base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        if (timeout.count() > 0)
+        {
+            uri_builder.append_query(uri_query_timeout, timeout.count());
+        }
+
+        web::http::http_request request(method);
+        request.set_request_uri(uri_builder.to_uri());
+
+        web::http::http_headers& headers = request.headers();
+        headers.add(web::http::header_names::user_agent, header_value_user_agent);
+        headers.add(ms_header_version, header_value_storage_version);
+
+        if (method == web::http::methods::PUT)
+        {
+            headers.set_content_length(0);
+        }
+
+        return request;
+    }
+
+    web::http::http_request get_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(uri_query_resource_type, resource_service);
+        uri_builder.append_query(uri_query_component, component_properties);
+        web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
+        return request;
+    }
+
+    web::http::http_request set_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(uri_query_resource_type, resource_service);
+        uri_builder.append_query(uri_query_component, component_properties);
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        return request;
+    }
+
+    void add_optional_header(web::http::http_headers& headers, const utility::string_t& header, const utility::string_t& value)
+    {
+        if (!value.empty())
+        {
+            headers.add(header, value);
+        }
+    }
+
+    void add_metadata(web::http::http_request& request, const cloud_metadata& metadata)
+    {
+        web::http::http_headers& headers = request.headers();
+        for (auto iter = metadata.cbegin(); iter != metadata.cend(); ++iter)
+        {
+            headers.add(ms_header_metadata_prefix + iter->first, iter->second);
+        }
+    }
+
+}}} // namespace wa::storage::protocol

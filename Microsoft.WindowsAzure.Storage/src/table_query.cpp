@@ -19,26 +19,12 @@
 #include "was/table.h"
 #include "wascore/util.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     const utility::string_t table_query::generate_filter_condition(const utility::string_t& property_name, const utility::string_t& comparison_operator, const utility::string_t& value)
     {
         utility::string_t modified_value = core::single_quote(value);
         return generate_filter_condition_impl(property_name, comparison_operator, modified_value);
-    }
-
-    const utility::string_t table_query::generate_filter_condition_impl(const utility::string_t& property_name, const utility::string_t& comparison_operator, const utility::string_t& value)
-    {
-        utility::string_t result;
-        result.reserve(property_name.size() + comparison_operator.size() + value.size() + 2U);
-
-        result.append(property_name);
-        result.push_back(U(' '));
-        result.append(comparison_operator);
-        result.push_back(U(' '));
-        result.append(value);
-
-        return result;
     }
 
     const utility::string_t table_query::generate_filter_condition(const utility::string_t& property_name, const utility::string_t& comparison_operator, const std::vector<uint8_t>& value)
@@ -55,19 +41,30 @@ namespace wa { namespace storage {
         return generate_filter_condition_impl(property_name, comparison_operator, string_value);
     }
 
-    // TODO: Move this back to the .h file after switching to Casablanca's datetime parsing
-    const utility::string_t table_query::generate_filter_condition(const utility::string_t& property_name, const utility::string_t& comparison_operator, const utility::datetime& value)
+    const utility::string_t table_query::generate_filter_condition(const utility::string_t& property_name, const utility::string_t& comparison_operator, double value)
     {
-        utility::string_t string_data_value = core::convert_to_string(value);
-
-        utility::string_t string_value;
-        string_value.reserve(string_data_value.size() + 10U);
-
-        string_value.append(U("datetime'"));
-        string_value.append(string_data_value);
-        string_value.push_back(U('\''));
-
+        utility::string_t string_value = core::convert_to_string(value);
         return generate_filter_condition_impl(property_name, comparison_operator, string_value);
     }
 
-}} // namespace wa::storage
+    const utility::string_t table_query::generate_filter_condition(const utility::string_t& property_name, const utility::string_t& comparison_operator, int32_t value)
+    {
+        utility::string_t string_value = core::convert_to_string(value);
+        return generate_filter_condition_impl(property_name, comparison_operator, string_value);
+    }
+
+    const utility::string_t table_query::generate_filter_condition_impl(const utility::string_t& property_name, const utility::string_t& comparison_operator, const utility::string_t& value)
+    {
+        utility::string_t result;
+        result.reserve(property_name.size() + comparison_operator.size() + value.size() + 2U);
+
+        result.append(property_name);
+        result.push_back(U(' '));
+        result.append(comparison_operator);
+        result.push_back(U(' '));
+        result.append(value);
+
+        return result;
+    }
+
+}} // namespace azure::storage

@@ -17,9 +17,10 @@
 
 #pragma once
 
+#include "limits"
 #include "service_client.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     class cloud_blob;
     class cloud_block_blob;
@@ -91,11 +92,34 @@ namespace wa { namespace storage {
         /// </summary>
         enum permissions
         {
-            none = 0, read = 1, write = 2, del = 4, list = 8
+            /// <summary>
+            /// No permissions granted.
+            /// </summary>
+            none = 0,
+
+            /// <summary>
+            /// Permission granted to read the content, properties, metadata, and block list for a blob or any blob in a container. Use blob as the source of a copy operation.
+            /// </summary>
+            read = 1,
+
+            /// <summary>
+            /// Permission granted to create or write the content, properties, metadata, and block list for a blob or any blob in a container. Snapshot or lease the blob. Resize the blob (page blob only). Use the blob as the destination of a copy operation within the same account.
+            /// </summary>
+            write = 2,
+
+            /// <summary>
+            /// Permission granted to delete a blob or any blob in a container.
+            /// </summary>
+            del = 4,
+
+            /// <summary>
+            /// Permission granted to list the blobs in a container.
+            /// </summary>
+            list = 8,
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::blob_shared_access_policy" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::blob_shared_access_policy" /> class.
         /// </summary>
         blob_shared_access_policy()
             : shared_access_policy()
@@ -103,181 +127,88 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::blob_shared_access_policy" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::blob_shared_access_policy" /> class.
         /// </summary>
         /// <param name="expiry">The expiration date and time of the policy.</param>
         /// <param name="permission">A mask containing the permissions of the policy</param>
-        blob_shared_access_policy(const utility::datetime& expiry, uint8_t permission)
+        blob_shared_access_policy(utility::datetime expiry, uint8_t permission)
             : shared_access_policy(expiry, permission)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::blob_shared_access_policy" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::blob_shared_access_policy" /> class.
         /// </summary>
         /// <param name="start">The start date and time of the policy.</param>
         /// <param name="expiry">The expiration date and time of the policy.</param>
         /// <param name="permission">A mask containing the permissions of the policy</param>
-        blob_shared_access_policy(const utility::datetime& start, const utility::datetime& expiry, uint8_t permission)
+        blob_shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission)
             : shared_access_policy(start, expiry, permission)
         {
         }
     };
 
     /// <summary>
-    /// Specifies which details to include when listing a set of blobs.
+    /// Specifies which items to include when listing a set of blobs.
     /// </summary>
-    class blob_listing_includes
+    struct blob_listing_details
     {
-    public:
-        /// <summary>
-        /// Initializes a new instance of the <see cref="blob_listing_includes"/> class.
-        /// </summary>
-        blob_listing_includes()
-            : m_snapshots(false), m_metadata(false), m_uncommitted_blobs(false), m_copy(false)
+        enum values
         {
-        }
+            /// <summary>
+            /// List only committed blobs, and do not return blob metadata.
+            /// </summary>
+            none = 0,
 
-        /// <summary>
-        /// Returns a <see cref="blob_listing_includes" /> object with all details included for a blob listing operation.
-        /// </summary>
-        /// <returns>A <see cref="blob_listing_includes" /> object with all details included for a blob listing operation.</returns>
-        static blob_listing_includes all()
-        {
-            blob_listing_includes includes;
-            includes.set_snapshots(true);
-            includes.set_metadata(true);
-            includes.set_uncommitted_blobs(true);
-            includes.set_copy(true);
-            return includes;
-        }
+            /// <summary>
+            /// List committed blobs and blob snapshots.
+            /// </summary>
+            snapshots = 1 << 0,
 
-        /// <summary>
-        /// Indicates whether blob snapshots are included in the listing.
-        /// </summary>
-        /// <returns><c>true</c> if snapshots are included in the listing; otherwise, <c>false</c>.</returns>
-        bool snapshots() const
-        {
-            return m_snapshots;
-        }
+            /// <summary>
+            /// Retrieve blob metadata for each blob returned in the listing.
+            /// </summary>
+            metadata = 1 << 1,
 
-        /// <summary>
-        /// Specifies whether to include snapshots in the listing.
-        /// </summary>
-        /// <param name="value"><c>true</c> to include snapshots in the listing.</param>
-        void set_snapshots(bool value)
-        {
-            m_snapshots = value;
-        }
+            /// <summary>
+            /// List committed and uncommitted blobs.
+            /// </summary>
+            uncommitted_blobs = 1 << 2,
 
-        /// <summary>
-        /// Indicates whether blob metadata is included in the listing.
-        /// </summary>
-        /// <returns><c>true</c> if metadata is included in the listing; otherwise, <c>false</c>.</returns>
-        bool metadata() const
-        {
-            return m_metadata;
-        }
+            /// <summary>
+            /// Include copy properties in the listing.
+            /// </summary>
+            copy = 1 << 3,
 
-        /// <summary>
-        /// Specifies whether to include blob metadata in the listing.
-        /// </summary>
-        /// <param name="value"><c>true</c> to include metadata in the listing.</param>
-        void set_metadata(bool value)
-        {
-            m_metadata = value;
-        }
-
-        /// <summary>
-        /// Indicates whether uncommitted blobs are included in the listing.
-        /// </summary>
-        /// <returns><c>true</c> if uncommitted blobs are included in the listing; otherwise, <c>false</c>.</returns>
-        bool uncommitted_blobs() const
-        {
-            return m_uncommitted_blobs;
-        }
-
-        /// <summary>
-        /// Specifies whether to include uncommitted blobs in the listing.
-        /// </summary>
-        /// <param name="value"><c>true</c> to include uncommitted blobs in the listing.</param>
-        void set_uncommitted_blobs(bool value)
-        {
-            m_uncommitted_blobs = value;
-        }
-
-        /// <summary>
-        /// Indicates whether blob copy properties are included in the listing.
-        /// </summary>
-        /// <returns><c>true</c> if blob copy properties are included in the listing; otherwise, <c>false</c>.</returns>
-        bool copy() const
-        {
-            return m_copy;
-        }
-
-        /// <summary>
-        /// Specifies whether to include blob copy properties in the listing.
-        /// </summary>
-        /// <param name="value"><c>true</c> to include blob copy properties in the listing.</param>
-        void set_copy(bool value)
-        {
-            m_copy = value;
-        }
-
-    private:
-
-        bool m_snapshots;
-        bool m_metadata;
-        bool m_uncommitted_blobs;
-        bool m_copy;
+            /// <summary>
+            /// List all available committed blobs, uncommitted blobs, and snapshots, and return all metadata and copy status for those blobs.
+            /// </summary>
+            all = snapshots | metadata | uncommitted_blobs | copy
+        };
     };
 
     /// <summary>
     /// Specifies which details to include when listing the containers in this storage account.
     /// </summary>
-    class container_listing_includes
+    struct container_listing_details
     {
-    public:
-        /// <summary>
-        /// Initializes a new instance of the <see cref="container_listing_includes"/> class.
-        /// </summary>
-        container_listing_includes()
-            : m_metadata(false)
+        enum values
         {
-        }
+            /// <summary>
+            /// No additional details.
+            /// </summary>
+            none = 0x0,
 
-        /// <summary>
-        /// Returns a <see cref="container_listing_includes" /> object with all details included for a container listing operation.
-        /// </summary>
-        /// <returns>A <see cref="container_listing_includes" /> object with all details included for a container listing operation.</returns>
-        static container_listing_includes all()
-        {
-            container_listing_includes includes;
-            includes.set_metadata(true);
-            return includes;
-        }
+            /// <summary>
+            /// Retrieve container metadata.
+            /// </summary>
+            metadata = 1 << 0,
 
-        /// <summary>
-        /// Indicates whether container metadata is included in the listing.
-        /// </summary>
-        /// <returns><c>true</c> if metadata is included in the listing; otherwise, <c>false</c>.</returns>
-        bool metadata() const
-        {
-            return m_metadata;
-        }
-
-        /// <summary>
-        /// Specifies whether to include blob metadata in the listing.
-        /// </summary>
-        /// <param name="value"><c>true</c> to include metadata in the listing.</param>
-        void set_metadata(bool value)
-        {
-            m_metadata = value;
-        }
-
-    private:
-
-        bool m_metadata;
+            /// <summary>
+            /// Retrieve all available details.
+            /// </summary>
+            all = metadata
+        };
     };
 
     /// <summary>
@@ -395,7 +326,7 @@ namespace wa { namespace storage {
         /// to a successful copy, whether the operation was cancelled, or whether the operation failed.
         /// </summary>
         /// <returns>A <see cref="utility::datetime" /> containing the completion time.</returns>
-        const utility::datetime& completion_time() const
+        utility::datetime completion_time() const
         {
             return m_completion_time;
         }
@@ -403,7 +334,7 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the status of the copy blob operation.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::copy_status" /> enumeration indicating the status of the copy operation.</returns>
+        /// <returns>A <see cref="azure::storage::copy_status" /> enumeration indicating the status of the copy operation.</returns>
         copy_status status() const
         {
             return m_status;
@@ -465,18 +396,45 @@ namespace wa { namespace storage {
     class access_condition
     {
     public:
+
+        /// <summary>
+        /// Describes the set of operators for comparing the blob’s sequence number with the specified value.
+        /// </summary>
+        enum class sequence_number_operators
+        {
+            /// <summary>
+            /// The blob's sequence number will not be used as an access condition.
+            /// </summary>
+            none,
+
+            /// <summary>
+            /// If the blob’s sequence number is less than the specified value, the request proceeds.
+            /// </summary>
+            le,
+
+            /// <summary>
+            /// If the blob’s sequence number is less than or equal to the specified value, the request proceeds.
+            /// </summary>
+            lt,
+
+            /// <summary>
+            /// If the blob’s sequence number is equal to the specified value, the request proceeds.
+            /// </summary>
+            eq,
+        };
+
         /// <summary>
         /// Constructs an empty access condition.
         /// </summary>
         access_condition()
-            : m_sequence_number(0)
+            : m_sequence_number(0), m_sequence_number_operator(sequence_number_operators::none)
         {
         }
 
         /// <summary>
         /// Generates an empty access condition.
         /// </summary>
-        /// <returns>An empty <see cref="wa::storage::access_condition" /> object.</returns>
+        /// <returns>An empty <see cref="azure::storage::access_condition" /> object.</returns>
         static access_condition generate_empty_condition()
         {
             return access_condition();
@@ -487,11 +445,11 @@ namespace wa { namespace storage {
         /// matches the specified ETag value.
         /// </summary>
         /// <param name="etag">The ETag value that must be matched.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the If-Match condition.</returns>
-        static access_condition generate_if_match_condition(const utility::string_t& etag)
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the If-Match condition.</returns>
+        static access_condition generate_if_match_condition(utility::string_t etag)
         {
             access_condition condition;
-            condition.set_if_match_etag(etag);
+            condition.set_if_match_etag(std::move(etag));
             return condition;
         }
 
@@ -500,8 +458,8 @@ namespace wa { namespace storage {
         /// modified since the specified time.
         /// </summary>
         /// <param name="modified_time">The time since which the resource must have been modified in order for the operation to proceed.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the If-Modified-Since condition.</returns>
-        static access_condition generate_if_modified_since_condition(const utility::datetime& modified_time)
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the If-Modified-Since condition.</returns>
+        static access_condition generate_if_modified_since_condition(utility::datetime modified_time)
         {
             access_condition condition;
             condition.set_if_modified_since_time(modified_time);
@@ -513,14 +471,14 @@ namespace wa { namespace storage {
         /// does not match the specified ETag value.
         /// </summary>
         /// <param name="etag">The ETag value that must be matched, or <c>"*"</c>.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the If-None-Match condition.</returns>
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the If-None-Match condition.</returns>
         /// <remarks>
         /// If <c>"*"</c> is specified as the parameter then this condition requires that the resource does not exist.
         /// </remarks>
-        static access_condition generate_if_none_match_condition(const utility::string_t& etag)
+        static access_condition generate_if_none_match_condition(utility::string_t etag)
         {
             access_condition condition;
-            condition.set_if_none_match_etag(etag);
+            condition.set_if_none_match_etag(std::move(etag));
             return condition;
         }
 
@@ -529,8 +487,8 @@ namespace wa { namespace storage {
         /// modified since the specified time.
         /// </summary>
         /// <param name="modified_time">The time since which the resource must not have been modified in order for the operation to proceed.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the If-Unmodified-Since condition.</returns>
-        static access_condition generate_if_not_modified_since_condition(const utility::datetime& modified_time)
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the If-Unmodified-Since condition.</returns>
+        static access_condition generate_if_not_modified_since_condition(utility::datetime modified_time)
         {
             access_condition condition;
             condition.set_if_not_modified_since_time(modified_time);
@@ -542,7 +500,7 @@ namespace wa { namespace storage {
         /// number is less than or equal to the specified value.
         /// </summary>
         /// <param name="sequence_number">The value that the current sequence number of the resource must be less than or equal to.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the If-Sequence-Number-LE condition.</returns>
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the If-Sequence-Number-LE condition.</returns>
         static access_condition generate_if_sequence_number_less_than_or_equal_condition(int64_t sequence_number)
         {
             access_condition condition;
@@ -555,7 +513,7 @@ namespace wa { namespace storage {
         /// number is less than the specified value.
         /// </summary>
         /// <param name="sequence_number">The value that the current sequence number of the resource must be less than.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the If-Sequence-Number-LT condition.</returns>
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the If-Sequence-Number-LT condition.</returns>
         static access_condition generate_if_sequence_number_less_than_condition(int64_t sequence_number)
         {
             access_condition condition;
@@ -568,7 +526,7 @@ namespace wa { namespace storage {
         /// number is equal to the specified value.
         /// </summary>
         /// <param name="sequence_number">The value that the current sequence number of the resource must be equal to.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the If-Sequence-Number-EQ condition.</returns>
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the If-Sequence-Number-EQ condition.</returns>
         static access_condition generate_if_sequence_number_equal_condition(int64_t sequence_number)
         {
             access_condition condition;
@@ -581,11 +539,11 @@ namespace wa { namespace storage {
         /// resource matches the specified lease ID.
         /// </summary>
         /// <param name="lease_id">The lease ID that must match the lease ID of the resource.</param>
-        /// <returns>An <see cref="wa::storage::access_condition" /> object that represents the lease condition.</returns>
-        static access_condition generate_lease_condition(const utility::string_t& lease_id)
+        /// <returns>An <see cref="azure::storage::access_condition" /> object that represents the lease condition.</returns>
+        static access_condition generate_lease_condition(utility::string_t lease_id)
         {
             access_condition condition;
-            condition.set_lease_id(lease_id);
+            condition.set_lease_id(std::move(lease_id));
             return condition;
         }
 
@@ -602,9 +560,9 @@ namespace wa { namespace storage {
         /// Sets an ETag that must match the ETag of a resource.
         /// </summary>
         /// <param name="value">A string containing the ETag, in quotes.</param>
-        void set_if_match_etag(const utility::string_t& value)
+        void set_if_match_etag(utility::string_t value)
         {
-            m_if_match_etag = value;
+            m_if_match_etag = std::move(value);
         }
 
         /// <summary>
@@ -620,16 +578,16 @@ namespace wa { namespace storage {
         /// Sets an ETag that must not match the ETag of a resource.
         /// </summary>
         /// <param name="value">A quoted ETag string, or <c>"*"</c> to match any ETag.</param>
-        void set_if_none_match_etag(const utility::string_t& value)
+        void set_if_none_match_etag(utility::string_t value)
         {
-            m_if_none_match_etag = value;
+            m_if_none_match_etag = std::move(value);
         }
 
         /// <summary>
         /// Gets a time that must be before the last-modified time of a resource.
         /// </summary>
         /// <returns>A <see cref="utility::datetime" /> in UTC.</returns>
-        const utility::datetime& if_modified_since_time() const
+        utility::datetime if_modified_since_time() const
         {
             return m_if_modified_since_time;
         }
@@ -638,7 +596,7 @@ namespace wa { namespace storage {
         /// Sets a time that must be before the last-modified time of a resource.
         /// </summary>
         /// <param name="value">A <see cref="utility::datetime" /> in UTC.</param>
-        void set_if_modified_since_time(const utility::datetime& value)
+        void set_if_modified_since_time(utility::datetime value)
         {
             m_if_modified_since_time = value;
         }
@@ -647,7 +605,7 @@ namespace wa { namespace storage {
         /// Gets a time that must not be before the last-modified time of a resource.
         /// </summary>
         /// <returns>A <see cref="utility::datetime" /> in UTC.</returns>
-        const utility::datetime& if_not_modified_since_time() const
+        utility::datetime if_not_modified_since_time() const
         {
             return m_if_not_modified_since_time;
         }
@@ -656,7 +614,7 @@ namespace wa { namespace storage {
         /// Sets a time that must not be before the last-modified time of a resource.
         /// </summary>
         /// <param name="value">A <see cref="utility::datetime" /> in UTC.</param>
-        void set_if_not_modified_since_time(const utility::datetime& value)
+        void set_if_not_modified_since_time(utility::datetime value)
         {
             m_if_not_modified_since_time = value;
         }
@@ -669,8 +627,9 @@ namespace wa { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_less_than_or_equal(int64_t value)
         {
+            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
             m_sequence_number = value;
-            m_sequence_number_header = protocol::ms_header_if_sequence_number_le;
+            m_sequence_number_operator = sequence_number_operators::le;
         }
 
         /// <summary>
@@ -681,8 +640,9 @@ namespace wa { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_less_than(int64_t value)
         {
+            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
             m_sequence_number = value;
-            m_sequence_number_header = protocol::ms_header_if_sequence_number_lt;
+            m_sequence_number_operator = sequence_number_operators::lt;
         }
 
         /// <summary>
@@ -693,8 +653,9 @@ namespace wa { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_equal(int64_t value)
         {
+            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
             m_sequence_number = value;
-            m_sequence_number_header = protocol::ms_header_if_sequence_number_eq;
+            m_sequence_number_operator = sequence_number_operators::eq;
         }
 
         /// <summary>
@@ -709,12 +670,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Gets the sequence number header specified for the access condition.
+        /// Gets the sequence number comparison operator specified for the access condition.
         /// </summary>
-        /// <returns>A string containing the sequence number header specified for the <see cref="wa::storage::access_condition" /> object.</returns>
-        const utility::string_t& sequence_number_header() const
+        /// <returns>The sequence number comparison operator specified for the <see cref="azure::storage::access_condition" /> object.</returns>
+        sequence_number_operators sequence_number_operator() const
         {
-            return m_sequence_number_header;
+            return m_sequence_number_operator;
         }
 
         /// <summary>
@@ -730,13 +691,13 @@ namespace wa { namespace storage {
         /// Sets a lease ID that must match the lease on a resource.
         /// </summary>
         /// <param name="value">A string containing the lease ID.</param>
-        void set_lease_id(const utility::string_t& value)
+        void set_lease_id(utility::string_t value)
         {
-            m_lease_id = value;
+            m_lease_id = std::move(value);
         }
 
         /// <summary>
-        /// Indicates whether the <see cref="wa::storage::access_condition" /> object specifies a condition.
+        /// Indicates whether the <see cref="azure::storage::access_condition" /> object specifies a condition.
         /// </summary>
         /// <returns><c>true</c> if the access condition specifies a condition; otherwise, <c>false</c>.</returns>
         bool is_conditional() const
@@ -755,7 +716,7 @@ namespace wa { namespace storage {
         utility::datetime m_if_not_modified_since_time;
         utility::string_t m_lease_id;
         int64_t m_sequence_number;
-        utility::string_t m_sequence_number_header;
+        sequence_number_operators m_sequence_number_operator;
     };
 
     /// <summary>
@@ -822,23 +783,24 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::lease_break_period" /> class that breaks 
+        /// Initializes a new instance of the <see cref="azure::storage::lease_break_period" /> class that breaks 
         /// a fixed-duration lease after the remaining lease period elapses, or breaks an infinite lease immediately.
         /// </summary>
         lease_break_period()
-            : m_valid(false)
+            : m_seconds(std::chrono::seconds::max())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::lease_break_period" /> class that breaks 
+        /// Initializes a new instance of the <see cref="azure::storage::lease_break_period" /> class that breaks 
         /// a lease after the proposed duration.
         /// </summary>
         /// <param name="seconds">The proposed duration, in seconds, for the lease before it is broken. Value may
         /// be between 0 and 60 seconds.</param>
         lease_break_period(const std::chrono::seconds& seconds)
-            : m_valid(true), m_seconds(seconds)
+            : m_seconds(seconds)
         {
+            utility::assert_in_bounds(U("seconds"), seconds, std::chrono::seconds::zero());
         }
 
         /// <summary>
@@ -847,7 +809,7 @@ namespace wa { namespace storage {
         /// <returns><c>true</c> if the <see cref="lease_break_period" /> object is valid; otherwise, <c>false</c>.</returns>
         bool is_valid() const
         {
-            return m_valid;
+            return m_seconds < std::chrono::seconds::max();
         }
 
         /// <summary>
@@ -861,7 +823,6 @@ namespace wa { namespace storage {
 
     private:
 
-        bool m_valid;
         std::chrono::seconds m_seconds;
     };
 
@@ -893,7 +854,7 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::lease_time" /> class that never expires.
+        /// Initializes a new instance of the <see cref="azure::storage::lease_time" /> class that never expires.
         /// </summary>
         lease_time()
             : m_seconds(-1)
@@ -901,7 +862,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::lease_time" /> class that expires after the 
+        /// Initializes a new instance of the <see cref="azure::storage::lease_time" /> class that expires after the 
         /// specified duration.
         /// </summary>
         /// <param name="seconds">The duration of the lease in seconds. For a non-infinite lease, this value can be 
@@ -932,10 +893,10 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::blob_container_permissions" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::blob_container_permissions" /> class.
         /// </summary>
         blob_container_permissions()
-            : cloud_permissions(), m_access(blob_container_public_access_type::off)
+            : cloud_permissions(), m_public_access(blob_container_public_access_type::off)
         {
         }
 
@@ -945,7 +906,7 @@ namespace wa { namespace storage {
         /// <returns>The public access setting for the container.</returns>
         blob_container_public_access_type public_access() const
         {
-            return m_access;
+            return m_public_access;
         }
 
         /// <summary>
@@ -954,21 +915,16 @@ namespace wa { namespace storage {
         /// <param name="value">The public access setting for the container.</param>
         void set_public_access(blob_container_public_access_type value)
         {
-            m_access = value;
+            m_public_access = value;
         }
 
     private:
 
-        blob_container_public_access_type m_access;
+        blob_container_public_access_type m_public_access;
     };
 
     /// <summary>
-    /// Represents a continuation token for listing operations.
-    /// </summary>
-    typedef continuation_token blob_continuation_token;
-
-    /// <summary>
-    /// Represents a segment of <see cref="wa::storage::cloud_blob" /> and <see cref="wa::storage::cloud_blob_directory" /> 
+    /// Represents a segment of <see cref="azure::storage::cloud_blob" /> and <see cref="azure::storage::cloud_blob_directory" /> 
     /// results, and includes continuation information.
     /// </summary>
     class blob_result_segment
@@ -984,35 +940,35 @@ namespace wa { namespace storage {
         /// <param name="blobs">An enumerable collection of blob results.</param>
         /// <param name="directories">An enumerable collection of blob directories results.</param>
         /// <param name="token">The continuation token.</param>
-        blob_result_segment(std::vector<cloud_blob> blobs, std::vector<cloud_blob_directory> directories, continuation_token token)
+        blob_result_segment(std::vector<cloud_blob> blobs, std::vector<cloud_blob_directory> directories, azure::storage::continuation_token token)
             : m_blobs(std::move(blobs)), m_directories(std::move(directories)), m_continuation_token(std::move(token))
         {
         }
 
         /// <summary>
-        /// Gets an enumerable collection of <see cref="wa::storage::cloud_blob" /> results.
+        /// Gets an enumerable collection of <see cref="azure::storage::cloud_blob" /> results.
         /// </summary>
-        /// <returns>A reference to an enumerable collection of <see cref="wa::storage::cloud_blob" /> results.</returns>
+        /// <returns>A reference to an enumerable collection of <see cref="azure::storage::cloud_blob" /> results.</returns>
         const std::vector<cloud_blob>& blobs() const
         {
             return m_blobs;
         }
 
         /// <summary>
-        /// Gets an enumerable collection of <see cref="wa::storage::cloud_blob_directory" /> results.
+        /// Gets an enumerable collection of <see cref="azure::storage::cloud_blob_directory" /> results.
         /// </summary>
-        /// <returns>A reference to an enumerable collection of <see cref="wa::storage::cloud_blob_directory" /> results.</returns>
+        /// <returns>A reference to an enumerable collection of <see cref="azure::storage::cloud_blob_directory" /> results.</returns>
         const std::vector<cloud_blob_directory>& directories() const
         {
             return m_directories;
         }
 
         /// <summary>
-        /// Gets the continuation token to use to retrieve the next segment of <see cref="wa::storage::cloud_blob" /> and 
-        /// <see cref="wa::storage::cloud_blob_directory" /> results.
+        /// Gets the continuation token to use to retrieve the next segment of <see cref="azure::storage::cloud_blob" /> and 
+        /// <see cref="azure::storage::cloud_blob_directory" /> results.
         /// </summary>
-        /// <returns>A reference to the <see cref="blob_continuation_token" />.</returns>
-        const blob_continuation_token& continuation_token() const
+        /// <returns>A reference to the <see cref="continuation_token" />.</returns>
+        const azure::storage::continuation_token& continuation_token() const
         {
             return m_continuation_token;
         }
@@ -1021,11 +977,11 @@ namespace wa { namespace storage {
 
         std::vector<cloud_blob> m_blobs;
         std::vector<cloud_blob_directory> m_directories;
-        blob_continuation_token m_continuation_token;
+        azure::storage::continuation_token m_continuation_token;
     };
 
     /// <summary>
-    /// Represents a segment of <see cref="wa::storage::cloud_blob_container" /> results, and 
+    /// Represents a segment of <see cref="azure::storage::cloud_blob_container" /> results, and 
     /// includes continuation and pagination information.
     /// </summary>
     typedef result_segment<cloud_blob_container> container_result_segment;
@@ -1052,6 +1008,7 @@ namespace wa { namespace storage {
         /// <param name="other">A reference to a set of <see cref="cloud_blob_properties" /> on which to base the new instance.</param>
         cloud_blob_properties(cloud_blob_properties&& other)
         {
+            // TODO: Double check that the following std::move call is needed
             *this = std::move(other);
         }
 
@@ -1062,14 +1019,14 @@ namespace wa { namespace storage {
         /// <returns>A <see cref="cloud_blob_properties" /> object with properties set.</returns>
         cloud_blob_properties& operator=(cloud_blob_properties&& other)
         {
-            m_size = std::move(other.m_size);
+            m_size = other.m_size;
             m_etag = std::move(other.m_etag);
-            m_last_modified = std::move(other.m_last_modified);
-            m_type = std::move(other.m_type);
-            m_lease_duration = std::move(other.m_lease_duration);
-            m_lease_state = std::move(other.m_lease_state);
-            m_lease_status = std::move(other.m_lease_status);
-            m_page_blob_sequence_number = std::move(other.m_page_blob_sequence_number);
+            m_last_modified = other.m_last_modified;
+            m_type = other.m_type;
+            m_lease_duration = other.m_lease_duration;
+            m_lease_state = other.m_lease_state;
+            m_lease_status = other.m_lease_status;
+            m_page_blob_sequence_number = other.m_page_blob_sequence_number;
             m_cache_control = std::move(other.m_cache_control);
             m_content_disposition = std::move(other.m_content_disposition);
             m_content_encoding = std::move(other.m_content_encoding);
@@ -1092,9 +1049,9 @@ namespace wa { namespace storage {
         /// Sets the cache-control value stored for the blob.
         /// </summary>
         /// <param name="value">The blob's cache-control value.</param>
-        void set_cache_control(const utility::string_t& value)
+        void set_cache_control(utility::string_t value)
         {
-            m_cache_control = value;
+            m_cache_control = std::move(value);
         }
 
         /// <summary>
@@ -1110,9 +1067,9 @@ namespace wa { namespace storage {
         /// Sets the content-disposition value stored for the blob.
         /// </summary>
         /// <param name="value">The blob's content-disposition value.</param>
-        void set_content_disposition(const utility::string_t& value)
+        void set_content_disposition(utility::string_t value)
         {
-            m_content_disposition = value;
+            m_content_disposition = std::move(value);
         }
 
         /// <summary>
@@ -1128,9 +1085,9 @@ namespace wa { namespace storage {
         /// Sets the content-encoding value stored for the blob.
         /// </summary>
         /// <param name="value">The blob's content-encoding value.</param>
-        void set_content_encoding(const utility::string_t& value)
+        void set_content_encoding(utility::string_t value)
         {
-            m_content_encoding = value;
+            m_content_encoding = std::move(value);
         }
 
         /// <summary>
@@ -1146,9 +1103,9 @@ namespace wa { namespace storage {
         /// Sets the content-language value stored for the blob.
         /// </summary>
         /// <param name="value">The blob's content-language value.</param>
-        void set_content_language(const utility::string_t& value)
+        void set_content_language(utility::string_t value)
         {
-            m_content_language = value;
+            m_content_language = std::move(value);
         }
 
         /// <summary>
@@ -1173,9 +1130,9 @@ namespace wa { namespace storage {
         /// Sets the content-MD5 value stored for the blob.
         /// </summary>
         /// <param name="value">The blob's content-MD5 hash.</param>
-        void set_content_md5(const utility::string_t& value)
+        void set_content_md5(utility::string_t value)
         {
-            m_content_md5 = value;
+            m_content_md5 = std::move(value);
         }
 
         /// <summary>
@@ -1191,9 +1148,9 @@ namespace wa { namespace storage {
         /// Sets the content-type value stored for the blob.
         /// </summary>
         /// <param name="value">The blob's content-type value.</param>
-        void set_content_type(const utility::string_t& value)
+        void set_content_type(utility::string_t value)
         {
-            m_content_type = value;
+            m_content_type = std::move(value);
         }
 
         /// <summary>
@@ -1209,7 +1166,7 @@ namespace wa { namespace storage {
         /// Gets the last-modified time for the blob, expressed as a UTC value.
         /// </summary>
         /// <returns>The blob's last-modified time, in UTC format.</returns>
-        const utility::datetime& last_modified() const
+        utility::datetime last_modified() const
         {
             return m_last_modified;
         }
@@ -1217,7 +1174,7 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the type of the blob.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::blob_type" /> object that indicates the type of the blob.</returns>
+        /// <returns>A <see cref="azure::storage::blob_type" /> object that indicates the type of the blob.</returns>
         blob_type type() const
         {
             return m_type;
@@ -1226,8 +1183,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the blob's lease status.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::lease_status" /> object that indicates the blob's lease status.</returns>
-        wa::storage::lease_status lease_status() const
+        /// <returns>A <see cref="azure::storage::lease_status" /> object that indicates the blob's lease status.</returns>
+        azure::storage::lease_status lease_status() const
         {
             return m_lease_status;
         }
@@ -1235,8 +1192,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the blob's lease state.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::lease_state" /> object that indicates the blob's lease state.</returns>
-        wa::storage::lease_state lease_state() const
+        /// <returns>A <see cref="azure::storage::lease_state" /> object that indicates the blob's lease state.</returns>
+        azure::storage::lease_state lease_state() const
         {
             return m_lease_state;
         }
@@ -1244,8 +1201,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the blob's lease duration.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::lease_duration" /> object that indicates the blob's lease duration.</returns>
-        wa::storage::lease_duration lease_duration() const
+        /// <returns>A <see cref="azure::storage::lease_duration" /> object that indicates the blob's lease duration.</returns>
+        azure::storage::lease_duration lease_duration() const
         {
             return m_lease_duration;
         }
@@ -1276,9 +1233,9 @@ namespace wa { namespace storage {
         utility::string_t m_etag;
         utility::datetime m_last_modified;
         blob_type m_type;
-        wa::storage::lease_status m_lease_status;
-        wa::storage::lease_state m_lease_state;
-        wa::storage::lease_duration m_lease_duration;
+        azure::storage::lease_status m_lease_status;
+        azure::storage::lease_state m_lease_state;
+        azure::storage::lease_duration m_lease_duration;
         int64_t m_page_blob_sequence_number;
 
         void copy_from_root(const cloud_blob_properties& root_blob_properties);
@@ -1320,9 +1277,9 @@ namespace wa { namespace storage {
         /// Sets value of the cache-control header returned with the blob.
         /// </summary>
         /// <param name="value">The cache-control value.</param>
-        void set_cache_control(const utility::string_t& value)
+        void set_cache_control(utility::string_t value)
         {
-            m_cache_control = value;
+            m_cache_control = std::move(value);
         }
 
         /// <summary>
@@ -1338,9 +1295,9 @@ namespace wa { namespace storage {
         /// Sets the value of the content-disposition header returned with the blob.
         /// </summary>
         /// <param name="value">The content-disposition value.</param>
-        void set_content_disposition(const utility::string_t& value)
+        void set_content_disposition(utility::string_t value)
         {
-            m_content_disposition = value;
+            m_content_disposition = std::move(value);
         }
 
         /// <summary>
@@ -1356,9 +1313,9 @@ namespace wa { namespace storage {
         /// Sets the value of the content-encoding header returned with the blob.
         /// </summary>
         /// <param name="value">The content-encoding value.</param>
-        void set_content_encoding(const utility::string_t& value)
+        void set_content_encoding(utility::string_t value)
         {
-            m_content_encoding = value;
+            m_content_encoding = std::move(value);
         }
 
         /// <summary>
@@ -1374,9 +1331,9 @@ namespace wa { namespace storage {
         /// Sets the value of the content-language header returned with the blob.
         /// </summary>
         /// <param name="value">The content-language value.</param>
-        void set_content_language(const utility::string_t& value)
+        void set_content_language(utility::string_t value)
         {
-            m_content_language = value;
+            m_content_language = std::move(value);
         }
 
         /// <summary>
@@ -1392,9 +1349,9 @@ namespace wa { namespace storage {
         /// Sets the value of the content-type header returned with the blob.
         /// </summary>
         /// <param name="value">The content-type value.</param>
-        void set_content_type(const utility::string_t& value)
+        void set_content_type(utility::string_t value)
         {
-            m_content_type = value;
+            m_content_type = std::move(value);
         }
 
     private:
@@ -1413,7 +1370,7 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::blob_request_options" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::blob_request_options" /> class.
         /// </summary>
         blob_request_options()
             : request_options(),
@@ -1528,6 +1485,7 @@ namespace wa { namespace storage {
         /// ranging from between 1 and 64 MB inclusive.</param>
         void set_single_blob_upload_threshold_in_bytes(utility::size64_t value)
         {
+            utility::assert_in_bounds<utility::size64_t>(U("value"), value, 1 * 1024 * 1024, 64 * 1024 * 1024);
             m_single_blob_upload_threshold = value;
         }
 
@@ -1548,6 +1506,7 @@ namespace wa { namespace storage {
         /// <param name="value">The number of parallel block or page upload operations that may proceed.</param>
         void set_parallelism_factor(int value)
         {
+            utility::assert_in_bounds(U("value"), value, 0);
             m_parallelism_factor = value;
         }
 
@@ -1566,6 +1525,7 @@ namespace wa { namespace storage {
         /// <param name="value">The minimum number of bytes to buffer, being at least 16KB.</param>
         void set_stream_read_size_in_bytes(size_t value)
         {
+            utility::assert_in_bounds<size_t>(U("value"), value, 16 * 1024);
             m_stream_read_size = value;
         }
 
@@ -1584,6 +1544,7 @@ namespace wa { namespace storage {
         /// <param name="value">The size of a block, in bytes, ranging from between 16 KB and 4 MB inclusive.</param>
         void set_stream_write_size_in_bytes(size_t value)
         {
+            utility::assert_in_bounds<size_t>(U("value"), value, 16 * 1024, 4 * 1024 * 1024);
             m_stream_write_size = value;
         }
 
@@ -1626,12 +1587,14 @@ namespace wa { namespace storage {
             latest
         };
 
+        // TODO: Use std::numeric_limits<size_t>::max() here too?
+
         /// <summary>
         /// Initializes a new instance of the <see cref="block_list_item"/> class.
         /// </summary>
         /// <param name="id">The block name.</param>
-        block_list_item(const utility::string_t& id)
-            : m_id(id), m_size(-1), m_mode(block_mode::latest)
+        block_list_item(utility::string_t id)
+            : m_id(std::move(id)), m_size(std::numeric_limits<size_t>::max()), m_mode(block_mode::latest)
         {
         }
 
@@ -1640,8 +1603,8 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="id">The block name.</param>
         /// <param name="mode">A <see cref="block_mode" /> value that indicates which block lists to search for the block.</param>
-        block_list_item(const utility::string_t& id, block_mode mode)
-            : m_id(id), m_size(-1), m_mode(mode)
+        block_list_item(utility::string_t& id, block_mode mode)
+            : m_id(std::move(id)), m_size(std::numeric_limits<size_t>::max()), m_mode(mode)
         {
         }
 
@@ -1681,8 +1644,8 @@ namespace wa { namespace storage {
         /// <param name="size">The size of the block.</param>
         /// <param name="committed"><c>true</c> indicates that the block has been committed; 
         /// <c>false</c> indicates that it is uncommitted.</param>
-        block_list_item(const utility::string_t& id, size_t size, bool committed)
-            : m_id(id), m_size(size), m_mode(committed ? block_mode::committed : block_mode::uncommitted)
+        block_list_item(utility::string_t id, size_t size, bool committed)
+            : m_id(std::move(id)), m_size(size), m_mode(committed ? block_mode::committed : block_mode::uncommitted)
         {
         }
 
@@ -1700,12 +1663,12 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::page_range" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::page_range" /> class.
         /// </summary>
         /// <param name="start">The starting offset.</param>
         /// <param name="end">The ending offset.</param>
-        page_range(int64_t start, int64_t end)
-            : m_start_offset(start), m_end_offset(end)
+        page_range(int64_t start_offset, int64_t end_offset)
+            : m_start_offset(start_offset), m_end_offset(end_offset)
         {
         }
 
@@ -1750,6 +1713,7 @@ namespace wa { namespace storage {
     class sequence_number
     {
     public:
+
         enum class sequence_number_action
         {
             /// <summary>
@@ -1774,7 +1738,7 @@ namespace wa { namespace storage {
         /// or the value currently stored for the blob.
         /// </summary>
         /// <param name="value">The sequence number.</param>
-        /// <returns>A <see cref="wa::storage::sequence_number" /> object that represents the action.</returns>
+        /// <returns>A <see cref="azure::storage::sequence_number" /> object that represents the action.</returns>
         static sequence_number maximum(int64_t value)
         {
             return sequence_number(sequence_number_action::maximum, value);
@@ -1784,7 +1748,7 @@ namespace wa { namespace storage {
         /// Constructs a sequence number action to set the sequence number to the value included with the request.
         /// </summary>
         /// <param name="value">The sequence number.</param>
-        /// <returns>A <see cref="wa::storage::sequence_number" /> object that represents the action.</returns>
+        /// <returns>A <see cref="azure::storage::sequence_number" /> object that represents the action.</returns>
         static sequence_number update(int64_t value)
         {
             return sequence_number(sequence_number_action::update, value);
@@ -1793,7 +1757,7 @@ namespace wa { namespace storage {
         /// <summary>
         /// Constructs a sequence number action to increment the value of the sequence number by 1.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::sequence_number" /> object that represents the action.</returns>
+        /// <returns>A <see cref="azure::storage::sequence_number" /> object that represents the action.</returns>
         static sequence_number increment()
         {
             return sequence_number(sequence_number_action::increment, -1);
@@ -1857,10 +1821,10 @@ namespace wa { namespace storage {
         cloud_blob_container_properties& operator=(cloud_blob_container_properties&& other)
         {
             m_etag = std::move(other.m_etag);
-            m_last_modified = std::move(other.m_last_modified);
-            m_lease_duration = std::move(other.m_lease_duration);
-            m_lease_state = std::move(other.m_lease_state);
-            m_lease_status = std::move(other.m_lease_status);
+            m_last_modified = other.m_last_modified;
+            m_lease_duration = other.m_lease_duration;
+            m_lease_state = other.m_lease_state;
+            m_lease_status = other.m_lease_status;
             return *this;
         }
 
@@ -1877,7 +1841,7 @@ namespace wa { namespace storage {
         /// Gets the container's last-modified time.
         /// </summary>
         /// <returns>The container's last-modified time.</returns>
-        const utility::datetime& last_modified() const
+        utility::datetime last_modified() const
         {
             return m_last_modified;
         }
@@ -1885,8 +1849,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the container's lease status.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::lease_status" /> object that indicates the container's lease status.</returns>
-        wa::storage::lease_status lease_status() const
+        /// <returns>A <see cref="azure::storage::lease_status" /> object that indicates the container's lease status.</returns>
+        azure::storage::lease_status lease_status() const
         {
             return m_lease_status;
         }
@@ -1894,8 +1858,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the container's lease state.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::lease_state" /> object that indicates the container's lease state.</returns>
-        wa::storage::lease_state lease_state() const
+        /// <returns>A <see cref="azure::storage::lease_state" /> object that indicates the container's lease state.</returns>
+        azure::storage::lease_state lease_state() const
         {
             return m_lease_state;
         }
@@ -1903,8 +1867,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the container's lease duration.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::lease_duration" /> object that indicates the container's lease duration.</returns>
-        wa::storage::lease_duration lease_duration() const
+        /// <returns>A <see cref="azure::storage::lease_duration" /> object that indicates the container's lease duration.</returns>
+        azure::storage::lease_duration lease_duration() const
         {
             return m_lease_duration;
         }
@@ -1913,9 +1877,9 @@ namespace wa { namespace storage {
 
         utility::string_t m_etag;
         utility::datetime m_last_modified;
-        wa::storage::lease_status m_lease_status;
-        wa::storage::lease_state m_lease_state;
-        wa::storage::lease_duration m_lease_duration;
+        azure::storage::lease_status m_lease_status;
+        azure::storage::lease_state m_lease_state;
+        azure::storage::lease_duration m_lease_duration;
 
         void update_etag_and_last_modified(const cloud_blob_container_properties& parsed_properties);
 
@@ -1932,44 +1896,44 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_client" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_client" /> class.
         /// </summary>
         cloud_blob_client()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_client" /> class using the specified Blob service endpoint
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_client" /> class using the specified Blob service endpoint
         /// and anonymous credentials.
         /// </summary>
         /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Blob service endpoint for all locations.</param>
-        cloud_blob_client(const storage_uri& base_uri)
-            : cloud_client(base_uri)
+        explicit cloud_blob_client(storage_uri base_uri)
+            : cloud_client(std::move(base_uri))
         {
             initialize();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_client" /> class using the specified Blob service endpoint
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_client" /> class using the specified Blob service endpoint
         /// and account credentials.
         /// </summary>
         /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Blob service endpoint for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        cloud_blob_client(const storage_uri& base_uri, const storage_credentials& credentials)
-            : cloud_client(base_uri, credentials)
+        cloud_blob_client(storage_uri base_uri, storage_credentials credentials)
+            : cloud_client(std::move(base_uri), std::move(credentials))
         {
             initialize();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_client" /> class using the specified Blob service endpoint
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_client" /> class using the specified Blob service endpoint
         /// and account credentials.
         /// </summary>
         /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Blob service endpoint for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
         /// <param name="default_request_options">The default <see cref="blob_request_options" /> object to use for all requests made with this client object.</param>
-        cloud_blob_client(const storage_uri& base_uri, const storage_credentials& credentials, const blob_request_options& default_request_options)
-            : cloud_client(base_uri, credentials), m_default_request_options(default_request_options)
+        cloud_blob_client(storage_uri base_uri, storage_credentials credentials, blob_request_options default_request_options)
+            : cloud_client(std::move(base_uri), std::move(credentials)), m_default_request_options(std::move(default_request_options))
         {
             initialize();
         }
@@ -1978,90 +1942,90 @@ namespace wa { namespace storage {
         /// Sets the authentication scheme to use to sign HTTP requests.
         /// </summary>
         /// <param name="value">The authentication scheme.</param>
-        WASTORAGE_API void set_authentication_scheme(wa::storage::authentication_scheme value) override;
+        WASTORAGE_API void set_authentication_scheme(azure::storage::authentication_scheme value) override;
 
         /// <summary>
-        /// Returns a result segment containing a collection of <see cref="wa::storage::cloud_blob_container" /> objects.
+        /// Returns a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <returns>A <see cref="container_result_segment" /> containing a collection of containers.</returns>
-        container_result_segment list_containers_segmented(const blob_continuation_token& current_token) const
+        container_result_segment list_containers_segmented(const continuation_token& token) const
         {
-            return list_containers_segmented_async(current_token).get();
+            return list_containers_segmented_async(token).get();
         }
 
         /// <summary>
-        /// Returns a result segment containing a collection of <see cref="wa::storage::cloud_blob_container" /> objects.
+        /// Returns a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="prefix">The container name prefix.</param>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <returns>A <see cref="container_result_segment" /> containing a collection of containers.</returns>
-        container_result_segment list_containers_segmented(const utility::string_t& prefix, const blob_continuation_token& current_token) const
+        container_result_segment list_containers_segmented(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_containers_segmented_async(prefix, current_token).get();
+            return list_containers_segmented_async(prefix, token).get();
         }
 
         /// <summary>
-        /// Returns a result segment containing a collection of <see cref="wa::storage::cloud_blob_container" /> objects.
+        /// Returns a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="prefix">The container name prefix.</param>
         /// <param name="listing_details">A value that indicates whether to return container metadata with the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned 
         /// in the result segment, up to the per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options"/> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="container_result_segment" /> containing a collection of containers.</returns>
-        container_result_segment list_containers_segmented(const utility::string_t& prefix, const container_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+        container_result_segment list_containers_segmented(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
         {
-            return list_containers_segmented_async(prefix, includes, max_results, current_token, options, context).get();
+            return list_containers_segmented_async(prefix, includes, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of <see cref="wa::storage::cloud_blob_container" /> objects.
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="container_result_segment" /> that represents the current operation.</returns>
-        pplx::task<container_result_segment> list_containers_segmented_async(const blob_continuation_token& current_token) const
+        pplx::task<container_result_segment> list_containers_segmented_async(const continuation_token& token) const
         {
-            return list_containers_segmented_async(utility::string_t(), current_token);
+            return list_containers_segmented_async(utility::string_t(), token);
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of <see cref="wa::storage::cloud_blob_container" /> objects.
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="prefix">The container name prefix.</param>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="container_result_segment" /> that represents the current operation.</returns>
-        pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, const blob_continuation_token& current_token) const
+        pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_containers_segmented_async(prefix, container_listing_includes(), 0, current_token, blob_request_options(), operation_context());
+            return list_containers_segmented_async(prefix, container_listing_details::none, 0, token, blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of <see cref="wa::storage::cloud_blob_container" /> objects.
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="prefix">The container name prefix.</param>
-        /// <param name="includes">A <see cref="wa::storage::blob_listing_includes"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::container_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned 
         /// in the result segment, up to the per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options"/> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="container_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, const container_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Returns a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement 
-        /// <see cref="wa::storage::cloud_blob" /> or <see cref="wa::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, const blob_continuation_token& current_token) const
+        /// <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_blobs_segmented_async(prefix, current_token).get();
+            return list_blobs_segmented_async(prefix, token).get();
         }
 
         /// <summary>
@@ -2070,65 +2034,65 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
-        /// <param name="includes">A <see cref="wa::storage::blob_listing_includes"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>         
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options"/> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="wa::storage::cloud_blob" /> or <see cref="wa::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
         {
-            return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, current_token, options, context).get();
+            return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of blob items in the container.
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, const blob_continuation_token& current_token) const
+        pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_blobs_segmented_async(prefix, false, blob_listing_includes(), 0, current_token, blob_request_options(), operation_context());
+            return list_blobs_segmented_async(prefix, false, blob_listing_details::none, 0, token, blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of blob items in the container.
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
-        /// <param name="includes">A <see cref="wa::storage::blob_listing_includes"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>         
-        /// <param name="current_token">A <see cref="wa::storage::blob_continuation_token" /> returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options"/> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
-        /// Gets the service properties for the service client.
+        /// Gets the service properties for the Blob service client.
         /// </summary>
-        /// <returns>The <see cref="service_properties" /> for the service client.</returns>
+        /// <returns>The <see cref="service_properties" /> for the Blob service client.</returns>
         service_properties download_service_properties() const
         {
             return download_service_properties_async().get();
         }
 
         /// <summary>
-        /// Gets the service properties for the service client.
+        /// Gets the service properties for the Blob service client.
         /// </summary>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>The <see cref="service_properties" /> for the service client.</returns>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The <see cref="service_properties" /> for the Blob service client.</returns>
         service_properties download_service_properties(const blob_request_options& options, operation_context context) const
         {
             return download_service_properties_async(options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get the properties of the service.
+        /// Intitiates an asynchronous operation to get the properties of the service.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_properties" /> that represents the current operation.</returns>
         pplx::task<service_properties> download_service_properties_async() const
@@ -2137,40 +2101,40 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get the properties of the service.
+        /// Intitiates an asynchronous operation to get the properties of the service.
         /// </summary>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_properties" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<service_properties> download_service_properties_async(const blob_request_options& options, operation_context context) const;
 
         /// <summary>
-        /// Sets the service properties for the service client.
+        /// Sets the service properties for the Blob service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the service client.</param>
-        /// <param name="includes">A <see cref="wa::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="properties">The <see cref="service_properties" /> for the Blob service client.</param>
+        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
         void upload_service_properties(const service_properties& properties, const service_properties_includes& includes) const
         {
             upload_service_properties_async(properties, includes).wait();
         }
 
         /// <summary>
-        /// Sets the service properties for the service client.
+        /// Sets the service properties for the Blob service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the service client.</param>
-        /// <param name="includes">A <see cref="wa::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="properties">The <see cref="service_properties" /> for the Blob service client.</param>
+        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_service_properties(const service_properties& properties, const service_properties_includes& includes, const blob_request_options& options, operation_context context) const
         {
             upload_service_properties_async(properties, includes, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set the service properties for the service client.
+        /// Intitiates an asynchronous operation to set the service properties for the Blob service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the service client.</param>
-        /// <param name="includes">A <see cref="wa::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="properties">The <see cref="service_properties" /> for the Blob service client.</param>
+        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes) const
         {
@@ -2178,27 +2142,64 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set the service properties for the service client.
+        /// Intitiates an asynchronous operation to set the service properties for the Blob service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the service client.</param>
-        /// <param name="includes">A <see cref="wa::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="properties">The <see cref="service_properties" /> for the Blob service client.</param>
+        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
-        /// Returns a reference to a <see cref="wa::storage::cloud_blob_container" /> object.
+        /// Gets the service stats for the Blob service client.
+        /// </summary>
+        /// <returns>The <see cref="service_stats" /> for the Blob service client.</returns>
+        service_stats download_service_stats() const
+        {
+            return download_service_stats_async().get();
+        }
+
+        /// <summary>
+        /// Gets the service stats for the Blob service client.
+        /// </summary>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The <see cref="service_stats" /> for the Blob service client.</returns>
+        service_stats download_service_stats(const blob_request_options& options, operation_context context) const
+        {
+            return download_service_stats_async(options, context).get();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get the stats of the service.
+        /// </summary>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_stats" /> that represents the current operation.</returns>
+        pplx::task<service_stats> download_service_stats_async() const
+        {
+            return download_service_stats_async(blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get the stats of the service.
+        /// </summary>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_stats" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<service_stats> download_service_stats_async(const blob_request_options& options, operation_context context) const;
+
+        /// <summary>
+        /// Returns a reference to a <see cref="azure::storage::cloud_blob_container" /> object.
         /// </summary>
         /// <returns>A reference to the root container, of type <see cref="cloud_blob_container" />.</returns>
         WASTORAGE_API cloud_blob_container get_root_container_reference() const;
 
         /// <summary>
-        /// Returns a reference to a <see cref="wa::storage::cloud_blob_container" /> object with the specified name.
+        /// Returns a reference to a <see cref="azure::storage::cloud_blob_container" /> object with the specified name.
         /// </summary>
         /// <param name="container_name">The name of the container, or an absolute URI to the container.</param>
         /// <returns>A reference to a <see cref="cloud_blob_container" />.</returns>
-        WASTORAGE_API cloud_blob_container get_container_reference(const utility::string_t& container_name) const;
+        WASTORAGE_API cloud_blob_container get_container_reference(utility::string_t container_name) const;
 
         /// <summary>
         /// Returns the default set of request options.
@@ -2215,21 +2216,21 @@ namespace wa { namespace storage {
         /// <returns>A string containing the default delimiter.</returns>
         const utility::string_t& directory_delimiter() const
         {
-            return m_delimiter;
+            return m_directory_delimiter;
         }
 
         /// <summary>
         /// Sets the default delimiter that may be used to create a virtual directory structure of blobs.
         /// </summary>
         /// <param name="value">A string containing the default delimiter.</param>
-        void set_directory_delimiter(const utility::string_t& value)
+        void set_directory_delimiter(utility::string_t value)
         {
             if (value.empty())
             {
                 throw std::invalid_argument("value");
             }
 
-            m_delimiter = value;
+            m_directory_delimiter = std::move(value);
         }
 
     private:
@@ -2237,11 +2238,11 @@ namespace wa { namespace storage {
         void initialize()
         {
             set_authentication_scheme(authentication_scheme::shared_key);
-            m_delimiter = protocol::directory_delimiter;
+            m_directory_delimiter = protocol::directory_delimiter;
         }
 
         blob_request_options m_default_request_options;
-        utility::string_t m_delimiter;
+        utility::string_t m_directory_delimiter;
     };
 
     /// <summary>
@@ -2251,38 +2252,38 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_container" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
         /// </summary>
         cloud_blob_container() {}
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_container" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the container for all locations.</param>
-        WASTORAGE_API cloud_blob_container(const storage_uri& uri);
+        WASTORAGE_API cloud_blob_container(storage_uri uri);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_container" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the container for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        WASTORAGE_API cloud_blob_container(const storage_uri& uri, const storage_credentials& credentials);
+        WASTORAGE_API cloud_blob_container(storage_uri uri, storage_credentials credentials);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_container" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
         /// </summary>
         /// <param name="name">The name of the container.</param>
         /// <param name="client">The Blob service client.</param>
-        cloud_blob_container(const utility::string_t& name, const cloud_blob_client& client);
+        cloud_blob_container(utility::string_t name, cloud_blob_client client);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_container" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
         /// </summary>
         /// <param name="name">The container name.</param>
         /// <param name="client">The Blob service client.</param>
         /// <param name="properties">The properties for the container.</param>
         /// <param name="metadata">The metadata for the container.</param>
-        cloud_blob_container(utility::string_t name, const cloud_blob_client& client, cloud_blob_container_properties properties, cloud_metadata metadata);
+        cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
 
         /// <summary>
         /// Returns a shared access signature for the container.
@@ -2307,7 +2308,7 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="blob_name">The name of the blob.</param>
         /// <returns>A reference to a <see cref="cloud_blob" />.</returns>
-        WASTORAGE_API cloud_blob get_blob_reference(const utility::string_t& blob_name) const;
+        WASTORAGE_API cloud_blob get_blob_reference(utility::string_t blob_name) const;
 
         /// <summary>
         /// Gets a reference to a blob in this container.
@@ -2315,14 +2316,14 @@ namespace wa { namespace storage {
         /// <param name="blob_name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <returns>A reference to a <see cref="cloud_blob" />.</returns>
-        WASTORAGE_API cloud_blob get_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const;
+        WASTORAGE_API cloud_blob get_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const;
 
         /// <summary>
         /// Gets a reference to a page blob in this container.
         /// </summary>
         /// <param name="blob_name">The name of the blob.</param>
         /// <returns>A reference to a <see cref="cloud_page_blob" />.</returns>
-        WASTORAGE_API cloud_page_blob get_page_blob_reference(const utility::string_t& blob_name) const;
+        WASTORAGE_API cloud_page_blob get_page_blob_reference(utility::string_t blob_name) const;
 
         /// <summary>
         /// Gets a reference to a page blob in this container.
@@ -2330,14 +2331,14 @@ namespace wa { namespace storage {
         /// <param name="blob_name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <returns>A reference to a <see cref="cloud_page_blob" />.</returns>
-        WASTORAGE_API cloud_page_blob get_page_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const;
+        WASTORAGE_API cloud_page_blob get_page_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const;
 
         /// <summary>
         /// Gets a reference to a block blob in this container.
         /// </summary>
         /// <param name="blob_name">The name of the blob.</param>
         /// <returns>A reference to a <see cref="cloud_block_blob" />.</returns>
-        WASTORAGE_API cloud_block_blob get_block_blob_reference(const utility::string_t& blob_name) const;
+        WASTORAGE_API cloud_block_blob get_block_blob_reference(utility::string_t blob_name) const;
 
         /// <summary>
         /// Gets a reference to a block blob in this container.
@@ -2345,14 +2346,14 @@ namespace wa { namespace storage {
         /// <param name="blob_name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <returns>A reference to a <see cref="cloud_block_blob" />.</returns>
-        WASTORAGE_API cloud_block_blob get_block_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const;
+        WASTORAGE_API cloud_block_blob get_block_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const;
 
         /// <summary>
         /// Gets a reference to a virtual blob directory beneath this container.
         /// </summary>
         /// <param name="name">The name of the virtual blob directory.</param>
         /// <returns>A reference to a <see cref="cloud_blob_directory" />.</returns>
-        WASTORAGE_API cloud_blob_directory get_directory_reference(const utility::string_t& name) const;
+        WASTORAGE_API cloud_blob_directory get_directory_reference(utility::string_t name) const;
 
         /// <summary>
         /// Retrieves the container's attributes.
@@ -2365,16 +2366,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Retrieves the container's attributes.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void download_attributes(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             download_attributes_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to retrieve the container's attributes.
+        /// Intitiates an asynchronous operation to retrieve the container's attributes.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> download_attributes_async()
@@ -2383,11 +2384,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to retrieve the container's attributes.
+        /// Intitiates an asynchronous operation to retrieve the container's attributes.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -2402,16 +2403,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Sets the container's user-defined metadata.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_metadata(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_metadata_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set the container's user-defined metadata.
+        /// Intitiates an asynchronous operation to set the container's user-defined metadata.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_metadata_async()
@@ -2420,21 +2421,21 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set the container's user-defined metadata.
+        /// Intitiates an asynchronous operation to set the container's user-defined metadata.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Acquires a lease on the container.
         /// </summary>
-        /// <param name="duration">A <see cref="wa::storage::lease_time"/> representing the span of time for which to acquire the lease.</param>
+        /// <param name="duration">A <see cref="azure::storage::lease_time"/> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
         /// <returns>A string containing the ID of the acquired lease.</returns>
-        utility::string_t acquire_lease(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
+        utility::string_t acquire_lease(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
         {
             return acquire_lease_async(duration, proposed_lease_id).get();
         }
@@ -2442,38 +2443,38 @@ namespace wa { namespace storage {
         /// <summary>
         /// Acquires a lease on the container.
         /// </summary>
-        /// <param name="duration">A <see cref="wa::storage::lease_time"/> representing the span of time for which to acquire the lease.</param>
+        /// <param name="duration">A <see cref="azure::storage::lease_time"/> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A string containing the ID of the acquired lease.</returns>
-        utility::string_t acquire_lease(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        utility::string_t acquire_lease(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             return acquire_lease_async(duration, proposed_lease_id, condition, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to acquire a lease on the container.
+        /// Intitiates an asynchronous operation to acquire a lease on the container.
         /// </summary>
-        /// <param name="duration">A <see cref="wa::storage::lease_time"/> object representing the span of time for which to acquire the lease.</param>
+        /// <param name="duration">A <see cref="azure::storage::lease_time"/> object representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed..</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        pplx::task<utility::string_t> acquire_lease_async(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
+        pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
         {
             return acquire_lease_async(duration, proposed_lease_id, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to acquire a lease on the container.
+        /// Intitiates an asynchronous operation to acquire a lease on the container.
         /// </summary>
-        /// <param name="duration">A <see cref="wa::storage::lease_time"/> representing the span of time for which to acquire the lease.</param>
+        /// <param name="duration">A <see cref="azure::storage::lease_time"/> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Renews a lease on the container.
@@ -2486,16 +2487,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Renews a lease on the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void renew_lease(const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             renew_lease_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to renew a lease on the container.
+        /// Intitiates an asynchronous operation to renew a lease on the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> renew_lease_async() const
@@ -2504,11 +2505,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to renew a lease on the container.
+        /// Intitiates an asynchronous operation to renew a lease on the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
@@ -2526,9 +2527,9 @@ namespace wa { namespace storage {
         /// Changes the lease ID for a lease on the container.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The new lease ID.</returns>
         utility::string_t change_lease(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
@@ -2536,7 +2537,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to change the lease ID for a lease on the container.
+        /// Intitiates an asynchronous operation to change the lease ID for a lease on the container.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -2546,12 +2547,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to change the lease ID for a lease on the container.
+        /// Intitiates an asynchronous operation to change the lease ID for a lease on the container.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
@@ -2566,16 +2567,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Releases a lease on the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void release_lease(const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             release_lease_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to release a lease on the container.
+        /// Intitiates an asynchronous operation to release a lease on the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> release_lease_async() const
@@ -2584,20 +2585,20 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to release a lease on the container.
+        /// Intitiates an asynchronous operation to release a lease on the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Breaks the current lease on the container.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
         /// <returns>The time until the lease ends, in seconds.</returns>
-        std::chrono::seconds break_lease(const wa::storage::lease_break_period& break_period) const
+        std::chrono::seconds break_lease(const azure::storage::lease_break_period& break_period) const
         {
             return break_lease_async(break_period).get();
         }
@@ -2605,35 +2606,35 @@ namespace wa { namespace storage {
         /// <summary>
         /// Breaks the current lease on the container.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The time until the lease ends, in seconds.</returns>
-        std::chrono::seconds break_lease(const wa::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        std::chrono::seconds break_lease(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             return break_lease_async(break_period, condition, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to break the current lease on the container.
+        /// Intitiates an asynchronous operation to break the current lease on the container.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
-        pplx::task<std::chrono::seconds> break_lease_async(const wa::storage::lease_break_period& break_period) const
+        pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period) const
         {
             return break_lease_async(break_period, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to break the current lease on the container.
+        /// Intitiates an asynchronous operation to break the current lease on the container.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const wa::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Creates the container.
@@ -2646,9 +2647,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Creates the container and specifies the level of access to the container's data.
         /// </summary>
-        /// <param name="public_access">A <see cref="wa::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation. This object
+        /// <param name="public_access">A <see cref="azure::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object
         /// is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
         void create(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context)
         {
@@ -2656,7 +2657,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create the container.
+        /// Intitiates an asynchronous operation to create the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> create_async()
@@ -2665,11 +2666,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create the container.
+        /// Intitiates an asynchronous operation to create the container.
         /// </summary>
-        /// <param name="public_access">A <see cref="wa::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="public_access">A <see cref="azure::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> create_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context);
 
@@ -2685,9 +2686,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Creates the container if it does not already exist and specifies the level of public access to the container's data.
         /// </summary>
-        /// <param name="public_access">A <see cref="wa::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="public_access">A <see cref="azure::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns><c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.</returns>
         bool create_if_not_exists(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context)
         {
@@ -2695,7 +2696,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create the container if it does not already exist.
+        /// Intitiates an asynchronous operation to create the container if it does not already exist.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> create_if_not_exists_async()
@@ -2704,11 +2705,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create the container if it does not already exist and specify the level of public access to the container's data.
+        /// Intitiates an asynchronous operation to create the container if it does not already exist and specify the level of public access to the container's data.
         /// </summary>
-        /// <param name="public_access">A <see cref="wa::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="public_access">A <see cref="azure::storage::blob_container_public_access_type"/> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> create_if_not_exists_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context);
 
@@ -2723,16 +2724,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Deletes the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void delete_container(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             delete_container_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the container.
+        /// Intitiates an asynchronous operation to delete the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> delete_container_async()
@@ -2741,11 +2742,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the container.
+        /// Intitiates an asynchronous operation to delete the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> delete_container_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -2761,9 +2762,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Deletes the container if it already exists.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns><c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.</returns>
         bool delete_container_if_exists(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -2771,7 +2772,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the container if it already exists.
+        /// Intitiates an asynchronous operation to delete the container if it already exists.
         /// </summary>
         /// <returns><c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.</returns>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -2781,11 +2782,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the container if it already exists.
+        /// Intitiates an asynchronous operation to delete the container if it already exists.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns><c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.</returns>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> delete_container_if_exists_async(const access_condition& condition, const blob_request_options& options, operation_context context);
@@ -2793,22 +2794,22 @@ namespace wa { namespace storage {
         /// <summary>
         /// Returns a result segment containing a collection of blob items in the container.
         /// </summary>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="wa::storage::cloud_blob" /> or <see cref="wa::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const blob_continuation_token& current_token) const
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        blob_result_segment list_blobs_segmented(const continuation_token& token) const
         {
-            return list_blobs_segmented_async(current_token).get();
+            return list_blobs_segmented_async(token).get();
         }
 
         /// <summary>
         /// Returns a result segment containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A result segment containing objects that implement <see cref="wa::storage::cloud_blob" /> and <see cref="wa::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, const blob_continuation_token& current_token) const
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <returns>A result segment containing objects that implement <see cref="azure::storage::cloud_blob" /> and <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_blobs_segmented_async(prefix, current_token).get();
+            return list_blobs_segmented_async(prefix, token).get();
         }
 
         /// <summary>
@@ -2816,55 +2817,55 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
-        /// <param name="includes">A <see cref="wa::storage::blob_listing_includes"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="wa::storage::cloud_blob" /> or <see cref="wa::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
         {
-            return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, current_token, options, context).get();
+            return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const blob_continuation_token& current_token) const
+        pplx::task<blob_result_segment> list_blobs_segmented_async(const continuation_token& token) const
         {
-            return list_blobs_segmented_async(utility::string_t(), current_token);
+            return list_blobs_segmented_async(utility::string_t(), token);
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, const blob_continuation_token& current_token) const
+        pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_blobs_segmented_async(prefix, false, blob_listing_includes(), 0, current_token, blob_request_options(), operation_context());
+            return list_blobs_segmented_async(prefix, false, blob_listing_details::none, 0, token, blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
-        /// <param name="includes">A <see cref="wa::storage::blob_listing_includes"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Sets permissions for the container.
@@ -2879,16 +2880,16 @@ namespace wa { namespace storage {
         /// Sets permissions for the container.
         /// </summary>
         /// <param name="permissions">The permissions to apply to the container.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_permissions(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_permissions_async(permissions, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set permissions for the container.
+        /// Intitiates an asynchronous operation to set permissions for the container.
         /// </summary>
         /// <param name="permissions">The permissions to apply to the container.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -2898,12 +2899,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set permissions for the container.
+        /// Intitiates an asynchronous operation to set permissions for the container.
         /// </summary>
         /// <param name="permissions">The permissions to apply to the container.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_permissions_async(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -2919,9 +2920,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the permissions settings for the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The container's permissions.</returns>
         blob_container_permissions download_permissions(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -2929,7 +2930,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get permissions settings for the container.
+        /// Intitiates an asynchronous operation to get permissions settings for the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_container_permissions" /> that represents the current operation.</returns>
         pplx::task<blob_container_permissions> download_permissions_async()
@@ -2938,11 +2939,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get permissions settings for the container.
+        /// Intitiates an asynchronous operation to get permissions settings for the container.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_container_permissions" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<blob_container_permissions> download_permissions_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -2958,8 +2959,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Checks existence of the container.
         /// </summary>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns><c>true</c> if the container exists.</returns>
         bool exists(const blob_request_options& options, operation_context context)
         {
@@ -2967,7 +2968,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to check the existence of the container.
+        /// Intitiates an asynchronous operation to check the existence of the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> exists_async()
@@ -2976,10 +2977,10 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to check the existence of the container.
+        /// Intitiates an asynchronous operation to check the existence of the container.
         /// </summary>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
         pplx::task<bool> exists_async(const blob_request_options& options, operation_context context)
         {
@@ -2987,21 +2988,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Gets the service client for the container.
+        /// Gets the Blob service client for the container.
         /// </summary>
         /// <returns>A <see cref="cloud_blob_client" /> object that specifies the endpoint for the Blob service.</returns>
         const cloud_blob_client& service_client() const
         {
             return m_client;
-        }
-
-        /// <summary>
-        /// Gets the container URI for all locations.
-        /// </summary>
-        /// <returns>A <see cref="storage_uri" /> containing the container URI for all locations.</returns>
-        const storage_uri& uri() const
-        {
-            return m_uri;
         }
 
         /// <summary>
@@ -3011,6 +3003,15 @@ namespace wa { namespace storage {
         const utility::string_t& name() const
         {
             return m_name;
+        }
+
+        /// <summary>
+        /// Gets the container URI for all locations.
+        /// </summary>
+        /// <returns>A <see cref="storage_uri" /> containing the container URI for all locations.</returns>
+        const storage_uri& uri() const
+        {
+            return m_uri;
         }
 
         /// <summary>
@@ -3051,12 +3052,12 @@ namespace wa { namespace storage {
 
     private:
 
-        void init(const storage_credentials& credentials);
+        void init(storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
 
-        storage_uri m_uri;
-        utility::string_t m_name;
         cloud_blob_client m_client;
+        utility::string_t m_name;
+        storage_uri m_uri;
         std::shared_ptr<cloud_metadata> m_metadata;
         std::shared_ptr<cloud_blob_container_properties> m_properties;
     };
@@ -3064,28 +3065,30 @@ namespace wa { namespace storage {
     /// <summary>
     /// Represents a virtual directory of blobs, designated by a delimiter character.
     /// </summary>
-    /// <remarks>Containers, which are encapsulated as <see cref="wa::storage::cloud_blob_container" /> objects, hold directories, and directories hold block blobs and page blobs. Directories can also contain sub-directories.</remarks>
+    /// <remarks>Containers, which are encapsulated as <see cref="azure::storage::cloud_blob_container" /> objects, hold directories, and directories hold block blobs and page blobs. Directories can also contain sub-directories.</remarks>
     class cloud_blob_directory
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_directory" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_directory" /> class.
         /// </summary>
-        cloud_blob_directory() {}
+        cloud_blob_directory()
+        {
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob_directory" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_directory" /> class.
         /// </summary>
         /// <param name="name">Name of the virtual directory.</param>
         /// <param name="container">The container.</param>
-        cloud_blob_directory(const utility::string_t& name, const cloud_blob_container& container);
+        cloud_blob_directory(utility::string_t name, cloud_blob_container container);
 
         /// <summary>
         /// Gets a reference to a blob in this virtual directory.
         /// </summary>
         /// <param name="blob_name">The name of the blob.</param>
         /// <returns>A reference to a <see cref="cloud_blob" />.</returns>
-        WASTORAGE_API cloud_blob get_blob_reference(const utility::string_t& blob_name) const;
+        WASTORAGE_API cloud_blob get_blob_reference(utility::string_t blob_name) const;
 
         /// <summary>
         /// Gets a reference to a blob in this virtual directory.
@@ -3093,14 +3096,14 @@ namespace wa { namespace storage {
         /// <param name="blob_name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <returns>A reference to a <see cref="cloud_blob" />.</returns>
-        WASTORAGE_API cloud_blob get_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const;
+        WASTORAGE_API cloud_blob get_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const;
 
         /// <summary>
         /// Gets a reference to a page blob in this virtual directory.
         /// </summary>
         /// <param name="blob_name">The name of the blob.</param>
         /// <returns>A reference to a <see cref="cloud_page_blob" />.</returns>
-        WASTORAGE_API cloud_page_blob get_page_blob_reference(const utility::string_t& blob_name) const;
+        WASTORAGE_API cloud_page_blob get_page_blob_reference(utility::string_t blob_name) const;
 
         /// <summary>
         /// Gets a reference to a page blob in this virtual directory.
@@ -3108,14 +3111,14 @@ namespace wa { namespace storage {
         /// <param name="blob_name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <returns>A reference to a <see cref="cloud_page_blob" />.</returns>
-        WASTORAGE_API cloud_page_blob get_page_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const;
+        WASTORAGE_API cloud_page_blob get_page_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const;
 
         /// <summary>
         /// Gets a reference to a block blob in this virtual directory.
         /// </summary>
         /// <param name="blob_name">The name of the blob.</param>
         /// <returns>A reference to a <see cref="cloud_block_blob" />.</returns>
-        WASTORAGE_API cloud_block_blob get_block_blob_reference(const utility::string_t& blob_name) const;
+        WASTORAGE_API cloud_block_blob get_block_blob_reference(utility::string_t blob_name) const;
 
         /// <summary>
         /// Gets a reference to a block blob in this virtual directory.
@@ -3123,17 +3126,17 @@ namespace wa { namespace storage {
         /// <param name="blob_name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <returns>A reference to a <see cref="cloud_block_blob" />.</returns>
-        WASTORAGE_API cloud_block_blob get_block_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const;
+        WASTORAGE_API cloud_block_blob get_block_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const;
 
         /// <summary>
         /// Returns a virtual subdirectory within this virtual directory.
         /// </summary>
         /// <param name="name">The name of the virtual subdirectory.</param>
-        /// <returns>A <see cref="wa::storage::cloud_blob_directory" /> object representing the virtual subdirectory.</returns>
-        WASTORAGE_API cloud_blob_directory get_subdirectory_reference(const utility::string_t& name) const;
+        /// <returns>A <see cref="azure::storage::cloud_blob_directory" /> object representing the virtual subdirectory.</returns>
+        WASTORAGE_API cloud_blob_directory get_subdirectory_reference(utility::string_t name) const;
 
         /// <summary>
-        /// Gets the <see cref="wa::storage::cloud_blob_directory" /> object representing the
+        /// Gets the <see cref="azure::storage::cloud_blob_directory" /> object representing the
         /// parent directory for the current virtual directory.
         /// </summary>
         /// <returns>The virtual directory's parent directory.</returns>
@@ -3143,11 +3146,11 @@ namespace wa { namespace storage {
         /// Returns a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="wa::storage::cloud_blob" /> or <see cref="wa::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const blob_continuation_token& current_token) const
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        blob_result_segment list_blobs_segmented(const continuation_token& token) const
         {
-            return list_blobs_segmented_async(current_token).get();
+            return list_blobs_segmented_async(token).get();
         }
 
         /// <summary>
@@ -3155,45 +3158,45 @@ namespace wa { namespace storage {
         /// in the container.
         /// </summary>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
-        /// <param name="includes">A <see cref="wa::storage::blob_listing_includes"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>    
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="wa::storage::cloud_blob" /> or <see cref="wa::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        blob_result_segment list_blobs_segmented(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
         {
-            return list_blobs_segmented_async(use_flat_blob_listing, includes, max_results, current_token, options, context).get();
+            return list_blobs_segmented_async(use_flat_blob_listing, includes, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const blob_continuation_token& current_token) const
+        pplx::task<blob_result_segment> list_blobs_segmented_async(const continuation_token& token) const
         {
-            return list_blobs_segmented_async(false, blob_listing_includes(), 0, current_token, blob_request_options(), operation_context());
+            return list_blobs_segmented_async(false, blob_listing_details::none, 0, token, blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
-        /// <param name="includes">A <see cref="wa::storage::blob_listing_includes"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>    
-        /// <param name="current_token">A continuation token returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
-        /// Gets the service client for the virtual directory.
+        /// Gets the Blob service client for the virtual directory.
         /// </summary>
         /// <returns>A client object that specifies the endpoint for the Windows Azure Blob service.</returns>
         const cloud_blob_client& service_client() const
@@ -3202,7 +3205,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Gets a <see cref="wa::storage::cloud_blob_container" /> object representing the virtual directory's container.
+        /// Gets a <see cref="azure::storage::cloud_blob_container" /> object representing the virtual directory's container.
         /// </summary>
         /// <returns>The virtual directory's container.</returns>
         const cloud_blob_container& container() const
@@ -3239,56 +3242,58 @@ namespace wa { namespace storage {
 
     private:
 
+        utility::string_t m_name;
         cloud_blob_container m_container;
         storage_uri m_uri;
-        utility::string_t m_name;
     };
 
     /// <summary>
-    /// A class for Windows Azure blob types. The <see cref="wa::storage::cloud_block_blob"/> and 
-    /// <see cref="wa::storage::cloud_page_blob"/> classes derive from the <see cref="wa::storage::cloud_blob"/> class.
+    /// A class for Windows Azure blob types. The <see cref="azure::storage::cloud_block_blob"/> and 
+    /// <see cref="azure::storage::cloud_page_blob"/> classes derive from the <see cref="azure::storage::cloud_blob"/> class.
     /// </summary>
     class cloud_blob
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class using an absolute URI to the blob.
         /// </summary>
         cloud_blob()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
-        WASTORAGE_API cloud_blob(const storage_uri& uri);
+        WASTORAGE_API cloud_blob(storage_uri uri);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        WASTORAGE_API cloud_blob(const storage_uri& uri, const storage_credentials& credentials);
+        WASTORAGE_API cloud_blob(storage_uri uri, storage_credentials credentials);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        WASTORAGE_API cloud_blob(const storage_uri& uri, const utility::string_t& snapshot_time, const storage_credentials& credentials);
+        WASTORAGE_API cloud_blob(storage_uri uri, utility::string_t snapshot_time, storage_credentials credentials);
+
+        // TODO: Make constructors that are not called directly by users private
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
         /// </summary>
         /// <param name="name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <param name="container">A reference to the parent container.</param>
-        cloud_blob(const utility::string_t& name, const utility::string_t& snapshot_time, const cloud_blob_container& container);
+        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_blob" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
         /// </summary>
         /// <param name="name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
@@ -3296,10 +3301,10 @@ namespace wa { namespace storage {
         /// <param name="properties">A set of properties for the blob.</param>
         /// <param name="metadata">User-defined metadata for the blob.</param>
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
-        cloud_blob(utility::string_t name, utility::string_t snapshot_time, const cloud_blob_container& container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state);
+        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state);
 
         /// <summary>
-        /// Gets the <see cref="wa::storage::cloud_blob_directory" /> object representing the
+        /// Gets the <see cref="azure::storage::cloud_blob_directory" /> object representing the
         /// virtual parent directory for the blob.
         /// </summary>
         /// <returns>The blob's virtual parent directory.</returns>
@@ -3353,9 +3358,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Opens a stream for reading from the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A stream to be used for reading from the blob.</returns>
         concurrency::streams::istream open_read(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -3363,7 +3368,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for reading from the blob.
+        /// Intitiates an asynchronous operation to open a stream for reading from the blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::istream" /> that represents the current operation.</returns>
         pplx::task<concurrency::streams::istream> open_read_async()
@@ -3372,11 +3377,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for reading from the blob.
+        /// Intitiates an asynchronous operation to open a stream for reading from the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::istream" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<concurrency::streams::istream> open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -3392,8 +3397,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Checks existence of the blob.
         /// </summary>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns><c>true</c> if the blob exists.</returns>
         bool exists(const blob_request_options& options, operation_context context)
         {
@@ -3401,7 +3406,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to check the existence of the blob.
+        /// Intitiates an asynchronous operation to check the existence of the blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> exists_async()
@@ -3410,10 +3415,10 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to check the existence of the blob.
+        /// Intitiates an asynchronous operation to check the existence of the blob.
         /// </summary>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> exists_async(const blob_request_options& options, operation_context context)
         {
@@ -3431,16 +3436,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Populates a blob's properties and metadata.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void download_attributes(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             download_attributes_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to populate a blob's properties and metadata.
+        /// Intitiates an asynchronous operation to populate a blob's properties and metadata.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> download_attributes_async()
@@ -3449,11 +3454,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to populate a blob's properties and metadata.
+        /// Intitiates an asynchronous operation to populate a blob's properties and metadata.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -3468,16 +3473,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Updates the blob's metadata.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_metadata(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_metadata_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to update the blob's metadata.
+        /// Intitiates an asynchronous operation to update the blob's metadata.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_metadata_async()
@@ -3486,11 +3491,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to update the blob's metadata.
+        /// Intitiates an asynchronous operation to update the blob's metadata.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -3505,16 +3510,16 @@ namespace wa { namespace storage {
         /// <summary>
         /// Updates the blob's properties.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_properties(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_properties_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to update the blob's properties.
+        /// Intitiates an asynchronous operation to update the blob's properties.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_properties_async()
@@ -3523,11 +3528,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to update the blob's properties.
+        /// Intitiates an asynchronous operation to update the blob's properties.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_properties_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -3543,16 +3548,16 @@ namespace wa { namespace storage {
         /// Deletes the blob.
         /// </summary>
         /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void delete_blob(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             delete_blob_async(snapshots_option, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the blob.
+        /// Intitiates an asynchronous operation to delete the blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> delete_blob_async()
@@ -3561,12 +3566,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the blob.
+        /// Intitiates an asynchronous operation to delete the blob.
         /// </summary>
         /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> delete_blob_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -3583,9 +3588,9 @@ namespace wa { namespace storage {
         /// Deletes the blob if it already exists.
         /// </summary>
         /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns><c>true</c> if the blob did already exist and was deleted; otherwise <c>false</c>.</returns>
         bool delete_blob_if_exists(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -3593,7 +3598,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the blob if it already exists.
+        /// Intitiates an asynchronous operation to delete the blob if it already exists.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> delete_blob_if_exists_async()
@@ -3602,22 +3607,22 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to delete the blob if it already exists.
+        /// Intitiates an asynchronous operation to delete the blob if it already exists.
         /// </summary>
         /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> delete_blob_if_exists_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Acquires a lease on the blob.
         /// </summary>
-        /// <param name="lease_time">A <see cref="wa::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
+        /// <param name="lease_time">A <see cref="azure::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
         /// <returns>A string containing the lease ID.</returns>
-        utility::string_t acquire_lease(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
+        utility::string_t acquire_lease(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
         {
             return acquire_lease_async(duration, proposed_lease_id).get();
         }
@@ -3625,43 +3630,43 @@ namespace wa { namespace storage {
         /// <summary>
         /// Acquires a lease on the blob.
         /// </summary>
-        /// <param name="lease_time">A <see cref="wa::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
+        /// <param name="lease_time">A <see cref="azure::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A string containing the lease ID.</returns>
-        utility::string_t acquire_lease(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        utility::string_t acquire_lease(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             return acquire_lease_async(duration, proposed_lease_id, condition, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to acquire a lease on the blob.
+        /// Intitiates an asynchronous operation to acquire a lease on the blob.
         /// </summary>
-        /// <param name="lease_time">A <see cref="wa::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
+        /// <param name="lease_time">A <see cref="azure::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        pplx::task<utility::string_t> acquire_lease_async(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
+        pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id) const
         {
             return acquire_lease_async(duration, proposed_lease_id, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to acquire a lease on the blob.
+        /// Intitiates an asynchronous operation to acquire a lease on the blob.
         /// </summary>
-        /// <param name="lease_time">A <see cref="wa::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
+        /// <param name="lease_time">A <see cref="azure::storage::lease_duration"/> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const wa::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Renews a lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         void renew_lease(const access_condition& condition) const
         {
             renew_lease_async(condition).wait();
@@ -3670,18 +3675,18 @@ namespace wa { namespace storage {
         /// <summary>
         /// Renews a lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void renew_lease(const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             renew_lease_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to renew a lease on the blob.
+        /// Intitiates an asynchronous operation to renew a lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> renew_lease_async(const access_condition& condition) const
         {
@@ -3689,11 +3694,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to renew a lease on the blob.
+        /// Intitiates an asynchronous operation to renew a lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
@@ -3701,7 +3706,7 @@ namespace wa { namespace storage {
         /// Changes the lease ID on the blob.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <returns>The new lease ID.</returns>
         utility::string_t change_lease(const utility::string_t& proposed_lease_id, const access_condition& condition) const
         {
@@ -3712,9 +3717,9 @@ namespace wa { namespace storage {
         /// Changes the lease ID on the blob.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The new lease ID.</returns>
         utility::string_t change_lease(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
@@ -3722,10 +3727,10 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to change the lease ID on the blob.
+        /// Intitiates an asynchronous operation to change the lease ID on the blob.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition) const
         {
@@ -3733,19 +3738,19 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to change the lease ID on the blob.
+        /// Intitiates an asynchronous operation to change the lease ID on the blob.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Releases the lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         void release_lease(const access_condition& condition) const
         {
             release_lease_async(condition).wait();
@@ -3754,18 +3759,18 @@ namespace wa { namespace storage {
         /// <summary>
         /// Releases the lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void release_lease(const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             release_lease_async(condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to release the lease on the blob.
+        /// Intitiates an asynchronous operation to release the lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> release_lease_async(const access_condition& condition) const
         {
@@ -3773,20 +3778,20 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to release the lease on the blob.
+        /// Intitiates an asynchronous operation to release the lease on the blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Breaks the current lease on the blob.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
         /// <returns>The time until the lease ends, in seconds.</returns>
-        std::chrono::seconds break_lease(const wa::storage::lease_break_period& break_period) const
+        std::chrono::seconds break_lease(const azure::storage::lease_break_period& break_period) const
         {
             return break_lease_async(break_period).get();
         }
@@ -3794,35 +3799,35 @@ namespace wa { namespace storage {
         /// <summary>
         /// Breaks the current lease on the blob.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The time until the lease ends, in seconds.</returns>
-        std::chrono::seconds break_lease(const wa::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        std::chrono::seconds break_lease(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             return break_lease_async(break_period, condition, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to break the current lease on the blob.
+        /// Intitiates an asynchronous operation to break the current lease on the blob.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
-        pplx::task<std::chrono::seconds> break_lease_async(const wa::storage::lease_break_period& break_period) const
+        pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period) const
         {
             return break_lease_async(break_period, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to break the current lease on the blob.
+        /// Intitiates an asynchronous operation to break the current lease on the blob.
         /// </summary>
-        /// <param name="break_period">A <see cref="wa::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="break_period">A <see cref="azure::storage::lease_break_period"/> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const wa::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Downloads the contents of a blob to a stream.
@@ -3837,16 +3842,16 @@ namespace wa { namespace storage {
         /// Downloads the contents of a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void download_to_stream(concurrency::streams::ostream target, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             download_to_stream_async(target, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to download the contents of a blob to a stream.
+        /// Intitiates an asynchronous operation to download the contents of a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -3856,16 +3861,16 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to download the contents of a blob to a stream.
+        /// Intitiates an asynchronous operation to download the contents of a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> download_to_stream_async(concurrency::streams::ostream target, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return download_range_to_stream_async(target, -1, -1, condition, options, context);
+            return download_range_to_stream_async(target, std::numeric_limits<utility::size64_t>::max(), 0, condition, options, context);
         }
 
         /// <summary>
@@ -3874,7 +3879,7 @@ namespace wa { namespace storage {
         /// <param name="target">The target stream.</param>
         /// <param name="offset">The offset at which to begin downloading the blob, in bytes.</param>
         /// <param name="length">The length of the data to download from the blob, in bytes.</param>
-        void download_range_to_stream(concurrency::streams::ostream target, int64_t offset, int64_t length)
+        void download_range_to_stream(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length)
         {
             download_range_to_stream_async(target, offset, length).wait();
         }
@@ -3885,16 +3890,16 @@ namespace wa { namespace storage {
         /// <param name="target">The target stream.</param>
         /// <param name="offset">The offset at which to begin downloading the blob, in bytes.</param>
         /// <param name="length">The length of the data to download from the blob, in bytes.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void download_range_to_stream(concurrency::streams::ostream target, int64_t offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void download_range_to_stream(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             download_range_to_stream_async(target, offset, length, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to download a range of bytes in a blob to a stream.
+        /// Intitiates an asynchronous operation to download a range of bytes in a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
         /// <param name="offset">The offset at which to begin downloading the blob, in bytes.</param>
@@ -3906,16 +3911,57 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to download a range of bytes in a blob to a stream.
+        /// Intitiates an asynchronous operation to download a range of bytes in a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
         /// <param name="offset">The offset at which to begin downloading the blob, in bytes.</param>
         /// <param name="length">The length of the data to download from the blob, in bytes.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> download_range_to_stream_async(concurrency::streams::ostream target, int64_t offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> download_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Downloads the contents of a blob to a file.
+        /// </summary>
+        /// <param name="path">The target file.</param>
+        void download_to_file(const utility::string_t &path)
+        {
+            download_to_file_async(path).wait();
+        }
+
+        /// <summary>
+        /// Downloads the contents of a blob to a file.
+        /// </summary>
+        /// <param name="path">The target file.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void download_to_file(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            download_to_file_async(path, condition, options, context).wait();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to download the contents of a blob to a file.
+        /// </summary>
+        /// <param name="path">The target file.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> download_to_file_async(const utility::string_t &path)
+        {
+            return download_to_file_async(path, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to download the contents of a blob to a file.
+        /// </summary>
+        /// <param name="path">The target file.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> download_to_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
@@ -3935,10 +3981,10 @@ namespace wa { namespace storage {
         /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
-        /// <param name="source_condition">An object that represents the <see cref="wa::storage::access_condition" /> for the source blob.</param>
-        /// <param name="destination_condition">An object that represents the <see cref="wa::storage::access_condition" /> for the destination blob.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The copy ID associated with the copy operation.</returns>
         /// <remarks>
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
@@ -3969,8 +4015,8 @@ namespace wa { namespace storage {
         /// <param name="source">The URI of a source blob.</param>
         /// <param name="source_condition">An object that represents the <see cref="access_condition" /> for the source blob.</param>
         /// <param name="destination_condition">An object that represents the <see cref="access_condition" /> for the destination blob.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The copy ID associated with the copy operation.</returns>
         /// <remarks>
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
@@ -3982,7 +4028,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -3996,7 +4042,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -4010,13 +4056,13 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
-        /// <param name="source_condition">An object that represents the <see cref="wa::storage::access_condition" /> for the source blob.</param>
-        /// <param name="destination_condition">An object that represents the <see cref="wa::storage::access_condition" /> for the destination blob.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         /// <remarks>
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
@@ -4025,13 +4071,13 @@ namespace wa { namespace storage {
         WASTORAGE_API pplx::task<utility::string_t> start_copy_from_blob_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
-        /// <param name="source_condition">An object that represents the <see cref="wa::storage::access_condition" /> for the source blob.</param>
-        /// <param name="destination_condition">An object that represents the <see cref="wa::storage::access_condition" /> for the destination blob.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         /// <remarks>
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
@@ -4052,16 +4098,16 @@ namespace wa { namespace storage {
         /// Aborts an ongoing blob copy operation.
         /// </summary>
         /// <param name="copy_id">A string identifying the copy operation.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void abort_copy(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             abort_copy_async(copy_id, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to abort an ongoing blob copy operation.
+        /// Intitiates an asynchronous operation to abort an ongoing blob copy operation.
         /// </summary>
         /// <param name="copy_id">A string identifying the copy operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -4071,12 +4117,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to abort an ongoing blob copy operation.
+        /// Intitiates an asynchronous operation to abort an ongoing blob copy operation.
         /// </summary>
         /// <param name="copy_id">A string identifying the copy operation.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
@@ -4093,36 +4139,36 @@ namespace wa { namespace storage {
         /// Creates a snapshot of the blob.
         /// </summary>
         /// <param name="metadata">A collection of name-value pairs defining the metadata of the snapshot.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A blob snapshot.</returns>
-        cloud_blob create_snapshot(const cloud_metadata& metadata, const access_condition& condition, const blob_request_options& options, operation_context context)
+        cloud_blob create_snapshot(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return create_snapshot_async(metadata, condition, options, context).get();
+            return create_snapshot_async(std::move(metadata), condition, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create a snapshot of the blob.
+        /// Intitiates an asynchronous operation to create a snapshot of the blob.
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="wa::storage::cloud_blob" /> that represents the current operation.</returns>
-        pplx::task<wa::storage::cloud_blob> create_snapshot_async()
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_blob" /> that represents the current operation.</returns>
+        pplx::task<azure::storage::cloud_blob> create_snapshot_async()
         {
             return create_snapshot_async(cloud_metadata(), access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create a snapshot of the blob.
+        /// Intitiates an asynchronous operation to create a snapshot of the blob.
         /// </summary>
         /// <param name="metadata">A collection of name-value pairs defining the metadata of the snapshot.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="wa::storage::cloud_blob" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<wa::storage::cloud_blob> create_snapshot_async(const cloud_metadata& metadata, const access_condition& condition, const blob_request_options& options, operation_context context);
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_blob" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<azure::storage::cloud_blob> create_snapshot_async(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
-        /// Gets the <see cref="wa::storage::cloud_blob_client" /> object that represents the Blob service.
+        /// Gets the <see cref="azure::storage::cloud_blob_client" /> object that represents the Blob service.
         /// </summary>
         /// <returns>A client object that specifies the Blob service endpoint.</returns>
         const cloud_blob_client& service_client() const
@@ -4131,7 +4177,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Gets a <see cref="wa::storage::cloud_blob_container" /> object representing the blob's container.
+        /// Gets a <see cref="azure::storage::cloud_blob_container" /> object representing the blob's container.
         /// </summary>
         /// <returns>The blob's container.</returns>
         const cloud_blob_container& container() const
@@ -4196,8 +4242,8 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the state of the most recent or pending copy operation.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::copy_state" /> object containing the copy state.</returns>
-        const wa::storage::copy_state& copy_state() const
+        /// <returns>A <see cref="azure::storage::copy_state" /> object containing the copy state.</returns>
+        const azure::storage::copy_state& copy_state() const
         {
             return *m_copy_state;
         }
@@ -4249,17 +4295,17 @@ namespace wa { namespace storage {
 
         std::shared_ptr<cloud_blob_properties> m_properties;
         std::shared_ptr<cloud_metadata> m_metadata;
-        std::shared_ptr<wa::storage::copy_state> m_copy_state;
+        std::shared_ptr<azure::storage::copy_state> m_copy_state;
 
     private:
 
-        void init(const utility::string_t& snapshot_time, storage_credentials credentials);
+        void init(utility::string_t snapshot_time, storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
 
-        storage_uri m_uri;
         utility::string_t m_name;
         utility::string_t m_snapshot_time;
         cloud_blob_container m_container;
+        storage_uri m_uri;
     };
 
     /// <summary>
@@ -4268,8 +4314,9 @@ namespace wa { namespace storage {
     class cloud_block_blob : public cloud_blob
     {
     public:
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_block_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class using an absolute URI to the blob.
         /// </summary>
         cloud_block_blob()
             : cloud_blob()
@@ -4277,52 +4324,54 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_block_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
-        cloud_block_blob(const storage_uri& uri)
-            : cloud_blob(uri)
+        explicit cloud_block_blob(storage_uri uri)
+            : cloud_blob(std::move(uri))
         {
             set_type(blob_type::block_blob);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_block_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        cloud_block_blob(const storage_uri& uri, const storage_credentials& credentials)
-            : cloud_blob(uri, credentials)
+        cloud_block_blob(storage_uri uri, storage_credentials credentials)
+            : cloud_blob(std::move(uri), std::move(credentials))
         {
             set_type(blob_type::block_blob);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_block_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        cloud_block_blob(const storage_uri& uri, const utility::string_t& snapshot_time, const storage_credentials& credentials)
-            : cloud_blob(uri, snapshot_time, credentials)
+        cloud_block_blob(storage_uri uri, utility::string_t snapshot_time, storage_credentials credentials)
+            : cloud_blob(std::move(uri), std::move(snapshot_time), std::move(credentials))
         {
             set_type(blob_type::block_blob);
         }
 
+        // TODO: Consider making the following constructor private (and similar in other classes) because the user should be using get_blob_reference()
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_block_blob" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class.
         /// </summary>
         /// <param name="name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <param name="container">A reference to the parent container.</param>
-        cloud_block_blob(const utility::string_t& name, const utility::string_t& snapshot_time, const cloud_blob_container& container)
-            : cloud_blob(name, snapshot_time, container)
+        cloud_block_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
+            : cloud_blob(std::move(name), std::move(snapshot_time), std::move(container))
         {
             set_type(blob_type::block_blob);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_block_blob" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class.
         /// </summary>
         /// <param name="blob">Reference to the blob.</param>
         cloud_block_blob(const cloud_blob& blob)
@@ -4343,9 +4392,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Opens a stream for writing to the block blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A stream to be used for writing to the blob.</returns>
         concurrency::streams::ostream open_write(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -4353,7 +4402,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for writing to the block blob.
+        /// Intitiates an asynchronous operation to open a stream for writing to the block blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         pplx::task<concurrency::streams::ostream> open_write_async()
@@ -4362,18 +4411,18 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for writing to the block blob.
+        /// Intitiates an asynchronous operation to open a stream for writing to the block blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Returns an enumerable collection of the blob's blocks, using the specified block list filter.
         /// </summary>
-        /// <returns>An enumerable collection of objects implementing <see cref="wa::storage::block_list_item" />.</returns>
+        /// <returns>An enumerable collection of objects implementing <see cref="azure::storage::block_list_item" />.</returns>
         std::vector<block_list_item> download_block_list() const
         {
             return download_block_list_async().get();
@@ -4384,17 +4433,17 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="listing_filter">One of the enumeration values that indicates whether to return
         /// committed blocks, uncommitted blocks, or both.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>An enumerable collection of objects implementing <see cref="wa::storage::block_list_item" />.</returns>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>An enumerable collection of objects implementing <see cref="azure::storage::block_list_item" />.</returns>
         std::vector<block_list_item> download_block_list(block_listing_filter listing_filter, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             return download_block_list_async(listing_filter, condition, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return an enumerable collection of the blob's blocks, 
+        /// Intitiates an asynchronous operation to return an enumerable collection of the blob's blocks, 
         /// using the specified block list filter.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="block_list_item" />, that represents the current operation.</returns>
@@ -4404,14 +4453,14 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to return an enumerable collection of the blob's blocks, 
+        /// Intitiates an asynchronous operation to return an enumerable collection of the blob's blocks, 
         /// using the specified block list filter.
         /// </summary>
         /// <param name="listing_filter">One of the enumeration values that indicates whether to return
         /// committed blocks, uncommitted blocks, or both.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="block_list_item" />, that represents the current operation.</returns>
         WASTORAGE_API pplx::task<std::vector<block_list_item>> download_block_list_async(block_listing_filter listing_filter, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
@@ -4427,9 +4476,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Downloads the blob's contents as a string.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The contents of the blob, as a string.</returns>
         utility::string_t download_text(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -4437,7 +4486,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to download the blob's contents as a string.
+        /// Intitiates an asynchronous operation to download the blob's contents as a string.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         pplx::task<utility::string_t> download_text_async()
@@ -4446,11 +4495,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to download the blob's contents as a string.
+        /// Intitiates an asynchronous operation to download the blob's contents as a string.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -4473,16 +4522,16 @@ namespace wa { namespace storage {
         /// <param name="block_data">A stream that provides the data for the block.</param>
         /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
         /// on the blob. May be an empty string.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_block(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             upload_block_async(block_id, block_data, content_md5, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a single block.
+        /// Intitiates an asynchronous operation to upload a single block.
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
@@ -4495,15 +4544,15 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a single block.
+        /// Intitiates an asynchronous operation to upload a single block.
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
         /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
         /// on the blob. May be an empty string.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
@@ -4520,16 +4569,16 @@ namespace wa { namespace storage {
         /// Uploads a list of blocks to a new or existing blob. 
         /// </summary>
         /// <param name="block_list">An enumerable collection of block IDs, as Base64-encoded strings.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_block_list(const std::vector<block_list_item>& block_list, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_block_list_async(block_list, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a list of blocks to a new or existing blob. 
+        /// Intitiates an asynchronous operation to upload a list of blocks to a new or existing blob. 
         /// </summary>
         /// <param name="block_list">An enumerable collection of block IDs, as Base64-encoded strings.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -4539,12 +4588,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a list of blocks to a new or existing blob. 
+        /// Intitiates an asynchronous operation to upload a list of blocks to a new or existing blob. 
         /// </summary>
         /// <param name="block_list">An enumerable collection of block IDs, as Base64-encoded strings.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_block_list_async(const std::vector<block_list_item>& block_list, const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -4561,9 +4610,9 @@ namespace wa { namespace storage {
         /// Uploads a stream to a block blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_from_stream(concurrency::streams::istream source, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_from_stream_async(source, condition, options, context).wait();
@@ -4584,39 +4633,39 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_from_stream(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_from_stream_async(source, length, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a block blob.
+        /// Intitiates an asynchronous operation to upload a stream to a block blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_from_stream_async(concurrency::streams::istream source)
         {
-            return upload_from_stream_async(source, protocol::invalid_size64_t);
+            return upload_from_stream_async(source, std::numeric_limits<utility::size64_t>::max());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a block blob.
+        /// Intitiates an asynchronous operation to upload a stream to a block blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return upload_from_stream_async(source, protocol::invalid_size64_t, condition, options, context);
+            return upload_from_stream_async(source, std::numeric_limits<utility::size64_t>::max(), condition, options, context);
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a block blob.
+        /// Intitiates an asynchronous operation to upload a stream to a block blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -4627,15 +4676,56 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a block blob.
+        /// Intitiates an asynchronous operation to upload a stream to a block blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Uploads a file to a block blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        void upload_from_file(const utility::string_t &path)
+        {
+            upload_from_file_async(path).wait();
+        }
+
+        /// <summary>
+        /// Uploads a file to a block blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void upload_from_file(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            upload_from_file_async(path, condition, options, context).wait();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to upload a file to a block blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> upload_from_file_async(const utility::string_t &path)
+        {
+            return upload_from_file_async(path, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to upload a file to a block blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Uploads a string of text to a blob.
@@ -4650,9 +4740,9 @@ namespace wa { namespace storage {
         /// Uploads a string of text to a blob.
         /// </summary>
         /// <param name="content">A string containing the text to upload.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_text(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_text_async(content, condition, options, context).wait();
@@ -4672,9 +4762,9 @@ namespace wa { namespace storage {
         /// Uploads a string of text to a blob.
         /// </summary>
         /// <param name="content">A string containing the text to upload.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context);
     };
@@ -4685,8 +4775,9 @@ namespace wa { namespace storage {
     class cloud_page_blob : public cloud_blob
     {
     public:
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_page_blob" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class.
         /// </summary>
         cloud_page_blob()
             : cloud_blob()
@@ -4694,52 +4785,52 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_page_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
-        cloud_page_blob(const storage_uri& uri)
-            : cloud_blob(uri)
+        explicit cloud_page_blob(storage_uri uri)
+            : cloud_blob(std::move(uri))
         {
             set_type(blob_type::page_blob);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_page_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        cloud_page_blob(const storage_uri& uri, const storage_credentials& credentials)
-            : cloud_blob(uri, credentials)
+        cloud_page_blob(storage_uri uri, storage_credentials credentials)
+            : cloud_blob(std::move(uri), std::move(credentials))
         {
             set_type(blob_type::page_blob);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_page_blob" /> class using an absolute URI to the blob.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class using an absolute URI to the blob.
         /// </summary>
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the blob for all locations.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        cloud_page_blob(const storage_uri& uri, const utility::string_t& snapshot_time, const storage_credentials& credentials)
-            : cloud_blob(uri, snapshot_time, credentials)
+        cloud_page_blob(storage_uri uri, utility::string_t snapshot_time, storage_credentials credentials)
+            : cloud_blob(std::move(uri), std::move(snapshot_time), std::move(credentials))
         {
             set_type(blob_type::page_blob);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_page_blob" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class.
         /// </summary>
         /// <param name="name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <param name="container">A reference to the parent container.</param>
-        cloud_page_blob(const utility::string_t& name, const utility::string_t& snapshot_time, const cloud_blob_container& container)
-            : cloud_blob(name, snapshot_time, container)
+        cloud_page_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
+            : cloud_blob(std::move(name), std::move(snapshot_time), std::move(container))
         {
             set_type(blob_type::page_blob);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_page_blob" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class.
         /// </summary>
         /// <param name="blob">Reference to the blob.</param>
         cloud_page_blob(const cloud_blob& blob)
@@ -4760,9 +4851,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Opens a stream for writing to an existing page blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A stream to be used for writing to the blob.</returns>
         concurrency::streams::ostream open_write(const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -4783,9 +4874,9 @@ namespace wa { namespace storage {
         /// Opens a stream for writing to a new page blob.
         /// </summary>
         /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A stream to be used for writing to the blob.</returns>
         concurrency::streams::ostream open_write(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
@@ -4793,7 +4884,7 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for writing to an existing page blob.
+        /// Intitiates an asynchronous operation to open a stream for writing to an existing page blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         pplx::task<concurrency::streams::ostream> open_write_async()
@@ -4802,16 +4893,16 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for writing to an existing page blob.
+        /// Intitiates an asynchronous operation to open a stream for writing to an existing page blob.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for writing to a new page blob.
+        /// Intitiates an asynchronous operation to open a stream for writing to a new page blob.
         /// </summary>
         /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
@@ -4821,12 +4912,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to open a stream for writing to a new page blob.
+        /// Intitiates an asynchronous operation to open a stream for writing to a new page blob.
         /// </summary>
         /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -4845,16 +4936,16 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="start_offset">The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</param>
         /// <param name="length">The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void clear_pages(int64_t start_offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             clear_pages_async(start_offset, length, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to clear pages from a page blob.
+        /// Intitiates an asynchronous operation to clear pages from a page blob.
         /// </summary>
         /// <param name="start_offset">The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</param>
         /// <param name="length">The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</param>
@@ -4865,13 +4956,13 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to clear pages from a page blob.
+        /// Intitiates an asynchronous operation to clear pages from a page blob.
         /// </summary>
         /// <param name="start_offset">The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</param>
         /// <param name="length">The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> clear_pages_async(int64_t start_offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -4887,9 +4978,9 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>An enumerable collection of page ranges.</returns>
         std::vector<page_range> download_page_ranges(const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
@@ -4902,7 +4993,7 @@ namespace wa { namespace storage {
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <returns>An enumerable collection of page ranges.</returns>
-        std::vector<page_range> download_page_ranges(int64_t offset, int64_t length) const
+        std::vector<page_range> download_page_ranges(utility::size64_t offset, utility::size64_t length) const
         {
             return download_page_ranges_async(offset, length).get();
         }
@@ -4912,57 +5003,57 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>An enumerable collection of page ranges.</returns>
-        std::vector<page_range> download_page_ranges(int64_t offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        std::vector<page_range> download_page_ranges(utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
             return download_page_ranges_async(offset, length, condition, options, context).get();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="page_range" />, that represents the current operation.</returns>
         pplx::task<std::vector<page_range>> download_page_ranges_async() const
         {
-            return download_page_ranges_async(-1, -1);
+            return download_page_ranges_async(access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="page_range" />, that represents the current operation.</returns>
         pplx::task<std::vector<page_range>> download_page_ranges_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
-            return download_page_ranges_async(-1, -1, condition, options, context);
+            return download_page_ranges_async(std::numeric_limits<utility::size64_t>::max(), 0, condition, options, context);
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="page_range" />, that represents the current operation.</returns>
-        pplx::task<std::vector<page_range>> download_page_ranges_async(int64_t offset, int64_t length) const
+        pplx::task<std::vector<page_range>> download_page_ranges_async(utility::size64_t offset, utility::size64_t length) const
         {
             return download_page_ranges_async(offset, length, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="page_range" />, that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::vector<page_range>> download_page_ranges_async(int64_t offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<std::vector<page_range>> download_page_ranges_async(utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Writes pages to a page blob.
@@ -4983,16 +5074,16 @@ namespace wa { namespace storage {
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
         /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
         /// on the blob. May be an empty string.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_pages(concurrency::streams::istream page_data, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_pages_async(page_data, start_offset, content_md5, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to write pages to a page blob.
+        /// Intitiates an asynchronous operation to write pages to a page blob.
         /// </summary>
         /// <param name="page_data">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
@@ -5005,15 +5096,15 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to write pages to a page blob.
+        /// Intitiates an asynchronous operation to write pages to a page blob.
         /// </summary>
         /// <param name="page_data">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
         /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
         /// on the blob. May be an empty string.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -5030,9 +5121,9 @@ namespace wa { namespace storage {
         /// Uploads a stream to a page blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_from_stream(concurrency::streams::istream source, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_from_stream_async(source, condition, options, context).wait();
@@ -5053,39 +5144,39 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_from_stream(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             upload_from_stream_async(source, length, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a page blob.
+        /// Intitiates an asynchronous operation to upload a stream to a page blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_from_stream_async(concurrency::streams::istream source)
         {
-            return upload_from_stream_async(source, protocol::invalid_size64_t);
+            return upload_from_stream_async(source, std::numeric_limits<utility::size64_t>::max());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a page blob.
+        /// Intitiates an asynchronous operation to upload a stream to a page blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return upload_from_stream_async(source, protocol::invalid_size64_t, condition, options, context);
+            return upload_from_stream_async(source, std::numeric_limits<utility::size64_t>::max(), condition, options, context);
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a page blob.
+        /// Intitiates an asynchronous operation to upload a stream to a page blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -5096,15 +5187,56 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to upload a stream to a page blob.
+        /// Intitiates an asynchronous operation to upload a stream to a page blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Uploads a file to a page blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        void upload_from_file(const utility::string_t &path)
+        {
+            upload_from_file_async(path).wait();
+        }
+
+        /// <summary>
+        /// Uploads a file to a page blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void upload_from_file(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            upload_from_file_async(path, condition, options, context).wait();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to upload a file to a page blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> upload_from_file_async(const utility::string_t &path)
+        {
+            return upload_from_file_async(path, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to upload a file to a page blob.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Creates a page blob.
@@ -5119,16 +5251,16 @@ namespace wa { namespace storage {
         /// Creates a page blob.
         /// </summary>
         /// <param name="size">The maximum size of the page blob, in bytes.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void create(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             create_async(size, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create a page blob.
+        /// Intitiates an asynchronous operation to create a page blob.
         /// </summary>
         /// <param name="size">The maximum size of the page blob, in bytes.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -5138,12 +5270,12 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to create a page blob.
+        /// Intitiates an asynchronous operation to create a page blob.
         /// </summary>
         /// <param name="size">The maximum size of the page blob, in bytes.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> create_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context);
 
@@ -5160,16 +5292,16 @@ namespace wa { namespace storage {
         /// Resizes the page blob to the specified size.
         /// </summary>
         /// <param name="size">The size of the page blob, in bytes.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void resize(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             resize_async(size, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to resize the page blob to the specified size.
+        /// Intitiates an asynchronous operation to resize the page blob to the specified size.
         /// </summary>
         /// <param name="size">The size of the page blob, in bytes.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -5179,20 +5311,20 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to resize the page blob to the specified size.
+        /// Intitiates an asynchronous operation to resize the page blob to the specified size.
         /// </summary>
         /// <param name="size">The size of the page blob, in bytes.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> resize_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Sets the page blob's sequence number.
         /// </summary>
-        /// <param name="sequence_number">A value of type <see cref="wa::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
-        void set_sequence_number(const wa::storage::sequence_number& sequence_number)
+        /// <param name="sequence_number">A value of type <see cref="azure::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
+        void set_sequence_number(const azure::storage::sequence_number& sequence_number)
         {
             set_sequence_number_async(sequence_number).wait();
         }
@@ -5200,34 +5332,34 @@ namespace wa { namespace storage {
         /// <summary>
         /// Sets the page blob's sequence number.
         /// </summary>
-        /// <param name="sequence_number">A value of type <see cref="wa::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void set_sequence_number(const wa::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        /// <param name="sequence_number">A value of type <see cref="azure::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void set_sequence_number(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
             set_sequence_number_async(sequence_number, condition, options, context).wait();
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set the page blob's sequence number.
+        /// Intitiates an asynchronous operation to set the page blob's sequence number.
         /// </summary>
-        /// <param name="sequence_number">A value of type <see cref="wa::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
+        /// <param name="sequence_number">A value of type <see cref="azure::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> set_sequence_number_async(const wa::storage::sequence_number& sequence_number)
+        pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number)
         {
             return set_sequence_number_async(sequence_number, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a task that performs an asynchronous operation to set the page blob's sequence number.
+        /// Intitiates an asynchronous operation to set the page blob's sequence number.
         /// </summary>
-        /// <param name="sequence_number">A value of type <see cref="wa::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
-        /// <param name="condition">An <see cref="wa::storage::access_condition" /> object that represents the access condition for the operation.</param>
-        /// <param name="options">A <see cref="wa::storage::blob_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="sequence_number">A value of type <see cref="azure::storage::sequence_number"/>, indicating the operation to perform on the sequence number.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> set_sequence_number_async(const wa::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
     };
 
-}} // namespace wa::storage
+}} // namespace azure::storage

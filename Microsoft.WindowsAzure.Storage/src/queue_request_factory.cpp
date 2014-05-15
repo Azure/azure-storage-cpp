@@ -23,7 +23,7 @@
 #include "was/common.h"
 #include "was/queue.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     web::http::uri generate_queue_uri(const web::http::uri& base_uri, const cloud_queue& queue)
     {
@@ -39,13 +39,13 @@ namespace wa { namespace storage { namespace protocol {
 
     storage_uri generate_queue_uri(const cloud_queue_client& service_client, const cloud_queue& queue)
     {
-        web::http::uri primary_uri = generate_queue_uri(service_client.base_uri().primary_uri(), queue);
-        web::http::uri secondary_uri = generate_queue_uri(service_client.base_uri().secondary_uri(), queue);
+        web::http::uri primary_uri(generate_queue_uri(service_client.base_uri().primary_uri(), queue));
+        web::http::uri secondary_uri(generate_queue_uri(service_client.base_uri().secondary_uri(), queue));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
-    web::http::uri generate_queue_uri(const web::http::uri& base_uri, const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& continuation_token)
+    web::http::uri generate_queue_uri(const web::http::uri& base_uri, const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token)
     {
         if (base_uri.is_empty())
         {
@@ -56,140 +56,125 @@ namespace wa { namespace storage { namespace protocol {
 
         if (!prefix.empty())
         {
-            builder.append_query(U("prefix"), prefix);
+            builder.append_query(core::make_query_parameter(uri_query_prefix, prefix));
         }
 
         if (get_metadata)
         {
-            builder.append_query(U("include"), U("metadata"));
+            builder.append_query(core::make_query_parameter(uri_query_include, component_metadata, /* do_encoding */ false));
         }
 
         if (max_results >= 0)
         {
-            builder.append_query(U("maxresults"), max_results);
+            builder.append_query(core::make_query_parameter(uri_query_max_results, max_results, /* do_encoding */ false));
         }
 
-        if (!continuation_token.empty())
+        if (!token.empty())
         {
-            builder.append_query(continuation_token.next_marker());
+            builder.append_query(token.next_marker());
         }
 
         return builder.to_uri();
     }
 
-    storage_uri generate_queue_uri(const cloud_queue_client& service_client, const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& continuation_token)
+    storage_uri generate_queue_uri(const cloud_queue_client& service_client, const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token)
     {
-        web::http::uri primary_uri = generate_queue_uri(service_client.base_uri().primary_uri(), prefix, get_metadata, max_results, continuation_token);
-        web::http::uri secondary_uri = generate_queue_uri(service_client.base_uri().secondary_uri(), prefix, get_metadata, max_results, continuation_token);
+        web::http::uri primary_uri(generate_queue_uri(service_client.base_uri().primary_uri(), prefix, get_metadata, max_results, token));
+        web::http::uri secondary_uri(generate_queue_uri(service_client.base_uri().secondary_uri(), prefix, get_metadata, max_results, token));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
+    }
+
+    web::http::uri generate_queue_message_uri(const web::http::uri& base_uri, const cloud_queue& queue, const utility::string_t& message_id)
+    {
+        if (base_uri.is_empty())
+        {
+            return web::http::uri();
+        }
+
+        web::http::uri_builder builder(base_uri);
+        builder.append_path(queue.name(), /* do_encoding */ true);
+        builder.append_path(U("messages"));
+        builder.append_path(message_id, /* do_encoding */ true);
+
+        return builder.to_uri();
     }
 
     web::http::uri generate_queue_message_uri(const web::http::uri& base_uri, const cloud_queue& queue)
     {
-        if (base_uri.is_empty())
-        {
-            return web::http::uri();
-        }
-
-        web::http::uri_builder builder(base_uri);
-        builder.append_path(queue.name(), /* do_encoding */ true);
-        builder.append_path(U("messages"));
-        return builder.to_uri();
+        return generate_queue_message_uri(base_uri, queue, utility::string_t());
     }
 
     storage_uri generate_queue_message_uri(const cloud_queue_client& service_client, const cloud_queue& queue)
     {
-        web::http::uri primary_uri = generate_queue_message_uri(service_client.base_uri().primary_uri(), queue);
-        web::http::uri secondary_uri = generate_queue_message_uri(service_client.base_uri().secondary_uri(), queue);
+        web::http::uri primary_uri(generate_queue_message_uri(service_client.base_uri().primary_uri(), queue));
+        web::http::uri secondary_uri(generate_queue_message_uri(service_client.base_uri().secondary_uri(), queue));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
     web::http::uri generate_queue_message_uri(const web::http::uri& base_uri, const cloud_queue& queue, const cloud_queue_message& message)
     {
-        if (base_uri.is_empty())
-        {
-            return web::http::uri();
-        }
-
-        web::http::uri_builder builder(base_uri);
-        builder.append_path(queue.name(), /* do_encoding */ true);
-        builder.append_path(U("messages"));
-        builder.append_path(message.id(), /* do_encoding */ true);
-        return builder.to_uri();
+        return generate_queue_message_uri(base_uri, queue, message.id());
     }
 
     storage_uri generate_queue_message_uri(const cloud_queue_client& service_client, const cloud_queue& queue, const cloud_queue_message& message)
     {
-        web::http::uri primary_uri = generate_queue_message_uri(service_client.base_uri().primary_uri(), queue, message);
-        web::http::uri secondary_uri = generate_queue_message_uri(service_client.base_uri().secondary_uri(), queue, message);
+        web::http::uri primary_uri(generate_queue_message_uri(service_client.base_uri().primary_uri(), queue, message));
+        web::http::uri secondary_uri(generate_queue_message_uri(service_client.base_uri().secondary_uri(), queue, message));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
     web::http::http_request queue_base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = base_request(method, uri_builder, timeout, context);
 
-        /*
-        web::http::http_headers& headers = request.headers();
-        headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);
-        */
-
         return request;
     }
 
     web::http::http_request list_queues(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_list);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
 
         web::http::http_request request = queue_base_request(web::http::methods::GET, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request create_queue(const cloud_queue& queue, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request create_queue(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = queue_base_request(web::http::methods::PUT, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request delete_queue(const cloud_queue& queue, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request delete_queue(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = queue_base_request(web::http::methods::DEL, uri_builder, timeout, context);
         return request;
     }
 
-    /*
-    web::http::http_request queue_exists(const cloud_queue& queue, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
-    {
-        web::http::http_request request = queue_base_request(web::http::methods::GET, uri_builder, timeout, context);
-        return request;
-    }
-    */
-
-    web::http::http_request add_message(const cloud_queue& queue, const cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request add_message(const cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         if (time_to_live.count() >= 0LL && time_to_live.count() != 604800LL)
         {
-            uri_builder.append_query(U("messagettl"), time_to_live.count());
+            uri_builder.append_query(core::make_query_parameter(U("messagettl"), time_to_live.count(), /* do_encoding */ false));
         }
 
         if (initial_visibility_timeout.count() > 0LL)
         {
-            uri_builder.append_query(U("visibilitytimeout"), initial_visibility_timeout.count());
+            uri_builder.append_query(core::make_query_parameter(U("visibilitytimeout"), initial_visibility_timeout.count(), /* do_encoding */ false));
         }
 
         web::http::http_request request = queue_base_request(web::http::methods::POST, uri_builder, timeout, context);
 
         protocol::message_writer writer;
-        std::string content = writer.write(message.content_as_string());
+        std::string content = writer.write(message);
         request.set_body(content);
 
         return request;
     }
 
-    web::http::http_request get_messages(const cloud_queue& queue, size_t message_count, std::chrono::seconds visibility_timeout, bool is_peek, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_messages(size_t message_count, std::chrono::seconds visibility_timeout, bool is_peek, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         if (is_peek)
         {
@@ -199,77 +184,77 @@ namespace wa { namespace storage { namespace protocol {
         if (message_count > 1U)
         {
             // The service uses the default value 1
-            uri_builder.append_query(U("numofmessages"), message_count);
+            uri_builder.append_query(core::make_query_parameter(U("numofmessages"), message_count, /* do_encoding */ false));
         }
 
         if (!is_peek && visibility_timeout.count() > 0LL)
         {
-            uri_builder.append_query(U("visibilitytimeout"), visibility_timeout.count());
+            uri_builder.append_query(core::make_query_parameter(U("visibilitytimeout"), visibility_timeout.count(), /* do_encoding */ false));
         }
 
         web::http::http_request request = queue_base_request(web::http::methods::GET, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request delete_message(const cloud_queue& queue, const cloud_queue_message& message, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request delete_message(const cloud_queue_message& message, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(U("popreceipt"), message.pop_receipt());
+        uri_builder.append_query(core::make_query_parameter(U("popreceipt"), message.pop_receipt()));
 
         web::http::http_request request = queue_base_request(web::http::methods::DEL, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request update_message(const cloud_queue& queue, const cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_contents, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request update_message(const cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_contents, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(U("popreceipt"), message.pop_receipt());
-        uri_builder.append_query(U("visibilitytimeout"), visibility_timeout.count());
+        uri_builder.append_query(core::make_query_parameter(U("popreceipt"), message.pop_receipt()));
+        uri_builder.append_query(core::make_query_parameter(U("visibilitytimeout"), visibility_timeout.count(), /* do_encoding */ false));
 
         web::http::http_request request = queue_base_request(web::http::methods::PUT, uri_builder, timeout, context);
 
         if (update_contents)
         {
             protocol::message_writer writer;
-            std::string content = writer.write(message.content_as_string());
+            std::string content = writer.write(message);
             request.set_body(content);
         }
 
         return request;
     }
 
-    web::http::http_request clear_messages(const cloud_queue& queue, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request clear_messages(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = queue_base_request(web::http::methods::DEL, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request download_queue_metadata(const cloud_queue& queue, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request download_queue_metadata(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_metadata);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_metadata, /* do_encoding */ false));
         web::http::http_request request = queue_base_request(web::http::methods::HEAD, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request upload_queue_metadata(const cloud_queue& queue, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request upload_queue_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         // TODO: Make a copy of needed data so it is OK for the main object class to be destructed mid-operation
-        uri_builder.append_query(uri_query_component, component_metadata);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_metadata, /* do_encoding */ false));
         web::http::http_request request = queue_base_request(web::http::methods::PUT, uri_builder, timeout, context);
-        add_metadata(request, queue.metadata());
+        add_metadata(request, metadata);
         return request;
     }
 
     web::http::http_request get_queue_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_acl);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = queue_base_request(web::http::methods::GET, uri_builder, timeout, context);
         return request;
     }
 
     web::http::http_request set_queue_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_acl);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = queue_base_request(web::http::methods::PUT, uri_builder, timeout, context);
         return request;
     }
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

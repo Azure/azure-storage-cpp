@@ -25,13 +25,37 @@
 #include <float.h>
 #endif
 
-// TODO: Remove this include after switching to Casablanca's datetime parsing
-#include <regex>
-
-namespace wa { namespace storage {  namespace core {
+namespace azure { namespace storage {  namespace core {
 
     const wchar_t hex_alphabet[16] = {U('0'), U('1'), U('2'), U('3'), U('4'), U('5'), U('6'), U('7'), U('8'), U('9'), U('a'), U('b'), U('c'), U('d'), U('e'), U('f')};
     const utility::datetime::interval_type second_interval = 10000000;
+
+    utility::string_t make_query_parameter_impl(const utility::string_t& parameter_name, const utility::string_t& parameter_value)
+    {
+        utility::string_t result;
+        result.reserve(parameter_name.size() + parameter_value.size() + 1);
+
+        result.append(parameter_name);
+        result.push_back(U('='));
+        result.append(parameter_value);
+
+        return result;
+    }
+
+    utility::string_t make_query_parameter(const utility::string_t& parameter_name, const utility::string_t& parameter_value, bool do_encoding)
+    {
+        // TODO: Remove this function if the Casablanca library changes its default query parameter encoding to include all possible encoded characters
+
+        if (do_encoding)
+        {
+            utility::string_t encoded_parameter_value = web::http::uri::encode_data_string(parameter_value);
+            return make_query_parameter_impl(parameter_name, encoded_parameter_value);
+        }
+        else
+        {
+            return make_query_parameter_impl(parameter_name, parameter_value);
+        }
+    }
 
     utility::size64_t get_remaining_stream_length(concurrency::streams::istream stream)
     {
@@ -43,20 +67,20 @@ namespace wa { namespace storage {  namespace core {
             return static_cast<utility::size64_t>(end - offset);
         }
 
-        return protocol::invalid_size64_t;
+        return std::numeric_limits<utility::size64_t>::max();
     }
 
     pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length)
     {
         size_t buffer_size(protocol::default_buffer_size);
-        utility::size64_t istream_length = length == protocol::invalid_size64_t ? get_remaining_stream_length(istream) : length;
-        if ((istream_length != protocol::invalid_size64_t) && (istream_length < buffer_size))
+        utility::size64_t istream_length = length == std::numeric_limits<utility::size64_t>::max() ? get_remaining_stream_length(istream) : length;
+        if ((istream_length != std::numeric_limits<utility::size64_t>::max()) && (istream_length < buffer_size))
         {
             buffer_size = static_cast<size_t>(istream_length);
         }
 
         auto obuffer = ostream.streambuf();
-        auto length_ptr = (length != protocol::invalid_size64_t) ? std::make_shared<utility::size64_t>(length) : nullptr;
+        auto length_ptr = (length != std::numeric_limits<utility::size64_t>::max()) ? std::make_shared<utility::size64_t>(length) : nullptr;
         auto total_ptr = std::make_shared<utility::size64_t>(0);
         return pplx::details::do_while([istream, obuffer, buffer_size, length_ptr, total_ptr] () -> pplx::task<bool>
         {
@@ -78,13 +102,20 @@ namespace wa { namespace storage {  namespace core {
             });
         }).then([total_ptr, length] (bool) -> utility::size64_t
         {
-            if (length != protocol::invalid_size64_t && *total_ptr != length)
+            if (length != std::numeric_limits<utility::size64_t>::max() && *total_ptr != length)
             {
-                throw std::invalid_argument(utility::conversions::to_utf8string(protocol::error_stream_short));
+                throw std::invalid_argument(protocol::error_stream_short);
             }
 
             return *total_ptr;
         });
+    }
+
+    utility::char_t utility_char_tolower(const utility::char_t& character)
+    {
+        int i = (int)character;
+        int lower = tolower(i);
+        return (utility::char_t)lower;
     }
 
     std::vector<utility::string_t> string_split(const utility::string_t& string, const utility::string_t& separator)
@@ -101,6 +132,19 @@ namespace wa { namespace storage {  namespace core {
         } while (sep != utility::string_t::npos);
 
         return result;
+    }
+
+    bool is_empty_or_whitespace(const utility::string_t& value)
+    {
+        for (utility::string_t::const_iterator it = value.cbegin(); it != value.cend(); ++it)
+        {
+            if (!isspace(*it))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     utility::string_t single_quote(const utility::string_t& value)
@@ -127,21 +171,6 @@ namespace wa { namespace storage {  namespace core {
         return result;
     }
 
-    /*
-    utility::string_t replace(const utility::string_t& source, const utility::string_t& old_value, const utility::string_t& new_value)
-    {
-        utility::string_t result(source);
-
-        utility::string_t::size_type position = result.find(old_value, 0U);
-        while (position != utility::string_t::npos)
-        {
-            result.replace(position, old_value.size(), new_value);
-            position = result.find(old_value, position + new_value.size());
-        }
-    }
-    */
-
-
     bool is_nan(double value)
     {
 #ifdef WIN32
@@ -160,29 +189,52 @@ namespace wa { namespace storage {  namespace core {
 #endif
     }
 
-    utility::datetime truncate_fractional_seconds(const utility::datetime& value)
+    bool is_integral(const utility::string_t& value)
+    {
+        // Check if the string consists entirely of an optional negative sign followed by one or more digits
+
+        utility::string_t::const_iterator it = value.cbegin();
+
+        if (it != value.cend())
+        {
+            // Skip the negative sign if present
+            utility::char_t ch = *it;
+            if (ch == U('-'))
+            {
+                ++it;
+            }
+        }
+
+        if (it == value.cend())
+        {
+            return false;
+        }
+
+        do
+        {
+            // Check that all remaining characters are digits
+            utility::char_t ch = *it;
+            if (ch < U('0') || ch > U('9'))
+            {
+                return false;
+            }
+            ++it;
+        } while (it != value.cend());
+
+        return true;
+    }
+
+    utility::datetime truncate_fractional_seconds(utility::datetime value)
     {
         utility::datetime result;
         result = result + (value.to_interval() / second_interval * second_interval);
         return result;
-        //return utility::datetime::from_seconds(value.to_interval() / seconds_per_interval);
     }
 
-    /*
-    const utility::datetime::interval_type half_second_interval = second_interval / 2;
-
-    utility::datetime round_fractional_seconds(const utility::datetime& value)
+    utility::string_t convert_to_string(double value)
     {
-        utility::datetime result;
-        result = result + ((value.to_interval() + half_second_interval) / second_interval * second_interval);
-        return result;
-    }
-    */
-
-    utility::string_t convert_to_string(int value)
-    {
-        // TODO: Try to use a standard function for this
         utility::ostringstream_t buffer;
+        buffer.precision(std::numeric_limits<double>::digits10 + 2);
         buffer << value;
         return buffer.str();
     }
@@ -202,9 +254,11 @@ namespace wa { namespace storage {  namespace core {
         return result;
     }
 
-    // TODO: Remove the following 4 functions and switch to Casablanca's datetime parsing when it is ready
-    utility::string_t convert_to_string(utility::datetime value)
+    utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value)
     {
+        // TODO: Remove this function if Casablanca changes their datetime serialization to not trim trailing zeros in the fractional seconds component of a time
+
+#ifdef _MS_WINDOWS
         int status;
 
         ULARGE_INTEGER largeInt;
@@ -222,170 +276,77 @@ namespace wa { namespace storage {  namespace core {
 
         std::wostringstream outStream;
 
-            const size_t buffSize = 64;
-    #if _WIN32_WINNT < _WIN32_WINNT_VISTA 
-            TCHAR dateStr[buffSize] = {0};
-            status = GetDateFormat(LOCALE_INVARIANT, 0, &systemTime, "yyyy-MM-dd", dateStr, buffSize);
-    #else
-            wchar_t dateStr[buffSize] = {0};
-            status = GetDateFormatEx(LOCALE_NAME_INVARIANT, 0, &systemTime, L"yyyy-MM-dd", dateStr, buffSize, NULL);
-    #endif // _WIN32_WINNT < _WIN32_WINNT_VISTA 
-            if (status == 0)
-            {
-                throw utility::details::create_system_error(GetLastError());
-            }
+        const size_t buffSize = 64;
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+        TCHAR dateStr[buffSize] = { 0 };
+        status = GetDateFormat(LOCALE_INVARIANT, 0, &systemTime, "yyyy-MM-dd", dateStr, buffSize);
+#else
+        wchar_t dateStr[buffSize] = { 0 };
+        status = GetDateFormatEx(LOCALE_NAME_INVARIANT, 0, &systemTime, L"yyyy-MM-dd", dateStr, buffSize, NULL);
+#endif // _WIN32_WINNT < _WIN32_WINNT_VISTA
+        if (status == 0)
+        {
+            throw utility::details::create_system_error(GetLastError());
+        }
 
-    #if _WIN32_WINNT < _WIN32_WINNT_VISTA 
-            TCHAR timeStr[buffSize] = {0};
-            status = GetTimeFormat(LOCALE_INVARIANT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, &systemTime, "HH':'mm':'ss", timeStr, buffSize);
-    #else
-            wchar_t timeStr[buffSize] = {0};
-            status = GetTimeFormatEx(LOCALE_NAME_INVARIANT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, &systemTime, L"HH':'mm':'ss", timeStr, buffSize);
-    #endif // _WIN32_WINNT < _WIN32_WINNT_VISTA 
-            if (status == 0)
-            {
-                throw utility::details::create_system_error(GetLastError());
-            }
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+        TCHAR timeStr[buffSize] = { 0 };
+        status = GetTimeFormat(LOCALE_INVARIANT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, &systemTime, "HH':'mm':'ss", timeStr, buffSize);
+#else
+        wchar_t timeStr[buffSize] = { 0 };
+        status = GetTimeFormatEx(LOCALE_NAME_INVARIANT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, &systemTime, L"HH':'mm':'ss", timeStr, buffSize);
+#endif // _WIN32_WINNT < _WIN32_WINNT_VISTA
+        if (status == 0)
+        {
+            throw utility::details::create_system_error(GetLastError());
+        }
 
-            outStream << dateStr << "T" << timeStr;
-            uint64_t frac_sec = largeInt.QuadPart % static_cast<utility::datetime::interval_type>(10000000);
-            if (frac_sec > 0)
-            {
-                // Append fractional second, which is a 7-digit value with no trailing zeros
-                // This way, '1200' becomes '00012'
-                char buf[9] = { 0 };
-                sprintf_s(buf, sizeof(buf), ".%07d", frac_sec);
-                // trim trailing zeros
-                for (int i = 7; buf[i] == '0'; i--) buf[i] = '\0';
-                outStream << buf;
-            }
-            outStream << "Z";
+        outStream << dateStr << "T" << timeStr;
+        uint64_t frac_sec = largeInt.QuadPart % second_interval;
+        if (frac_sec > 0)
+        {
+            // Append fractional second, which is a 7-digit value
+            // This way, '1200' becomes '0001200'
+            char buf[9] = { 0 };
+            sprintf_s(buf, sizeof(buf), ".%07ld", (long int)frac_sec);
+            outStream << buf;
+        }
+        outStream << "Z";
 
         return outStream.str();
-    }
+#else //LINUX
+        uint64_t input = value.to_interval();
+        uint64_t frac_sec = input % second_interval;
+        input /= second_interval; // convert to seconds
+        time_t time = (time_t)input - (time_t)11644473600LL;// diff between windows and unix epochs (seconds)
 
-    bool system_type_to_datetime(void* pvsysTime, uint64_t seconds, utility::datetime * pdt)
-    {
-        SYSTEMTIME* psysTime = (SYSTEMTIME*)pvsysTime;
-        FILETIME fileTime;
+        struct tm datetime;
+        gmtime_r(&time, &datetime);
 
-        if (SystemTimeToFileTime(psysTime, &fileTime))
+        const int max_dt_length = 64;
+        char output[max_dt_length + 1] = { 0 };
+
+        if (frac_sec > 0)
         {
-            ULARGE_INTEGER largeInt;
-            largeInt.LowPart = fileTime.dwLowDateTime;
-            largeInt.HighPart = fileTime.dwHighDateTime;
-
-            // Add hundredths of nanoseconds
-            largeInt.QuadPart += seconds;
-
-            *pdt = utility::datetime() + largeInt.QuadPart;
-            return true;
+            // Append fractional second, which is a 7-digit value
+            // This way, '1200' becomes '0001200'
+            char buf[9] = { 0 };
+            snprintf(buf, sizeof(buf), ".%07ld", (long int)frac_sec);
+            // format the datetime into a separate buffer
+            char datetime_str[max_dt_length + 1] = { 0 };
+            strftime(datetime_str, sizeof(datetime_str), "%Y-%m-%dT%H:%M:%S", &datetime);
+            // now print this buffer into the output buffer
+            snprintf(output, sizeof(output), "%s%sZ", datetime_str, buf);
         }
-        return false;
-    }
-
-    uint64_t timeticks_from_second(const utility::string_t& str)
-    {
-        _ASSERTE(str.size()>1);
-        _ASSERTE(str[0]==U('.'));
-        uint64_t ufrac_second = 0;
-        for(int i=1; i<=7; ++i)
+        else
         {
-            ufrac_second *= 10;
-            auto add = i < (int)str.size() ? str[i] - U('0') : 0;
-            ufrac_second += add;
+            strftime(output, sizeof(output),
+                format == RFC_1123 ? "%a, %d %b %Y %H:%M:%S GMT" : "%Y-%m-%dT%H:%M:%SZ",
+                &datetime);
         }
-        return ufrac_second;
+
+        return std::string(output);
+#endif
     }
 
-    utility::datetime parse_datetime(utility::string_t dateString)
-    {
-        // avoid floating point math to preserve precision
-        uint64_t ufrac_second = 0;
-
-        utility::datetime result;
-
-            // Unlike FILETIME, SYSTEMTIME does not have enough precision to hold seconds in 100 nanosecond
-            // increments. Therefore, start with seconds and milliseconds set to 0, then add them separately
-
-            // Try to extract the fractional second from the timestamp
-            std::wregex r_frac_second(L"(.+)(\\.\\d+)(Z$)");
-            std::wsmatch m;
-
-            std::wstring input(dateString);
-            if (std::regex_search(dateString, m, r_frac_second))
-            {
-                auto frac = m[2].str(); // this is the fractional second
-                ufrac_second = timeticks_from_second(frac);
-                input = m[1].str() + m[3].str();
-            }
-
-            {
-                SYSTEMTIME sysTime = { 0 };
-                const wchar_t * formatString = L"%4d-%2d-%2dT%2d:%2d:%2dZ";
-                auto n = swscanf_s(input.c_str(), formatString,
-                    &sysTime.wYear,  
-                    &sysTime.wMonth,  
-                    &sysTime.wDay, 
-                    &sysTime.wHour, 
-                    &sysTime.wMinute, 
-                    &sysTime.wSecond);
-
-                if (n == 3 || n == 6)
-                {
-                    if (system_type_to_datetime(&sysTime, ufrac_second, &result))
-                    {
-                        return result;
-                    }
-                }
-            }
-            {
-                SYSTEMTIME sysTime = {0};
-                DWORD date = 0;
-
-                const wchar_t * formatString = L"%8dT%2d:%2d:%2dZ";
-                auto n = swscanf_s(input.c_str(), formatString,
-                    &date, 
-                    &sysTime.wHour, 
-                    &sysTime.wMinute, 
-                    &sysTime.wSecond);
-
-                if (n == 1 || n == 4)
-                {
-                    sysTime.wDay = date % 100;
-                    date /= 100;
-                    sysTime.wMonth = date % 100;
-                    date /= 100;
-                    sysTime.wYear = (WORD)date;
-
-                    if (system_type_to_datetime(&sysTime, ufrac_second, &result))
-                    {
-                        return result;
-                    }
-                }
-            }
-            {
-                SYSTEMTIME sysTime = {0};
-                GetSystemTime(&sysTime);    // Fill date portion with today's information
-                sysTime.wSecond = 0;
-                sysTime.wMilliseconds = 0;
-    
-                const wchar_t * formatString = L"%2d:%2d:%2dZ";
-                auto n = swscanf_s(input.c_str(), formatString,
-                    &sysTime.wHour, 
-                    &sysTime.wMinute, 
-                    &sysTime.wSecond);
-
-                if (n == 3)
-                {
-                    if (system_type_to_datetime(&sysTime, ufrac_second, &result))
-                    {
-                        return result;
-                    }
-                }
-            }
-
-        return utility::datetime();
-    }
-
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

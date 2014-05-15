@@ -20,7 +20,7 @@
 #include "wascore/protocol_xml.h"
 #include "wascore/blobstreams.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     pplx::task<void> cloud_block_blob::upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
     {
@@ -35,7 +35,7 @@ namespace wa { namespace storage {
         command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
         return core::istream_descriptor::create(block_data, needs_md5).then([command, context, block_id, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<void>
         {
-            auto md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
+            const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             command->set_build_request(std::bind(protocol::put_block, block_id, md5, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
@@ -49,7 +49,7 @@ namespace wa { namespace storage {
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
         protocol::block_list_writer writer;
-        concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(std::move(writer.write(block_list))));
+        concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(writer.write(block_list)));
 
         auto properties = m_properties;
         
@@ -137,26 +137,28 @@ namespace wa { namespace storage {
 
     pplx::task<void> cloud_block_blob::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
+        // TODO: Consider providing an overload for concurrency::streams::wistream
+
         assert_no_snapshot();
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
-        if (length == protocol::invalid_size64_t)
+        if (length == std::numeric_limits<utility::size64_t>::max())
         {
             length = core::get_remaining_stream_length(source);
         }
 
-        auto properties = m_properties;
-        auto metadata = m_metadata;
-
-        if ((length != protocol::invalid_size64_t) &&
+        if ((length != std::numeric_limits<utility::size64_t>::max()) &&
             (length <= modified_options.single_blob_upload_threshold_in_bytes()) &&
             (modified_options.parallelism_factor() == 1))
         {
             if (modified_options.use_transactional_md5() && !modified_options.store_blob_content_md5())
             {
-                throw std::invalid_argument(utility::conversions::to_utf8string(protocol::error_md5_options_mismatch));
+                throw std::invalid_argument(protocol::error_md5_options_mismatch);
             }
+
+            auto properties = m_properties;
+            auto metadata = m_metadata;
 
             auto command = std::make_shared<core::storage_command<void>>(uri());
             command->set_authentication_handler(service_client().authentication_handler());
@@ -187,6 +189,21 @@ namespace wa { namespace storage {
         });
     }
 
+    pplx::task<void> cloud_block_blob::upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        auto instance = std::make_shared<cloud_block_blob>(*this);
+        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context] (concurrency::streams::istream stream) -> pplx::task<void>
+        {
+            return instance->upload_from_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> upload_task) -> pplx::task<void>
+            {
+                return stream.close().then([upload_task] ()
+                {
+                    upload_task.wait();
+                });
+            });
+        });
+    }
+
     pplx::task<void> cloud_block_blob::upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         auto utf8_body = utility::conversions::to_utf8string(content);
@@ -205,7 +222,7 @@ namespace wa { namespace storage {
         {
             if (properties->content_type() != protocol::header_value_content_type_utf8)
             {
-                throw std::logic_error(utility::conversions::to_utf8string(protocol::error_unsupported_text_blob));
+                throw std::logic_error(protocol::error_unsupported_text_blob);
             }
 
             std::string utf8_body(reinterpret_cast<char*>(buffer.collection().data()), static_cast<unsigned int>(buffer.size()));
@@ -213,4 +230,4 @@ namespace wa { namespace storage {
         });
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

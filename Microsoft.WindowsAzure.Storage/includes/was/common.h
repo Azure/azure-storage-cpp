@@ -22,7 +22,12 @@
 #include "core.h"
 #include "retry_policies.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
+
+    namespace protocol
+    {
+        class service_stats_reader;
+    }
 
     /// <summary>
     /// Represents the user meta-data for queues, containers and blobs.
@@ -50,7 +55,7 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the <see cref="continuation_token"/> class.
         /// </summary>
         /// <param name="next_marker">The next_marker.</param>
-        continuation_token(const utility::string_t& next_marker)
+        explicit continuation_token(utility::string_t next_marker)
             : m_next_marker(std::move(next_marker)), m_target_location(storage_location::unspecified)
         {
         }
@@ -68,7 +73,7 @@ namespace wa { namespace storage {
         /// Sets the next marker for continuing results for enumeration operations.
         /// </summary>
         /// <param name="next_marker">The next marker for continuing results for enumeration operations.</param>
-        void set_next_marker(const utility::string_t& next_marker)
+        void set_next_marker(utility::string_t next_marker)
         {
             m_next_marker = std::move(next_marker);
         }
@@ -153,7 +158,7 @@ namespace wa { namespace storage {
     private:
 
         std::vector<result_type> m_results;
-        wa::storage::continuation_token m_continuation_token;
+        azure::storage::continuation_token m_continuation_token;
     };
 
     /// <summary>
@@ -287,21 +292,21 @@ namespace wa { namespace storage {
             }
 
             /// <summary>
-            /// Gets the version of Storage Analytics.
+            /// Gets the version of Storage Analytics in use.
             /// </summary>
-            /// <returns>A string identifying the version of Storage Analytics.</returns>
+            /// <returns>A string specifying the version of Storage Analytics to use. Set this value to "1.0".</returns>
             const utility::string_t& version() const
             {
                 return m_version;
             }
 
             /// <summary>
-            /// Sets the version of Storage Analytics.
+            /// Gets the version of Storage Analytics to use.
             /// </summary>
-            /// <param name="value">A string identifying the version of Storage Analytics.</param>
-            void set_version(const utility::string_t& value)
+            /// <param name="value">A string specifying the version of Storage Analytics to use. Set this value to "1.0".</param>
+            void set_version(utility::string_t value)
             {
-                m_version = value;
+                m_version = std::move(value);
             }
 
             /// <summary>
@@ -412,7 +417,7 @@ namespace wa { namespace storage {
         public:
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="wa::storage::service_properties::metrics_properties" /> class.
+            /// Initializes a new instance of the <see cref="azure::storage::service_properties::metrics_properties" /> class.
             /// </summary>
             metrics_properties()
                 : m_include_apis(false), m_retention_enabled(false), m_retention_days(0)
@@ -420,21 +425,21 @@ namespace wa { namespace storage {
             }
 
             /// <summary>
-            /// Gets the version of Storage Analytics.
+            /// Gets the version of Storage Analytics in use.
             /// </summary>
-            /// <returns>A string identifying the version of Storage Analytics.</returns>
+            /// <returns>A string specifying the version of Storage Analytics to use. Set this value to "1.0".</returns>
             const utility::string_t& version() const
             {
                 return m_version;
             }
 
             /// <summary>
-            /// Sets the version of Storage Analytics.
+            /// Gets the version of Storage Analytics to use.
             /// </summary>
-            /// <param name="value">A string identifying the version of Storage Analytics.</param>
-            void set_version(const utility::string_t& value)
+            /// <param name="value">A string specifying the version of Storage Analytics to use. Set this value to "1.0".</param>
+            void set_version(utility::string_t value)
             {
-                m_version = value;
+                m_version = std::move(value);
             }
 
             /// <summary>
@@ -526,7 +531,7 @@ namespace wa { namespace storage {
         public:
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="wa::storage::service_properties::cors_rule" /> class.
+            /// Initializes a new instance of the <see cref="azure::storage::service_properties::cors_rule" /> class.
             /// </summary>
             cors_rule()
             {
@@ -554,9 +559,9 @@ namespace wa { namespace storage {
             /// Sets domain names allowed via CORS.
             /// </summary>
             /// <param name="value">A collection of strings containing the allowed domain names, limited to 64.</param>
-            void set_allowed_origins(const std::vector<utility::string_t>& value)
+            void set_allowed_origins(std::vector<utility::string_t> value)
             {
-                m_allowed_origins = value;
+                m_allowed_origins = std::move(value);
             }
 
             /// <summary>
@@ -581,9 +586,9 @@ namespace wa { namespace storage {
             /// Sets response headers that should be exposed to client via CORS.
             /// </summary>
             /// <param name="value">A collection of strings containing exposed headers, limited to 64 defined headers and two prefixed headers.</param>
-            void set_exposed_headers(const std::vector<utility::string_t>& value)
+            void set_exposed_headers(std::vector<utility::string_t> value)
             {
-                m_exposed_headers = value;
+                m_exposed_headers = std::move(value);
             }
 
             /// <summary>
@@ -608,9 +613,9 @@ namespace wa { namespace storage {
             /// Sets headers allowed to be part of the CORS request.
             /// </summary>
             /// <param name="value">A collection of strings containing allowed headers, limited to 64 defined headers and two prefixed headers.</param>
-            void set_allowed_headers(const std::vector<utility::string_t>& value)
+            void set_allowed_headers(std::vector<utility::string_t> value)
             {
-                m_allowed_headers = value;
+                m_allowed_headers = std::move(value);
             }
 
             /// <summary>
@@ -635,16 +640,16 @@ namespace wa { namespace storage {
             /// Sets the HTTP methods permitted to execute for this origin.
             /// </summary>
             /// <param name="value">The allowed HTTP methods.</param>
-            void set_allowed_methods(const std::vector<web::http::method>& value)
+            void set_allowed_methods(std::vector<web::http::method> value)
             {
-                m_allowed_methods = value;
+                m_allowed_methods = std::move(value);
             }
 
             /// <summary>
             /// Gets the length of time in seconds that a preflight response should be cached by browser.
             /// </summary>
             /// <returns>The maximum number of seconds to cache the response.</returns>
-            const std::chrono::seconds& max_age() const
+            const std::chrono::seconds max_age() const
             {
                 return m_max_age;
             }
@@ -653,7 +658,7 @@ namespace wa { namespace storage {
             /// Sets the length of time in seconds that a preflight response should be cached by browser.
             /// </summary>
             /// <param name="value">The maximum number of seconds to cache the response.</param>
-            void set_max_age(const std::chrono::seconds& value)
+            void set_max_age(const std::chrono::seconds value)
             {
                 m_max_age = value;
             }
@@ -696,9 +701,9 @@ namespace wa { namespace storage {
         /// Sets the logging properties for the service.
         /// </summary>
         /// <param name="value">The logging properties for the service.</param>
-        void set_logging(const logging_properties& value)
+        void set_logging(logging_properties value)
         {
-            m_logging = value;
+            m_logging = std::move(value);
         }
 
         /// <summary>
@@ -723,9 +728,9 @@ namespace wa { namespace storage {
         /// Sets the hour metrics properties for the service.
         /// </summary>
         /// <param name="value">The hour metrics properties for the service.</param>
-        void set_hour_metrics(const metrics_properties& value)
+        void set_hour_metrics(metrics_properties value)
         {
-            m_hour_metrics = value;
+            m_hour_metrics = std::move(value);
         }
 
         /// <summary>
@@ -750,9 +755,9 @@ namespace wa { namespace storage {
         /// Sets the minute metrics properties for the service.
         /// </summary>
         /// <param name="value">The minute metrics properties for the service.</param>
-        void set_minute_metrics(const metrics_properties& value)
+        void set_minute_metrics(metrics_properties value)
         {
-            m_minute_metrics = value;
+            m_minute_metrics = std::move(value);
         }
 
         /// <summary>
@@ -777,9 +782,9 @@ namespace wa { namespace storage {
         /// Sets the Cross Origin Resource Sharing (CORS) properties for the service.
         /// </summary>
         /// <param name="value">The CORS properties for the service.</param>
-        void set_cors(const std::vector<cors_rule>& value)
+        void set_cors(std::vector<cors_rule> value)
         {
-            m_cors_rules = value;
+            m_cors_rules = std::move(value);
         }
 
         /// <summary>
@@ -795,9 +800,9 @@ namespace wa { namespace storage {
         /// Sets the default service version for the Blob service.
         /// </summary>
         /// <param name="value">The default service version for the Blob service.</param>
-        void set_default_service_version(const utility::string_t& value)
+        void set_default_service_version(utility::string_t value)
         {
-            m_default_service_version = value;
+            m_default_service_version = std::move(value);
         }
 
     private:
@@ -807,6 +812,126 @@ namespace wa { namespace storage {
         metrics_properties m_hour_metrics;
         std::vector<cors_rule> m_cors_rules;
         utility::string_t m_default_service_version;
+    };
+
+    /// <summary>
+    /// Enumeration representing the status of geo-replication for the storage account.
+    /// </summary>
+    enum class geo_replication_status
+    {
+        /// <summary>
+        /// The status of geo-replication is unavailable for the storage account.
+        /// </summary>
+        unavailable,
+
+        /// <summary>
+        /// Geo-replication is live for the storage account.
+        /// </summary>
+        live,
+
+        /// <summary>
+        /// Data is being bootstrapped from the primary location to the secondary location.
+        /// </summary>
+        bootstrap,
+    };
+
+    /// <summary>
+    /// Represents a set of stats pertaining to the Blob, Queue, or Table service.
+    /// </summary>
+    class service_stats
+    {
+    public:
+
+        /// <summary>
+        /// Represents the geo-replication stats for the service.
+        /// </summary>
+        class geo_replication_stats
+        {
+        public:
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="geo_replication_stats"/> struct.
+            /// </summary>
+            geo_replication_stats()
+                : m_status(geo_replication_status::unavailable)
+            {
+            }
+
+            /// <summary>
+            /// Gets the status of geo-replication.
+            /// </summary>
+            /// <returns>The status of geo-replication.</returns>
+            geo_replication_status status() const
+            {
+                return m_status;
+            }
+
+            /// <summary>
+            /// Gets the last synchronization time.
+            /// </summary>
+            /// <returns>The last synchronization time.</returns>
+            /// <remarks>All primary writes preceding this value are guaranteed to be available for read operations. Primary writes following this point in time may or may not be available for reads.</remarks>
+            const utility::datetime last_sync_time() const
+            {
+                return m_last_sync_time;
+            }
+
+        private:
+
+            /// <summary>
+            /// Sets the status of geo-replication.
+            /// </summary>
+            /// <param name="value">The status of geo-replication.</param>
+            void set_status(geo_replication_status value)
+            {
+                m_status = value;
+            }
+
+            /// <summary>
+            /// Sets the last synchronization time.
+            /// </summary>
+            /// <param name="value">The last synchronization time.</param>
+            void set_last_sync_time(utility::datetime value)
+            {
+                m_last_sync_time = value;
+            }
+
+            geo_replication_status m_status;
+            utility::datetime m_last_sync_time;
+
+            friend class protocol::service_stats_reader;
+        };
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="service_stats"/> class.
+        /// </summary>
+        service_stats()
+        {
+        }
+
+        /// <summary>
+        /// Gets the geo-replication stats.
+        /// </summary>
+        /// <returns>The geo-replication stats.</returns>
+        const geo_replication_stats& geo_replication() const
+        {
+            return m_geo_replication;
+        }
+
+    private:
+
+        /// <summary>
+        /// Gets the geo-replication stats.
+        /// </summary>
+        /// <returns>The geo-replication stats.</returns>
+        geo_replication_stats& geo_replication_private()
+        {
+            return m_geo_replication;
+        }
+
+        geo_replication_stats m_geo_replication;
+
+        friend class protocol::service_stats_reader;
     };
 
     /// <summary>
@@ -859,16 +984,16 @@ namespace wa { namespace storage {
         /// Sets the client request ID.
         /// </summary>
         /// <param name="client_request_id">A string containing the client request ID.</param>
-        void set_client_request_id(const utility::string_t& client_request_id)
+        void set_client_request_id(utility::string_t client_request_id)
         {
-            m_client_request_id = client_request_id;
+            m_client_request_id = std::move(client_request_id);
         }
 
         /// <summary>
         /// Gets the start time of the request.
         /// </summary>
         /// <returns>The start time of the request.</returns>
-        const utility::datetime& start_time() const
+        utility::datetime start_time() const
         {
             return m_start_time;
         }
@@ -877,7 +1002,7 @@ namespace wa { namespace storage {
         /// Sets the start time of the requeset.
         /// </summary>
         /// <param name="start_time">The start time of the request.</param>
-        void set_start_time(const utility::datetime& start_time)
+        void set_start_time(utility::datetime start_time)
         {
             m_start_time = start_time;
         }
@@ -886,7 +1011,7 @@ namespace wa { namespace storage {
         /// Gets the end time of the request.
         /// </summary>
         /// <returns>The end time of the request.</returns>
-        const utility::datetime& end_time() const
+        utility::datetime end_time() const
         {
             return m_end_time;
         }
@@ -895,7 +1020,7 @@ namespace wa { namespace storage {
         /// Sets the end time of the requeset.
         /// </summary>
         /// <param name="start_time">The end time of the request.</param>
-        void set_end_time(const utility::datetime& end_time)
+        void set_end_time(utility::datetime end_time)
         {
             m_end_time = end_time;
         }
@@ -940,10 +1065,10 @@ namespace wa { namespace storage {
         /// Adds a request result to the set of results.
         /// </summary>
         /// <param name="result">A <see cref="request_result" /> object.</param>
-        void add_request_result(const request_result& result)
+        void add_request_result(request_result result)
         {
             pplx::extensibility::scoped_critical_section_t l(m_request_results_lock);
-            m_request_results.push_back(result);
+            m_request_results.push_back(std::move(result));
         }
 
         /// <summary>
@@ -1044,16 +1169,16 @@ namespace wa { namespace storage {
         /// Sets the client request ID.
         /// </summary>
         /// <param name="client_request_id">The client request ID.</param>
-        void set_client_request_id(const utility::string_t& client_request_id)
+        void set_client_request_id(utility::string_t client_request_id)
         {
-            return m_impl->set_client_request_id(client_request_id);
+            return m_impl->set_client_request_id(std::move(client_request_id));
         }
 
         /// <summary>
         /// Gets the start time of the operation.
         /// </summary>
         /// <returns>The start time of the operation.</returns>
-        const utility::datetime& start_time() const
+        utility::datetime start_time() const
         {
             return m_impl->start_time();
         }
@@ -1062,7 +1187,7 @@ namespace wa { namespace storage {
         /// Sets the start time of the operation.
         /// </summary>
         /// <param name="start_time">The start time of the operation.</param>
-        void set_start_time(const utility::datetime& start_time)
+        void set_start_time(utility::datetime start_time)
         {
             return m_impl->set_start_time(start_time);
         }
@@ -1071,7 +1196,7 @@ namespace wa { namespace storage {
         /// Gets the end time of the operation.
         /// </summary>
         /// <returns>The end time of the operation.</returns>
-        const utility::datetime& end_time() const
+        utility::datetime end_time() const
         {
             return m_impl->end_time();
         }
@@ -1080,36 +1205,36 @@ namespace wa { namespace storage {
         /// Sets the end time of the operation.
         /// </summary>
         /// <param name="end_time">The end time of the operation.</param>
-        void set_end_time(const utility::datetime& end_time)
+        void set_end_time(utility::datetime end_time)
         {
             return m_impl->set_end_time(end_time);
         }
 
         /// <summary>
-        /// Gets the default logging level to be used for subsequently created instances of the <see cref="wa::storage::operation_context"/> class.
+        /// Gets the default logging level to be used for subsequently created instances of the <see cref="azure::storage::operation_context"/> class.
         /// </summary>
-        /// <returns>A value of type <see cref="wa::storage::client_log_level"/> that specifies which events are logged by default by instances of the <see cref="wa::storage::operation_context"/>.</returns>
+        /// <returns>A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by default by instances of the <see cref="azure::storage::operation_context"/>.</returns>
         WASTORAGE_API static client_log_level default_log_level();
 
         /// <summary>
-        /// Sets the default logging level to be used for subsequently created instances of the <see cref="wa::storage::operation_context"/> class.
+        /// Sets the default logging level to be used for subsequently created instances of the <see cref="azure::storage::operation_context"/> class.
         /// </summary>
-        /// <param name="log_level">A value of type <see cref="wa::storage::client_log_level"/> that specifies which events are logged by default by instances of the <see cref="wa::storage::operation_context"/>.</param>
+        /// <param name="log_level">A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by default by instances of the <see cref="azure::storage::operation_context"/>.</param>
         WASTORAGE_API static void set_default_log_level(client_log_level log_level);
 
         /// <summary>
-        /// Gets the logging level to be used for an instance of the <see cref="wa::storage::operation_context"/> class.
+        /// Gets the logging level to be used for an instance of the <see cref="azure::storage::operation_context"/> class.
         /// </summary>
-        /// <returns>A value of type <see cref="wa::storage::client_log_level"/> that specifies which events are logged by the <see cref="wa::storage::operation_context"/>.</returns>
+        /// <returns>A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by the <see cref="azure::storage::operation_context"/>.</returns>
         client_log_level log_level() const
         {
             return m_impl->log_level();
         }
 
         /// <summary>
-        /// Sets the logging level to be used for an instance of the <see cref="wa::storage::operation_context"/> class.
+        /// Sets the logging level to be used for an instance of the <see cref="azure::storage::operation_context"/> class.
         /// </summary>
-        /// <param name="log_level">A value of type <see cref="wa::storage::client_log_level"/> that specifies which events are logged by the <see cref="wa::storage::operation_context"/>.</param>
+        /// <param name="log_level">A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by the <see cref="azure::storage::operation_context"/>.</param>
         void set_log_level(client_log_level log_level)
         {
             m_impl->set_log_level(log_level);
@@ -1127,7 +1252,7 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the set of request results that the current operation has created.
         /// </summary>
-        /// <returns>A <see cref="std::vector"/> object that contains <see cref="wa::storage::request_result"/> objects that represent the request results created by the current operation.</returns>
+        /// <returns>A <see cref="std::vector"/> object that contains <see cref="azure::storage::request_result"/> objects that represent the request results created by the current operation.</returns>
         const std::vector<request_result>& request_results() const
         {
             return m_impl->request_results();
@@ -1289,7 +1414,7 @@ namespace wa { namespace storage {
         /// Sets the start time for the shared access policy.
         /// </summary>
         /// <param name="start">The start time for the access policy.</param>
-        void set_start(const utility::datetime& value)
+        void set_start(utility::datetime value)
         {
             m_start = value;
         }
@@ -1298,7 +1423,7 @@ namespace wa { namespace storage {
         /// Gets the start time for the shared access policy.
         /// </summary>
         /// <returns>The start time for the access policy.</returns>
-        const utility::datetime& start() const
+        utility::datetime start() const
         {
             return m_start;
         }
@@ -1307,7 +1432,7 @@ namespace wa { namespace storage {
         /// Sets the expiry time for the shared access policy.
         /// </summary>
         /// <param name="expiry">The expiry time for the shared access policy.</param>
-        void set_expiry(const utility::datetime& value)
+        void set_expiry(utility::datetime value)
         {
             m_expiry = value;
         }
@@ -1316,7 +1441,7 @@ namespace wa { namespace storage {
         /// Gets the expiry time for the shared access policy.
         /// </summary>
         /// <returns>The expiry time for the shared access policy.</returns>
-        const utility::datetime& expiry() const
+        utility::datetime expiry() const
         {
             return m_expiry;
         }
@@ -1345,7 +1470,7 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
-        shared_access_policy(const utility::datetime& expiry, uint8_t permission)
+        shared_access_policy(utility::datetime expiry, uint8_t permission)
             : m_permission(permission), m_expiry(expiry)
         {
         }
@@ -1356,7 +1481,7 @@ namespace wa { namespace storage {
         /// <param name="start">The start date and time for the shared access policy.</param>
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
-        shared_access_policy(const utility::datetime& start, const utility::datetime& expiry, uint8_t permission)
+        shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission)
             : m_permission(permission), m_start(start), m_expiry(expiry)
         {
         }
@@ -1387,7 +1512,7 @@ namespace wa { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_permissions" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_permissions" /> class.
         /// </summary>
         cloud_permissions()
         {
@@ -1415,9 +1540,9 @@ namespace wa { namespace storage {
         /// Sets the set of shared access policies for the specified object.
         /// </summary>
         /// <param name="value">The set of shared access policies for the specified object.</param>
-        void set_policies(const shared_access_policies<Policy>& value)
+        void set_policies(shared_access_policies<Policy> value)
         {
-            m_policies = value;
+            m_policies = std::move(value);
         }
 
     private:
@@ -1432,11 +1557,14 @@ namespace wa { namespace storage {
     {
     public:
 
+        // TODO: Optimize request_options to make copying and duplicating these objects unnecesary (maybe make it immutable)
+        // TODO: Consider not overwriting unset values in request_options with the service's defaults because it is a confusing interface (the service's defaults would be used only when the user does not supply a request_options parameter)
+
         /// <summary>
         /// Gets the retry policy for the request.
         /// </summary>
         /// <returns>The retry policy for the request.</returns>
-        wa::storage::retry_policy retry_policy() const
+        azure::storage::retry_policy retry_policy() const
         {
             return m_retry_policy;
         }
@@ -1445,7 +1573,7 @@ namespace wa { namespace storage {
         /// Sets the retry policy for the request.
         /// </summary>
         /// <param name="retry_policy">The retry policy for the request.</param>
-        void set_retry_policy(wa::storage::retry_policy retry_policy)
+        void set_retry_policy(azure::storage::retry_policy retry_policy)
         {
             m_retry_policy = retry_policy;
         }
@@ -1454,7 +1582,7 @@ namespace wa { namespace storage {
         /// Gets the server timeout for the request. 
         /// </summary>
         /// <returns>The server timeout for the request.</returns>
-        const std::chrono::seconds& server_timeout() const
+        const std::chrono::seconds server_timeout() const
         {
             return m_server_timeout;
         }
@@ -1463,7 +1591,7 @@ namespace wa { namespace storage {
         /// Sets the server timeout for the request. 
         /// </summary>
         /// <param name="server_timeout">The server timeout for the request.</param>
-        void set_server_timeout(const std::chrono::seconds& server_timeout)
+        void set_server_timeout(std::chrono::seconds server_timeout)
         {
             m_server_timeout = server_timeout;
         }
@@ -1472,7 +1600,7 @@ namespace wa { namespace storage {
         /// Gets the maximum execution time across all potential retries.
         /// </summary>
         /// <returns>The maximum execution time.</returns>
-        const std::chrono::seconds& maximum_execution_time() const
+        const std::chrono::seconds maximum_execution_time() const
         {
             return m_maximum_execution_time;
         }
@@ -1481,7 +1609,7 @@ namespace wa { namespace storage {
         /// Sets the maximum execution time across all potential retries.
         /// </summary>
         /// <param name="maximum_execution_time">The maximum execution time.</param>
-        void set_maximum_execution_time(const std::chrono::seconds& maximum_execution_time)
+        void set_maximum_execution_time(std::chrono::seconds maximum_execution_time)
         {
             m_maximum_execution_time = maximum_execution_time;
         }
@@ -1490,7 +1618,7 @@ namespace wa { namespace storage {
         /// Gets the location mode of the request.
         /// </summary>
         /// <returns>The location mode of the request.</returns>
-        wa::storage::location_mode location_mode() const
+        azure::storage::location_mode location_mode() const
         {
             return m_location_mode;
         }
@@ -1499,7 +1627,7 @@ namespace wa { namespace storage {
         /// Sets the location mode of the request.
         /// </summary>
         /// <param name="location_mode">The location mode of the request.</param>
-        void set_location_mode(wa::storage::location_mode location_mode)
+        void set_location_mode(azure::storage::location_mode location_mode)
         {
             m_location_mode = location_mode;
         }
@@ -1508,7 +1636,7 @@ namespace wa { namespace storage {
         /// Gets the expiry time across all potential retries for the request.
         /// </summary>
         /// <returns>The expiry time.</returns>
-        const utility::datetime& operation_expiry_time() const
+        utility::datetime operation_expiry_time() const
         {
             return m_operation_expiry_time;
         }
@@ -1519,8 +1647,7 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the <see cref="request_options"/> class.
         /// </summary>
         request_options()
-            : m_server_timeout(protocol::default_server_timeout),
-            m_location_mode(location_mode::primary_only),
+            : m_location_mode(location_mode::primary_only),
             m_retry_policy(exponential_retry_policy())
         {
         }
@@ -1559,10 +1686,10 @@ namespace wa { namespace storage {
     private:
 
         utility::datetime m_operation_expiry_time;
-        wa::storage::retry_policy m_retry_policy;
+        azure::storage::retry_policy m_retry_policy;
         option_with_default<std::chrono::seconds> m_server_timeout;
         option_with_default<std::chrono::seconds> m_maximum_execution_time;
-        option_with_default<wa::storage::location_mode> m_location_mode;
+        option_with_default<azure::storage::location_mode> m_location_mode;
     };
 
-}} // namespace wa::storage
+}} // namespace azure::storage

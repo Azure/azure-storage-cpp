@@ -19,7 +19,7 @@
 #include "was/table.h"
 #include "wascore/util.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     table_request_options cloud_table_client::get_modified_options(const table_request_options& options) const
     {
@@ -31,24 +31,24 @@ namespace wa { namespace storage {
     pplx::task<std::vector<cloud_table>> cloud_table_client::list_tables_async(const utility::string_t& prefix, const table_request_options& options, operation_context context) const
     {
         std::shared_ptr<std::vector<cloud_table>> results = std::make_shared<std::vector<cloud_table>>();
-        std::shared_ptr<continuation_token> continuation_token = std::make_shared<wa::storage::continuation_token>();
+        std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
 
-        return pplx::details::do_while([this, results, prefix, continuation_token, options, context] () mutable -> pplx::task<bool>
+        return pplx::details::do_while([this, results, prefix, token, options, context] () mutable -> pplx::task<bool>
         {
-            return list_tables_segmented_async(prefix, -1, *continuation_token, options, context).then([results, continuation_token] (table_result_segment result_segment) mutable -> bool
+            return list_tables_segmented_async(prefix, -1, *token, options, context).then([results, token] (table_result_segment result_segment) mutable -> bool
             {
-                std::vector<wa::storage::cloud_table> partial_results = result_segment.results();
+                std::vector<azure::storage::cloud_table> partial_results = result_segment.results();
                 results->insert(results->end(), partial_results.begin(), partial_results.end());
-                *continuation_token = result_segment.continuation_token();
-                return !continuation_token->empty();
+                *token = result_segment.continuation_token();
+                return !token->empty();
             });
-        }).then([results] (bool guard) -> pplx::task<std::vector<cloud_table>>
+        }).then([results] (bool) -> pplx::task<std::vector<cloud_table>>
         {
             return pplx::task_from_result(*results);
         });
     }
 
-    pplx::task<table_result_segment> cloud_table_client::list_tables_segmented_async(const utility::string_t& prefix, int max_results, const continuation_token& continuation_token, const table_request_options& options, operation_context context) const
+    pplx::task<table_result_segment> cloud_table_client::list_tables_segmented_async(const utility::string_t& prefix, int max_results, const continuation_token& token, const table_request_options& options, operation_context context) const
     {
         table_request_options modified_options = get_modified_options(options);
 
@@ -72,7 +72,7 @@ namespace wa { namespace storage {
             query.set_filter_string(filter_string);
         }
 
-        return table.execute_query_segmented_async(query, continuation_token, options, context).then([this] (table_query_segment query_segment) -> table_result_segment
+        return table.execute_query_segmented_async(query, token, options, context).then([this] (table_query_segment query_segment) -> table_result_segment
         {
             std::vector<table_entity> query_results = query_segment.results();
 
@@ -85,8 +85,8 @@ namespace wa { namespace storage {
                 table_entity entity = *itr;
 
                 utility::string_t table_name = entity.properties()[U("TableName")].string_value();
-                cloud_table current_table = get_table_reference(table_name);
-                table_results.push_back(current_table);
+                cloud_table current_table = get_table_reference(std::move(table_name));
+                table_results.push_back(std::move(current_table));
             }
 
             table_result_segment result_segment;
@@ -111,34 +111,42 @@ namespace wa { namespace storage {
         return upload_service_properties_base_async(properties, includes, modified_options, context);
     }
 
-    cloud_table cloud_table_client::get_table_reference(const utility::string_t& table_name) const
+    pplx::task<service_stats> cloud_table_client::download_service_stats_async(const table_request_options& options, operation_context context) const
     {
-        storage_uri uri = core::append_path_to_uri(base_uri(), table_name);
-        cloud_table table(*this, table_name, uri);
+        table_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options());
+
+        return download_service_stats_base_async(modified_options, context);
+    }
+
+    cloud_table cloud_table_client::get_table_reference(utility::string_t table_name) const
+    {
+        cloud_table table(*this, std::move(table_name));
         return table;
     }
 
-    void cloud_table_client::set_authentication_scheme(wa::storage::authentication_scheme value)
+    void cloud_table_client::set_authentication_scheme(azure::storage::authentication_scheme value)
     {
         cloud_client::set_authentication_scheme(value);
 
         storage_credentials creds = credentials();
         if (creds.is_shared_key())
         {
+            utility::string_t account_name = creds.account_name();
             switch (authentication_scheme())
             {
-            case wa::storage::authentication_scheme::shared_key_lite:
-                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_lite_table_canonicalizer>(creds.account_name()), creds));
+            case azure::storage::authentication_scheme::shared_key_lite:
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_lite_table_canonicalizer>(std::move(account_name)), std::move(creds)));
                 break;
 
-            default: // wa::storage::authentication_scheme::shared_key
-                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_table_canonicalizer>(creds.account_name()), creds));
+            default: // azure::storage::authentication_scheme::shared_key
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_table_canonicalizer>(std::move(account_name)), std::move(creds)));
                 break;
             }
         }
         else if (creds.is_sas())
         {
-            set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(creds));
+            set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(std::move(creds)));
         }
         else
         {
@@ -146,4 +154,4 @@ namespace wa { namespace storage {
         }
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

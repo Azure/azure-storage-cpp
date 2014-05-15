@@ -23,11 +23,12 @@
 #include "util.h"
 #include "was/blob.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     class basic_cloud_blob_istreambuf : public basic_istreambuf<concurrency::streams::ostream::traits::char_type>
     {
     public:
+
         basic_cloud_blob_istreambuf(std::shared_ptr<cloud_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
             : basic_istreambuf<concurrency::streams::ostream::traits::char_type>(),
             m_blob(blob), m_condition(condition), m_options(options), m_context(context),
@@ -124,11 +125,15 @@ namespace wa { namespace storage { namespace core {
 
         bool acquire(_Out_writes_(count) char_type*& ptr, _In_ size_t& count)
         {
+            UNREFERENCED_PARAMETER(ptr);
+            UNREFERENCED_PARAMETER(count);
             return false;
         }
 
         void release(_Out_writes_(count) char_type* ptr, _In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(ptr);
+            UNREFERENCED_PARAMETER(count);
             // no-op, as blob streams do not support acquire/release
         }
 
@@ -152,8 +157,8 @@ namespace wa { namespace storage { namespace core {
         blob_request_options m_options;
         operation_context m_context;
         hash_streambuf m_blob_hash;
-        int64_t m_current_blob_offset;
-        int64_t m_next_blob_offset;
+        off_type m_current_blob_offset;
+        off_type m_next_blob_offset;
         size_t m_buffer_size;
         size_t m_next_buffer_size;
         concurrency::streams::container_buffer<std::vector<char_type>> m_buffer;
@@ -253,11 +258,13 @@ namespace wa { namespace storage { namespace core {
 
         char_type* _alloc(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             return nullptr;
         }
 
         void _commit(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             // no-op, as blob streams do not support alloc/commit
         }
 
@@ -272,8 +279,8 @@ namespace wa { namespace storage { namespace core {
         {
         public:
             buffer_to_upload(concurrency::streams::container_buffer<std::vector<char_type>> buffer, const utility::string_t& content_md5)
-                : m_stream(concurrency::streams::container_stream<std::vector<char_type>>::open_istream(std::move(buffer.collection()))),
-                m_size(buffer.size()),
+                : m_size(buffer.size()),
+                m_stream(concurrency::streams::container_stream<std::vector<char_type>>::open_istream(std::move(buffer.collection()))),
                 m_content_md5(content_md5)
             {
             }
@@ -351,6 +358,8 @@ namespace wa { namespace storage { namespace core {
 
         pos_type seekpos(pos_type pos, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(pos);
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
@@ -371,6 +380,7 @@ namespace wa { namespace storage { namespace core {
     class cloud_block_blob_ostreambuf : public concurrency::streams::streambuf<basic_cloud_block_blob_ostreambuf::char_type>
     {
     public:
+
         cloud_block_blob_ostreambuf(std::shared_ptr<cloud_block_blob> blob,const access_condition &condition, const blob_request_options& options, operation_context context)
             : concurrency::streams::streambuf<basic_cloud_block_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_block_blob_ostreambuf>(blob, condition, options, context))
         {
@@ -380,6 +390,7 @@ namespace wa { namespace storage { namespace core {
     class basic_cloud_page_blob_ostreambuf : public basic_cloud_blob_ostreambuf
     {
     public:
+
         basic_cloud_page_blob_ostreambuf(std::shared_ptr<cloud_page_blob> blob, utility::size64_t blob_size, const access_condition &condition, const blob_request_options& options, operation_context context)
             : basic_cloud_blob_ostreambuf(condition, options, context),
             m_blob(blob), m_blob_size(blob_size), m_current_blob_offset(0)
@@ -436,10 +447,11 @@ namespace wa { namespace storage { namespace core {
     class cloud_page_blob_ostreambuf : public concurrency::streams::streambuf<basic_cloud_page_blob_ostreambuf::char_type>
     {
     public:
+
         cloud_page_blob_ostreambuf(std::shared_ptr<cloud_page_blob> blob, utility::size64_t blob_size, const access_condition &condition, const blob_request_options& options, operation_context context)
-        : concurrency::streams::streambuf<basic_cloud_page_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_page_blob_ostreambuf>(blob, blob_size, condition, options, context))
+            : concurrency::streams::streambuf<basic_cloud_page_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_page_blob_ostreambuf>(blob, blob_size, condition, options, context))
         {
         }
     };
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

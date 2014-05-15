@@ -21,13 +21,13 @@
 
 #include "common.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     class cloud_blob_shared_access_headers;
 
-}} // namespace wa::storage
+}} // namespace azure::storage
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials);
 
@@ -119,7 +119,7 @@ namespace wa { namespace storage { namespace protocol {
         /// Converts the specified HTTP request data into a standard form for signing.
         /// </summary>
         /// <param name="request">The HTTP request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The canonicalized string containing the HTTP request data in a standard form for signing.</returns>
         /// <remarks>
         /// <para>For detailed information on how to authenticate a request, 
@@ -143,8 +143,8 @@ namespace wa { namespace storage { namespace protocol {
         /// Initializes a new instance of the <see cref="canonicalizer"/> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
-        canonicalizer(const utility::string_t& account_name)
-            : m_account_name(account_name)
+        explicit canonicalizer(utility::string_t account_name)
+            : m_account_name(std::move(account_name))
         {
         }
 
@@ -170,8 +170,8 @@ namespace wa { namespace storage { namespace protocol {
         /// Initializes a new instance of the <see cref="shared_key_blob_queue_canonicalizer"/> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
-        shared_key_blob_queue_canonicalizer(const utility::string_t& account_name)
-            : canonicalizer(account_name)
+        explicit shared_key_blob_queue_canonicalizer(utility::string_t account_name)
+            : canonicalizer(std::move(account_name))
         {
         }
 
@@ -179,7 +179,7 @@ namespace wa { namespace storage { namespace protocol {
         /// Converts the specified HTTP request data into a standard form for signing.
         /// </summary>
         /// <param name="request">The HTTP request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The canonicalized string containing the HTTP request data in a standard form for signing.</returns>
         /// <remarks>
         /// <para>For detailed information on how to authenticate a request, 
@@ -217,8 +217,8 @@ namespace wa { namespace storage { namespace protocol {
         /// Initializes a new instance of the <see cref="shared_key_lite_blob_queue_canonicalizer"/> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
-        shared_key_lite_blob_queue_canonicalizer(const utility::string_t& account_name)
-            : canonicalizer(account_name)
+        explicit shared_key_lite_blob_queue_canonicalizer(utility::string_t account_name)
+            : canonicalizer(std::move(account_name))
         {
         }
 
@@ -226,7 +226,7 @@ namespace wa { namespace storage { namespace protocol {
         /// Converts the specified HTTP request data into a standard form for signing.
         /// </summary>
         /// <param name="request">The HTTP request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The canonicalized string containing the HTTP request data in a standard form for signing.</returns>
         /// <remarks>
         /// <para>For detailed information on how to authenticate a request, 
@@ -264,8 +264,8 @@ namespace wa { namespace storage { namespace protocol {
         /// Initializes a new instance of the <see cref="shared_key_table_canonicalizer"/> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
-        shared_key_table_canonicalizer(const utility::string_t& account_name)
-            : canonicalizer(account_name)
+        explicit shared_key_table_canonicalizer(utility::string_t account_name)
+            : canonicalizer(std::move(account_name))
         {
         }
 
@@ -273,7 +273,7 @@ namespace wa { namespace storage { namespace protocol {
         /// Converts the specified HTTP request data into a standard form for signing.
         /// </summary>
         /// <param name="request">The HTTP request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The canonicalized string containing the HTTP request data in a standard form for signing.</returns>
         /// <remarks>
         /// <para>For detailed information on how to authenticate a request, 
@@ -311,8 +311,8 @@ namespace wa { namespace storage { namespace protocol {
         /// Initializes a new instance of the <see cref="shared_key_lite_table_canonicalizer"/> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
-        shared_key_lite_table_canonicalizer(const utility::string_t& account_name)
-            : canonicalizer(account_name)
+        explicit shared_key_lite_table_canonicalizer(utility::string_t account_name)
+            : canonicalizer(std::move(account_name))
         {
         }
 
@@ -320,7 +320,7 @@ namespace wa { namespace storage { namespace protocol {
         /// Converts the specified HTTP request data into a standard form for signing.
         /// </summary>
         /// <param name="request">The HTTP request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The canonicalized string containing the HTTP request data in a standard form for signing.</returns>
         /// <remarks>
         /// <para>For detailed information on how to authenticate a request, 
@@ -357,9 +357,11 @@ namespace wa { namespace storage { namespace protocol {
         /// Sign the specified request for authentication.
         /// </summary>
         /// <param name="request">The request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         virtual void sign_request(web::http::http_request& request, operation_context context) const
         {
+            UNREFERENCED_PARAMETER(request);
+            UNREFERENCED_PARAMETER(context);
         }
     };
 
@@ -374,8 +376,8 @@ namespace wa { namespace storage { namespace protocol {
         /// Initializes a new instance of the <see cref="sas_authentication_handler"/> class.
         /// </summary>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use to sign the request.</param>
-        sas_authentication_handler(const storage_credentials& credentials)
-            : m_credentials(credentials)
+        explicit sas_authentication_handler(storage_credentials credentials)
+            : m_credentials(std::move(credentials))
         {
         }
 
@@ -383,7 +385,7 @@ namespace wa { namespace storage { namespace protocol {
         /// Sign the specified request for authentication.
         /// </summary>
         /// <param name="request">The request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         WASTORAGE_API void sign_request(web::http::http_request& request, operation_context context) const override;
 
     private:
@@ -403,8 +405,8 @@ namespace wa { namespace storage { namespace protocol {
         /// </summary>
         /// <param name="canonicalizer">The canonicalizer to use to sign the request.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use to sign the request.</param>
-        shared_key_authentication_handler(std::shared_ptr<canonicalizer> canonicalizer, const storage_credentials& credentials)
-            : m_canonicalizer(canonicalizer), m_credentials(credentials)
+        shared_key_authentication_handler(std::shared_ptr<canonicalizer> canonicalizer, storage_credentials credentials)
+            : m_canonicalizer(canonicalizer), m_credentials(std::move(credentials))
         {
         }
 
@@ -412,7 +414,7 @@ namespace wa { namespace storage { namespace protocol {
         /// Sign the specified request for authentication via Shared Key.
         /// </summary>
         /// <param name="request">The request to be signed.</param>
-        /// <param name="context">An <see cref="wa::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         WASTORAGE_API void sign_request(web::http::http_request& request, operation_context context) const override;
 
     private:
@@ -432,4 +434,4 @@ namespace wa { namespace storage { namespace protocol {
 
 #pragma endregion
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

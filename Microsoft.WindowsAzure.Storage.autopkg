@@ -1,7 +1,7 @@
 nuget {
     nuspec {
         id = wastorage;
-        version: 0.2.0-preview;
+        version: 0.3.0-preview;
         title: Microsoft Windows Azure Storage Client Library for C++;
         authors: {Microsoft Corporation};
         owners: {Microsoft Corporation};
@@ -9,9 +9,7 @@ nuget {
         projectUrl: "http://go.microsoft.com/fwlink/?LinkId=235168";
         iconUrl: "http://go.microsoft.com/fwlink/?LinkID=288890";
         summary: "A client library for working with Windows Azure storage services including blobs, tables, and queues.";
-        description: @"This client library enables working with the Windows Azure storage services
-        which include the blob service for storing binary and text data, the table service for storing
-        structured non-relational data, and the queue service for storing messages that may be accessed by a client.
+        description: @"This client library enables working with the Windows Azure storage services which include the blob service for storing binary and text data, the table service for storing structured non-relational data, and the queue service for storing messages that may be accessed by a client.
         Windows Azure Storage team's blog - http://blogs.msdn.com/b/windowsazurestorage/";
         releaseNotes: "Preview release";
         tags: { Microsoft, Azure, Storage, Table, Blob, Queue, Scalable, windowsazureofficial };

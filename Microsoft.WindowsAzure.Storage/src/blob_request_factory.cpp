@@ -20,7 +20,7 @@
 #include "wascore/constants.h"
 #include "wascore/resources.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     void add_blob_container_public_access_type(web::http::http_headers& headers, blob_container_public_access_type access_type)
     {
@@ -40,13 +40,13 @@ namespace wa { namespace storage { namespace protocol {
     {
         if (!snapshot_time.empty())
         {
-            uri_builder.append_query(uri_query_snapshot, snapshot_time);
+            uri_builder.append_query(core::make_query_parameter(uri_query_snapshot, snapshot_time));
         }
     }
 
     web::http::http_request create_blob_container(blob_container_public_access_type access_type, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_blob_container_public_access_type(request.headers(), access_type);
         add_metadata(request, metadata);
@@ -55,7 +55,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request delete_blob_container(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::DEL, uri_builder, timeout, context));
         add_access_condition(request, condition);
         return request;
@@ -63,7 +63,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request get_blob_container_properties(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::HEAD, uri_builder, timeout, context));
         add_access_condition(request, condition);
         return request;
@@ -71,14 +71,14 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request set_blob_container_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         return set_blob_metadata(metadata, condition, uri_builder, timeout, context);
     }
 
     web::http::http_request get_blob_container_acl(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
-        uri_builder.append_query(uri_query_component, component_acl);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         add_lease_id(request, condition);
         return request;
@@ -86,84 +86,84 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request set_blob_container_acl(blob_container_public_access_type access_type, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
-        uri_builder.append_query(uri_query_component, component_acl);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_blob_container_public_access_type(request.headers(), access_type);
         add_lease_id(request, condition);
         return request;
     }
 
-    web::http::http_request list_containers(const utility::string_t& prefix, const container_listing_includes& includes, int max_results, const blob_continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request list_containers(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_list);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
 
         if (!prefix.empty())
         {
-            uri_builder.append_query(uri_query_prefix, prefix);
+            uri_builder.append_query(core::make_query_parameter(uri_query_prefix, prefix));
         }
 
         if (!token.empty())
         {
-            uri_builder.append_query(uri_query_marker, token.next_marker());
+            uri_builder.append_query(core::make_query_parameter(uri_query_marker, token.next_marker()));
         }
 
         if (max_results > 0)
         {
-            uri_builder.append_query(uri_query_max_results, max_results);
+            uri_builder.append_query(core::make_query_parameter(uri_query_max_results, max_results, /* do_encoding */ false));
         }
 
-        if (includes.metadata())
+        if ((includes & container_listing_details::metadata) != 0)
         {
-            uri_builder.append_query(uri_query_include, component_metadata);
+            uri_builder.append_query(core::make_query_parameter(uri_query_include, component_metadata, /* do_encoding */ false));
         }
 
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         return request;
     }
 
-    web::http::http_request list_blobs(const utility::string_t& prefix, const utility::string_t& delimiter, const blob_listing_includes& includes, int max_results, const blob_continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request list_blobs(const utility::string_t& prefix, const utility::string_t& delimiter, blob_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
-        uri_builder.append_query(uri_query_component, component_list);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
         utility::ostringstream_t include_str;
 
         if (!prefix.empty())
         {
-            uri_builder.append_query(uri_query_prefix, prefix);
+            uri_builder.append_query(core::make_query_parameter(uri_query_prefix, prefix));
         }
 
         if (!delimiter.empty())
         {
-            uri_builder.append_query(uri_query_delimiter, delimiter);
+            uri_builder.append_query(core::make_query_parameter(uri_query_delimiter, delimiter));
         }
 
         if (!token.empty())
         {
-            uri_builder.append_query(uri_query_marker, token.next_marker());
+            uri_builder.append_query(core::make_query_parameter(uri_query_marker, token.next_marker()));
         }
 
         if (max_results > 0)
         {
-            uri_builder.append_query(uri_query_max_results, max_results);
+            uri_builder.append_query(core::make_query_parameter(uri_query_max_results, max_results, /* do_encoding */ false));
         }
 
-        if (includes.snapshots())
+        if ((includes & blob_listing_details::snapshots) != 0)
         {
             include_str << component_snapshots << U(',');
         }
 
-        if (includes.metadata())
+        if ((includes & blob_listing_details::metadata) != 0)
         {
             include_str << component_metadata << U(',');
         }
 
-        if (includes.uncommitted_blobs())
+        if ((includes & blob_listing_details::uncommitted_blobs) != 0)
         {
             include_str << component_uncommitted_blobs << U(',');
         }
 
-        if (includes.copy())
+        if ((includes & blob_listing_details::copy) != 0)
         {
             include_str << component_copy << U(',');
         }
@@ -172,7 +172,7 @@ namespace wa { namespace storage { namespace protocol {
         if (!include.empty())
         {
             include.pop_back();
-            uri_builder.append_query(uri_query_include, include);
+            uri_builder.append_query(core::make_query_parameter(uri_query_include, include, /* do_encoding */ false));
         }
 
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
@@ -181,7 +181,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request lease(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_lease);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_lease, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         web::http::http_headers& headers = request.headers();
         headers.add(ms_header_lease_action, lease_action);
@@ -205,7 +205,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request lease_blob_container(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_container);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(lease(lease_action, proposed_lease_id, duration, break_period, uri_builder, timeout, context));
         add_lease_id(request, condition);
         return request;
@@ -229,13 +229,13 @@ namespace wa { namespace storage { namespace protocol {
         add_optional_header(headers, ms_header_blob_content_type, properties.content_type());
     }
 
-    void add_range(web::http::http_request& request, int64_t offset, int64_t length)
+    void add_range(web::http::http_request& request, utility::size64_t offset, utility::size64_t length)
     {
-        if (offset >= 0)
+        if (offset < std::numeric_limits<utility::size64_t>::max())
         {
             utility::ostringstream_t value;
             value << header_value_range_prefix << offset << U('-');
-            if (length >= 0)
+            if (length > 0)
             {
                 length += offset - 1;
                 value << length;
@@ -243,7 +243,7 @@ namespace wa { namespace storage { namespace protocol {
 
             request.headers().add(ms_header_range, value.str());
         }
-        else if (length >= 0)
+        else if (length > 0)
         {
             throw std::invalid_argument("length");
         }
@@ -251,8 +251,8 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request put_block(const utility::string_t& block_id, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_block);
-        uri_builder.append_query(uri_query_block_id, block_id);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_block_id, block_id));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(web::http::header_names::content_md5, content_md5);
         add_lease_id(request, condition);
@@ -261,7 +261,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_block_list);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_properties(request, properties);
         add_metadata(request, metadata);
@@ -276,28 +276,28 @@ namespace wa { namespace storage { namespace protocol {
         switch (listing_filter)
         {
         case block_listing_filter::all:
-            uri_builder.append_query(uri_query_block_list_type, resource_block_list_all);
+            uri_builder.append_query(core::make_query_parameter(uri_query_block_list_type, resource_block_list_all, /* do_encoding */ false));
             break;
 
         case block_listing_filter::committed:
-            uri_builder.append_query(uri_query_block_list_type, resource_block_list_committed);
+            uri_builder.append_query(core::make_query_parameter(uri_query_block_list_type, resource_block_list_committed, /* do_encoding */ false));
             break;
 
         case block_listing_filter::uncommitted:
-            uri_builder.append_query(uri_query_block_list_type, resource_block_list_uncommitted);
+            uri_builder.append_query(core::make_query_parameter(uri_query_block_list_type, resource_block_list_uncommitted, /* do_encoding */ false));
             break;
         }
 
-        uri_builder.append_query(uri_query_component, component_block_list);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request get_page_ranges(int64_t offset, int64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_page_ranges(utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
-        uri_builder.append_query(uri_query_component, component_page_list);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         add_range(request, offset, length);
         add_access_condition(request, condition);
@@ -306,7 +306,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request put_page(page_range range, page_write write, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_page);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
 
         web::http::http_headers& headers = request.headers();
@@ -325,7 +325,7 @@ namespace wa { namespace storage { namespace protocol {
         }
 
         add_sequence_number_condition(request, condition);
-        add_lease_id(request, condition);
+        add_access_condition(request, condition);
         return request;
     }
 
@@ -352,13 +352,13 @@ namespace wa { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_blob(int64_t offset, int64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         add_range(request, offset, length);
 
-        if ((offset >= 0) && get_range_content_md5)
+        if ((offset < std::numeric_limits<utility::size64_t>::max()) && get_range_content_md5)
         {
             request.headers().add(ms_header_range_get_content_md5, header_value_true);
         }
@@ -377,7 +377,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request set_blob_properties(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_properties);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_properties(request, properties);
         add_metadata(request, metadata);
@@ -387,16 +387,16 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request resize_page_blob(utility::size64_t size, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_properties);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_blob_content_length, size);
         add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request set_page_blob_sequence_number(const wa::storage::sequence_number& sequence_number, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_page_blob_sequence_number(const azure::storage::sequence_number& sequence_number, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_properties);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         web::http::http_headers& headers = request.headers();
 
@@ -423,7 +423,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request snapshot_blob(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_snapshot);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_snapshot, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_metadata(request, metadata);
         add_access_condition(request, condition);
@@ -432,7 +432,7 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request set_blob_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_metadata);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_metadata, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_metadata(request, metadata);
         add_access_condition(request, condition);
@@ -474,8 +474,8 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_copy);
-        uri_builder.append_query(uri_query_copy_id, copy_id);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_copy, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_copy_id, copy_id));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_copy_action, header_value_copy_abort);
         add_lease_id(request, condition);
@@ -489,10 +489,19 @@ namespace wa { namespace storage { namespace protocol {
 
     void add_sequence_number_condition(web::http::http_request& request, const access_condition& condition)
     {
-        web::http::http_headers& headers = request.headers();
-        if (!condition.sequence_number_header().empty())
+        switch (condition.sequence_number_operator())
         {
-            headers.add(condition.sequence_number_header(), condition.sequence_number());
+        case access_condition::sequence_number_operators::eq:
+            request.headers().add(ms_header_if_sequence_number_eq, condition.sequence_number());
+            break;
+
+        case access_condition::sequence_number_operators::le:
+            request.headers().add(ms_header_if_sequence_number_le, condition.sequence_number());
+            break;
+
+        case access_condition::sequence_number_operators::lt:
+            request.headers().add(ms_header_if_sequence_number_lt, condition.sequence_number());
+            break;
         }
     }
 
@@ -535,8 +544,8 @@ namespace wa { namespace storage { namespace protocol {
 
         if (!condition.lease_id().empty())
         {
-            throw storage_exception(utility::conversions::to_utf8string(error_lease_id_on_source));
+            throw storage_exception(protocol::error_lease_id_on_source);
         }
     }
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

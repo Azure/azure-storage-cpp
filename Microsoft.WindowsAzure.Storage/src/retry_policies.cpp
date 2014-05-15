@@ -20,7 +20,7 @@
 #include "was/common.h"
 #include "was/retry_policies.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     retry_info retry_policy::evaluate(const retry_context& retry_context, operation_context context)
     {
@@ -34,6 +34,8 @@ namespace wa { namespace storage {
 
     retry_info basic_no_retry_policy::evaluate(const retry_context& retry_context, operation_context context)
     {
+        UNREFERENCED_PARAMETER(retry_context);
+        UNREFERENCED_PARAMETER(context);
         return retry_info();
     }
 
@@ -54,11 +56,11 @@ namespace wa { namespace storage {
         // request to a specific location.
         switch (retry_context.last_request_result().target_location())
         {
-        case wa::storage::storage_location::primary:
+        case azure::storage::storage_location::primary:
             m_last_primary_attempt = retry_context.last_request_result().end_time();
             break;
 
-        case wa::storage::storage_location::secondary:
+        case azure::storage::storage_location::secondary:
             m_last_secondary_attempt = retry_context.last_request_result().end_time();
             break;
         }
@@ -66,9 +68,10 @@ namespace wa { namespace storage {
         bool secondary_not_found = (retry_context.last_request_result().http_status_code() == web::http::status_codes::NotFound) &&
             (retry_context.last_request_result().target_location() == storage_location::secondary);
 
-        // Anything between 300 and 500 should not be retried
-        if ((retry_context.last_request_result().http_status_code() >= 300) &&
-            (retry_context.last_request_result().http_status_code() < 500) &&
+        // Anything between 300 and 500 other than 408 should not be retried
+        if (retry_context.last_request_result().http_status_code() >= 300 &&
+            retry_context.last_request_result().http_status_code() < 500 &&
+            retry_context.last_request_result().http_status_code() != web::http::status_codes::RequestTimeout &&
             !secondary_not_found)
         {
             return retry_info();
@@ -97,11 +100,11 @@ namespace wa { namespace storage {
         utility::datetime last_attempt;
         switch (retry_info.target_location())
         {
-        case wa::storage::storage_location::primary:
+        case azure::storage::storage_location::primary:
             last_attempt = m_last_primary_attempt;
             break;
 
-        case wa::storage::storage_location::secondary:
+        case azure::storage::storage_location::secondary:
             last_attempt = m_last_secondary_attempt;
             break;
 
@@ -149,4 +152,4 @@ namespace wa { namespace storage {
         return result;
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

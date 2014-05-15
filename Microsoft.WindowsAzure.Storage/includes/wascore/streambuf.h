@@ -22,12 +22,13 @@
 #include "wascore/basic_types.h"
 #include "resources.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     template<typename _CharType>
     class basic_istreambuf : public concurrency::streams::details::streambuf_state_manager<_CharType>
     {
     public:
+
         basic_istreambuf()
             : concurrency::streams::details::streambuf_state_manager<_CharType>(std::ios_base::in)
         {
@@ -35,11 +36,14 @@ namespace wa { namespace storage { namespace core {
 
         pplx::task<int_type> _putc(_CharType ch)
         {
+            UNREFERENCED_PARAMETER(ch);
             return pplx::task_from_result(traits::eof());
         }
 
         pplx::task<size_t> _putn(const _CharType *ptr, size_t count)
         {
+            UNREFERENCED_PARAMETER(ptr);
+            UNREFERENCED_PARAMETER(count);
             return pplx::task_from_result((size_t)0);
         }
 
@@ -50,11 +54,13 @@ namespace wa { namespace storage { namespace core {
 
         _CharType* _alloc(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             return nullptr;
         }
 
         void _commit(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
         }
     };
 
@@ -62,6 +68,7 @@ namespace wa { namespace storage { namespace core {
     class basic_ostreambuf : public concurrency::streams::details::streambuf_state_manager<_CharType>
     {
     public:
+
         basic_ostreambuf()
             : concurrency::streams::details::streambuf_state_manager<_CharType>(std::ios_base::out)
         {
@@ -104,21 +111,29 @@ namespace wa { namespace storage { namespace core {
 
         pplx::task<size_t> _getn(_Out_writes_(count) _CharType *ptr, _In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(ptr);
+            UNREFERENCED_PARAMETER(count);
             return pplx::task_from_result((size_t)0);
         }
 
         size_t _scopy(_Out_writes_(count) _CharType *ptr, _In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(ptr);
+            UNREFERENCED_PARAMETER(count);
             return 0;
         }
 
         bool acquire(_Out_ _CharType*& ptr, _Out_ size_t& count)
         {
+            UNREFERENCED_PARAMETER(ptr);
+            UNREFERENCED_PARAMETER(count);
             return false;
         }
 
         void release(_Out_writes_(count) _CharType* ptr, _In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(ptr);
+            UNREFERENCED_PARAMETER(count);
         }
     };
 
@@ -126,6 +141,7 @@ namespace wa { namespace storage { namespace core {
     class basic_splitter_streambuf : public basic_ostreambuf<_CharType>
     {
     public:
+
         basic_splitter_streambuf(concurrency::streams::streambuf<_CharType> streambuf1, concurrency::streams::streambuf<_CharType> streambuf2)
             : basic_ostreambuf<_CharType>(), m_streambuf1(streambuf1), m_streambuf2(streambuf2), m_total_written(0)
         {
@@ -143,40 +159,51 @@ namespace wa { namespace storage { namespace core {
 
         utility::size64_t size() const
         {
-            return (utility::size64_t)0;
+            return 0;
         }
 
         size_t buffer_size(std::ios_base::openmode direction) const
         {
+            UNREFERENCED_PARAMETER(direction);
             return (size_t)0;
         }
 
         void set_buffer_size(size_t size, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(size);
+            UNREFERENCED_PARAMETER(direction);
         }
 
         pos_type getpos(std::ios_base::openmode direction) const
         {
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         pos_type seekoff(off_type offset, std::ios_base::seekdir way, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(offset);
+            UNREFERENCED_PARAMETER(way);
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         pos_type seekpos(pos_type pos, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(pos);
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         char_type* _alloc(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             return nullptr;
         }
 
         void _commit(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             // no-op, as hash streams do not support alloc/commit
         }
 
@@ -244,6 +271,7 @@ namespace wa { namespace storage { namespace core {
         }
 
     private:
+
         concurrency::streams::streambuf<_CharType> m_streambuf1;
         concurrency::streams::streambuf<_CharType> m_streambuf2;
         utility::size64_t m_total_written;
@@ -253,6 +281,7 @@ namespace wa { namespace storage { namespace core {
     class basic_null_streambuf : public basic_ostreambuf<_CharType>
     {
     public:
+
         basic_null_streambuf()
             : basic_ostreambuf<_CharType>()
         {
@@ -275,35 +304,46 @@ namespace wa { namespace storage { namespace core {
 
         size_t buffer_size(std::ios_base::openmode direction) const
         {
+            UNREFERENCED_PARAMETER(direction);
             return (size_t)0;
         }
 
         void set_buffer_size(size_t size, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(size);
+            UNREFERENCED_PARAMETER(direction);
         }
 
         pos_type getpos(std::ios_base::openmode direction) const
         {
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         pos_type seekoff(off_type offset, std::ios_base::seekdir way, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(offset);
+            UNREFERENCED_PARAMETER(way);
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         pos_type seekpos(pos_type pos, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(pos);
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         char_type* _alloc(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             return nullptr;
         }
 
         void _commit(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             // no-op, as hash streams do not support alloc/commit
         }
 
@@ -324,6 +364,7 @@ namespace wa { namespace storage { namespace core {
 
         pplx::task<size_t> _putn(const char_type* ptr, size_t count)
         {
+            UNREFERENCED_PARAMETER(ptr);
             return pplx::task_from_result<size_t>(count);
         }
     };
@@ -331,6 +372,7 @@ namespace wa { namespace storage { namespace core {
     class basic_hash_streambuf : public basic_ostreambuf<concurrency::streams::ostream::traits::char_type>
     {
     public:
+
         basic_hash_streambuf()
             : basic_ostreambuf<concurrency::streams::ostream::traits::char_type>()
         {
@@ -353,35 +395,46 @@ namespace wa { namespace storage { namespace core {
 
         size_t buffer_size(std::ios_base::openmode direction) const
         {
+            UNREFERENCED_PARAMETER(direction);
             return (size_t)0;
         }
 
         void set_buffer_size(size_t size, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(size);
+            UNREFERENCED_PARAMETER(direction);
         }
 
         pos_type getpos(std::ios_base::openmode direction) const
         {
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         pos_type seekoff(off_type offset, std::ios_base::seekdir way, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(offset);
+            UNREFERENCED_PARAMETER(way);
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         pos_type seekpos(pos_type pos, std::ios_base::openmode direction)
         {
+            UNREFERENCED_PARAMETER(pos);
+            UNREFERENCED_PARAMETER(direction);
             return (pos_type)traits::eof();
         }
 
         char_type* _alloc(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             return nullptr;
         }
 
         void _commit(_In_ size_t count)
         {
+            UNREFERENCED_PARAMETER(count);
             // no-op, as hash streams do not support alloc/commit
         }
 
@@ -394,7 +447,7 @@ namespace wa { namespace storage { namespace core {
         {
             if (is_open())
             {
-                throw std::logic_error("Hash is calculated when the streambuf is closed");
+                throw std::logic_error(protocol::error_hash_on_closed_streambuf);
             }
 
             return m_hash;
@@ -411,4 +464,4 @@ namespace wa { namespace storage { namespace core {
         std::vector<unsigned char> m_hash;
     };
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

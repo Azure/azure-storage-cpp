@@ -22,14 +22,7 @@
 #include "was/common.h"
 #include "was/table.h"
 
-namespace wa { namespace storage { namespace protocol {
-
-    /*
-    utility::string_t generate_table_query_string(const table_query& query, const continuation_token& continuation_token)
-    {
-        continuation_token.next_marker()
-    }
-    */
+namespace azure { namespace storage { namespace protocol {
 
     web::http::uri generate_table_uri(const web::http::uri& base_uri, const cloud_table& table)
     {
@@ -105,6 +98,9 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::uri generate_table_uri(const web::http::uri& base_uri, const cloud_table& table, const table_batch_operation& operation)
     {
+        UNREFERENCED_PARAMETER(table);
+        UNREFERENCED_PARAMETER(operation);
+
         if (base_uri.is_empty())
         {
             return web::http::uri();
@@ -117,7 +113,7 @@ namespace wa { namespace storage { namespace protocol {
         return builder.to_uri();
     }
 
-    web::http::uri generate_table_uri(const web::http::uri& base_uri, const cloud_table& table, const table_query& query, const continuation_token& continuation_token)
+    web::http::uri generate_table_uri(const web::http::uri& base_uri, const cloud_table& table, const table_query& query, const continuation_token& token)
     {
         if (base_uri.is_empty())
         {
@@ -130,12 +126,12 @@ namespace wa { namespace storage { namespace protocol {
 
         if (!query.filter_string().empty())
         {
-            builder.append_query(U("$filter"), query.filter_string());
+            builder.append_query(core::make_query_parameter(U("$filter"), query.filter_string()));
         }
 
         if (query.take_count() >= 0)
         {
-            builder.append_query(U("$top"), query.take_count());
+            builder.append_query(core::make_query_parameter(U("$top"), query.take_count(), /* do_encoding */ false));
         }
 
         if (!query.select_columns().empty())
@@ -155,12 +151,12 @@ namespace wa { namespace storage { namespace protocol {
                 }
             }
 
-            builder.append_query(U("$select"), select_builder.str());
+            builder.append_query(core::make_query_parameter(U("$select"), select_builder.str()));
         }
 
-        if (!continuation_token.empty())
+        if (!token.empty())
         {
-            builder.append_query(continuation_token.next_marker());
+            builder.append_query(token.next_marker());
         }
 
         return builder.to_uri();
@@ -168,42 +164,42 @@ namespace wa { namespace storage { namespace protocol {
 
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table)
     {
-        web::http::uri primary_uri = generate_table_uri(service_client.base_uri().primary_uri(), table);
-        web::http::uri secondary_uri = generate_table_uri(service_client.base_uri().secondary_uri(), table);
+        web::http::uri primary_uri(generate_table_uri(service_client.base_uri().primary_uri(), table));
+        web::http::uri secondary_uri(generate_table_uri(service_client.base_uri().secondary_uri(), table));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, bool create_table)
     {
-        web::http::uri primary_uri = generate_table_uri(service_client.base_uri().primary_uri(), table, create_table);
-        web::http::uri secondary_uri = generate_table_uri(service_client.base_uri().secondary_uri(), table, create_table);
+        web::http::uri primary_uri(generate_table_uri(service_client.base_uri().primary_uri(), table, create_table));
+        web::http::uri secondary_uri(generate_table_uri(service_client.base_uri().secondary_uri(), table, create_table));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_operation& operation)
     {
-        web::http::uri primary_uri = generate_table_uri(service_client.base_uri().primary_uri(), table, operation);
-        web::http::uri secondary_uri = generate_table_uri(service_client.base_uri().secondary_uri(), table, operation);
+        web::http::uri primary_uri(generate_table_uri(service_client.base_uri().primary_uri(), table, operation));
+        web::http::uri secondary_uri(generate_table_uri(service_client.base_uri().secondary_uri(), table, operation));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_batch_operation& operation)
     {
-        web::http::uri primary_uri = generate_table_uri(service_client.base_uri().primary_uri(), table, operation);
-        web::http::uri secondary_uri = generate_table_uri(service_client.base_uri().secondary_uri(), table, operation);
+        web::http::uri primary_uri(generate_table_uri(service_client.base_uri().primary_uri(), table, operation));
+        web::http::uri secondary_uri(generate_table_uri(service_client.base_uri().secondary_uri(), table, operation));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
-    storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_query& query, const continuation_token& continuation_token)
+    storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_query& query, const continuation_token& token)
     {
-        web::http::uri primary_uri = generate_table_uri(service_client.base_uri().primary_uri(), table, query, continuation_token);
-        web::http::uri secondary_uri = generate_table_uri(service_client.base_uri().secondary_uri(), table, query, continuation_token);
+        web::http::uri primary_uri(generate_table_uri(service_client.base_uri().primary_uri(), table, query, token));
+        web::http::uri secondary_uri(generate_table_uri(service_client.base_uri().secondary_uri(), table, query, token));
 
-        return storage_uri(primary_uri, secondary_uri);
+        return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
     const utility::string_t get_http_method(table_operation_type operation_type)
@@ -242,30 +238,16 @@ namespace wa { namespace storage { namespace protocol {
         }
     }
 
-    void populate_http_headers(web::http::http_headers& headers)
-    {
-        headers.add(header_max_data_service_version, header_value_data_service_version);
-    }
-
     void populate_http_headers(web::http::http_headers& headers, const utility::string_t& boundary_name)
     {
         headers.add(web::http::header_names::content_type, get_multipart_content_type(boundary_name));
-        populate_http_headers(headers);
-    }
-
-    void populate_http_headers(web::http::http_headers& headers, table_payload_format payload_format, const utility::string_t& boundary_name)
-    {
-        headers.add(web::http::header_names::accept, get_accept_header(payload_format));
-        populate_http_headers(headers, boundary_name);
     }
 
     void populate_http_headers(web::http::http_headers& headers, table_operation_type operation_type, table_payload_format payload_format)
     {
-        if (operation_type == table_operation_type::retrieve_operation || 
-            operation_type == table_operation_type::insert_operation)
-        {
-            headers.add(web::http::header_names::accept, get_accept_header(payload_format));
-        }
+        headers.add(web::http::header_names::accept, get_accept_header(payload_format));
+        // TODO: Stop sending the Accept-Charset request header here if possible because UTF-8 appears to be the default anyway
+        headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);
 
         if (operation_type == table_operation_type::insert_operation || 
             operation_type == table_operation_type::insert_or_merge_operation || 
@@ -275,27 +257,18 @@ namespace wa { namespace storage { namespace protocol {
         {
             if (operation_type == table_operation_type::insert_operation)
             {
-                // TODO: Make the "Prefer: return-no-content" header configurable if needed
                 headers.add(header_prefer, U("return-no-content"));
             }
 
-            /*
-            if (operation.operation_type() == table_operation_type::insert_or_merge_operation || 
-                operation.operation_type() == table_operation_type::merge_operation)
-            {
-                headers.add(header_http_method, U("MERGE"));
-            }
-            */
-
+            // TODO: Consider sending the Content-Type request header even for empty requests
             headers.add(web::http::header_names::content_type, header_value_content_type_json);
         }
-
-        populate_http_headers(headers);
     }
 
     void populate_http_headers(web::http::http_headers& headers, const table_operation& operation, table_payload_format payload_format)
     {
         table_operation_type operation_type = operation.operation_type();
+        populate_http_headers(headers, operation_type, payload_format);
 
         if (operation_type == table_operation_type::delete_operation || 
             operation_type == table_operation_type::merge_operation || 
@@ -314,8 +287,6 @@ namespace wa { namespace storage { namespace protocol {
 
             headers.add(web::http::header_names::if_match, etag);
         }
-
-        populate_http_headers(headers, operation_type, payload_format);
     }
 
     web::json::value generate_json_object(const table_operation& operation)
@@ -326,81 +297,93 @@ namespace wa { namespace storage { namespace protocol {
             operation.operation_type() == table_operation_type::merge_operation || 
             operation.operation_type() == table_operation_type::replace_operation)
         {
-            const std::unordered_map<utility::string_t, entity_property>& properties = operation.entity().properties();
-            web::json::value::field_map fields;
-            fields.reserve(properties.size() * 2U + 2U);
+            const table_entity::properties_type& properties = operation.entity().properties();
+            std::vector<std::pair<utility::string_t, web::json::value>> fields;
 
-            web::json::value partition_key_name(U("PartitionKey"));
+            // The PartitionKey and RowKey each need a field, and every property can have up to 2 fields for a value and type
+            fields.reserve(properties.size() * 2 + 2);
+
             web::json::value partition_key_value(operation.entity().partition_key());
-            fields.push_back(std::pair<web::json::value, web::json::value>(partition_key_name, partition_key_value));
+            fields.push_back(std::make_pair(U("PartitionKey"), std::move(partition_key_value)));
 
-            web::json::value row_key_name(U("RowKey"));
             web::json::value row_key_value(operation.entity().row_key());
-            fields.push_back(std::pair<web::json::value, web::json::value>(row_key_name, row_key_value));
+            fields.push_back(std::make_pair(U("RowKey"), std::move(row_key_value)));
 
-            // TODO: Confirm that there is no need to write the ETag in the message body
-
-            for (std::unordered_map<utility::string_t, entity_property>::const_iterator itr = properties.cbegin(); itr != properties.cend(); ++itr)
+            for (table_entity::properties_type::const_iterator it = properties.cbegin(); it != properties.cend(); ++it)
             {
+                const utility::string_t& property_name = it->first;
+                const entity_property& entity_property = it->second;
+
                 bool requires_type;
-                web::json::value property_name(itr->first);
-
                 web::json::value property_value;
-                if (itr->second.property_type() == edm_type::boolean)
-                {
-                    requires_type = false;
-                    property_value = web::json::value(itr->second.boolean_value());
-                }
-                else if (itr->second.property_type() == edm_type::int32)
-                {
-                    requires_type = false;
-                    property_value = web::json::value(itr->second.int32_value());
-                }
-                else if (itr->second.property_type() == edm_type::double_floating_point)
-                {
-                    // TODO: Test writing special double values: NaN, Inf, -Inf
 
-                    /*
-                    double double_value = itr->second.double_value();
+                if (entity_property.property_type() == edm_type::boolean)
+                {
+                    requires_type = false;
+                    property_value = web::json::value(entity_property.boolean_value());
+                }
+                else if (entity_property.property_type() == edm_type::int32)
+                {
+                    requires_type = false;
+                    property_value = web::json::value(entity_property.int32_value());
+                }
+                else if (entity_property.property_type() == edm_type::double_floating_point)
+                {
+                    double double_value = entity_property.double_value();
                     if (core::is_finite(double_value))
                     {
-                        requires_type = false;
-                        property_value = web::json::value(double_value);
+                        const utility::string_t& string_value = entity_property.str();
+                        if (core::is_integral(string_value))
+                        {
+                            // TODO: Remove this temporary workaround after Casablanca starts serializing whole number doubles with a decimal point
+
+                            // The value consists entirely of an optional negative sign followed by digits, so add a decimal point to make it clear it is not an int32
+                            utility::string_t modified_string_value;
+                            modified_string_value.reserve(string_value.size() + 2);
+                            modified_string_value.append(string_value);
+                            modified_string_value.append(U(".0"));
+
+                            requires_type = true;
+                            property_value = web::json::value(modified_string_value);
+                        }
+                        else
+                        {
+                            requires_type = false;
+                            property_value = web::json::value(double_value);
+                        }
                     }
                     else
                     {
                         // Serialize special double values as strings
                         requires_type = true;
-                        property_value = web::json::value(itr->second.str());
+                        property_value = web::json::value(entity_property.str());
                     }
-                    */
-
-                    // TODO: Remove this temporary workaround and use the above code after Casablanca fixes truncated double values
-                    requires_type = true;
-                    property_value = web::json::value(itr->second.str());
+                }
+                else if (entity_property.property_type() == edm_type::string)
+                {
+                    requires_type = false;
+                    property_value = web::json::value(entity_property.str());
                 }
                 else
                 {
                     requires_type = true;
-                    property_value = web::json::value(itr->second.str());
+                    property_value = web::json::value(entity_property.str());
                 }
 
                 if (requires_type)
                 {
-                    utility::string_t property_name_for_type;
-                    property_name_for_type.reserve(itr->first.size() + 11U);
-                    property_name_for_type.append(itr->first);
-                    property_name_for_type.append(U("@odata.type"));
+                    // The type name length is the length of the property name plus 11 characters for the @odata.type suffix
+                    utility::string_t type_name;
+                    type_name.reserve(property_name.size() + 11);
+                    type_name.append(property_name);
+                    type_name.append(U("@odata.type"));
 
-                    utility::string_t value_for_type = get_property_type_name(itr->second.property_type());
+                    web::json::value type_value(get_property_type_name(entity_property.property_type()));
 
-                    web::json::value type_name(property_name_for_type);
-                    web::json::value type_value(value_for_type);
-
-                    fields.push_back(std::pair<web::json::value, web::json::value>(type_name, type_value));
+                    fields.push_back(std::make_pair(std::move(type_name), std::move(type_value)));
                 }
 
-                fields.push_back(std::pair<web::json::value, web::json::value>(property_name, property_value));
+                fields.push_back(std::make_pair(property_name, std::move(property_value)));
             }
 
             return web::json::value::object(fields);
@@ -414,59 +397,35 @@ namespace wa { namespace storage { namespace protocol {
         web::http::http_request request = base_request(method, uri_builder, timeout, context);
 
         web::http::http_headers& headers = request.headers();
-        headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);
+        headers.add(header_max_data_service_version, header_value_data_service_version);
 
         return request;
     }
-
-    /*
-    http_request query_table_base_request(table_payload_format format, method method, web::http::uri_builder web::http::uri_builder, const std::chrono::seconds& timeout, operation_context context)
-    {
-        http_request request = table_base_request(method, web::http::uri_builder, timeout, context);
-        return request;
-    }
-    */
 
     web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::method method = get_http_method(operation_type);
         web::http::http_request request = table_base_request(method, uri_builder, timeout, context);
 
-        if (operation_type == table_operation_type::retrieve_operation || 
-            operation_type == table_operation_type::insert_operation)
+        web::http::http_headers& headers = request.headers();
+
+        // This operation is processed internally and it does not need metadata because all property types are known
+        populate_http_headers(headers, operation_type, table_payload_format::json_no_metadata);
+
+        if (operation_type == table_operation_type::insert_operation)
         {
-            web::http::http_headers& headers = request.headers();
+            web::json::value property_value(table.name());
 
-            // This operation is processed internally and it does not need metadata because all property types are known
-            populate_http_headers(headers, operation_type, table_payload_format::json_no_metadata);
+            std::vector<std::pair<utility::string_t, web::json::value>> fields;
+            fields.reserve(1U);
+            fields.push_back(std::make_pair(U("TableName"), std::move(property_value)));
 
-            if (operation_type == table_operation_type::insert_operation)
-            {
-                web::json::value property_name(U("TableName"));
-                web::json::value property_value(table.name());
-
-                web::json::value::field_map fields;
-                fields.push_back(std::pair<web::json::value, web::json::value>(property_name, property_value));
-
-                web::json::value obj = web::json::value::object(fields);
-                request.set_body(obj);
-            }
+            web::json::value document = web::json::value::object(fields);
+            request.set_body(document);
         }
 
         return request;
     }
-
-    /*
-    web::http::http_request delete_table(const cloud_table& table, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
-    {
-        web::http::http_request request = table_base_request(web::http::methods::DEL, uri_builder, timeout, context);
-
-        web::http::http_headers& headers = request.headers();
-        headers.add(web::http::header_names::content_type, header_value_content_type_json);
-
-        return request;
-    }
-    */
 
     web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
@@ -493,17 +452,20 @@ namespace wa { namespace storage { namespace protocol {
         web::http::http_request request = table_base_request(web::http::methods::POST, uri_builder, timeout, context);
         request.set_response_stream(Concurrency::streams::ostream(response_buffer));
 
-        web::http::http_headers& batch_headers = request.headers();
-        populate_http_headers(batch_headers, payload_format, batch_boundary_name);
+        // TODO: Consider sending the Accept request header
+        web::http::http_headers& request_headers = request.headers();
+        // TODO: Stop sending the Accept-Charset request header here if possible because it doesn't apply to a multipart message
+        request_headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);
+        populate_http_headers(request_headers, batch_boundary_name);
 
         table_batch_operation::operations_type operations = operation.operations();
-        //bool is_query = operations.size() == 1 && operations[0].operation_type() == table_operation_type::retrieve_operation;
 
         web::http::uri base_uri = table.service_client().base_uri().primary_uri();
         utility::string_t body_text;
 
         core::write_boundary(body_text, batch_boundary_name);
 
+        // Write batch headers
         if (!is_query)
         {
             web::http::http_headers changeset_headers;
@@ -515,9 +477,9 @@ namespace wa { namespace storage { namespace protocol {
         if (operations.size() > 0U)
         {
             int content_id = 0;
-            for (table_batch_operation::operations_type::const_iterator itr = operations.cbegin(); itr != operations.cend(); ++itr)
+            for (table_batch_operation::operations_type::const_iterator it = operations.cbegin(); it != operations.cend(); ++it)
             {
-                table_operation operation = *itr;
+                const table_operation& operation = *it;
                 web::http::method method = get_http_method(operation.operation_type());
                 web::http::uri uri = generate_table_uri(base_uri, table, operation);
 
@@ -526,14 +488,15 @@ namespace wa { namespace storage { namespace protocol {
 
                 if (!is_query)
                 {
-                    operation_headers.add(header_content_id, core::convert_to_string(content_id));
+                    // TODO: Stop sending the MaxDataServiceVersion request header here if possible because it is already sent in the outer request
+                    operation_headers.add(header_max_data_service_version, header_value_data_service_version);
+                    // TODO: Consider sending the Content-ID request header -- operation_headers.add(header_content_id, core::convert_to_string(content_id));
 
                     core::write_boundary(body_text, changeset_boundary_name);
                 }
 
-                core::write_mime_multipart_headers(body_text);
+                core::write_mime_changeset_headers(body_text);
                 core::write_request_line(body_text, method, uri);
-                //core::write_content_id_request_header(body_text, content_id);
                 core::write_request_headers(body_text, operation_headers);
 
                 web::json::value json_object = generate_json_object(operation);
@@ -571,15 +534,15 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request get_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_acl);
-        web::http::http_request request = table_base_request(web::http::methods::GET, uri_builder, timeout, context);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
+        web::http::http_request request = base_request(web::http::methods::GET, uri_builder, timeout, context);
         return request;
     }
 
     web::http::http_request set_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_component, component_acl);
-        web::http::http_request request = table_base_request(web::http::methods::PUT, uri_builder, timeout, context);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
+        web::http::http_request request = base_request(web::http::methods::PUT, uri_builder, timeout, context);
         return request;
     }
 
@@ -622,4 +585,4 @@ namespace wa { namespace storage { namespace protocol {
         return content_type;
     }
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

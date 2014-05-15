@@ -22,46 +22,46 @@
 #include "wascore/blobstreams.h"
 #include "wascore/util.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
-    cloud_blob::cloud_blob(const storage_uri& uri)
-        : m_uri(uri), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()),
-        m_copy_state(std::make_shared<wa::storage::copy_state>())
+    cloud_blob::cloud_blob(storage_uri uri)
+        : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()),
+        m_copy_state(std::make_shared<azure::storage::copy_state>())
     {
         init(utility::string_t(), storage_credentials());
     }
 
-    cloud_blob::cloud_blob(const storage_uri& uri, const storage_credentials& credentials)
-        : m_uri(uri), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()),
-        m_copy_state(std::make_shared<wa::storage::copy_state>())
+    cloud_blob::cloud_blob(storage_uri uri, storage_credentials credentials)
+        : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()),
+        m_copy_state(std::make_shared<azure::storage::copy_state>())
     {
-        init(utility::string_t(), credentials);
+        init(utility::string_t(), std::move(credentials));
     }
 
-    cloud_blob::cloud_blob(const storage_uri& uri, const utility::string_t& snapshot_time, const storage_credentials& credentials)
-        : m_uri(uri), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()),
-        m_copy_state(std::make_shared<wa::storage::copy_state>())
+    cloud_blob::cloud_blob(storage_uri uri, utility::string_t snapshot_time, storage_credentials credentials)
+        : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()),
+        m_copy_state(std::make_shared<azure::storage::copy_state>())
     {
-        init(snapshot_time, credentials);
+        init(std::move(snapshot_time), std::move(credentials));
     }
 
-    cloud_blob::cloud_blob(const utility::string_t& name, const utility::string_t& snapshot_time, const cloud_blob_container& container)
-        : m_name(name), m_snapshot_time(snapshot_time), m_container(container), m_uri(core::append_path_to_uri(container.uri(), name)),
+    cloud_blob::cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
+        : m_name(std::move(name)), m_snapshot_time(std::move(snapshot_time)), m_container(std::move(container)), m_uri(core::append_path_to_uri(m_container.uri(), m_name)),
         m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()),
-        m_copy_state(std::make_shared<wa::storage::copy_state>())
+        m_copy_state(std::make_shared<azure::storage::copy_state>())
     {
     }
 
-    cloud_blob::cloud_blob(utility::string_t name, utility::string_t snapshot_time, const cloud_blob_container& container, cloud_blob_properties properties, cloud_metadata metadata, wa::storage::copy_state copy_state)
-        : m_name(std::move(name)), m_snapshot_time(std::move(snapshot_time)), m_container(container), m_uri(core::append_path_to_uri(container.uri(), name)),
+    cloud_blob::cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, azure::storage::copy_state copy_state)
+        : m_name(std::move(name)), m_snapshot_time(std::move(snapshot_time)), m_container(std::move(container)), m_uri(core::append_path_to_uri(m_container.uri(), m_name)),
         m_metadata(std::make_shared<cloud_metadata>(std::move(metadata))), m_properties(std::make_shared<cloud_blob_properties>(std::move(properties))),
-        m_copy_state(std::make_shared<wa::storage::copy_state>(std::move(copy_state)))
+        m_copy_state(std::make_shared<azure::storage::copy_state>(std::move(copy_state)))
     {
     }
 
-    void cloud_blob::init(const utility::string_t& snapshot_time, storage_credentials credentials)
+    void cloud_blob::init(utility::string_t snapshot_time, storage_credentials credentials)
     {
-        m_snapshot_time = snapshot_time;
+        m_snapshot_time = std::move(snapshot_time);
         m_uri = core::verify_blob_uri(m_uri, credentials, m_snapshot_time);
 
         utility::string_t container_name;
@@ -70,7 +70,7 @@ namespace wa { namespace storage {
             throw std::invalid_argument("uri");
         }
 
-        m_container = cloud_blob_container(container_name, cloud_blob_client(core::get_service_client_uri(m_uri), credentials));
+        m_container = cloud_blob_container(std::move(container_name), cloud_blob_client(core::get_service_client_uri(m_uri), std::move(credentials)));
     }
 
     web::http::uri add_snapshot_to_uri(const web::http::uri& uri, const utility::string_t& snapshot_time)
@@ -81,7 +81,7 @@ namespace wa { namespace storage {
         }
 
         web::http::uri_builder builder(uri);
-        builder.append_query(protocol::uri_query_snapshot, snapshot_time);
+        builder.append_query(core::make_query_parameter(protocol::uri_query_snapshot, snapshot_time));
         return builder.to_uri();
     }
 
@@ -107,7 +107,7 @@ namespace wa { namespace storage {
     {
         if (!service_client().credentials().is_shared_key())
         {
-            throw std::logic_error(utility::conversions::to_utf8string(protocol::error_sas_missing_credentials));
+            throw std::logic_error(protocol::error_sas_missing_credentials);
         }
 
         utility::ostringstream_t resource_str;
@@ -124,7 +124,7 @@ namespace wa { namespace storage {
         auto instance = std::make_shared<cloud_blob>(*this);
         return instance->download_attributes_async(condition, modified_options, context).then([instance, condition, modified_options, context] () -> concurrency::streams::istream
         {
-            auto modified_condition = wa::storage::access_condition::generate_if_match_condition(instance->properties().etag());
+            auto modified_condition = azure::storage::access_condition::generate_if_match_condition(instance->properties().etag());
             modified_condition.set_lease_id(condition.lease_id());
             return core::cloud_blob_istreambuf(instance, modified_condition, modified_options, context).create_istream();
         });
@@ -186,7 +186,10 @@ namespace wa { namespace storage {
         command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
         {
             protocol::preprocess_response(response, context);
-            properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
+            
+            auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
+            properties->update_etag_and_last_modified(parsed_properties);
+            properties->update_page_blob_sequence_number(parsed_properties);
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }
@@ -222,7 +225,7 @@ namespace wa { namespace storage {
                     }
                     catch (const storage_exception& e)
                     {
-                        auto result = e.result();
+                        const azure::storage::request_result& result = e.result();
                         if (result.is_response_available() &&
                             (result.http_status_code() == web::http::status_codes::NotFound) &&
                             (result.extended_error().code() == protocol::error_code_blob_not_found))
@@ -356,7 +359,7 @@ namespace wa { namespace storage {
         return core::executor<std::chrono::seconds>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob::download_range_to_stream_async(concurrency::streams::ostream target, int64_t offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob::download_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -366,7 +369,7 @@ namespace wa { namespace storage {
         auto copy_state = m_copy_state;
         auto target_offset = target.can_seek() ? target.tell() : 0;
         auto response_md5 = std::make_shared<utility::string_t>();
-        auto response_length = std::make_shared<utility::size64_t>(protocol::invalid_size64_t);
+        auto response_length = std::make_shared<utility::size64_t>(std::numeric_limits<utility::size64_t>::max());
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::get_blob, offset, length, modified_options.use_transactional_md5(), snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -390,7 +393,7 @@ namespace wa { namespace storage {
         command->set_preprocess_response([modified_options, properties, metadata, copy_state, offset, response_md5, response_length] (const web::http::http_response& response, operation_context context)
         {
             protocol::preprocess_response(response, context);
-            properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), offset >= 0);
+            properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), offset < std::numeric_limits<utility::size64_t>::max());
             *metadata = protocol::parse_metadata(response);
             *copy_state = protocol::blob_response_parsers::parse_copy_state(response);
             
@@ -398,17 +401,32 @@ namespace wa { namespace storage {
             
             if (modified_options.use_transactional_md5() && !modified_options.disable_content_md5_validation() && response_md5->empty())
             {
-                throw storage_exception(utility::conversions::to_utf8string(protocol::error_missing_md5));
+                throw storage_exception(protocol::error_missing_md5);
             }
 
             *response_length = response.headers().content_length();
         });
-        command->set_postprocess_response([response_md5, response_length] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor& descriptor, operation_context context) -> pplx::task<void>
+        command->set_postprocess_response([response_md5, response_length] (const web::http::http_response&, const request_result&, const core::ostream_descriptor& descriptor, operation_context context) -> pplx::task<void>
         {
             protocol::check_stream_length_and_md5(*response_length, *response_md5, descriptor);
             return pplx::task_from_result();
         });
         return core::executor<void>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<void> cloud_blob::download_to_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        auto instance = std::make_shared<cloud_blob>(*this);
+        return concurrency::streams::file_stream<uint8_t>::open_ostream(path).then([instance, condition, options, context] (concurrency::streams::ostream stream) -> pplx::task<void>
+        {
+            return instance->download_to_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> download_task) -> pplx::task<void>
+            {
+                return stream.close().then([download_task] ()
+                {
+                    download_task.wait();
+                });
+            });
+        });
     }
 
     pplx::task<bool> cloud_blob::exists_async(bool primary_only, const blob_request_options& options, operation_context context)
@@ -465,8 +483,8 @@ namespace wa { namespace storage {
 
     pplx::task<utility::string_t> cloud_blob::start_copy_from_blob_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
     {
-        auto source_uri = source.snapshot_qualified_uri().primary_uri();
-        source_uri = service_client().credentials().transform_uri(source_uri);
+        const web::http::uri& raw_source_uri = source.snapshot_qualified_uri().primary_uri();
+        web::http::uri source_uri = service_client().credentials().transform_uri(raw_source_uri);
 
         return start_copy_from_blob_async(source_uri, source_condition, destination_condition, options, context);
     }
@@ -484,7 +502,7 @@ namespace wa { namespace storage {
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<cloud_blob> cloud_blob::create_snapshot_async(const cloud_metadata& metadata, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<cloud_blob> cloud_blob::create_snapshot_async(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -493,15 +511,18 @@ namespace wa { namespace storage {
         auto properties = m_properties;
         auto snapshot_name = name();
         auto snapshot_container = container();
+        auto snapshot_metadata = std::make_shared<cloud_metadata>(std::move(metadata));
+        auto resulting_metadata = snapshot_metadata->empty() ? m_metadata : snapshot_metadata;
 
         auto command = std::make_shared<core::storage_command<cloud_blob>>(uri());
-        command->set_build_request(std::bind(protocol::snapshot_blob, metadata, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::snapshot_blob, *snapshot_metadata, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([snapshot_name, snapshot_container, properties] (const web::http::http_response& response, operation_context context) -> cloud_blob
+        command->set_preprocess_response([snapshot_name, snapshot_container, resulting_metadata, properties] (const web::http::http_response& response, operation_context context) -> cloud_blob
         {
             protocol::preprocess_response(response, context);
             auto snapshot_time = protocol::get_header_value(response, protocol::ms_header_snapshot);
             cloud_blob snapshot(snapshot_name, snapshot_time, snapshot_container);
+            *snapshot.m_metadata = *resulting_metadata;
             snapshot.m_properties->copy_from_root(*properties);
             snapshot.m_properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             return snapshot;
@@ -513,8 +534,8 @@ namespace wa { namespace storage {
     {
         if (!m_snapshot_time.empty())
         {
-            throw std::logic_error(utility::conversions::to_utf8string(protocol::error_cannot_modify_snapshot));
+            throw std::logic_error(protocol::error_cannot_modify_snapshot);
         }
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

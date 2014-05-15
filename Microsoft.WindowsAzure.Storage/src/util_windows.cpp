@@ -25,7 +25,7 @@
 #include <rpc.h>
 #include <agents.h>
 
-namespace wa { namespace storage {  namespace core {
+namespace azure { namespace storage {  namespace core {
 
     pplx::task<void> complete_after(std::chrono::milliseconds timeout)
     {
@@ -57,6 +57,6 @@ namespace wa { namespace storage {  namespace core {
         });
     }
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core
 
 #endif

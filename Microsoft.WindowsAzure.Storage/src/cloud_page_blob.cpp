@@ -20,7 +20,7 @@
 #include "wascore/protocol_xml.h"
 #include "wascore/blobstreams.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     pplx::task<void> cloud_page_blob::clear_pages_async(int64_t start_offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
@@ -31,10 +31,19 @@ namespace wa { namespace storage {
         auto end_offset = start_offset + length - 1;
         page_range range(start_offset, end_offset);
 
+        auto properties = m_properties;
+
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::put_page, range, page_write::clear, utility::string_t(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        {
+            protocol::preprocess_response(response, context);
+
+            auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
+            properties->update_etag_and_last_modified(parsed_properties);
+            properties->update_page_blob_sequence_number(parsed_properties);
+        });
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
@@ -52,11 +61,14 @@ namespace wa { namespace storage {
         command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
         {
             protocol::preprocess_response(response, context);
-            properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
+
+            auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
+            properties->update_etag_and_last_modified(parsed_properties);
+            properties->update_page_blob_sequence_number(parsed_properties);
         });
         return core::istream_descriptor::create(page_data, needs_md5).then([command, context, start_offset, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<void>
         {
-            auto md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
+            const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             auto end_offset = start_offset + request_body.length() - 1;
             page_range range(start_offset, end_offset);
             command->set_build_request(std::bind(protocol::put_page, range, page_write::update, md5, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -73,7 +85,7 @@ namespace wa { namespace storage {
 
         if (modified_options.store_blob_content_md5())
         {
-            throw std::logic_error(utility::conversions::to_utf8string(protocol::error_md5_not_possible));
+            throw std::logic_error(protocol::error_md5_not_possible);
         }
 
         auto instance = std::make_shared<cloud_page_blob>(*this);
@@ -102,12 +114,12 @@ namespace wa { namespace storage {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
-        if (length == protocol::invalid_size64_t)
+        if (length == std::numeric_limits<utility::size64_t>::max())
         {
             length = core::get_remaining_stream_length(source);
-            if (length == protocol::invalid_size64_t)
+            if (length == std::numeric_limits<utility::size64_t>::max())
             {
-                throw std::logic_error(utility::conversions::to_utf8string(protocol::error_page_blob_size_unknown));
+                throw std::logic_error(protocol::error_page_blob_size_unknown);
             }
         }
 
@@ -116,6 +128,21 @@ namespace wa { namespace storage {
             return core::stream_copy_async(source, blob_stream, length).then([blob_stream] (utility::size64_t) -> pplx::task<void>
             {
                 return blob_stream.close();
+            });
+        });
+    }
+
+    pplx::task<void> cloud_page_blob::upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        auto instance = std::make_shared<cloud_page_blob>(*this);
+        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context] (concurrency::streams::istream stream) -> pplx::task<void>
+        {
+            return instance->upload_from_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> upload_task) -> pplx::task<void>
+            {
+                return stream.close().then([upload_task] ()
+                {
+                    upload_task.wait();
+                });
             });
         });
     }
@@ -154,13 +181,16 @@ namespace wa { namespace storage {
         command->set_preprocess_response([properties, size] (const web::http::http_response& response, operation_context context)
         {
             protocol::preprocess_response(response, context);
-            properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
+
+            auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
+            properties->update_etag_and_last_modified(parsed_properties);
+            properties->update_page_blob_sequence_number(parsed_properties);
             properties->m_size = size;
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_page_blob::set_sequence_number_async(const wa::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_page_blob::set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -182,7 +212,7 @@ namespace wa { namespace storage {
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<std::vector<page_range>> cloud_page_blob::download_page_ranges_async(int64_t offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<std::vector<page_range>> cloud_page_blob::download_page_ranges_async(utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
@@ -210,4 +240,4 @@ namespace wa { namespace storage {
         return core::executor<std::vector<page_range>>::execute_async(command, modified_options, context);
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

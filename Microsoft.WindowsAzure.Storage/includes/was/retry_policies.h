@@ -21,7 +21,7 @@
 
 #include "core.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     const int default_attempts(3);
     const std::chrono::milliseconds max_exponential_retry_interval(120 * 1000);
@@ -85,7 +85,7 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the <see cref="basic_common_retry_policy"/> class.
         /// </summary>
         /// <param name="max_attempts">The maximum number of retries to attempt.</param>
-        basic_common_retry_policy(int max_attempts)
+        explicit basic_common_retry_policy(int max_attempts)
             : basic_retry_policy(), m_max_attempts(max_attempts)
         {
         }
@@ -227,4 +227,4 @@ namespace wa { namespace storage {
         }
     };
 
-}} // namespace wa::storage
+}} // namespace azure::storage

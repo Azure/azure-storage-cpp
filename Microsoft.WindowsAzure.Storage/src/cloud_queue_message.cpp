@@ -18,8 +18,8 @@
 #include "stdafx.h"
 #include "was/queue.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     const std::chrono::seconds max_time_to_live(7 * 24 * 60 * 60);
 
-}} // namespace wa::storage
+}} // namespace azure::storage

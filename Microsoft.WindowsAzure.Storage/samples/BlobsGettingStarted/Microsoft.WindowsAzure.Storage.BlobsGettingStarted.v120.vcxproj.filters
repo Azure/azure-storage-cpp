@@ -28,6 +28,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="DataFile.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
 </Project>

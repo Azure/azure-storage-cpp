@@ -23,36 +23,36 @@
 #include "was/table.h"
 #include "wascore/util.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
 #pragma region Common Helpers
 
-    void add_query_if_not_empty(web::http::uri_builder& builder, const utility::string_t& name, const utility::string_t& value)
+    void add_query_if_not_empty(web::http::uri_builder& builder, const utility::string_t& name, const utility::string_t& value, bool do_encoding)
     {
         if (!value.empty())
         {
-            builder.append_query(name + U("=") + web::http::uri::encode_data_string(value), false);
+            builder.append_query(core::make_query_parameter(name, value, do_encoding));
         }
     }
 
-    utility::string_t convert_datetime_if_initialized(const utility::datetime& value)
+    utility::string_t convert_datetime_if_initialized(utility::datetime value)
     {
-        return value.is_initialized() ? core::convert_to_string(core::truncate_fractional_seconds(value)) : utility::string_t();
+        return value.is_initialized() ? core::truncate_fractional_seconds(value).to_string(utility::datetime::ISO_8601) : utility::string_t();
     }
 
     web::http::uri_builder get_sas_token_builder(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& signature)
     {
         web::http::uri_builder builder;
 
-        add_query_if_not_empty(builder, uri_query_sas_version, header_value_storage_version);
-        add_query_if_not_empty(builder, uri_query_sas_identifier, identifier);
-        add_query_if_not_empty(builder, uri_query_sas_signature, signature);
+        add_query_if_not_empty(builder, uri_query_sas_version, header_value_storage_version, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_identifier, identifier, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_signature, signature, /* do_encoding */ true);
 
         if (policy.is_valid())
         {
-            add_query_if_not_empty(builder, uri_query_sas_start, convert_datetime_if_initialized(policy.start()));
-            add_query_if_not_empty(builder, uri_query_sas_expiry, convert_datetime_if_initialized(policy.expiry()));
-            add_query_if_not_empty(builder, uri_query_sas_permissions, policy.permissions_to_string());
+            add_query_if_not_empty(builder, uri_query_sas_start, convert_datetime_if_initialized(policy.start()), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_expiry, convert_datetime_if_initialized(policy.expiry()), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_permissions, policy.permissions_to_string(), /* do_encoding */ true);
         }
 
         return builder;
@@ -106,7 +106,7 @@ namespace wa { namespace storage { namespace protocol {
             if (param != splitted_query.end())
             {
                 params_found = true;
-                add_query_if_not_empty(builder, param->first, param->second);
+                add_query_if_not_empty(builder, param->first, param->second, /* do_encoding */ false);
             }
         }
 
@@ -119,7 +119,7 @@ namespace wa { namespace storage { namespace protocol {
         auto signed_resource = splitted_query.find(protocol::uri_query_sas_resource);
         if ((signature == splitted_query.end()) || (require_signed_resource && (signed_resource == splitted_query.end())))
         {
-            throw std::invalid_argument(utility::conversions::to_utf8string(protocol::error_missing_params_for_sas));
+            throw std::invalid_argument(protocol::error_missing_params_for_sas);
         }
 
         return storage_credentials(builder.query());
@@ -147,14 +147,14 @@ namespace wa { namespace storage { namespace protocol {
         auto signature = get_blob_sas_string_to_sign(identifier, policy, headers, resource, credentials);
         auto builder = get_sas_token_builder(identifier, policy, signature);
 
-        add_query_if_not_empty(builder, uri_query_sas_resource, resource_type);
-        add_query_if_not_empty(builder, uri_query_sas_cache_control, headers.cache_control());
-        add_query_if_not_empty(builder, uri_query_sas_content_type, headers.content_type());
-        add_query_if_not_empty(builder, uri_query_sas_content_encoding, headers.content_encoding());
-        add_query_if_not_empty(builder, uri_query_sas_content_language, headers.content_language());
-        add_query_if_not_empty(builder, uri_query_sas_content_disposition, headers.content_disposition());
+        add_query_if_not_empty(builder, uri_query_sas_resource, resource_type, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_cache_control, headers.cache_control(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_type, headers.content_type(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_encoding, headers.content_encoding(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_language, headers.content_language(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_disposition, headers.content_disposition(), /* do_encoding */ true);
 
-        return U("?") + builder.query();
+        return builder.query();
     }
 
 #pragma endregion
@@ -173,7 +173,7 @@ namespace wa { namespace storage { namespace protocol {
         auto signature = get_queue_sas_string_to_sign(identifier, policy, resource, credentials);
         auto builder = get_sas_token_builder(identifier, policy, signature);
 
-        return U("?") + builder.query();
+        return builder.query();
     }
 
 #pragma endregion
@@ -197,15 +197,15 @@ namespace wa { namespace storage { namespace protocol {
         auto signature = get_table_sas_string_to_sign(identifier, policy, start_partition_key, start_row_key, end_partition_key, end_row_key, resource, credentials);
         auto builder = get_sas_token_builder(identifier, policy, signature);
 
-        add_query_if_not_empty(builder, uri_query_sas_table_name, table_name);
-        add_query_if_not_empty(builder, uri_query_sas_start_partition_key, start_partition_key);
-        add_query_if_not_empty(builder, uri_query_sas_start_row_key, start_row_key);
-        add_query_if_not_empty(builder, uri_query_sas_end_partition_key, end_partition_key);
-        add_query_if_not_empty(builder, uri_query_sas_end_row_key, end_row_key);
+        add_query_if_not_empty(builder, uri_query_sas_table_name, table_name, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_start_partition_key, start_partition_key, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_start_row_key, start_row_key, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_end_partition_key, end_partition_key, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_end_row_key, end_row_key, /* do_encoding */ true);
 
-        return U("?") + builder.query();
+        return builder.query();
     }
 
 #pragma endregion
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

@@ -21,7 +21,7 @@
 #include <evntprov.h>
 #include <evntrace.h>
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     // {EE5D17C5-1B3E-4792-B0F9-F8C5FC6AC22A}
     static const GUID event_provider_guid = { 0xee5d17c5, 0x1b3e, 0x4792, { 0xb0, 0xf9, 0xf8, 0xc5, 0xfc, 0x6a, 0xc2, 0x2a } };
@@ -63,18 +63,28 @@ namespace wa { namespace storage { namespace core {
         }
     }
 
-    void logger::log(wa::storage::operation_context context, client_log_level level, const utility::string_t& message) const
+    void logger::log(azure::storage::operation_context context, client_log_level level, const std::string& message) const
     {
         if (g_event_provider_handle != NULL)
         {
-            auto utf16_message = utility::conversions::to_utf16string(message);
+            utf16string utf16_message = utility::conversions::to_utf16string(message);
             EventWriteString(g_event_provider_handle, get_etw_log_level(level), 0, utf16_message.c_str());
         }
     }
 
-    bool logger::should_log(wa::storage::operation_context context, client_log_level level) const
+    void logger::log(azure::storage::operation_context context, client_log_level level, const std::wstring& message) const
+    {
+        if (g_event_provider_handle != NULL)
+        {
+            EventWriteString(g_event_provider_handle, get_etw_log_level(level), 0, message.c_str());
+        }
+    }
+
+    bool logger::should_log(azure::storage::operation_context context, client_log_level level) const
     {
         return (g_event_provider_handle != NULL) && (level <= context.log_level());
     }
 
-}}} // namespace wa::storage::core
+    logger logger::m_instance;
+
+}}} // namespace azure::storage::core

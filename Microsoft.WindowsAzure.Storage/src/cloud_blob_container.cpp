@@ -22,51 +22,50 @@
 #include "wascore/util.h"
 #include "wascore/constants.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
-    cloud_blob_container::cloud_blob_container(const storage_uri& uri)
-        : m_uri(uri), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_container_properties>())
+    cloud_blob_container::cloud_blob_container(storage_uri uri)
+        : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_container_properties>())
     {
         init(storage_credentials());
     }
 
-    cloud_blob_container::cloud_blob_container(const storage_uri& uri, const storage_credentials& credentials)
-        : m_uri(uri), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_container_properties>())
+    cloud_blob_container::cloud_blob_container(storage_uri uri, storage_credentials credentials)
+        : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_container_properties>())
     {
-        init(credentials);
+        init(std::move(credentials));
     }
 
-    cloud_blob_container::cloud_blob_container(const utility::string_t& name, const cloud_blob_client& client)
-        : m_name(name), m_client(client), m_uri(core::append_path_to_uri(client.base_uri(), name)),
+    cloud_blob_container::cloud_blob_container(utility::string_t name, cloud_blob_client client)
+        : m_name(std::move(name)), m_client(std::move(client)), m_uri(core::append_path_to_uri(m_client.base_uri(), m_name)),
         m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_container_properties>())
     {
     }
 
-    cloud_blob_container::cloud_blob_container(utility::string_t name, const cloud_blob_client& client, cloud_blob_container_properties properties, cloud_metadata metadata)
-        : m_name(std::move(name)), m_client(client), m_uri(core::append_path_to_uri(client.base_uri(), name)),
+    cloud_blob_container::cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata)
+        : m_name(std::move(name)), m_client(std::move(client)), m_uri(core::append_path_to_uri(m_client.base_uri(), m_name)),
         m_metadata(std::make_shared<cloud_metadata>(std::move(metadata))), m_properties(std::make_shared<cloud_blob_container_properties>(std::move(properties)))
     {
     }
 
-    void cloud_blob_container::init(const storage_credentials& credentials)
+    void cloud_blob_container::init(storage_credentials credentials)
     {
-        storage_credentials creds(credentials);
         utility::string_t snapshot;
-        m_uri = core::verify_blob_uri(m_uri, creds, snapshot);
+        m_uri = core::verify_blob_uri(m_uri, credentials, snapshot);
 
         if (!core::parse_container_uri(m_uri, m_name))
         {
             throw std::invalid_argument("uri");
         }
 
-        m_client = cloud_blob_client(core::get_service_client_uri(m_uri), creds);
+        m_client = cloud_blob_client(core::get_service_client_uri(m_uri), std::move(credentials));
     }
 
     utility::string_t cloud_blob_container::get_shared_access_signature(const blob_shared_access_policy& policy, const utility::string_t& stored_policy_identifier) const
     {
         if (!service_client().credentials().is_shared_key())
         {
-            throw std::logic_error(utility::conversions::to_utf8string(protocol::error_sas_missing_credentials));
+            throw std::logic_error(protocol::error_sas_missing_credentials);
         }
 
         utility::ostringstream_t resource_str;
@@ -75,39 +74,40 @@ namespace wa { namespace storage {
         return protocol::get_blob_sas_token(stored_policy_identifier, policy, cloud_blob_shared_access_headers(), U("c"), resource_str.str(), service_client().credentials());
     }
 
-    cloud_blob cloud_blob_container::get_blob_reference(const utility::string_t& blob_name) const
+    cloud_blob cloud_blob_container::get_blob_reference(utility::string_t blob_name) const
     {
-        return get_blob_reference(blob_name, utility::string_t());
+        return get_blob_reference(std::move(blob_name), utility::string_t());
     }
 
-    cloud_blob cloud_blob_container::get_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const
+    cloud_blob cloud_blob_container::get_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
     {
-        return cloud_blob(blob_name, snapshot_time, *this);
+        return cloud_blob(std::move(blob_name), std::move(snapshot_time), *this);
     }
 
-    cloud_page_blob cloud_blob_container::get_page_blob_reference(const utility::string_t& blob_name) const
+    cloud_page_blob cloud_blob_container::get_page_blob_reference(utility::string_t blob_name) const
     {
-        return get_page_blob_reference(blob_name, utility::string_t());
+        return get_page_blob_reference(std::move(blob_name), utility::string_t());
     }
 
-    cloud_page_blob cloud_blob_container::get_page_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const
+    cloud_page_blob cloud_blob_container::get_page_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
     {
-        return cloud_page_blob(blob_name, snapshot_time, *this);
+        return cloud_page_blob(std::move(blob_name), std::move(snapshot_time), *this);
     }
 
-    cloud_block_blob cloud_blob_container::get_block_blob_reference(const utility::string_t& blob_name) const
+    cloud_block_blob cloud_blob_container::get_block_blob_reference(utility::string_t blob_name) const
     {
-        return get_block_blob_reference(blob_name, utility::string_t());
+        return get_block_blob_reference(std::move(blob_name), utility::string_t());
     }
 
-    cloud_block_blob cloud_blob_container::get_block_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const
+    cloud_block_blob cloud_blob_container::get_block_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
     {
-        return cloud_block_blob(blob_name, snapshot_time, *this);
+        return cloud_block_blob(std::move(blob_name), std::move(snapshot_time), *this);
     }
 
-    cloud_blob_directory cloud_blob_container::get_directory_reference(const utility::string_t& name) const
+    cloud_blob_directory cloud_blob_container::get_directory_reference(utility::string_t name) const
     {
-        return cloud_blob_directory(name, *this);
+        // TODO: Consider renaming the parameter to directory_name for consistency
+        return cloud_blob_directory(std::move(name), *this);
     }
 
     pplx::task<void> cloud_blob_container::download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context)
@@ -294,7 +294,7 @@ namespace wa { namespace storage {
                     }
                     catch (const storage_exception& e)
                     {
-                        auto result = e.result();
+                        const azure::storage::request_result& result = e.result();
                         if (result.is_response_available() &&
                             (result.http_status_code() == web::http::status_codes::Conflict) &&
                             (result.extended_error().code() == protocol::error_code_container_already_exists))
@@ -346,7 +346,7 @@ namespace wa { namespace storage {
                     }
                     catch (const storage_exception& e)
                     {
-                        auto result = e.result();
+                        const azure::storage::request_result& result = e.result();
                         if (result.is_response_available() &&
                             (result.http_status_code() == web::http::status_codes::NotFound) &&
                             (result.extended_error().code() == protocol::error_code_container_not_found))
@@ -367,9 +367,7 @@ namespace wa { namespace storage {
         });
     }
 
-    // TODO: Rename current_token to continuation_token for consistency
-
-    pplx::task<blob_result_segment> cloud_blob_container::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+    pplx::task<blob_result_segment> cloud_blob_container::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -379,7 +377,7 @@ namespace wa { namespace storage {
 
         if (!use_flat_blob_listing)
         {
-            if (includes.snapshots())
+            if ((includes & blob_listing_details::snapshots) != 0)
             {
                 throw std::invalid_argument("includes");
             }
@@ -388,31 +386,31 @@ namespace wa { namespace storage {
         }
 
         auto command = std::make_shared<core::storage_command<blob_result_segment>>(uri());
-        command->set_build_request(std::bind(protocol::list_blobs, prefix, delimiter, includes, max_results, current_token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::list_blobs, prefix, delimiter, includes, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_location_mode(core::command_location_mode::primary_or_secondary, current_token.target_location());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<blob_result_segment>, blob_result_segment(), std::placeholders::_1, std::placeholders::_2));
         command->set_postprocess_response([container, delimiter] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<blob_result_segment>
         {
             protocol::list_blobs_reader reader(response.body());
 
-            std::vector<protocol::cloud_blob_list_item> blob_items(std::move(reader.extract_blob_items()));
+            std::vector<protocol::cloud_blob_list_item> blob_items(reader.extract_blob_items());
             std::vector<cloud_blob> blobs;
-            for (auto iter = blob_items.begin(); iter != blob_items.end(); ++iter)
+            for (std::vector<protocol::cloud_blob_list_item>::iterator iter = blob_items.begin(); iter != blob_items.end(); ++iter)
             {
-                blobs.push_back(cloud_blob(std::move(iter->name()), std::move(iter->snapshot_time()), container, std::move(iter->properties()), std::move(iter->metadata()), std::move(iter->copy_state())));
+                blobs.push_back(cloud_blob(iter->name(), iter->snapshot_time(), container, iter->properties(), iter->metadata(), iter->copy_state()));
             }
 
-            std::vector<protocol::cloud_blob_prefix_list_item> blob_prefix_items(std::move(reader.extract_blob_prefix_items()));
+            std::vector<protocol::cloud_blob_prefix_list_item> blob_prefix_items(reader.extract_blob_prefix_items());
             std::vector<cloud_blob_directory> directories;
             for (auto iter = blob_prefix_items.begin(); iter != blob_prefix_items.end(); ++iter)
             {
                 directories.push_back(cloud_blob_directory(iter->name(), container));
             }
 
-            continuation_token token(std::move(reader.extract_next_marker()));
-            token.set_target_location(result.target_location());
-            return pplx::task_from_result(blob_result_segment(std::move(blobs), std::move(directories), token));
+            continuation_token next_token(reader.extract_next_marker());
+            next_token.set_target_location(result.target_location());
+            return pplx::task_from_result(blob_result_segment(std::move(blobs), std::move(directories), next_token));
         });
         return core::executor<blob_result_segment>::execute_async(command, modified_options, context);
     }
@@ -423,7 +421,7 @@ namespace wa { namespace storage {
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
         protocol::access_policy_writer<blob_shared_access_policy> writer;
-        concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(std::move(writer.write(permissions.policies()))));
+        concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(writer.write(permissions.policies())));
 
         auto properties = m_properties;
 
@@ -463,7 +461,7 @@ namespace wa { namespace storage {
         {
             blob_container_permissions permissions;
             protocol::access_policy_reader<blob_shared_access_policy> reader(response.body());
-            permissions.set_policies(std::move(reader.extract_policies()));
+            permissions.set_policies(reader.extract_policies());
             permissions.set_public_access(protocol::blob_response_parsers::parse_public_access_type(response));
             return pplx::task_from_result<blob_container_permissions>(permissions);
         });
@@ -497,4 +495,4 @@ namespace wa { namespace storage {
         return core::executor<bool>::execute_async(command, modified_options, context);
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

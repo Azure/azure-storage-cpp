@@ -29,24 +29,25 @@ test_config::test_config()
     config_file >> config;
 
     auto target_name = config[U("target")].as_string();
-    auto tenants = config[U("tenants")];
+    web::json::value& tenants = config[U("tenants")];
 
-    for (auto iter = tenants.cbegin(); iter != tenants.cend(); ++iter)
+	for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
     {
-        if (iter->second[U("name")].as_string() == target_name)
+        const web::json::value& name_obj = it->at(U("name"));
+        if (name_obj.as_string() == target_name)
         {
-            if (!iter->second.has_field(U("connection_string")))
+            if (!it->has_field(U("connection_string")))
             {
-                wa::storage::storage_credentials credentials(iter->second[U("account_name")].as_string(), iter->second[U("account_key")].as_string());
-                wa::storage::storage_uri blob_uri(iter->second[U("blob_primary_endpoint")].as_string(), iter->second[U("blob_secondary_endpoint")].as_string());
-                wa::storage::storage_uri queue_uri(iter->second[U("queue_primary_endpoint")].as_string(), iter->second[U("queue_secondary_endpoint")].as_string());
-                wa::storage::storage_uri table_uri(iter->second[U("table_primary_endpoint")].as_string(), iter->second[U("table_secondary_endpoint")].as_string());
-                m_account = wa::storage::cloud_storage_account(credentials, blob_uri, queue_uri, table_uri);
+                azure::storage::storage_credentials credentials(it->at(U("account_name")).as_string(), it->at(U("account_key")).as_string());
+                azure::storage::storage_uri blob_uri(it->at(U("blob_primary_endpoint")).as_string(), it->at(U("blob_secondary_endpoint")).as_string());
+                azure::storage::storage_uri queue_uri(it->at(U("queue_primary_endpoint")).as_string(), it->at(U("queue_secondary_endpoint")).as_string());
+                azure::storage::storage_uri table_uri(it->at(U("table_primary_endpoint")).as_string(), it->at(U("table_secondary_endpoint")).as_string());
+                m_account = azure::storage::cloud_storage_account(credentials, blob_uri, queue_uri, table_uri);
             }
             else
             {
-                auto connection_string = iter->second[U("connection_string")];
-                m_account = wa::storage::cloud_storage_account::parse(connection_string.as_string());
+                const web::json::value& connection_string_obj = it->at(U("connection_string"));
+                m_account = azure::storage::cloud_storage_account::parse(connection_string_obj.as_string());
             }
 
             break;
@@ -54,7 +55,7 @@ test_config::test_config()
     }
 }
 
-void test_base::print_client_request_id(const wa::storage::operation_context& context, const utility::string_t& purpose)
+void test_base::print_client_request_id(const azure::storage::operation_context& context, const utility::string_t& purpose)
 {
     std::string suite_name(UnitTest::CurrentTest::Details()->suiteName);
     std::string test_name(UnitTest::CurrentTest::Details()->testName);

@@ -21,45 +21,58 @@
 #include "was/storage_account.h"
 #include "was/queue.h"
 
-namespace wa { namespace storage { namespace samples {
+namespace azure { namespace storage { namespace samples {
 
     void queues_getting_started_sample()
     {
         try
         {
             // Initialize storage account
-            wa::storage::cloud_storage_account storage_account = wa::storage::cloud_storage_account::parse(storage_connection_string);
+            azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);
 
             // Create a queue
-            wa::storage::cloud_queue_client queue_client = storage_account.create_cloud_queue_client();
-            wa::storage::cloud_queue queue = queue_client.get_queue_reference(U("azure-native-client-library-sample-queue"));
+            azure::storage::cloud_queue_client queue_client = storage_account.create_cloud_queue_client();
+            azure::storage::cloud_queue queue = queue_client.get_queue_reference(U("my-sample-queue"));
             bool created = queue.create_if_not_exists();
 
             // Insert some queue messages
-            wa::storage::cloud_queue_message message1(U("some message"));
+            azure::storage::cloud_queue_message message1(U("some message"));
             queue.add_message(message1);
-            wa::storage::cloud_queue_message message2(U("different message"));
+            azure::storage::cloud_queue_message message2(U("different message"));
             queue.add_message(message2);
-            wa::storage::cloud_queue_message message3(U("another message"));
+            azure::storage::cloud_queue_message message3(U("another message"));
             queue.add_message(message3);
 
             // Peek the next queue message
-            wa::storage::cloud_queue_message message4 = queue.peek_message();
+            azure::storage::cloud_queue_message peeked_message = queue.peek_message();
+            ucout << U("Peek: ") << peeked_message.content_as_string() << std::endl;
 
             // Dequeue the next queue message
-            wa::storage::cloud_queue_message message5 = queue.get_message();
+            azure::storage::cloud_queue_message dequeued_message = queue.get_message();
+            ucout << U("Get: ") << dequeued_message.content_as_string() << std::endl;
 
             // Update a queue message (content and visibility timeout)
-            message5.set_content(U("changed message"));
-            queue.update_message(message5, std::chrono::seconds(30), true);
+            dequeued_message.set_content(U("changed message"));
+            queue.update_message(dequeued_message, std::chrono::seconds(30), true);
+            ucout << U("Update: ") << dequeued_message.content_as_string() << std::endl;
 
-            // Delete a queue message
-            queue.delete_message(message5);
+            // Delete the queue message
+            queue.delete_message(dequeued_message);
 
             // Dequeue some queue messages (maximum 32 at a time) and set their visibility timeout to 5 minutes
-            wa::storage::queue_request_options options;
-            wa::storage::operation_context context;
-            std::vector<wa::storage::cloud_queue_message> messages = queue.get_messages(32, std::chrono::seconds(300), options, context);
+            azure::storage::queue_request_options options;
+            azure::storage::operation_context context;
+            std::vector<azure::storage::cloud_queue_message> messages = queue.get_messages(32, std::chrono::seconds(300), options, context);
+            for (std::vector<azure::storage::cloud_queue_message>::const_iterator it = messages.cbegin(); it != messages.cend(); ++it)
+            {
+                ucout << U("Get: ") << it->content_as_string() << std::endl;
+            }
+
+            // Delete the queue messages
+            for (std::vector<azure::storage::cloud_queue_message>::iterator it = messages.begin(); it != messages.end(); ++it)
+            {
+                queue.delete_message(*it);
+            }
 
             // Get the approximate queue size
             queue.download_attributes();
@@ -68,28 +81,28 @@ namespace wa { namespace storage { namespace samples {
             // Delete the queue
             bool deleted = queue.delete_queue_if_exists();
         }
-        catch (wa::storage::storage_exception& e)
+        catch (const azure::storage::storage_exception& e)
         {
             ucout << U("Error: ") << e.what() << std::endl;
 
-            wa::storage::request_result result = e.result();
-            wa::storage::storage_extended_error extended_error = result.extended_error();
+            azure::storage::request_result result = e.result();
+            azure::storage::storage_extended_error extended_error = result.extended_error();
             if (!extended_error.message().empty())
             {
                 ucout << extended_error.message() << std::endl;
             }
         }
-        catch (std::exception& e)
+        catch (const std::exception& e)
         {
             ucout << U("Error: ") << e.what() << std::endl;
         }
     }
 
-}}} // namespace wa::storage::samples
+}}} // namespace azure::storage::samples
 
 int _tmain(int argc, _TCHAR *argv[])
 {
-    wa::storage::samples::queues_getting_started_sample();
+    azure::storage::samples::queues_getting_started_sample();
     return 0;
 }
 

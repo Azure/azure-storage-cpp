@@ -19,17 +19,20 @@
 #include "wascore/protocol.h"
 #include "wascore/protocol_xml.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     void storage_error_reader::handle_element(const utility::string_t& element_name)
     {
-        if (element_name == xml_code)
+        if (get_parent_element_name() != xml_innererror_table)
         {
-            m_error_code = get_current_element_text();
-        }
-        else if (element_name == xml_message)
-        {
-            m_error_message = get_current_element_text();
+            if (element_name == xml_code || element_name == xml_code_table)
+            {
+                m_error_code = get_current_element_text();
+            }
+            else if (element_name == xml_message || element_name == xml_message_table)
+            {
+                m_error_message = get_current_element_text();
+            }
         }
 
         // TODO parse details
@@ -357,7 +360,7 @@ namespace wa { namespace storage { namespace protocol {
         }
         else if (m_handling_what != 0 && element_name == xml_block)
         {
-            m_size = (size_t)-1;
+            m_size = std::numeric_limits<size_t>::max();
             m_name.clear();
         }
     }
@@ -387,7 +390,7 @@ namespace wa { namespace storage { namespace protocol {
             }
             else if (element_name == xml_block)
             {
-                if (!m_name.empty() && (m_size != (size_t)-1))
+                if (!m_name.empty() && (m_size != std::numeric_limits<size_t>::max()))
                 {
                     m_block_list.push_back(block_list_item(m_name, m_size, m_handling_what == 1));
                 }
@@ -470,19 +473,23 @@ namespace wa { namespace storage { namespace protocol {
     {
         if (element_name == xml_service_properties_allowed_origins)
         {
-            m_current_cors_rule.allowed_origins().swap(core::string_split(get_current_element_text(), U(",")));
+            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            m_current_cors_rule.allowed_origins().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_allowed_methods)
         {
-            m_current_cors_rule.allowed_methods().swap(core::string_split(get_current_element_text(), U(",")));
+            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            m_current_cors_rule.allowed_methods().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_exposed_headers)
         {
-            m_current_cors_rule.exposed_headers().swap(core::string_split(get_current_element_text(), U(",")));
+            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            m_current_cors_rule.exposed_headers().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_allowed_headers)
         {
-            m_current_cors_rule.allowed_headers().swap(core::string_split(get_current_element_text(), U(",")));
+            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            m_current_cors_rule.allowed_headers().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_max_age)
         {
@@ -571,14 +578,6 @@ namespace wa { namespace storage { namespace protocol {
             return;
         }
 
-        /*
-        if (element_name == xml_url)
-        {
-            m_uri = get_current_element_text();
-            return;
-        }
-        */
-
         if (get_parent_element_name() == xml_metadata)
         {
             m_metadata[element_name] = get_current_element_text();
@@ -587,7 +586,7 @@ namespace wa { namespace storage { namespace protocol {
 
         if (element_name == xml_next_marker)
         {
-            m_next_marker = U("marker=") + get_current_element_text();
+            m_next_marker = get_current_element_text();
             return;
         }
     }
@@ -655,7 +654,7 @@ namespace wa { namespace storage { namespace protocol {
     {
         if (element_name == U("QueueMessage"))
         {
-            cloud_message_list_item item(m_content, m_id, m_pop_receipt, m_insertion_time, m_expiration_time, m_next_visible_time, m_dequeue_count);
+            cloud_message_list_item item(std::move(m_content), std::move(m_id), std::move(m_pop_receipt), m_insertion_time, m_expiration_time, m_next_visible_time, m_dequeue_count);
             m_items.push_back(item);
         }
     }
@@ -682,21 +681,21 @@ namespace wa { namespace storage { namespace protocol {
         if (includes.logging())
         {
             write_start_element(xml_service_properties_logging);
-            write_logging(properties.logging(), outstream);
+            write_logging(properties.logging());
             write_end_element();
         }
 
         if (includes.hour_metrics())
         {
             write_start_element(xml_service_properties_hour_metrics);
-            write_metrics(properties.hour_metrics(), outstream);
+            write_metrics(properties.hour_metrics());
             write_end_element();
         }
 
         if (includes.minute_metrics())
         {
             write_start_element(xml_service_properties_minute_metrics);
-            write_metrics(properties.minute_metrics(), outstream);
+            write_metrics(properties.minute_metrics());
             write_end_element();
         }
 
@@ -707,7 +706,7 @@ namespace wa { namespace storage { namespace protocol {
             for (auto iter = properties.cors().cbegin(); iter != properties.cors().cend(); ++iter)
             {
                 write_start_element(xml_service_properties_cors_rule);
-                write_cors_rule(*iter, outstream);
+                write_cors_rule(*iter);
                 write_end_element();
             }
         
@@ -723,24 +722,24 @@ namespace wa { namespace storage { namespace protocol {
         return outstream.str();
     }
 
-    void service_properties_writer::write_logging(const service_properties::logging_properties& logging, std::ostringstream& output)
+    void service_properties_writer::write_logging(const service_properties::logging_properties& logging)
     {
         write_element(xml_service_properties_version, logging.version());
         write_element(xml_service_properties_delete, logging.delete_enabled() ? header_value_true : header_value_false);
         write_element(xml_service_properties_read, logging.read_enabled() ? header_value_true : header_value_false);
         write_element(xml_service_properties_write, logging.write_enabled() ? header_value_true : header_value_false);
-        write_retention_policy(logging.retention_policy_enabled(), logging.retention_days(), output);
+        write_retention_policy(logging.retention_policy_enabled(), logging.retention_days());
     }
 
-    void service_properties_writer::write_metrics(const service_properties::metrics_properties& metrics, std::ostringstream& output)
+    void service_properties_writer::write_metrics(const service_properties::metrics_properties& metrics)
     {
         write_element(xml_service_properties_version, metrics.version());
         write_element(xml_service_properties_enabled, metrics.enabled() ? header_value_true : header_value_false);
         write_element(xml_service_properties_include_apis, metrics.include_apis() ? header_value_true : header_value_false);
-        write_retention_policy(metrics.retention_policy_enabled(), metrics.retention_days(), output);
+        write_retention_policy(metrics.retention_policy_enabled(), metrics.retention_days());
     }
 
-    void service_properties_writer::write_cors_rule(const service_properties::cors_rule& rule, std::ostringstream& output)
+    void service_properties_writer::write_cors_rule(const service_properties::cors_rule& rule)
     {
         write_element(xml_service_properties_allowed_origins, core::string_join(rule.allowed_origins(), U(",")));
         write_element(xml_service_properties_allowed_methods, core::string_join(rule.allowed_methods(), U(",")));
@@ -749,7 +748,7 @@ namespace wa { namespace storage { namespace protocol {
         write_element(xml_service_properties_allowed_headers, core::string_join(rule.allowed_headers(), U(",")));
     }
 
-    void service_properties_writer::write_retention_policy(bool enabled, int days, std::ostringstream& output)
+    void service_properties_writer::write_retention_policy(bool enabled, int days)
     {
         write_start_element(xml_service_properties_retention);
         
@@ -766,4 +765,32 @@ namespace wa { namespace storage { namespace protocol {
         write_end_element();
     }
 
-}}} // namespace wa::storage::protocol
+    void service_stats_reader::handle_element(const utility::string_t& element_name)
+    {
+        if (get_parent_element_name() == xml_service_stats_geo_replication)
+        {
+            handle_geo_replication_status(element_name);
+        }
+    }
+
+    void service_stats_reader::handle_geo_replication_status(const utility::string_t& element_name)
+    {
+        if (element_name == xml_service_stats_geo_replication_status)
+        {
+            auto status = get_current_element_text();
+            if (status == xml_service_stats_geo_replication_status_live)
+            {
+                m_service_stats.geo_replication_private().set_status(geo_replication_status::live);
+            }
+            else if (status == xml_service_stats_geo_replication_status_bootstrap)
+            {
+                m_service_stats.geo_replication_private().set_status(geo_replication_status::bootstrap);
+            }
+        }
+        else if (element_name == xml_service_stats_geo_replication_last_sync_time)
+        {
+            m_service_stats.geo_replication_private().set_last_sync_time(utility::datetime::from_string(get_current_element_text(), utility::datetime::RFC_1123));
+        }
+    }
+
+}}} // namespace azure::storage::protocol

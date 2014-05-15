@@ -48,7 +48,7 @@
 #include "cpprest/rawptrstream.h"
 #include "cpprest/streams.h"
 
-namespace wa { namespace storage { namespace core { namespace xml {
+namespace azure { namespace storage { namespace core { namespace xml {
 
 /// <summary>
 /// A base implementation for IStream that returns E_NOTIMPL for all the methods
@@ -234,4 +234,4 @@ protected:
     std::ostream& m_stream;
 };
 
-}}}} // namespace wa::storage::core::xml
+}}}} // namespace azure::storage::core::xml

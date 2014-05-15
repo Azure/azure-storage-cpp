@@ -19,15 +19,25 @@
 
 #include "cpprest/basic_types.h"
 
-#ifdef WASTORAGE_DLL
-#define WASTORAGE_API __declspec( dllexport )
+#ifdef _NO_WASTORAGE_API
+    #define WASTORAGE_API
 #else
-#define WASTORAGE_API __declspec( dllimport )
+    #ifdef WASTORAGE_DLL
+        #define WASTORAGE_API __declspec( dllexport )
+    #else
+        #define WASTORAGE_API __declspec( dllimport )
+    #endif
 #endif
 
 #ifdef WIN32
+
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
+
 #include <Rpc.h>
 #else
 extern "C"
@@ -66,18 +76,24 @@ namespace utility {
     /// </summary>
     WASTORAGE_API bool __cdecl uuid_equal(const utility::uuid& value1, const utility::uuid& value2);
 
+    template<typename T>
+    void assert_in_bounds(const utility::string_t& param_name, const T& value, const T& min)
+    {
+        if (value < min)
+        {
+            throw std::invalid_argument(utility::conversions::to_utf8string(param_name));
+        }
+    }
+
+    template<typename T>
+    void assert_in_bounds(const utility::string_t& param_name, const T& value, const T& min, const T& max)
+    {
+        assert_in_bounds(param_name, value, min);
+
+        if (value > max)
+        {
+            throw std::invalid_argument(utility::conversions::to_utf8string(param_name));
+        }
+    }
+
 } // namespace utility
-
-/*
-utility::ostream_t& operator<<(utility::ostream_t& os, const utility::uuid& uu)
-{
-    os << utility::uuid_to_string(uu);
-    return os;
-}
-
-utility::ostream_t& operator<<(utility::ostream_t& os, const utility::datetime& dt)
-{
-    os << dt.to_string(utility::datetime::date_format::ISO_8601);
-    return os;
-}
-*/

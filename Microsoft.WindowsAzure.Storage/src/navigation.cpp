@@ -22,16 +22,15 @@
 #include "wascore/resources.h"
 #include "was/auth.h"
 
-namespace wa { namespace storage { namespace core {
-
-    const std::locale loc(std::locale::classic());
+namespace azure { namespace storage { namespace core {
 
     bool is_host_dns_name(const web::http::uri& uri)
     {
-        utility::string_t host = uri.host();
-        for (auto iter = host.cbegin(); iter != host.cend(); iter++)
+        const utility::string_t& host = uri.host();
+        for (utility::string_t::const_iterator it = host.cbegin(); it != host.cend(); ++it)
         {
-            if (!std::isdigit(*iter, loc) && *iter != U('.'))
+            utility::char_t c = *it;
+            if ((c < U('0') || c > U('9')) && c != U('.'))
             {
                 return true;
             }
@@ -50,28 +49,49 @@ namespace wa { namespace storage { namespace core {
         return use_path_style(uri.primary_uri());
     }
 
+    utility::string_t::size_type find_path_start(const web::http::uri& uri)
+    {
+        if (use_path_style(uri))
+        {
+            const utility::string_t& path = uri.path();
+            if (path.size() > 0)
+            {
+                // The path should always start with "/", but this code would still handle the case where it does not.
+                utility::string_t::size_type start_pos = path.find(U('/'), 1);
+                if (start_pos == utility::string_t::npos)
+                {
+                    start_pos = path.size();
+                }
+
+                return start_pos;
+            }
+        }
+
+        return 0;
+    }
+
     bool parse_container_uri(const web::http::uri& uri, utility::string_t& container_name)
     {
-        auto segments = web::http::uri::split_path(uri.path());
-        auto iter = segments.cbegin();
+        std::vector<utility::string_t> segments = web::http::uri::split_path(uri.path());
+        std::vector<utility::string_t>::const_iterator it = segments.cbegin();
 
         if (use_path_style(uri))
         {
-            if (iter == segments.cend())
+            if (it == segments.cend())
             {
                 return false;
             }
 
-            iter++;
+            ++it;
         }
 
-        if (iter == segments.cend())
+        if (it == segments.cend())
         {
             container_name = protocol::root_container;
         }
         else
         {
-            container_name = *iter;
+            container_name = *it;
         }
 
         return true;
@@ -128,6 +148,44 @@ namespace wa { namespace storage { namespace core {
         return parse_blob_uri(uri.primary_uri(), container_name, blob_name);
     }
 
+    web::http::uri create_stripped_uri(const web::http::uri& uri)
+    {
+        web::http::uri_builder builder;
+        builder.set_scheme(uri.scheme());
+        builder.set_host(uri.host());
+        builder.set_port(uri.port());
+        builder.set_path(uri.path());
+        return builder.to_uri();
+    }
+
+    storage_uri create_stripped_uri(const storage_uri& uri)
+    {
+        return storage_uri(create_stripped_uri(uri.primary_uri()), create_stripped_uri(uri.secondary_uri()));
+    }
+
+    void parse_query_and_verify(const web::http::uri& uri, storage_credentials& credentials, bool require_signed_resource)
+    {
+        // Read the SAS credentials if present from the URI
+        storage_credentials parsed_credentials = protocol::parse_query(uri, require_signed_resource);
+        if (parsed_credentials.is_sas())
+        {
+            if (credentials.is_shared_key() || (credentials.is_sas() && credentials.sas_token() != parsed_credentials.sas_token()))
+            {
+                throw std::invalid_argument(protocol::error_multiple_credentials);
+            }
+
+            // TODO: Consider if it is OK here to override explicitly given anonymous credentials with the parsed SAS credentials (the .Net Library does not)
+
+            // Overwrite the given credentials with the SAS credentials read from the URI
+            credentials = parsed_credentials;
+        }
+    }
+
+    void parse_query_and_verify(const storage_uri& uri, storage_credentials& credentials, bool require_signed_resource)
+    {
+        parse_query_and_verify(uri.primary_uri(), credentials, require_signed_resource);
+    }
+
     web::http::uri verify_blob_uri(const web::http::uri& uri, storage_credentials& credentials, utility::string_t& snapshot)
     {
         if (uri.host().empty())
@@ -139,35 +197,21 @@ namespace wa { namespace storage { namespace core {
         auto snapshot_iter = query.find(protocol::uri_query_snapshot);
         if (snapshot_iter != query.end())
         {
-            utility::string_t parsed_snapshot = snapshot_iter->second;
+            const utility::string_t& parsed_snapshot = snapshot_iter->second;
             if (!parsed_snapshot.empty())
             {
                 if (!snapshot.empty() && (parsed_snapshot != snapshot))
                 {
-                    throw std::invalid_argument(utility::conversions::to_utf8string(protocol::error_multiple_snapshots));
+                    throw std::invalid_argument(protocol::error_multiple_snapshots);
                 }
 
                 snapshot = parsed_snapshot;
             }
         }
 
-        auto parsed_credentials = protocol::parse_query(uri, true);
-        if (parsed_credentials.is_sas())
-        {
-            if (credentials.is_shared_key() || (credentials.is_sas() && parsed_credentials.sas_token() != credentials.sas_token()))
-            {
-                throw std::invalid_argument(utility::conversions::to_utf8string(protocol::error_multiple_credentials));
-            }
+        parse_query_and_verify(uri, credentials, true);
 
-            credentials = parsed_credentials;
-        }
-
-        web::http::uri_builder builder;
-        builder.set_scheme(uri.scheme());
-        builder.set_host(uri.host());
-        builder.set_port(uri.port());
-        builder.set_path(uri.path());
-        return builder.to_uri();
+        return create_stripped_uri(uri);
     }
 
     storage_uri verify_blob_uri(const storage_uri& uri, storage_credentials& credentials, utility::string_t& snapshot)
@@ -218,6 +262,33 @@ namespace wa { namespace storage { namespace core {
         return name;
     }
 
+    bool parse_object_uri(const web::http::uri& uri, utility::string_t& object_name)
+    {
+        std::vector<utility::string_t> segments = web::http::uri::split_path(uri.path());
+        std::vector<utility::string_t>::const_iterator it = segments.cbegin();
+
+        if (use_path_style(uri))
+        {
+            if (it != segments.cend())
+            {
+                ++it;
+            }
+        }
+
+        if (it == segments.cend())
+        {
+            return false;
+        }
+
+        object_name = *it;
+        return true;
+    }
+
+    bool parse_object_uri(const storage_uri& uri, utility::string_t& object_name)
+    {
+        return parse_object_uri(uri.primary_uri(), object_name);
+    }
+
     web::http::uri get_service_client_uri(const web::http::uri& uri)
     {
         if (uri.is_empty())
@@ -250,4 +321,4 @@ namespace wa { namespace storage { namespace core {
             get_service_client_uri(uri.secondary_uri()));
     }
 
-}}} // namespace wa::storage::navigation
+}}} // namespace azure::storage::navigation

@@ -18,7 +18,7 @@
 #include "stdafx.h"
 #include "was/service_client.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     client_log_level operation_context::m_global_log_level = client_log_level::log_level_off;
 
@@ -39,4 +39,4 @@ namespace wa { namespace storage {
         m_global_log_level = log_level;
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

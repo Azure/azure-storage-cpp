@@ -30,7 +30,7 @@ public:
         return singleton_instance;
     }
 
-    const wa::storage::cloud_storage_account& account() const
+    const azure::storage::cloud_storage_account& account() const
     {
         return m_account;
     }
@@ -39,7 +39,7 @@ private:
 
     test_config();
 
-    wa::storage::cloud_storage_account m_account;
+    azure::storage::cloud_storage_account m_account;
 };
 
 class test_base
@@ -57,7 +57,7 @@ public:
 
 protected:
 
-    static void print_client_request_id(const wa::storage::operation_context& context, const utility::string_t& purpose);
+    static void print_client_request_id(const azure::storage::operation_context& context, const utility::string_t& purpose);
   
-    wa::storage::operation_context m_context;
+    azure::storage::operation_context m_context;
 };

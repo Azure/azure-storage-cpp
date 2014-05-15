@@ -21,7 +21,7 @@
 #include "wascore/util.h"
 #include "was/queue.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     queue_request_options cloud_queue_client::get_modified_options(const queue_request_options& options) const
     {
@@ -32,33 +32,35 @@ namespace wa { namespace storage {
 
     pplx::task<std::vector<cloud_queue>> cloud_queue_client::list_queues_async(const utility::string_t& prefix, bool get_metadata, const queue_request_options& options, operation_context context) const
     {
-        std::shared_ptr<std::vector<cloud_queue>> results = std::make_shared<std::vector<cloud_queue>>();
-        std::shared_ptr<continuation_token> continuation_token = std::make_shared<wa::storage::continuation_token>();
+        // TODO: Consider having a max_results parameter or request option to limit the total number of items retrieved (consistent with any design changes in other libraries)
 
-        return pplx::details::do_while([this, results, prefix, get_metadata, continuation_token, options, context] () mutable -> pplx::task<bool>
+        std::shared_ptr<std::vector<cloud_queue>> results = std::make_shared<std::vector<cloud_queue>>();
+        std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
+
+        return pplx::details::do_while([this, results, prefix, get_metadata, token, options, context] () mutable -> pplx::task<bool>
         {
-            return list_queues_segmented_async(prefix, get_metadata, -1, *continuation_token, options, context).then([results, continuation_token] (queue_result_segment result_segment) mutable -> bool
+            return list_queues_segmented_async(prefix, get_metadata, -1, *token, options, context).then([results, token] (queue_result_segment result_segment) mutable -> bool
             {
-                std::vector<wa::storage::cloud_queue> partial_results = result_segment.results();
+                std::vector<azure::storage::cloud_queue> partial_results = result_segment.results();
                 results->insert(results->end(), partial_results.begin(), partial_results.end());
-                *continuation_token = result_segment.continuation_token();
-                return !continuation_token->empty();
+                *token = result_segment.continuation_token();
+                return !token->empty();
             });
-        }).then([results] (bool guard) -> pplx::task<std::vector<cloud_queue>>
+        }).then([results] (bool) -> pplx::task<std::vector<cloud_queue>>
         {
             return pplx::task_from_result(*results);
         });
     }
 
-    pplx::task<queue_result_segment> cloud_queue_client::list_queues_segmented_async(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& continuation_token, const queue_request_options& options, operation_context context) const
+    pplx::task<queue_result_segment> cloud_queue_client::list_queues_segmented_async(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token, const queue_request_options& options, operation_context context) const
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(*this, prefix, get_metadata, max_results, continuation_token);
+        storage_uri uri = protocol::generate_queue_uri(*this, prefix, get_metadata, max_results, token);
 
         std::shared_ptr<core::storage_command<queue_result_segment>> command = std::make_shared<core::storage_command<queue_result_segment>>(uri);
         command->set_build_request(std::bind(protocol::list_queues, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
-        command->set_location_mode(core::command_location_mode::primary_or_secondary, continuation_token.target_location());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<queue_result_segment>, queue_result_segment(), std::placeholders::_1, std::placeholders::_2));
         command->set_postprocess_response([this, get_metadata] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<queue_result_segment>
         {
@@ -68,23 +70,29 @@ namespace wa { namespace storage {
             std::vector<cloud_queue> results;
             results.reserve(queue_items.size());
 
-            for (std::vector<protocol::cloud_queue_list_item>::const_iterator itr = queue_items.cbegin(); itr != queue_items.cend(); ++itr)
+            for (std::vector<protocol::cloud_queue_list_item>::iterator it = queue_items.begin(); it != queue_items.end(); ++it)
             {
-                cloud_queue queue(*this, itr->name());
+                cloud_queue queue = get_queue_reference(it->name());
                 if (get_metadata)
                 {
-                    queue.set_metadata(itr->metadata());
+                    queue.set_metadata(it->metadata());
                 }
 
-                results.push_back(queue);
+                results.push_back(std::move(queue));
             }
 
-            wa::storage::continuation_token next_token(reader.extract_next_marker());
+            utility::string_t next_marker = reader.extract_next_marker();
+            if (!next_marker.empty())
+            {
+                next_marker = core::make_query_parameter(protocol::queue_query_next_marker, next_marker);
+            }
+
+            azure::storage::continuation_token next_token(std::move(next_marker));
             next_token.set_target_location(result.target_location());
 
             queue_result_segment result_segment;
-            result_segment.set_results(results);
-            result_segment.set_continuation_token(next_token);
+            result_segment.set_results(std::move(results));
+            result_segment.set_continuation_token(std::move(next_token));
 
             return pplx::task_from_result(result_segment);
         });
@@ -107,33 +115,42 @@ namespace wa { namespace storage {
         return upload_service_properties_base_async(properties, includes, modified_options, context);
     }
 
-    cloud_queue cloud_queue_client::get_queue_reference(const utility::string_t& queue_name) const
+    pplx::task<service_stats> cloud_queue_client::download_service_stats_async(const queue_request_options& options, operation_context context) const
     {
-        cloud_queue queue(*this, queue_name);
+        queue_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options());
+
+        return download_service_stats_base_async(modified_options, context);
+    }
+
+    cloud_queue cloud_queue_client::get_queue_reference(utility::string_t queue_name) const
+    {
+        cloud_queue queue(*this, std::move(queue_name));
         return queue;
     }
 
-    void cloud_queue_client::set_authentication_scheme(wa::storage::authentication_scheme value)
+    void cloud_queue_client::set_authentication_scheme(azure::storage::authentication_scheme value)
     {
         cloud_client::set_authentication_scheme(value);
 
         storage_credentials creds = credentials();
         if (creds.is_shared_key())
         {
+            utility::string_t account_name = creds.account_name();
             switch (authentication_scheme())
             {
-            case wa::storage::authentication_scheme::shared_key_lite:
-                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_lite_blob_queue_canonicalizer>(creds.account_name()), creds));
+            case azure::storage::authentication_scheme::shared_key_lite:
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_lite_blob_queue_canonicalizer>(std::move(account_name)), std::move(creds)));
                 break;
 
-            default: // wa::storage::authentication_scheme::shared_key
-                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_blob_queue_canonicalizer>(creds.account_name()), creds));
+            default: // azure::storage::authentication_scheme::shared_key
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_blob_queue_canonicalizer>(std::move(account_name)), std::move(creds)));
                 break;
             }
         }
         else if (creds.is_sas())
         {
-            set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(creds));
+            set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(std::move(creds)));
         }
         else
         {
@@ -141,4 +158,4 @@ namespace wa { namespace storage {
         }
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

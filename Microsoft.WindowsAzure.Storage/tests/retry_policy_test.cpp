@@ -19,42 +19,42 @@
 #include "test_base.h"
 #include "check_macros.h"
 
-wa::storage::storage_location get_initial_location(wa::storage::location_mode mode)
+azure::storage::storage_location get_initial_location(azure::storage::location_mode mode)
 {
     switch (mode)
     {
-    case wa::storage::location_mode::primary_only:
-    case wa::storage::location_mode::primary_then_secondary:
-        return wa::storage::storage_location::primary;
+    case azure::storage::location_mode::primary_only:
+    case azure::storage::location_mode::primary_then_secondary:
+        return azure::storage::storage_location::primary;
     
-    case wa::storage::location_mode::secondary_only:
-    case wa::storage::location_mode::secondary_then_primary:
-        return wa::storage::storage_location::secondary;
+    case azure::storage::location_mode::secondary_only:
+    case azure::storage::location_mode::secondary_then_primary:
+        return azure::storage::storage_location::secondary;
 
     default:
         throw std::invalid_argument("mode");
     }
 }
 
-wa::storage::storage_location get_next_location(wa::storage::location_mode mode, wa::storage::storage_location current_location)
+azure::storage::storage_location get_next_location(azure::storage::location_mode mode, azure::storage::storage_location current_location)
 {
     switch (mode)
     {
-    case wa::storage::location_mode::primary_only:
-        return wa::storage::storage_location::primary;
+    case azure::storage::location_mode::primary_only:
+        return azure::storage::storage_location::primary;
 
-    case wa::storage::location_mode::secondary_only:
-        return wa::storage::storage_location::secondary;
+    case azure::storage::location_mode::secondary_only:
+        return azure::storage::storage_location::secondary;
 
-    case wa::storage::location_mode::primary_then_secondary:
-    case wa::storage::location_mode::secondary_then_primary:
+    case azure::storage::location_mode::primary_then_secondary:
+    case azure::storage::location_mode::secondary_then_primary:
         switch (current_location)
         {
-        case wa::storage::storage_location::primary:
-            return wa::storage::storage_location::secondary;
+        case azure::storage::storage_location::primary:
+            return azure::storage::storage_location::secondary;
 
-        case wa::storage::storage_location::secondary:
-            return wa::storage::storage_location::primary;
+        case azure::storage::storage_location::secondary:
+            return azure::storage::storage_location::primary;
 
         default:
             throw std::invalid_argument("current_location");
@@ -65,21 +65,21 @@ wa::storage::storage_location get_next_location(wa::storage::location_mode mode,
     }
 }
 
-void verify_retry_results(wa::storage::retry_policy policy, web::http::status_code primary_status_code, web::http::status_code secondary_status_code, wa::storage::location_mode mode, std::function<std::chrono::milliseconds (int)> allowed_delta, std::vector<wa::storage::retry_info> expected_retry_info_list)
+void verify_retry_results(azure::storage::retry_policy policy, web::http::status_code primary_status_code, web::http::status_code secondary_status_code, azure::storage::location_mode mode, std::function<std::chrono::milliseconds (int)> allowed_delta, std::vector<azure::storage::retry_info> expected_retry_info_list)
 {
     auto initial_location = get_initial_location(mode);
     auto next_location = get_next_location(mode, initial_location);
 
-    wa::storage::operation_context op_context;
-    wa::storage::request_result result(utility::datetime::utc_now(),
+    azure::storage::operation_context op_context;
+    azure::storage::request_result result(utility::datetime::utc_now(),
         initial_location,
-        web::http::http_response(initial_location == wa::storage::storage_location::secondary ? secondary_status_code : primary_status_code),
+        web::http::http_response(initial_location == azure::storage::storage_location::secondary ? secondary_status_code : primary_status_code),
         false);
 
     int retry_count = 0;
     for (auto iter = expected_retry_info_list.cbegin(); iter != expected_retry_info_list.cend(); ++iter)
     {
-        auto retry_info = policy.evaluate(wa::storage::retry_context(retry_count++, result, next_location, mode), op_context);
+        auto retry_info = policy.evaluate(azure::storage::retry_context(retry_count++, result, next_location, mode), op_context);
 
         CHECK(retry_info.should_retry());
         CHECK(iter->target_location() == retry_info.target_location());
@@ -88,22 +88,22 @@ void verify_retry_results(wa::storage::retry_policy policy, web::http::status_co
 
         std::this_thread::sleep_for(retry_info.retry_interval());
 
-        result = wa::storage::request_result(utility::datetime::utc_now(),
+        result = azure::storage::request_result(utility::datetime::utc_now(),
             retry_info.target_location(),
-            web::http::http_response(retry_info.target_location() == wa::storage::storage_location::secondary ? secondary_status_code : primary_status_code),
+            web::http::http_response(retry_info.target_location() == azure::storage::storage_location::secondary ? secondary_status_code : primary_status_code),
             false);
         mode = retry_info.updated_location_mode();
         next_location = get_next_location(mode, next_location);
     }
 
-    auto retry_info = policy.evaluate(wa::storage::retry_context(retry_count++, result, next_location, mode), op_context);
+    auto retry_info = policy.evaluate(azure::storage::retry_context(retry_count++, result, next_location, mode), op_context);
     CHECK(!retry_info.should_retry());
 }
 
-static wa::storage::retry_info create_fake_retry_info(wa::storage::storage_location target_location, wa::storage::location_mode updated_mode, std::chrono::milliseconds interval)
+static azure::storage::retry_info create_fake_retry_info(azure::storage::storage_location target_location, azure::storage::location_mode updated_mode, std::chrono::milliseconds interval)
 {
-    wa::storage::retry_context dummy_context(0, wa::storage::request_result(), target_location, updated_mode);
-    wa::storage::retry_info fake_info(dummy_context);
+    azure::storage::retry_context dummy_context(0, azure::storage::request_result(), target_location, updated_mode);
+    azure::storage::retry_info fake_info(dummy_context);
     fake_info.set_retry_interval(interval);
     return fake_info;
 }
@@ -120,47 +120,47 @@ SUITE(Core)
         // Both locations return InternalError
 
         {
-            wa::storage::no_retry_policy policy;
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::primary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::no_retry_policy policy;
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::primary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::no_retry_policy policy;
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::no_retry_policy policy;
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::no_retry_policy policy;
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
+            azure::storage::no_retry_policy policy;
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::no_retry_policy policy;
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
+            azure::storage::no_retry_policy policy;
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
         }
 
         // Primary location returns InternalError, while secondary location returns NotFound
 
         {
-            wa::storage::no_retry_policy policy;
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::no_retry_policy policy;
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::no_retry_policy policy;
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
+            azure::storage::no_retry_policy policy;
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::no_retry_policy policy;
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
+            azure::storage::no_retry_policy policy;
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
         }
     }
 
@@ -174,75 +174,75 @@ SUITE(Core)
         // Both locations return InternalError
 
         {
-            wa::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(3)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(4)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(6)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(10)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::primary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(3)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(4)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(6)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(10)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::primary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(3)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(4)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(6)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(10)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(3)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(4)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(6)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(10)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(4)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(8)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
+            azure::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(4)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(8)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(4)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(8)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
+            azure::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(4)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(8)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
         }
 
         // Primary location returns InternalError, while secondary location returns NotFound
 
         {
-            wa::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(3)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(4)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(6)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(10)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(3)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(4)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(6)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(10)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(4)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(6)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(10)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
+            azure::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(4)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(6)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(10)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(4)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(6)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(10)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
+            azure::storage::exponential_retry_policy policy(std::chrono::seconds(1), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(4)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(6)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(10)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
         }
     }
 
@@ -256,75 +256,75 @@ SUITE(Core)
         // Both locations return InternalError
 
         {
-            wa::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::primary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::primary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(2)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
+            azure::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(2)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_then_primary, std::chrono::seconds(2)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, wa::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
+            azure::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_then_primary, std::chrono::seconds(2)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::InternalError, azure::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
         }
 
         // Primary location returns InternalError, while secondary location returns NotFound
 
         {
-            wa::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::secondary_only, std::chrono::seconds(2)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
+            azure::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::secondary_only, std::chrono::seconds(2)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::secondary_only, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::secondary, wa::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
+            azure::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::secondary, azure::storage::location_mode::primary_then_secondary, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::primary_then_secondary, allowed_delta, expected_retry_info_list);
         }
 
         {
-            wa::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
-            std::vector<wa::storage::retry_info> expected_retry_info_list;
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(0)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            expected_retry_info_list.push_back(create_fake_retry_info(wa::storage::storage_location::primary, wa::storage::location_mode::primary_only, std::chrono::seconds(2)));
-            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, wa::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
+            azure::storage::linear_retry_policy policy(std::chrono::seconds(2), 4);
+            std::vector<azure::storage::retry_info> expected_retry_info_list;
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(0)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
+            verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
         }
     }
 }

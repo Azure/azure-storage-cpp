@@ -23,65 +23,65 @@ SUITE(TableClient)
 {
     TEST(TableClient_Empty)
     {
-        wa::storage::cloud_table_client client;
+        azure::storage::cloud_table_client client;
 
         CHECK(client.base_uri().primary_uri().is_empty());
         CHECK(client.base_uri().secondary_uri().is_empty());
         CHECK(client.credentials().is_anonymous());
-        CHECK(client.default_request_options().payload_format() == wa::storage::table_payload_format::json);
+        CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json);
     }
 
     TEST(TableClient_BaseUri)
     {
-        wa::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
 
-        wa::storage::cloud_table_client client(base_uri);
+        azure::storage::cloud_table_client client(base_uri);
 
         CHECK(client.base_uri().primary_uri() == base_uri.primary_uri());
         CHECK(client.base_uri().secondary_uri() == base_uri.secondary_uri());
         CHECK(client.credentials().is_anonymous());
-        CHECK(client.default_request_options().payload_format() == wa::storage::table_payload_format::json);
+        CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json);
     }
 
     TEST(TableClient_BaseUriAndCredentials)
     {
-        wa::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
-        wa::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
-        wa::storage::table_request_options default_request_options;
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::table_request_options default_request_options;
 
-        wa::storage::cloud_table_client client(base_uri, credentials);
+        azure::storage::cloud_table_client client(base_uri, credentials);
 
         CHECK(client.base_uri().primary_uri() == base_uri.primary_uri());
         CHECK(client.base_uri().secondary_uri() == base_uri.secondary_uri());
         CHECK(client.credentials().is_shared_key());
-        CHECK(client.default_request_options().payload_format() == wa::storage::table_payload_format::json);
+        CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json);
     }
 
     TEST(TableClient_BaseUriAndCredentialsAndDefaultRequestOptions)
     {
-        wa::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
-        wa::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
-        wa::storage::table_request_options default_request_options;
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::table_request_options default_request_options;
 
-        wa::storage::cloud_table_client client(base_uri, credentials, default_request_options);
+        azure::storage::cloud_table_client client(base_uri, credentials, default_request_options);
 
         CHECK(client.base_uri().primary_uri() == base_uri.primary_uri());
         CHECK(client.base_uri().secondary_uri() == base_uri.secondary_uri());
         CHECK(client.credentials().is_shared_key());
-        CHECK(client.default_request_options().payload_format() == wa::storage::table_payload_format::json);
+        CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json);
 
-        default_request_options.set_payload_format(wa::storage::table_payload_format::json_no_metadata);
+        default_request_options.set_payload_format(azure::storage::table_payload_format::json_no_metadata);
 
-        client = wa::storage::cloud_table_client(base_uri, credentials, default_request_options);
+        client = azure::storage::cloud_table_client(base_uri, credentials, default_request_options);
 
-        CHECK(client.default_request_options().payload_format() == wa::storage::table_payload_format::json_no_metadata);
+        CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json_no_metadata);
     }
 
     TEST(ListTables_Normal)
     {
         const int TABLE_COUNT = 5;
 
-        wa::storage::cloud_table tables[TABLE_COUNT];
+        azure::storage::cloud_table tables[TABLE_COUNT];
         bool is_found[TABLE_COUNT];
         for (int i = 0; i < TABLE_COUNT; ++i)
         {
@@ -89,21 +89,21 @@ SUITE(TableClient)
             is_found[i] = false;
         }
 
-        wa::storage::cloud_table_client client = get_table_client();
+        azure::storage::cloud_table_client client = get_table_client();
 
         utility::string_t prefix;
-        wa::storage::table_request_options options;
-        wa::storage::operation_context context;
+        azure::storage::table_request_options options;
+        azure::storage::operation_context context;
 
         prefix = object_name_prefix;
 
-        std::vector<wa::storage::cloud_table> results = client.list_tables(prefix, options, context);
+        std::vector<azure::storage::cloud_table> results = client.list_tables(prefix, options, context);
 
         CHECK(results.size() >= TABLE_COUNT);
 
-        for (std::vector<wa::storage::cloud_table>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
+        for (std::vector<azure::storage::cloud_table>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
         {
-            wa::storage::cloud_table table = *itr;
+            azure::storage::cloud_table table = *itr;
 
             for (int i = 0; i < TABLE_COUNT; ++i)
             {
@@ -119,6 +119,23 @@ SUITE(TableClient)
             }
         }
 
+        CHECK(!context.client_request_id().empty());
+        CHECK(context.start_time().is_initialized());
+        CHECK(context.end_time().is_initialized());
+        CHECK_EQUAL(1, context.request_results().size());
+        CHECK(context.request_results()[0].is_response_available());
+        CHECK(context.request_results()[0].start_time().is_initialized());
+        CHECK(context.request_results()[0].end_time().is_initialized());
+        CHECK(context.request_results()[0].target_location() != azure::storage::storage_location::unspecified);
+        CHECK_EQUAL(web::http::status_codes::OK, context.request_results()[0].http_status_code());
+        CHECK(!context.request_results()[0].service_request_id().empty());
+        CHECK(context.request_results()[0].request_date().is_initialized());
+        CHECK(context.request_results()[0].content_md5().empty());
+        CHECK(context.request_results()[0].etag().empty());
+        CHECK(context.request_results()[0].extended_error().code().empty());
+        CHECK(context.request_results()[0].extended_error().message().empty());
+        CHECK(context.request_results()[0].extended_error().details().empty());
+
         for (int i = 0; i < TABLE_COUNT; ++i)
         {
             tables[i].delete_table();
@@ -129,7 +146,7 @@ SUITE(TableClient)
     {
         const int TABLE_COUNT = 5;
 
-        wa::storage::cloud_table tables[TABLE_COUNT];
+        azure::storage::cloud_table tables[TABLE_COUNT];
         bool is_found[TABLE_COUNT];
         for (int i = 0; i < TABLE_COUNT; ++i)
         {
@@ -137,30 +154,30 @@ SUITE(TableClient)
             is_found[i] = false;
         }
 
-        wa::storage::cloud_table_client client = get_table_client();
+        azure::storage::cloud_table_client client = get_table_client();
 
         utility::string_t prefix;
         int max_results;
-        wa::storage::continuation_token continuation_token;
-        wa::storage::table_request_options options;
-        wa::storage::operation_context context;
+        azure::storage::continuation_token token;
+        azure::storage::table_request_options options;
+        azure::storage::operation_context context;
 
         prefix = object_name_prefix;
         max_results = 3;
 
         int segment_count = 0;
-        wa::storage::table_result_segment result_segment;
+        azure::storage::table_result_segment result_segment;
         do
         {
-            result_segment = client.list_tables_segmented(prefix, max_results, continuation_token, options, context);
-            std::vector<wa::storage::cloud_table> results = result_segment.results();
+            result_segment = client.list_tables_segmented(prefix, max_results, token, options, context);
+            std::vector<azure::storage::cloud_table> results = result_segment.results();
 
             CHECK(results.size() >= 0);
             CHECK((int)results.size() <= max_results);
 
-            for (std::vector<wa::storage::cloud_table>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
+            for (std::vector<azure::storage::cloud_table>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
             {
-                wa::storage::cloud_table table = *itr;
+                azure::storage::cloud_table table = *itr;
 
                 for (int i = 0; i < TABLE_COUNT; ++i)
                 {
@@ -176,10 +193,27 @@ SUITE(TableClient)
                 }
             }
 
+            CHECK(!context.client_request_id().empty());
+            CHECK(context.start_time().is_initialized());
+            CHECK(context.end_time().is_initialized());
+            CHECK_EQUAL(segment_count + 1, context.request_results().size());
+            CHECK(context.request_results()[segment_count].is_response_available());
+            CHECK(context.request_results()[segment_count].start_time().is_initialized());
+            CHECK(context.request_results()[segment_count].end_time().is_initialized());
+            CHECK(context.request_results()[segment_count].target_location() != azure::storage::storage_location::unspecified);
+            CHECK_EQUAL(web::http::status_codes::OK, context.request_results()[segment_count].http_status_code());
+            CHECK(!context.request_results()[segment_count].service_request_id().empty());
+            CHECK(context.request_results()[segment_count].request_date().is_initialized());
+            CHECK(context.request_results()[segment_count].content_md5().empty());
+            CHECK(context.request_results()[segment_count].etag().empty());
+            CHECK(context.request_results()[segment_count].extended_error().code().empty());
+            CHECK(context.request_results()[segment_count].extended_error().message().empty());
+            CHECK(context.request_results()[segment_count].extended_error().details().empty());
+
             ++segment_count;
-            continuation_token = result_segment.continuation_token();
+            token = result_segment.continuation_token();
         }
-        while (!continuation_token.empty());
+        while (!token.empty());
 
         CHECK(segment_count > 1);
 

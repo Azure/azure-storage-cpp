@@ -25,16 +25,20 @@
 #include "streams.h"
 #include "was/auth.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     class istream_descriptor
     {
     public:
-        istream_descriptor() {}
-        
-        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = protocol::invalid_size64_t)
+
+        istream_descriptor()
+            : m_offset(std::numeric_limits<concurrency::streams::istream::pos_type>::max()), m_length(std::numeric_limits<utility::size64_t>::max())
         {
-            if (length == protocol::invalid_size64_t)
+        }
+        
+        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = std::numeric_limits<utility::size64_t>::max())
+        {
+            if (length == std::numeric_limits<utility::size64_t>::max())
             {
                 length = get_remaining_stream_length(stream);
             }
@@ -69,7 +73,7 @@ namespace wa { namespace storage { namespace core {
                     md5 = utility::conversions::to_base64(hash_buffer.hash());
                 }
 
-                return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(std::move(temp_buffer.collection())), buffer_task.get(), md5);
+                return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(temp_buffer.collection()), buffer_task.get(), md5);
             });
         }
 
@@ -114,7 +118,9 @@ namespace wa { namespace storage { namespace core {
     class ostream_descriptor
     {
     public:
+
         ostream_descriptor()
+            : m_length(std::numeric_limits<utility::size64_t>::max())
         {
         }
 
@@ -153,7 +159,8 @@ namespace wa { namespace storage { namespace core {
     class storage_command
     {
     public:
-        storage_command(const storage_uri& request_uri)
+
+        explicit storage_command(const storage_uri& request_uri)
             : m_request_uri(request_uri), m_location_mode(command_location_mode::primary_only)
         {
         }
@@ -165,6 +172,11 @@ namespace wa { namespace storage { namespace core {
 
         void set_destination_stream(concurrency::streams::ostream value)
         {
+            if (!value)
+            {
+                throw std::invalid_argument("stream");
+            }
+
             m_destination_stream = value;
         }
 
@@ -210,7 +222,7 @@ namespace wa { namespace storage { namespace core {
             case storage_location::primary:
                 if (value == command_location_mode::secondary_only)
                 {
-                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_secondary_only_command), false);
+                    throw storage_exception(protocol::error_secondary_only_command, false);
                 }
 
                 m_location_mode = command_location_mode::primary_only;
@@ -219,7 +231,7 @@ namespace wa { namespace storage { namespace core {
             case storage_location::secondary:
                 if (value == command_location_mode::primary_only)
                 {
-                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_primary_only_command), false);
+                    throw storage_exception(protocol::error_primary_only_command, false);
                 }
 
                 m_location_mode = command_location_mode::secondary_only;
@@ -266,6 +278,9 @@ namespace wa { namespace storage { namespace core {
             {
                 context.set_start_time(utility::datetime::utc_now());
             }
+
+            // TODO: Use "it" variable name for iterators in for loops
+            // TODO: Reduce usage of auto variable types
 
             auto instance = std::make_shared<executor<T>>(command, options, context);
             return pplx::details::do_while([instance] () -> pplx::task<bool>
@@ -437,9 +452,23 @@ namespace wa { namespace storage { namespace core {
                             descriptor = ostream_descriptor(instance->m_response_streambuf.total_written(), md5);
                         }
 
-                        return instance->m_command->m_postprocess_response(response, instance->m_request_result, descriptor, instance->m_context).then([instance] (T result)
+                        return instance->m_command->m_postprocess_response(response, instance->m_request_result, descriptor, instance->m_context).then([instance] (pplx::task<T> result_task)
                         {
-                            instance->m_result = result;
+                            try
+                            {
+                                instance->m_result = result_task.get();
+                            }
+                            catch (const storage_exception& e)
+                            {
+                                if (e.result().is_response_available())
+                                {
+                                    instance->m_request_result.set_http_status_code(e.result().http_status_code());
+                                    instance->m_request_result.set_extended_error(e.result().extended_error());
+                                }
+
+                                throw;
+                            }
+
                         });
                     }
                     else
@@ -553,7 +582,7 @@ namespace wa { namespace storage { namespace core {
                 }
                 else
                 {
-                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_client_timeout), false);
+                    throw storage_exception(protocol::error_client_timeout, false);
                 }
             }
 
@@ -617,7 +646,7 @@ namespace wa { namespace storage { namespace core {
 
             if (!is_valid)
             {
-                throw storage_exception(utility::conversions::to_utf8string(protocol::error_uri_missing_location), false);
+                throw storage_exception(protocol::error_uri_missing_location, false);
             }
 
             switch (m_command->m_location_mode)
@@ -625,7 +654,7 @@ namespace wa { namespace storage { namespace core {
             case command_location_mode::primary_only:
                 if (m_current_location_mode == location_mode::secondary_only)
                 {
-                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_primary_only_command), false);
+                    throw storage_exception(protocol::error_primary_only_command, false);
                 }
             
                 if (logger::instance().should_log(m_context, client_log_level::log_level_verbose))
@@ -640,7 +669,7 @@ namespace wa { namespace storage { namespace core {
             case command_location_mode::secondary_only:
                 if (m_current_location_mode == location_mode::primary_only)
                 {
-                    throw storage_exception(utility::conversions::to_utf8string(protocol::error_secondary_only_command), false);
+                    throw storage_exception(protocol::error_secondary_only_command, false);
                 }
 
                 if (logger::instance().should_log(m_context, client_log_level::log_level_verbose))
@@ -677,7 +706,8 @@ namespace wa { namespace storage { namespace core {
     class storage_command<void> : public storage_command<void_command_type>
     {
     public:
-        storage_command(const storage_uri& request_uri)
+
+        explicit storage_command(const storage_uri& request_uri)
             : storage_command<void_command_type>(request_uri)
         {
         }
@@ -709,8 +739,8 @@ namespace wa { namespace storage { namespace core {
     public:
         static pplx::task<void> execute_async(std::shared_ptr<storage_command<void>> command, const request_options& options, operation_context context)
         {
-            return executor<void_command_type>::execute_async(command, options, context).then([] (void_command_type result) {});
+            return executor<void_command_type>::execute_async(command, options, context).then([] (void_command_type) {});
         }
     };
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

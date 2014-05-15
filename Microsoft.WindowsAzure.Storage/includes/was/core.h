@@ -22,7 +22,7 @@
 #include "wascore/basic_types.h"
 #include "wascore/constants.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     class operation_context;
 
@@ -98,7 +98,6 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the <see cref="storage_uri"/> class.
         /// </summary>
         storage_uri()
-            : m_primary_uri(), m_secondary_uri()
         {
         }
 
@@ -106,21 +105,14 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the <see cref="storage_uri"/> class using the primary endpoint.
         /// </summary>
         /// <param name="primary_uri">The endpoint for the primary location.</param>
-        storage_uri(const web::http::uri& primary_uri)
-            : m_primary_uri(primary_uri), m_secondary_uri()
-        {
-            if (primary_uri.is_empty())
-            {
-                throw std::invalid_argument("primary_uri");
-            }
-        }
+        WASTORAGE_API storage_uri(web::http::uri primary_uri);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="storage_uri"/> class using the primary endpoint.
         /// </summary>
         /// <param name="primary_uri">The endpoint for the primary location.</param>
         /// <param name="secondary_uri">The endpoint for the secondary location.</param>
-        WASTORAGE_API storage_uri(const web::http::uri& primary_uri, const web::http::uri& secondary_uri);
+        WASTORAGE_API storage_uri(web::http::uri primary_uri, web::http::uri secondary_uri);
 
         /// <summary>
         /// Gets the primary endpoint.
@@ -170,6 +162,7 @@ namespace wa { namespace storage {
         }
 
     private:
+
         web::http::uri m_primary_uri;
         web::http::uri m_secondary_uri;
     };
@@ -181,39 +174,43 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::storage_credentials" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class.
         /// </summary>
         storage_credentials()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::storage_credentials" /> class with the specified account name and key value.
+        /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified account name and key value.
         /// </summary>
         /// <param name="account_name">A string containing the name of the storage account.</param>
         /// <param name="account_key">A string containing the Base64-encoded account access key.</param>
-        storage_credentials(const utility::string_t& account_name, const utility::string_t& account_key)
-            : m_account_name(account_name), m_account_key(utility::conversions::from_base64(account_key))
+        storage_credentials(utility::string_t account_name, const utility::string_t& account_key)
+            : m_account_name(std::move(account_name)), m_account_key(utility::conversions::from_base64(account_key))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::storage_credentials" /> class with the specified account name and key value.
+        /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified account name and key value.
         /// </summary>
         /// <param name="account_name">A string containing the name of the storage account.</param>
         /// <param name="account_key">An array of bytes that represent the account access key.</param>
-        storage_credentials(const utility::string_t& account_name, const std::vector<uint8_t>& account_key)
-            : m_account_name(account_name), m_account_key(account_key)
+        storage_credentials(utility::string_t account_name, std::vector<uint8_t> account_key)
+            : m_account_name(std::move(account_name)), m_account_key(std::move(account_key))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::storage_credentials" /> class with the specified shared access signature token.
+        /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified shared access signature token.
         /// </summary>
         /// <param name="sas_token">A string containing the shared access signature token.</param>
-        storage_credentials(const utility::string_t& sas_token)
-            : m_sas_token(sas_token)
+        explicit storage_credentials(utility::string_t sas_token)
+            : m_sas_token(std::move(sas_token))
         {
+            if (m_sas_token.size() >= 1 && m_sas_token.at(0) == U('?'))
+            {
+                m_sas_token = m_sas_token.substr(1);
+            }
         }
 
         /// <summary>
@@ -223,11 +220,11 @@ namespace wa { namespace storage {
         /// <returns>A <see cref="web::http::uri" /> object that represents the signature, including the resource URI and the shared access token.</returns>
         web::http::uri transform_uri(const web::http::uri& resource_uri) const
         {
+            // TODO: Consider modifying the parameter instead of returning a new URI so a copy doesn't need to be made
+
             if (is_sas() && !resource_uri.is_empty())
             {
-                // m_sas_token always contains the leading '?' and append_query does not expect it, so
-                // substr(1) here ensures that it does not contain the '?'.
-                return web::http::uri_builder(resource_uri).append_query(m_sas_token.substr(1)).to_uri();
+                return web::http::uri_builder(resource_uri).append_query(m_sas_token).to_uri();
             }
 
             return resource_uri;
@@ -237,7 +234,7 @@ namespace wa { namespace storage {
         /// Gets the shared access signature token associated with the credentials.
         /// </summary>
         /// <returns>The shared access signature token.</returns>
-        utility::string_t sas_token() const
+        const utility::string_t& sas_token() const
         {
             return m_sas_token;
         }
@@ -246,7 +243,7 @@ namespace wa { namespace storage {
         /// Gets the associated storage account name for the credentials.
         /// </summary>
         /// <returns>The storage account name.</returns>
-        utility::string_t account_name() const
+        const utility::string_t& account_name() const
         {
             return m_account_name;
         }
@@ -255,7 +252,7 @@ namespace wa { namespace storage {
         /// Returns the key for the credentials.
         /// </summary>
         /// <returns>An array of bytes that contains the key.</returns>
-        std::vector<uint8_t> account_key() const
+        const std::vector<uint8_t>& account_key() const
         {
             return m_account_key;
         }
@@ -434,9 +431,48 @@ namespace wa { namespace storage {
     {
     public:
 
-        WASTORAGE_API request_result();
-        WASTORAGE_API request_result(const utility::datetime& start_time, storage_location target_location);
-        WASTORAGE_API request_result(const utility::datetime& start_time, storage_location target_location, const web::http::http_response& response, bool parse_body_as_error);
+        /// <summary>
+        /// Initializes a new instance of the <see cref="request_result"/> class.
+        /// </summary>
+        request_result()
+            : m_is_response_available(false),
+            m_target_location(storage_location::unspecified),
+            m_http_status_code(0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="request_result"/> class.
+        /// </summary>
+        /// <param name="start_time">The start time of the request.</param>
+        /// <param name="target_location">The target location for the request.</param>
+        request_result(utility::datetime start_time, storage_location target_location)
+            : m_is_response_available(false),
+            m_start_time(start_time),
+            m_target_location(target_location),
+            m_end_time(utility::datetime::utc_now()),
+            m_http_status_code(0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="request_result"/> class.
+        /// </summary>
+        /// <param name="start_time">The start time of the request.</param>
+        /// <param name="target_location">The target location for the request.</param>
+        /// <param name="response">The HTTP response to read.</param>
+        /// <param name="parse_body_as_error">A flag that indicates whether to parse error data from the response body.</param>
+        WASTORAGE_API request_result(utility::datetime start_time, storage_location target_location, const web::http::http_response& response, bool parse_body_as_error);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="request_result"/> class.
+        /// </summary>
+        /// <param name="start_time">The start time of the request.</param>
+        /// <param name="target_location">The target location for the request.</param>
+        /// <param name="response">The HTTP response to read.</param>
+        /// <param name="http_status_code">The HTTP status code for the request.</param>
+        /// <param name="extended_error">The extended error information for the request.</param>
+        WASTORAGE_API request_result(utility::datetime start_time, storage_location target_location, const web::http::http_response& response, web::http::status_code http_status_code, storage_extended_error extended_error);
 
         /// <summary>
         /// Indicates whether a response is available for the request.
@@ -451,16 +487,25 @@ namespace wa { namespace storage {
         /// Gets the start time of the request.
         /// </summary>
         /// <returns>The start time of the request.</returns>
-        const utility::datetime& start_time() const
+        utility::datetime start_time() const
         {
             return m_start_time;
+        }
+
+        /// <summary>
+        /// Gets the target location for the request.
+        /// </summary>
+        /// <returns>The target location for the request.</returns>
+        storage_location target_location() const
+        {
+            return m_target_location;
         }
 
         /// <summary>
         /// Gets the end time of the request.
         /// </summary>
         /// <returns>The end time of the request.</returns>
-        const utility::datetime& end_time() const
+        utility::datetime end_time() const
         {
             return m_end_time;
         }
@@ -472,6 +517,15 @@ namespace wa { namespace storage {
         web::http::status_code http_status_code() const
         {
             return m_http_status_code;
+        }
+
+        /// <summary>
+        /// Sets the HTTP status code for the request.
+        /// </summary>
+        /// <param name="value">The HTTP status code for the request.</param>
+        void set_http_status_code(web::http::status_code value)
+        {
+            m_http_status_code = value;
         }
 
         /// <summary>
@@ -487,7 +541,7 @@ namespace wa { namespace storage {
         /// Gets the service request date.
         /// </summary>
         /// <returns>The service request date.</returns>
-        const utility::datetime& request_date() const
+        utility::datetime request_date() const
         {
             return m_request_date;
         }
@@ -511,15 +565,6 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Gets the target location for the request.
-        /// </summary>
-        /// <returns>The target location for the request.</returns>
-        storage_location target_location() const
-        {
-            return m_target_location;
-        }
-
-        /// <summary>
         /// Gets extended error information for the request.
         /// </summary>
         /// <returns>The extended error information for the request.</returns>
@@ -528,21 +573,30 @@ namespace wa { namespace storage {
             return m_extended_error;
         }
 
+        /// <summary>
+        /// Sets extended error information for the request.
+        /// </summary>
+        /// <param name="value">The extended error information for the request.</param>
+        void set_extended_error(storage_extended_error value)
+        {
+            m_extended_error = std::move(value);
+        }
+
     private:
 
         void parse_headers(const web::http::http_headers& headers);
-        void parse_body(const concurrency::streams::istream& body);
+        void parse_body(const web::http::http_response& response);
 
         bool m_is_response_available;
+        utility::datetime m_start_time;
+        storage_location m_target_location;
+        utility::datetime m_end_time;
         web::http::status_code m_http_status_code;
         utility::string_t m_service_request_id;
         utility::datetime m_request_date;
         utility::string_t m_content_md5;
         utility::string_t m_etag;
-        storage_location m_target_location;
         storage_extended_error m_extended_error;
-        utility::datetime m_start_time;
-        utility::datetime m_end_time;
     };
 
     /// <summary>
@@ -567,8 +621,8 @@ namespace wa { namespace storage {
         /// <param name="message">The error message.</param>
         /// <param name="result">The request result.</param>
         /// <param name="retryable">Indicates whether the request is retryable.</param>
-        storage_exception(const std::string& message, const request_result& result, bool retryable = true)
-            : std::runtime_error(message), m_result(result), m_retryable(retryable)
+        storage_exception(const std::string& message, request_result result, bool retryable = true)
+            : std::runtime_error(message), m_result(std::move(result)), m_retryable(retryable)
         {
         }
 
@@ -610,8 +664,8 @@ namespace wa { namespace storage {
         /// <param name="last_request_result">The last request result.</param>
         /// <param name="next_location">The next location to retry.</param>
         /// <param name="current_location_mode">The current location mode.</param>
-        retry_context(int current_retry_count, const request_result& last_request_result, storage_location next_location, location_mode current_location_mode)
-            : m_current_retry_count(current_retry_count), m_last_request_result(last_request_result), m_next_location(next_location), m_current_location_mode(current_location_mode)
+        retry_context(int current_retry_count, request_result last_request_result, storage_location next_location, location_mode current_location_mode)
+            : m_current_retry_count(current_retry_count), m_last_request_result(std::move(last_request_result)), m_next_location(next_location), m_current_location_mode(current_location_mode)
         {
         }
 
@@ -645,7 +699,7 @@ namespace wa { namespace storage {
         /// <summary>
         /// Gets the results of the last request.
         /// </summary>
-        /// <returns>A <see cref="wa::storage::request_result"/> object that represents the results of the last request.</returns>
+        /// <returns>A <see cref="azure::storage::request_result"/> object that represents the results of the last request.</returns>
         const request_result& last_request_result() const
         {
             return m_last_request_result;
@@ -667,7 +721,7 @@ namespace wa { namespace storage {
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::retry_info"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::retry_info"/> class.
         /// </summary>
         retry_info()
             : m_should_retry(false)
@@ -675,10 +729,10 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::retry_info"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::retry_info"/> class.
         /// </summary>
-        /// <param name="retryContext">The <see cref="wa::storage::retry_context"/> object that was passed in to the retry policy.</param>
-        retry_info(const retry_context& context)
+        /// <param name="retryContext">The <see cref="azure::storage::retry_context"/> object that was passed in to the retry policy.</param>
+        explicit retry_info(const retry_context& context)
             : m_should_retry(true),
             m_target_location(context.next_location()),
             m_updated_location_mode(context.current_location_mode()),
@@ -795,7 +849,7 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the <see cref="retry_policy"/> class.
         /// </summary>
         /// <param name="ptr">The PTR.</param>
-        retry_policy(std::shared_ptr<basic_retry_policy> ptr)
+        explicit retry_policy(std::shared_ptr<basic_retry_policy> ptr)
             : m_policy(ptr)
         {
         }
@@ -830,4 +884,4 @@ namespace wa { namespace storage {
         std::shared_ptr<basic_retry_policy> m_policy;
     };
 
-}} // namespace wa::storage
+}} // namespace azure::storage

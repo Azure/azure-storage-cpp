@@ -23,7 +23,7 @@ const utility::string_t delimiters[] = { U("$"), U("@"), U("-"), U("%"), U("/"),
 
 #pragma region Fixture
 
-void create_blob_tree(const wa::storage::cloud_blob_container& container, const std::vector<wa::storage::cloud_blob>& blobs, const utility::string_t& delimiter, wa::storage::operation_context context)
+void create_blob_tree(const azure::storage::cloud_blob_container& container, const std::vector<azure::storage::cloud_blob>& blobs, const utility::string_t& delimiter, azure::storage::operation_context context)
 {
     for (auto iter = blobs.begin(); iter != blobs.end(); ++iter)
     {
@@ -39,7 +39,7 @@ void create_blob_tree(const wa::storage::cloud_blob_container& container, const 
             splitted_name.push_back(name.substr(0, pos));
         } while (pos != utility::string_t::npos);
 
-        wa::storage::cloud_blob blob;
+        azure::storage::cloud_blob blob;
         if (splitted_name.size() == 1)
         {
             blob = container.get_blob_reference(splitted_name.back());
@@ -55,22 +55,22 @@ void create_blob_tree(const wa::storage::cloud_blob_container& container, const 
             blob = directory.get_blob_reference(splitted_name.back());
         }
 
-        if (iter->type() == wa::storage::blob_type::page_blob)
+        if (iter->type() == azure::storage::blob_type::page_blob)
         {
-            wa::storage::cloud_page_blob page_blob(blob);
-            page_blob.create(0, wa::storage::access_condition(), wa::storage::blob_request_options(), context);
+            azure::storage::cloud_page_blob page_blob(blob);
+            page_blob.create(0, azure::storage::access_condition(), azure::storage::blob_request_options(), context);
         }
         else
         {
-            wa::storage::cloud_block_blob block_blob(blob);
-            block_blob.upload_block_list(std::vector<wa::storage::block_list_item>(), wa::storage::access_condition(), wa::storage::blob_request_options(), context);
+            azure::storage::cloud_block_blob block_blob(blob);
+            block_blob.upload_block_list(std::vector<azure::storage::block_list_item>(), azure::storage::access_condition(), azure::storage::blob_request_options(), context);
         }
     }
 }
 
-int list_entire_blob_tree_helper(std::vector<wa::storage::cloud_blob>& blobs, const wa::storage::cloud_blob_directory& directory, const wa::storage::blob_listing_includes& includes, int max_results, const wa::storage::blob_request_options& options, wa::storage::operation_context context)
+int list_entire_blob_tree_helper(std::vector<azure::storage::cloud_blob>& blobs, const azure::storage::cloud_blob_directory& directory, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options, azure::storage::operation_context context)
 {
-    wa::storage::blob_continuation_token token;
+    azure::storage::continuation_token token;
     int max_depth = 0;
 
     do
@@ -99,10 +99,10 @@ int list_entire_blob_tree_helper(std::vector<wa::storage::cloud_blob>& blobs, co
     return max_depth + 1;
 }
 
-std::vector<wa::storage::cloud_blob> list_entire_blob_tree(const wa::storage::cloud_blob_container& container, const wa::storage::blob_listing_includes& includes, int max_results, int& max_depth, const wa::storage::blob_request_options& options, wa::storage::operation_context context)
+std::vector<azure::storage::cloud_blob> list_entire_blob_tree(const azure::storage::cloud_blob_container& container, azure::storage::blob_listing_details::values includes, int max_results, int& max_depth, const azure::storage::blob_request_options& options, azure::storage::operation_context context)
 {
-    std::vector<wa::storage::cloud_blob> blobs;
-    wa::storage::blob_continuation_token token;
+    std::vector<azure::storage::cloud_blob> blobs;
+    azure::storage::continuation_token token;
     max_depth = 0;
 
     do
@@ -131,7 +131,7 @@ std::vector<wa::storage::cloud_blob> list_entire_blob_tree(const wa::storage::cl
     return blobs;
 }
 
-void check_parents(const wa::storage::cloud_blob_container& container, const utility::string_t& delimiter)
+void check_parents(const azure::storage::cloud_blob_container& container, const utility::string_t& delimiter)
 {
     auto dir1 = container.get_directory_reference(U("dir1"));
     CHECK_UTF8_EQUAL(U("dir1") + delimiter, dir1.prefix());
@@ -146,11 +146,11 @@ void check_parents(const wa::storage::cloud_blob_container& container, const uti
     CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("blob"), blob.name());
 
     auto block_blob = dir3.get_block_blob_reference(U("block_blob"));
-    CHECK(wa::storage::blob_type::block_blob == block_blob.type());
+    CHECK(azure::storage::blob_type::block_blob == block_blob.type());
     CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("block_blob"), block_blob.name());
 
     auto page_blob = dir3.get_page_blob_reference(U("page_blob"));
-    CHECK(wa::storage::blob_type::page_blob == page_blob.type());
+    CHECK(azure::storage::blob_type::page_blob == page_blob.type());
     CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("page_blob"), page_blob.name());
 
     auto blob_parent = blob.get_parent_reference();
@@ -203,7 +203,7 @@ SUITE(Blob)
             m_client.set_directory_delimiter(delimiter);
             auto container = m_client.get_container_reference(m_container.name());
 
-            std::vector<wa::storage::cloud_blob> blobs;
+            std::vector<azure::storage::cloud_blob> blobs;
             blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("dir1") + delimiter + U("dir2") + delimiter + U("blob1")));
             blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("dir1") + delimiter + U("dir2") + delimiter + U("blob2")));
             blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("dir1") + delimiter + U("blob3")));
@@ -215,7 +215,7 @@ SUITE(Blob)
             create_blob_tree(container, blobs, delimiter, m_context);
 
             int depth;
-            auto results = list_entire_blob_tree(container, wa::storage::blob_listing_includes(), 2, depth, wa::storage::blob_request_options(), m_context);
+            auto results = list_entire_blob_tree(container, azure::storage::blob_listing_details::none, 2, depth, azure::storage::blob_request_options(), m_context);
             CHECK_EQUAL(3, depth);
 
             for (auto iter = results.begin(); iter != results.end(); ++iter)
@@ -234,14 +234,12 @@ SUITE(Blob)
 
                 CHECK(found);
 
-                iter->delete_blob(wa::storage::delete_snapshots_option::none, wa::storage::access_condition(), wa::storage::blob_request_options(), m_context);
+                iter->delete_blob(azure::storage::delete_snapshots_option::none, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             }
 
             CHECK(blobs.empty());
 
-            wa::storage::blob_listing_includes includes;
-            includes.set_snapshots(true);
-            CHECK_THROW(list_entire_blob_tree(container, includes, 1, depth, wa::storage::blob_request_options(), m_context), std::invalid_argument);
+            CHECK_THROW(list_entire_blob_tree(container, azure::storage::blob_listing_details::snapshots, 1, depth, azure::storage::blob_request_options(), m_context), std::invalid_argument);
         }
     }
 }

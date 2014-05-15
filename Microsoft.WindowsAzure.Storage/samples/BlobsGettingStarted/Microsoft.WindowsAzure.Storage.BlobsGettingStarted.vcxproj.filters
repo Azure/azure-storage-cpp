@@ -30,4 +30,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="DataFile.txt" />
+  </ItemGroup>
 </Project>

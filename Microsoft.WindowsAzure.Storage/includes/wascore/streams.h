@@ -26,7 +26,7 @@
 #include "hash_linux.h"
 #endif
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     template<typename _CharType>
     class splitter_streambuf : public concurrency::streams::streambuf<_CharType>
@@ -53,6 +53,7 @@ namespace wa { namespace storage { namespace core {
     class null_streambuf : public concurrency::streams::streambuf<_CharType>
     {
     public:
+
         null_streambuf()
             : concurrency::streams::streambuf<_CharType>(std::make_shared<basic_null_streambuf<_CharType>>())
         {
@@ -62,12 +63,13 @@ namespace wa { namespace storage { namespace core {
     class hash_streambuf : public concurrency::streams::streambuf<basic_hash_streambuf::char_type>
     {
     public:
+
         hash_streambuf()
             : concurrency::streams::streambuf<basic_hash_streambuf::char_type>()
         {
         }
 
-        hash_streambuf(_In_ const std::shared_ptr<basic_hash_streambuf> &ptr)
+        explicit hash_streambuf(const std::shared_ptr<basic_hash_streambuf> &ptr)
             : concurrency::streams::streambuf<basic_hash_streambuf::char_type>(ptr)
         {
         }
@@ -82,7 +84,8 @@ namespace wa { namespace storage { namespace core {
     class hash_hmac_sha256_streambuf : public hash_streambuf
     {
     public:
-        hash_hmac_sha256_streambuf(std::vector<unsigned char> key)
+
+        explicit hash_hmac_sha256_streambuf(std::vector<unsigned char> key)
             : hash_streambuf(std::make_shared<basic_hash_hmac_sha256_streambuf>(std::move(key)))
         {
         }
@@ -91,10 +94,11 @@ namespace wa { namespace storage { namespace core {
     class hash_md5_streambuf : public hash_streambuf
     {
     public:
+
         hash_md5_streambuf()
             : hash_streambuf(std::make_shared<basic_hash_md5_streambuf>())
         {
         }
     };
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

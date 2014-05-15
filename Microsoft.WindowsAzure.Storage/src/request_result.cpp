@@ -17,37 +17,35 @@
 
 #include "stdafx.h"
 #include "was/common.h"
-#include "wascore/protocol_xml.h"
+#include "wascore/protocol.h"
+#include "wascore/util.h"
 #include "wascore/constants.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
-    request_result::request_result()
-        : m_is_response_available(false)
-    {
-    }
-
-    request_result::request_result(const utility::datetime& start_time, storage_location target_location)
-        : m_start_time(start_time),
-        m_end_time(utility::datetime::utc_now()),
+    request_result::request_result(utility::datetime start_time, storage_location target_location, const web::http::http_response& response, bool parse_body_as_error)
+        : m_is_response_available(true),
+        m_start_time(start_time),
         m_target_location(target_location),
-        m_is_response_available(false),
-        m_http_status_code(0)
-    {
-    }
-
-    request_result::request_result(const utility::datetime& start_time, storage_location target_location, const web::http::http_response& response, bool parse_body_as_error)
-        : m_start_time(start_time),
         m_end_time(utility::datetime::utc_now()),
-        m_target_location(target_location),
-        m_is_response_available(true),
         m_http_status_code(response.status_code())
     {
         parse_headers(response.headers());
         if (parse_body_as_error)
         {
-            parse_body(response.body());
+            parse_body(response);
         }
+    }
+
+    request_result::request_result(utility::datetime start_time, storage_location target_location, const web::http::http_response& response, web::http::status_code http_status_code, storage_extended_error extended_error)
+        : m_is_response_available(true),
+        m_start_time(start_time),
+        m_target_location(target_location),
+        m_end_time(utility::datetime::utc_now()),
+        m_http_status_code(http_status_code),
+        m_extended_error(std::move(extended_error))
+    {
+        parse_headers(response.headers());
     }
 
     void request_result::parse_headers(const web::http::http_headers& headers)
@@ -63,12 +61,9 @@ namespace wa { namespace storage {
         }
     }
 
-    void request_result::parse_body(const concurrency::streams::istream& body)
+    void request_result::parse_body(const web::http::http_response& response)
     {
-        protocol::storage_error_reader reader(body);
-        m_extended_error = storage_extended_error(reader.extract_error_code(),
-            reader.extract_error_message(),
-            std::unordered_map<utility::string_t, utility::string_t>());
+        m_extended_error = protocol::parse_extended_error(response);
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

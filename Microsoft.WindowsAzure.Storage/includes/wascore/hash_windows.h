@@ -21,19 +21,22 @@
 #include "streambuf.h"
 
 #ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#endif
+
 #define NOMINMAX
 #include <Windows.h>
 #include <BCrypt.h>
 #include <winsock2.h>
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     class basic_hash_hmac_sha256_streambuf : public basic_hash_streambuf
     {
     public:
 
-        basic_hash_hmac_sha256_streambuf(const std::vector<unsigned char>& key);
+        explicit basic_hash_hmac_sha256_streambuf(const std::vector<unsigned char>& key);
         ~basic_hash_hmac_sha256_streambuf();
 
         pplx::task<void> _close_write();
@@ -63,6 +66,6 @@ namespace wa { namespace storage { namespace core {
         BCRYPT_HASH_HANDLE m_handle;
     };
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core
 
 #endif

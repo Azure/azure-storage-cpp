@@ -20,7 +20,7 @@
 #include "auth.h"
 #include "common.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     /// <summary>
     /// Provides a client-side logical representation of a Windows Azure service. This client is used to configure and execute requests against the service.
@@ -34,7 +34,7 @@ namespace wa { namespace storage {
         /// Gets the base URI for the service client.
         /// </summary>
         /// <returns>The base URI for the service client.</returns>
-        storage_uri base_uri() const
+        const storage_uri& base_uri() const
         {
             return m_base_uri;
         }
@@ -43,7 +43,7 @@ namespace wa { namespace storage {
         /// Gets the storage account credentials for the service client.
         /// </summary>
         /// <returns>The storage account credentials for the service client.</returns>
-        const wa::storage::storage_credentials& credentials() const
+        const azure::storage::storage_credentials& credentials() const
         {
             return m_credentials;
         }
@@ -52,7 +52,7 @@ namespace wa { namespace storage {
         /// Gets the authentication scheme to use to sign HTTP requests for the service client.
         /// </summary>
         /// <returns>The authentication scheme to use to sign HTTP requests for the service client.</returns>
-        wa::storage::authentication_scheme authentication_scheme() const
+        azure::storage::authentication_scheme authentication_scheme() const
         {
             return m_authentication_scheme;
         }
@@ -61,7 +61,7 @@ namespace wa { namespace storage {
         /// Sets the authentication scheme to use to sign HTTP requests.
         /// </summary>
         /// <param name="value">The authentication scheme to use to sign HTTP requests.</param>
-        virtual void set_authentication_scheme(wa::storage::authentication_scheme value)
+        virtual void set_authentication_scheme(azure::storage::authentication_scheme value)
         {
             m_authentication_scheme = value;
         }
@@ -88,8 +88,8 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the service client class using the specified service endpoint.
         /// </summary>
         /// <param name="base_uri">A <see cref="storage_uri" /> object containing the service endpoint for all locations.</param>
-        cloud_client(const storage_uri& base_uri)
-            : m_base_uri(base_uri)
+        explicit cloud_client(storage_uri base_uri)
+            : m_base_uri(std::move(base_uri))
         {
         }
 
@@ -98,8 +98,8 @@ namespace wa { namespace storage {
         /// </summary>
         /// <param name="base_uri">A <see cref="storage_uri" /> object containing the service endpoint for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        cloud_client(const storage_uri& base_uri, const wa::storage::storage_credentials& credentials)
-            : m_base_uri(base_uri), m_credentials(credentials)
+        cloud_client(storage_uri base_uri, azure::storage::storage_credentials credentials)
+            : m_base_uri(std::move(base_uri)), m_credentials(std::move(credentials))
         {
         }
 
@@ -114,13 +114,14 @@ namespace wa { namespace storage {
 
         WASTORAGE_API pplx::task<service_properties> download_service_properties_base_async(const request_options& modified_options, operation_context context) const;
         WASTORAGE_API pplx::task<void> upload_service_properties_base_async(const service_properties& properties, const service_properties_includes& includes, const request_options& modified_options, operation_context context) const;
+        WASTORAGE_API pplx::task<service_stats> download_service_stats_base_async(const request_options& modified_options, operation_context context) const;
 
     private:
 
         storage_uri m_base_uri;
-        wa::storage::storage_credentials m_credentials;
-        wa::storage::authentication_scheme m_authentication_scheme;
+        azure::storage::storage_credentials m_credentials;
+        azure::storage::authentication_scheme m_authentication_scheme;
         std::shared_ptr<protocol::authentication_handler> m_authentication_handler;
     };
 
-}} // namespace wa::storage
+}} // namespace azure::storage

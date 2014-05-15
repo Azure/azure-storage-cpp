@@ -18,11 +18,11 @@
 #include "stdafx.h"
 #include "wascore/async_semaphore.h"
 
-namespace wa { namespace storage {  namespace core {
+namespace azure { namespace storage {  namespace core {
 
     pplx::task<void> _async_semaphore::lock_async()
     {
-        std::lock_guard<std::mutex> guard(m_mutex);
+        pplx::extensibility::scoped_rw_lock_t guard(m_mutex);
         if (m_count > 0)
         {
             if (m_count-- == m_initial_count)
@@ -53,7 +53,7 @@ namespace wa { namespace storage {  namespace core {
 
     pplx::task_completion_event<void> _async_semaphore::dequeue_pending()
     {
-        std::lock_guard<std::mutex> guard(m_mutex);
+        pplx::extensibility::scoped_rw_lock_t guard(m_mutex);
         if (m_queue.empty())
         {
             if (++m_count == m_initial_count)
@@ -71,4 +71,4 @@ namespace wa { namespace storage {  namespace core {
         }
     }
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

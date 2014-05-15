@@ -1,0 +1,43 @@
+Azure Storage Client Library for C++
+History of Changes
+
+Changes in v0.3:
+- Changed namespace to azure::storage.
+- Added support for secondary location access in Azure Storage Emulator.
+- Added support for downloading service stats for blob, table, and queue services to check geo-replication status.
+- Added download_to_file_async function in cloud_blob class.
+- Added upload_from_file_async function in cloud_block_blob and cloud_page_blob classes.
+- The HTTP status code and extended error information are populated when the table service returns an error.
+- The SAS token returned by the get_shared_access_signature functions does not include a question mark (?) prefix.
+- The storage_credentials class stores SAS tokens without a question mark (?) prefix.
+- Added support for accepting SAS URIs to tables and queues.
+- Fixed error where table query filter strings containing special characters were not encoded correctly.
+- Fixed intermittent error where authentication fails when trying to update a queue message.
+- Fixed a race condition causing invalid handle errors when sending parallel requests right after loading the module.
+- The ETag is populated on table entities returned from table retrieve operations.
+- Changed retry policies to not retry when HTTP status code 408 is received.
+- Added check to prevent uploading metadata values that are empty or consist entirely of whitespace.
+- Changed the storage_uri class to permit specifying only a secondary URI.
+- No value is set for the server timeout by default, which means the service's default value will be in affect unless the caller specifies a value.
+- Added more parameter validation.
+- Removed the constness from the return values of binary_value, datetime_value, guid_value, and string_value functions in entity_property class.
+- Removed the constness from the return values of filter_string and select_columns functions in table_query class.
+- Changed many functions to accept pass-by-value arguments to support move semantics.
+- Changed many functions to accept pass-by-reference arguments or return references as a performance improvement.
+- Made some constructors explicit to avoid implicit conversions. This affects these classes:
+	canonicalizer, shared_key_blob_queue_canonicalizer, shared_key_lite_blob_queue_canonicalizer, shared_key_table_canonicalizer, shared_key_lite_table_canonicalizer, 
+	sas_authentication_handler, shared_key_authentication_handler, continuation_token, retry_info, retry_policy, cloud_queue_message, cloud_queue_client, 
+	basic_common_retry_policy, cloud_client
+- Major performance improvement when executing many requests in parallel.
+- Minor bug fixes and performance improvements.
+
+Changes in v0.2:
+- Added sample projects for getting started with the library.
+- Removed blob_continuation_token typedef (use continuation_token instead).
+- Renamed table_entity_property class to entity_property.
+- Renamed entity_property_type enum to edm_type.
+- Renamed query_payload_format enum to table_payload_format.
+- Minor bug fixes and performance improvements.
+
+Changes in v0.1:
+- Initial release of the library including support for blob, table, and queue storage abstractions and providing additional functionality such as retry logic, authentication, logging, and more.

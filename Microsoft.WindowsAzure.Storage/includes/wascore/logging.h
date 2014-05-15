@@ -20,7 +20,7 @@
 #include "wascore/basic_types.h"
 #include "was/common.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     class logger
     {
@@ -28,20 +28,20 @@ namespace wa { namespace storage { namespace core {
 
         static const logger& instance()
         {
-            // This is thread-safe in C++11 per ISO C++ Jan 2012 working draft
-            // 6.7 Declaration statement [stmt.dcl] para. 4
-            static logger singleton_instance;
-            return singleton_instance;
+            return m_instance;
         }
 
         ~logger();
 
-        void log(wa::storage::operation_context context, client_log_level level, const utility::string_t& message) const;
-        bool should_log(wa::storage::operation_context context, client_log_level level) const;
+        void log(azure::storage::operation_context context, client_log_level level, const std::string& message) const;
+        void log(azure::storage::operation_context context, client_log_level level, const std::wstring& message) const;
+        bool should_log(azure::storage::operation_context context, client_log_level level) const;
 
     private:
 
         logger();
+
+        static logger m_instance;
     };
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

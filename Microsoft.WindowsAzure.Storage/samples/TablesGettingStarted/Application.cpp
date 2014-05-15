@@ -21,94 +21,98 @@
 #include "was/storage_account.h"
 #include "was/table.h"
 
-namespace wa { namespace storage { namespace samples {
+namespace azure { namespace storage { namespace samples {
 
     void tables_getting_started_sample()
     {
         try
         {
             // Initialize storage account
-            wa::storage::cloud_storage_account storage_account = wa::storage::cloud_storage_account::parse(storage_connection_string);
+            azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);
 
             // Create a table
-            wa::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();
-            wa::storage::cloud_table table = table_client.get_table_reference(U("AzureNativeClientLibrarySampleTable"));
+            azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();
+            azure::storage::cloud_table table = table_client.get_table_reference(U("MySampleTable"));
             bool created = table.create_if_not_exists();
 
             // Insert a table entity
-            wa::storage::table_entity entity(U("MyPartitionKey"), U("MyRowKey"));
-            entity.properties().reserve(8);
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyA"), wa::storage::entity_property(utility::string_t(U("some string")))));
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyB"), wa::storage::entity_property(utility::datetime::utc_now())));
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyC"), wa::storage::entity_property(utility::new_uuid())));
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyD"), wa::storage::entity_property(1234567890)));
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyE"), wa::storage::entity_property(1234567890123456789LL)));
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyF"), wa::storage::entity_property(9.1234567890123456789)));
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyG"), wa::storage::entity_property(true)));
-            entity.properties().insert(wa::storage::table_entity::property_type(U("PropertyH"), wa::storage::entity_property(std::vector<uint8_t>(10, 'X'))));
-            wa::storage::table_operation operation1 = wa::storage::table_operation::insert_or_replace_entity(entity);
-            wa::storage::table_result insert_result = table.execute(operation1);
+            azure::storage::table_entity entity(U("MyPartitionKey"), U("MyRowKey"));
+            azure::storage::table_entity::properties_type& properties = entity.properties();
+            properties.reserve(8);
+            properties[U("StringProperty")] = azure::storage::entity_property(utility::string_t(U("some string")));
+            properties[U("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
+            properties[U("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
+            properties[U("Int32Property")] = azure::storage::entity_property(1234567890);
+            properties[U("Int64Property")] = azure::storage::entity_property(1234567890123456789LL);
+            properties[U("DoubleProperty")] = azure::storage::entity_property(9.1234567890123456789);
+            properties[U("BooleanProperty")] = azure::storage::entity_property(true);
+            properties[U("BinaryProperty")] = azure::storage::entity_property(std::vector<uint8_t>(10, 'X'));
+            azure::storage::table_operation insert_operation = azure::storage::table_operation::insert_entity(entity);
+            azure::storage::table_result insert_result = table.execute(insert_operation);
 
             // Retrieve a table entity
-            wa::storage::table_operation operation2 = wa::storage::table_operation::retrieve_entity(U("MyPartitionKey"), U("MyRowKey"));
-            wa::storage::table_result retrieve_result = table.execute(operation2);
+            azure::storage::table_operation retrieve_operation = azure::storage::table_operation::retrieve_entity(U("MyPartitionKey"), U("MyRowKey"));
+            azure::storage::table_result retrieve_result = table.execute(retrieve_operation);
 
             // Insert table entities in a batch
-            wa::storage::table_batch_operation operation3;
+            // A batch can contain a single retrieve operation or any mix of other types of operations up to 100 operations.
+            // All the operations in a batch must be for entities with the same Partition Key and different Row Keys.
+            azure::storage::table_batch_operation batch_operation;
             for (int i = 0; i < 10; ++i)
             {
                 utility::string_t row_key = U("MyRowKey") + utility::conversions::print_string(i);
-                wa::storage::table_entity entity2(U("MyPartitionKey"), row_key);
-                entity2.properties().reserve(3);
-                entity2.properties().insert(wa::storage::table_entity::property_type(U("PropertyA"), wa::storage::entity_property(utility::string_t(U("another string")))));
-                entity2.properties().insert(wa::storage::table_entity::property_type(U("PropertyB"), wa::storage::entity_property(utility::datetime::utc_now())));
-                entity2.properties().insert(wa::storage::table_entity::property_type(U("PropertyC"), wa::storage::entity_property(utility::new_uuid())));
-                operation3.insert_or_replace_entity(entity2);
+                azure::storage::table_entity entity2(U("MyPartitionKey"), row_key);
+                azure::storage::table_entity::properties_type& properties2 = entity2.properties();
+                properties2.reserve(3);
+                properties2[U("StringProperty")] = azure::storage::entity_property(utility::string_t(U("another string")));
+                properties2[U("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
+                properties2[U("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
+                batch_operation.insert_entity(entity2);
             }
-            std::vector<wa::storage::table_result> results = table.execute_batch(operation3);
+            std::vector<azure::storage::table_result> results = table.execute_batch(batch_operation);
 
             // Query for some table entities
-            wa::storage::table_query query;
-            query.set_filter_string(wa::storage::table_query::combine_filter_conditions(
-                wa::storage::table_query::generate_filter_condition(U("PartitionKey"), wa::storage::query_comparison_operator::equal, U("MyPartitionKey")), 
-                wa::storage::query_logical_operator::and, 
-                wa::storage::table_query::generate_filter_condition(U("RowKey"), wa::storage::query_comparison_operator::greater_than_or_equal, U("MyRowKey5"))));
-            std::vector<wa::storage::table_entity> entities = table.execute_query(query);
-            for (std::vector<wa::storage::table_entity>::const_iterator itr = entities.cbegin(); itr != entities.cend(); ++itr)
+            azure::storage::table_query query;
+            query.set_filter_string(azure::storage::table_query::combine_filter_conditions(
+                azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, U("MyPartitionKey")), 
+                azure::storage::query_logical_operator::and, 
+                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("MyRowKey5"))));
+            std::vector<azure::storage::table_entity> entities = table.execute_query(query);
+            for (std::vector<azure::storage::table_entity>::const_iterator it = entities.cbegin(); it != entities.cend(); ++it)
             {
-                wa::storage::table_entity::properties_type properties = itr->properties();
-                ucout << U("PK: ") << itr->partition_key() << U(", RK: ") << itr->row_key() << U(", Prop: ") << utility::uuid_to_string(properties[U("PropertyC")].guid_value()) << std::endl;
+                const azure::storage::table_entity::properties_type& properties = it->properties();
+                ucout << U("PK: ") << it->partition_key() << U(", RK: ") << it->row_key() << U(", Prop: ") << utility::uuid_to_string(properties.at(U("GuidProperty")).guid_value()) << std::endl;
             }
 
-            // Delete a table entity
-            wa::storage::table_operation operation4 = wa::storage::table_operation::delete_entity(retrieve_result.entity());
-            wa::storage::table_result delete_result = table.execute(operation4);
+            // Delete the table entity
+            azure::storage::table_operation delete_operation = azure::storage::table_operation::delete_entity(retrieve_result.entity());
+            azure::storage::table_result delete_result = table.execute(delete_operation);
 
             // Delete the table
             bool deleted = table.delete_table_if_exists();
         }
-        catch (wa::storage::storage_exception& e)
+        catch (const azure::storage::storage_exception& e)
         {
             ucout << U("Error: ") << e.what() << std::endl;
 
-            wa::storage::request_result result = e.result();
-            wa::storage::storage_extended_error extended_error = result.extended_error();
+            azure::storage::request_result result = e.result();
+            azure::storage::storage_extended_error extended_error = result.extended_error();
             if (!extended_error.message().empty())
             {
                 ucout << extended_error.message() << std::endl;
             }
         }
-        catch (std::exception& e)
+        catch (const std::exception& e)
         {
             ucout << U("Error: ") << e.what() << std::endl;
         }
     }
 
-}}} // namespace wa::storage::samples
+}}} // namespace azure::storage::samples
 
 int _tmain(int argc, _TCHAR *argv[])
 {
-    wa::storage::samples::tables_getting_started_sample();
+    azure::storage::samples::tables_getting_started_sample();
     return 0;
 }
 

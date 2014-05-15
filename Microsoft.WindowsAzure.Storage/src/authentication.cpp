@@ -17,11 +17,12 @@
 
 #include "stdafx.h"
 #include "was/auth.h"
+#include "wascore/util.h"
 #include "wascore/constants.h"
 #include "wascore/logging.h"
 #include "wascore/streams.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials)
     {
@@ -66,8 +67,8 @@ namespace wa { namespace storage { namespace protocol {
     {
         m_result << U("/") << m_account_name;
 
-        auto uri = m_request.request_uri();
-        auto& resource = uri.path();
+        web::http::uri uri = m_request.request_uri();
+        const utility::string_t& resource = uri.path();
         if (resource.front() != U('/'))
         {
             m_result << U("/");
@@ -75,10 +76,10 @@ namespace wa { namespace storage { namespace protocol {
 
         m_result << resource;
 
-        auto query_map = web::http::uri::split_query(web::http::uri::decode(uri.query()));
+        std::map<utility::string_t, utility::string_t> query_map = web::http::uri::split_query(web::http::uri::decode(uri.query()));
         if (query_only_comp)
         {
-            auto it = query_map.find(U("comp"));
+            std::map<utility::string_t, utility::string_t>::iterator it = query_map.find(U("comp"));
             if (it != query_map.end())
             {
                 m_result << U("?comp=") << it->second;
@@ -87,12 +88,12 @@ namespace wa { namespace storage { namespace protocol {
         else
         {
             // std::map keys are already sorted
-            for (auto iter = query_map.cbegin(); iter != query_map.cend(); ++iter)
+            for (std::map<utility::string_t, utility::string_t>::const_iterator it = query_map.cbegin(); it != query_map.cend(); ++it)
             {
-                auto name = iter->first;
-                std::transform(name.begin(), name.end(), name.begin(), tolower);
+                utility::string_t parameter_name = it->first;
+                std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), core::utility_char_tolower);
 
-                m_result << U("\n") << name << U(":") << iter->second;
+                m_result << U("\n") << parameter_name << U(":") << it->second;
             }
         }
     }
@@ -123,16 +124,20 @@ namespace wa { namespace storage { namespace protocol {
 
     void canonicalizer_helper::append_x_ms_headers()
     {
-        auto& headers = m_request.headers();
-        for (auto iter = headers.begin(); iter != headers.end(); ++iter)
+        const web::http::http_headers& headers = m_request.headers();
+        for (web::http::http_headers::const_iterator it = headers.begin(); it != headers.end(); ++it)
         {
-            auto key = iter->first;
+            const utility::string_t& key = it->first;
             if ((key.size() > ms_header_prefix.size()) &&
                 std::equal(ms_header_prefix.cbegin(), ms_header_prefix.cend(), key.cbegin()))
             {
-                std::transform(key.begin(), key.end(), key.begin(), tolower);
-                m_result << key << U(":");
-                append(iter->second);
+                if (!it->second.empty())
+                {
+                    utility::string_t transformed_key(key);
+                    std::transform(transformed_key.begin(), transformed_key.end(), transformed_key.begin(), core::utility_char_tolower);
+                    m_result << transformed_key << U(":");
+                    append(it->second);
+                }
             }
         }
     }
@@ -188,4 +193,4 @@ namespace wa { namespace storage { namespace protocol {
         return helper.str();
     }
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

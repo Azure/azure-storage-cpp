@@ -24,13 +24,13 @@
 
 #include "wascore/basic_types.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     class _async_semaphore
     {
     public:
 
-        _async_semaphore(int count)
+        explicit _async_semaphore(int count)
             : m_count(count), m_initial_count(count)
         {
             m_empty_event.set();
@@ -48,14 +48,14 @@ namespace wa { namespace storage { namespace core {
         int m_initial_count;
         pplx::task_completion_event<void> m_empty_event;
         std::queue<pplx::task_completion_event<void>> m_queue;
-        std::mutex m_mutex;
+        pplx::extensibility::reader_writer_lock_t m_mutex;
     };
 
     class async_semaphore
     {
     public:
 
-        async_semaphore(int count)
+        explicit async_semaphore(int count)
             : m_semaphore(std::make_shared<_async_semaphore>(count))
         {
         }
@@ -85,4 +85,4 @@ namespace wa { namespace storage { namespace core {
         std::shared_ptr<_async_semaphore> m_semaphore;
     };
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

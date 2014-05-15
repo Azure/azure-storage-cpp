@@ -18,13 +18,13 @@
 #include "stdafx.h"
 #include "wascore/blobstreams.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     pplx::task<void> basic_cloud_blob_ostreambuf::_close_write()
     {
         if (m_committed)
         {
-            throw std::logic_error(utility::conversions::to_utf8string(protocol::error_closed_stream));
+            throw std::logic_error(protocol::error_closed_stream);
         }
 
         m_committed = true;
@@ -260,4 +260,4 @@ namespace wa { namespace storage { namespace core {
         }
     }
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

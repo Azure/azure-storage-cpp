@@ -89,9 +89,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.WindowsAzure.Storage.vcxproj">
       <Project>{dcff75b0-b142-4ec8-992f-3e48f2e3eece}</Project>
       <Private>false</Private>
@@ -103,7 +100,5 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\..\packages\cpprestsdk.redist.1.3.1\build\native\cpprestsdk.redist.targets" Condition="Exists('..\..\..\packages\cpprestsdk.redist.1.3.1\build\native\cpprestsdk.redist.targets')" />
-    <Import Project="..\..\..\packages\cpprestsdk.1.3.1\build\native\cpprestsdk.targets" Condition="Exists('..\..\..\packages\cpprestsdk.1.3.1\build\native\cpprestsdk.targets')" />
   </ImportGroup>
 </Project>

@@ -22,8 +22,9 @@
 #include "was/queue.h"
 #include "was/table.h"
 #include "was/storage_account.h"
+#include "wascore/resources.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     const utility::string_t use_development_storage_setting_string(U("UseDevelopmentStorage"));
     const utility::string_t use_development_storage_setting_value(U("true"));
@@ -67,30 +68,39 @@ namespace wa { namespace storage {
     cloud_storage_account cloud_storage_account::get_development_storage_account(const web::http::uri& proxy_uri)
     {
         web::http::uri_builder builder;
-        if (!proxy_uri.is_empty())
-        {
-            builder.set_scheme(proxy_uri.scheme());
-            builder.set_host(proxy_uri.host());
-        }
-        else
+        if (proxy_uri.is_empty())
         {
             builder.set_scheme(U("http"));
             builder.set_host(U("127.0.0.1"));
+        }
+        else
+        {
+            builder.set_scheme(proxy_uri.scheme());
+            builder.set_host(proxy_uri.host());
         }
 
         builder.set_path(devstore_account_name);
 
         builder.set_port(10000);
-        auto blob_endpoint = storage_uri(builder.to_uri());
-
+        web::uri blob_endpoint_primary = builder.to_uri();
         builder.set_port(10001);
-        auto queue_endpoint = storage_uri(builder.to_uri());
-
+        web::uri queue_endpoint_primary = builder.to_uri();
         builder.set_port(10002);
-        auto table_endpoint = storage_uri(builder.to_uri());
+        web::uri table_endpoint_primary = builder.to_uri();
 
-        auto credentials = storage_credentials(devstore_account_name, devstore_account_key);
-        auto account = cloud_storage_account(credentials, blob_endpoint, queue_endpoint, table_endpoint);
+        builder.set_path(devstore_account_name + secondary_location_account_suffix);
+
+        builder.set_port(10000);
+        web::uri blob_endpoint_secondary = builder.to_uri();
+        builder.set_port(10001);
+        web::uri queue_endpoint_secondary = builder.to_uri();
+        builder.set_port(10002);
+        web::uri table_endpoint_secondary = builder.to_uri();
+
+        cloud_storage_account account(storage_credentials(devstore_account_name, devstore_account_key),
+            storage_uri(std::move(blob_endpoint_primary), std::move(blob_endpoint_secondary)),
+            storage_uri(std::move(queue_endpoint_primary), std::move(queue_endpoint_secondary)),
+            storage_uri(std::move(table_endpoint_primary), std::move(table_endpoint_secondary)));
         
         account.m_is_development_storage_account = true;
         account.m_settings.insert(std::make_pair(use_development_storage_setting_string, use_development_storage_setting_value));
@@ -131,7 +141,7 @@ namespace wa { namespace storage {
                 }
                 else
                 {
-                    throw std::logic_error("Settings must be of the form \"name=value\".");
+                    throw std::logic_error(protocol::error_invalid_settings_form);
                 }
             }
         }
@@ -178,8 +188,6 @@ namespace wa { namespace storage {
     cloud_storage_account cloud_storage_account::parse_devstore_settings(std::map<utility::string_t, utility::string_t> settings)
     {
         utility::string_t devstore;
-        utility::string_t devstore_proxy_uri;
-
         if (get_setting(settings, use_development_storage_setting_string, devstore))
         {
             if (devstore != use_development_storage_setting_value)
@@ -187,6 +195,7 @@ namespace wa { namespace storage {
                 throw std::invalid_argument(utility::conversions::to_utf8string(use_development_storage_setting_string));
             }
 
+            utility::string_t devstore_proxy_uri;
             web::http::uri proxy_uri;
             if (get_setting(settings, development_storage_proxy_uri_setting_string, devstore_proxy_uri))
             {
@@ -385,4 +394,4 @@ namespace wa { namespace storage {
         return result.str();
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

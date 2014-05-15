@@ -23,7 +23,7 @@ SUITE(QueueClient)
 {
     TEST(QueueClient_Empty)
     {
-        wa::storage::cloud_queue_client client;
+        azure::storage::cloud_queue_client client;
 
         CHECK(client.base_uri().primary_uri().is_empty());
         CHECK(client.base_uri().secondary_uri().is_empty());
@@ -32,9 +32,9 @@ SUITE(QueueClient)
 
     TEST(QueueClient_BaseUri)
     {
-        wa::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
 
-        wa::storage::cloud_queue_client client(base_uri);
+        azure::storage::cloud_queue_client client(base_uri);
 
         CHECK(client.base_uri().primary_uri() == base_uri.primary_uri());
         CHECK(client.base_uri().secondary_uri() == base_uri.secondary_uri());
@@ -43,11 +43,11 @@ SUITE(QueueClient)
 
     TEST(QueueClient_BaseUriAndCredentials)
     {
-        wa::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
-        wa::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
-        wa::storage::queue_request_options default_request_options;
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::queue_request_options default_request_options;
 
-        wa::storage::cloud_queue_client client(base_uri, credentials);
+        azure::storage::cloud_queue_client client(base_uri, credentials);
 
         CHECK(client.base_uri().primary_uri() == base_uri.primary_uri());
         CHECK(client.base_uri().secondary_uri() == base_uri.secondary_uri());
@@ -56,59 +56,59 @@ SUITE(QueueClient)
 
     TEST(QueueClient_BaseUriAndCredentialsAndDefaultRequestOptions)
     {
-        wa::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
-        wa::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
-        wa::storage::queue_request_options default_request_options;
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::queue_request_options default_request_options;
 
-        wa::storage::cloud_queue_client client(base_uri, credentials, default_request_options);
+        azure::storage::cloud_queue_client client(base_uri, credentials, default_request_options);
 
         CHECK(client.base_uri().primary_uri() == base_uri.primary_uri());
         CHECK(client.base_uri().secondary_uri() == base_uri.secondary_uri());
         CHECK(client.credentials().is_shared_key());
 
-        default_request_options.set_location_mode(wa::storage::location_mode::secondary_only);
+        default_request_options.set_location_mode(azure::storage::location_mode::secondary_only);
 
-        client = wa::storage::cloud_queue_client(base_uri, credentials, default_request_options);
+        client = azure::storage::cloud_queue_client(base_uri, credentials, default_request_options);
 
-        CHECK(client.default_request_options().location_mode() == wa::storage::location_mode::secondary_only);
+        CHECK(client.default_request_options().location_mode() == azure::storage::location_mode::secondary_only);
     }
 
     TEST(ListQueues_Normal)
     {
         const int QUEUE_COUNT = 5;
 
-        wa::storage::cloud_queue queues[QUEUE_COUNT];
+        azure::storage::cloud_queue queues[QUEUE_COUNT];
         bool is_found[QUEUE_COUNT];
         for (int i = 0; i < QUEUE_COUNT; ++i)
         {
-            wa::storage::cloud_queue queue = get_queue();
+            azure::storage::cloud_queue queue = get_queue();
 
-            queue.metadata().insert(std::pair<utility::string_t, utility::string_t>(U("aaa"), U("111")));
-            queue.metadata().insert(std::pair<utility::string_t, utility::string_t>(U("bbb"), U("222")));
+            queue.metadata().insert(std::make_pair(U("aaa"), U("111")));
+            queue.metadata().insert(std::make_pair(U("bbb"), U("222")));
             queue.upload_metadata();
 
             queues[i] = queue;
             is_found[i] = false;
         }
 
-        wa::storage::cloud_queue_client client = get_queue_client();
-
-        utility::string_t prefix;
-        bool get_metadata;
-        wa::storage::queue_request_options options;
-        wa::storage::operation_context context;
+        azure::storage::cloud_queue_client client = get_queue_client();
 
         {
+            utility::string_t prefix;
+            bool get_metadata;
+            azure::storage::queue_request_options options;
+            azure::storage::operation_context context;
+
             prefix = object_name_prefix;
             get_metadata = false;
 
-            std::vector<wa::storage::cloud_queue> results = client.list_queues(prefix, get_metadata, options, context);
+            std::vector<azure::storage::cloud_queue> results = client.list_queues(prefix, get_metadata, options, context);
 
             CHECK(results.size() >= QUEUE_COUNT);
 
-            for (std::vector<wa::storage::cloud_queue>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
+            for (std::vector<azure::storage::cloud_queue>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
             {
-                wa::storage::cloud_queue queue = *itr;
+                azure::storage::cloud_queue queue = *itr;
 
                 for (int i = 0; i < QUEUE_COUNT; ++i)
                 {
@@ -125,19 +125,41 @@ SUITE(QueueClient)
                     }
                 }
             }
+
+            CHECK(!context.client_request_id().empty());
+            CHECK(context.start_time().is_initialized());
+            CHECK(context.end_time().is_initialized());
+            CHECK_EQUAL(1, context.request_results().size());
+            CHECK(context.request_results()[0].is_response_available());
+            CHECK(context.request_results()[0].start_time().is_initialized());
+            CHECK(context.request_results()[0].end_time().is_initialized());
+            CHECK(context.request_results()[0].target_location() != azure::storage::storage_location::unspecified);
+            CHECK_EQUAL(web::http::status_codes::OK, context.request_results()[0].http_status_code());
+            CHECK(!context.request_results()[0].service_request_id().empty());
+            CHECK(context.request_results()[0].request_date().is_initialized());
+            CHECK(context.request_results()[0].content_md5().empty());
+            CHECK(context.request_results()[0].etag().empty());
+            CHECK(context.request_results()[0].extended_error().code().empty());
+            CHECK(context.request_results()[0].extended_error().message().empty());
+            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         {
+            utility::string_t prefix;
+            bool get_metadata;
+            azure::storage::queue_request_options options;
+            azure::storage::operation_context context;
+
             prefix = object_name_prefix;
             get_metadata = true;
 
-            std::vector<wa::storage::cloud_queue> results = client.list_queues(prefix, get_metadata, options, context);
+            std::vector<azure::storage::cloud_queue> results = client.list_queues(prefix, get_metadata, options, context);
 
             CHECK(results.size() >= QUEUE_COUNT);
 
-            for (std::vector<wa::storage::cloud_queue>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
+            for (std::vector<azure::storage::cloud_queue>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
             {
-                wa::storage::cloud_queue queue = *itr;
+                azure::storage::cloud_queue queue = *itr;
 
                 for (int i = 0; i < QUEUE_COUNT; ++i)
                 {
@@ -156,6 +178,23 @@ SUITE(QueueClient)
                     }
                 }
             }
+
+            CHECK(!context.client_request_id().empty());
+            CHECK(context.start_time().is_initialized());
+            CHECK(context.end_time().is_initialized());
+            CHECK_EQUAL(1, context.request_results().size());
+            CHECK(context.request_results()[0].is_response_available());
+            CHECK(context.request_results()[0].start_time().is_initialized());
+            CHECK(context.request_results()[0].end_time().is_initialized());
+            CHECK(context.request_results()[0].target_location() != azure::storage::storage_location::unspecified);
+            CHECK_EQUAL(web::http::status_codes::OK, context.request_results()[0].http_status_code());
+            CHECK(!context.request_results()[0].service_request_id().empty());
+            CHECK(context.request_results()[0].request_date().is_initialized());
+            CHECK(context.request_results()[0].content_md5().empty());
+            CHECK(context.request_results()[0].etag().empty());
+            CHECK(context.request_results()[0].extended_error().code().empty());
+            CHECK(context.request_results()[0].extended_error().message().empty());
+            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         for (int i = 0; i < QUEUE_COUNT; ++i)
@@ -168,7 +207,7 @@ SUITE(QueueClient)
     {
         const int QUEUE_COUNT = 5;
 
-        wa::storage::cloud_queue queues[QUEUE_COUNT];
+        azure::storage::cloud_queue queues[QUEUE_COUNT];
         bool is_found[QUEUE_COUNT];
         for (int i = 0; i < QUEUE_COUNT; ++i)
         {
@@ -176,32 +215,32 @@ SUITE(QueueClient)
             is_found[i] = false;
         }
 
-        wa::storage::cloud_queue_client client = get_queue_client();
+        azure::storage::cloud_queue_client client = get_queue_client();
 
         utility::string_t prefix;
         bool get_metadata;
         int max_results;
-        wa::storage::continuation_token continuation_token;
-        wa::storage::queue_request_options options;
-        wa::storage::operation_context context;
+        azure::storage::continuation_token token;
+        azure::storage::queue_request_options options;
+        azure::storage::operation_context context;
 
         prefix = object_name_prefix;
         get_metadata = false;
         max_results = 3;
 
         int segment_count = 0;
-        wa::storage::queue_result_segment result_segment;
+        azure::storage::queue_result_segment result_segment;
         do
         {
-            result_segment = client.list_queues_segmented(prefix, get_metadata, max_results, continuation_token, options, context);
-            std::vector<wa::storage::cloud_queue> results = result_segment.results();
+            result_segment = client.list_queues_segmented(prefix, get_metadata, max_results, token, options, context);
+            std::vector<azure::storage::cloud_queue> results = result_segment.results();
 
             CHECK(results.size() >= 0);
             CHECK((int)results.size() <= max_results);
 
-            for (std::vector<wa::storage::cloud_queue>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
+            for (std::vector<azure::storage::cloud_queue>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
             {
-                wa::storage::cloud_queue queue = *itr;
+                azure::storage::cloud_queue queue = *itr;
 
                 for (int i = 0; i < QUEUE_COUNT; ++i)
                 {
@@ -217,10 +256,27 @@ SUITE(QueueClient)
                 }
             }
 
+            CHECK(!context.client_request_id().empty());
+            CHECK(context.start_time().is_initialized());
+            CHECK(context.end_time().is_initialized());
+            CHECK_EQUAL(segment_count + 1, context.request_results().size());
+            CHECK(context.request_results()[segment_count].is_response_available());
+            CHECK(context.request_results()[segment_count].start_time().is_initialized());
+            CHECK(context.request_results()[segment_count].end_time().is_initialized());
+            CHECK(context.request_results()[segment_count].target_location() != azure::storage::storage_location::unspecified);
+            CHECK_EQUAL(web::http::status_codes::OK, context.request_results()[segment_count].http_status_code());
+            CHECK(!context.request_results()[segment_count].service_request_id().empty());
+            CHECK(context.request_results()[segment_count].request_date().is_initialized());
+            CHECK(context.request_results()[segment_count].content_md5().empty());
+            CHECK(context.request_results()[segment_count].etag().empty());
+            CHECK(context.request_results()[segment_count].extended_error().code().empty());
+            CHECK(context.request_results()[segment_count].extended_error().message().empty());
+            CHECK(context.request_results()[segment_count].extended_error().details().empty());
+
             ++segment_count;
-            continuation_token = result_segment.continuation_token();
+            token = result_segment.continuation_token();
         }
-        while (!continuation_token.empty());
+        while (!token.empty());
 
         CHECK(segment_count > 1);
 

@@ -55,7 +55,7 @@ using namespace web;
 using namespace utility;
 using namespace concurrency;
 
-namespace wa { namespace storage { namespace core { namespace xml {
+namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_reader::initialize(streams::istream stream)
     {
@@ -521,4 +521,4 @@ namespace wa { namespace storage { namespace core { namespace xml {
 }
         }
     }
-} // namespace wa::storage::core::xml
+} // namespace azure::storage::core::xml

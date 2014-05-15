@@ -18,30 +18,140 @@
 #include "stdafx.h"
 #include "was/table.h"
 #include "wascore/util.h"
+#include "wascore/resources.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
-    // TODO: Move this back to the .h file after switching to Casablanca's datetime parsing
-    const utility::datetime entity_property::datetime_value() const
+    std::vector<uint8_t> entity_property::binary_value() const
+    {
+        if (m_property_type != edm_type::binary)
+        {
+            throw std::runtime_error(protocol::error_entity_property_not_binary);
+        }
+
+        return std::vector<uint8_t>(utility::conversions::from_base64(m_value));
+    }
+
+    bool entity_property::boolean_value() const
+    {
+        if (m_property_type != edm_type::boolean)
+        {
+            throw std::runtime_error(protocol::error_entity_property_not_boolean);
+        }
+
+        if (m_value.compare(U("false")) == 0)
+        {
+            return false;
+        }
+        else if (m_value.compare(U("true")) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            throw std::runtime_error(protocol::error_parse_boolean);
+        }
+    }
+
+    utility::datetime entity_property::datetime_value() const
     {
         if (m_property_type != edm_type::datetime)
         {
-            throw std::runtime_error("The type of the entity property is not date/time.");
+            throw std::runtime_error(protocol::error_entity_property_not_datetime);
         }
 
-        utility::datetime result = core::parse_datetime(m_value);
+        utility::datetime result = utility::datetime::from_string(m_value, utility::datetime::ISO_8601);
         if (!result.is_initialized())
         {
-            throw std::runtime_error("An error occurred parsing the date/time.");
+            throw std::runtime_error(protocol::error_parse_datetime);
         }
 
         return result;
     }
 
-    // TODO: Move this back to the .h file after switching to Casablanca's datetime parsing
-    void entity_property::set_value_impl(const utility::datetime& value)
+    double entity_property::double_value() const
     {
-        m_value = core::convert_to_string(value);
+        if (m_property_type != edm_type::double_floating_point)
+        {
+            throw std::runtime_error(protocol::error_entity_property_not_double);
+        }
+
+        if (m_value.compare(protocol::double_not_a_number) == 0)
+        {
+            return std::numeric_limits<double>::quiet_NaN();
+        }
+        else if (m_value.compare(protocol::double_infinity) == 0)
+        {
+            return std::numeric_limits<double>::infinity();
+        }
+        else if (m_value.compare(protocol::double_negative_infinity) == 0)
+        {
+            return -std::numeric_limits<double>::infinity();
+        }
+
+        double result;
+        utility::istringstream_t buffer(m_value);
+        buffer >> result;
+
+        if (buffer.fail() || !buffer.eof())
+        {
+            throw std::runtime_error(protocol::error_parse_double);
+        }
+
+        return result;
+    }
+
+    utility::uuid entity_property::guid_value() const
+    {
+        if (m_property_type != edm_type::guid)
+        {
+            throw std::runtime_error(protocol::error_entity_property_not_guid);
+        }
+
+        utility::uuid result = utility::string_to_uuid(m_value);
+        return result;
+    }
+
+    int32_t entity_property::int32_value() const
+    {
+        if (m_property_type != edm_type::int32)
+        {
+            throw std::runtime_error(protocol::error_entity_property_not_int32);
+        }
+
+        int32_t result;
+        utility::istringstream_t buffer(m_value);
+        buffer >> result;
+
+        if (buffer.fail() || !buffer.eof())
+        {
+            throw std::runtime_error(protocol::error_parse_int32);
+        }
+
+        return result;
+    }
+
+    int64_t entity_property::int64_value() const
+    {
+        if (m_property_type != edm_type::int64)
+        {
+            throw std::runtime_error(protocol::error_entity_property_not_int64);
+        }
+
+        int64_t result;
+        utility::istringstream_t buffer(m_value);
+        buffer >> result;
+        return result;
+    }
+
+    utility::string_t entity_property::string_value() const
+    {
+        if (m_property_type != edm_type::string)
+        {
+            throw std::runtime_error(protocol::error_entity_property_not_string);
+        }
+
+        return m_value;
     }
 
     void entity_property::set_value_impl(double value)
@@ -60,12 +170,18 @@ namespace wa { namespace storage {
         }
         else
         {
-            utility::ostringstream_t buffer;
-            // Two extra digits of precision are needed to ensure proper rounding
-            buffer.precision(std::numeric_limits<double>::digits10 + 2);
-            buffer << value;
-            m_value = buffer.str();
+            m_value = core::convert_to_string(value);
         }
     }
 
-}} // namespace wa::storage
+    void entity_property::set_value_impl(int32_t value)
+    {
+        m_value = core::convert_to_string(value);
+    }
+
+    void entity_property::set_value_impl(int64_t value)
+    {
+        m_value = core::convert_to_string(value);
+    }
+
+}} // namespace azure::storage

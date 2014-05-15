@@ -17,46 +17,28 @@
 
 #include "stdafx.h"
 #include "wascore/protocol.h"
+#include "wascore/protocol_xml.h"
+#include "wascore/protocol_json.h"
 #include "wascore/constants.h"
 #include "wascore/resources.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     void preprocess_response(const web::http::http_response& response, operation_context context)
     {
         preprocess_response<char>(0, response, context);
     }
 
-    /*
-    void preprocess_table_response(const web::http::http_response& response, operation_context context)
-    {
-        switch (response.status_code())
-        {
-        case web::http::status_codes::OK:
-        case web::http::status_codes::Created:
-        case web::http::status_codes::Accepted:
-        case web::http::status_codes::NoContent:
-        case web::http::status_codes::PartialContent:
-            break;
-
-        default:
-            utility::ostringstream_t str;
-            str << U("Status code: ") << response.status_code();
-            throw storage_exception(utility::conversions::to_utf8string(str.str()));
-        }
-    }
-    */
-
     void check_stream_length_and_md5(utility::size64_t length, const utility::string_t& content_md5, const core::ostream_descriptor& descriptor)
     {
         if (length != descriptor.length())
         {
-            throw storage_exception(utility::conversions::to_utf8string(error_incorrect_length));
+            throw storage_exception(protocol::error_incorrect_length);
         }
 
         if (!content_md5.empty() && !descriptor.content_md5().empty() && (content_md5 != descriptor.content_md5()))
         {
-            throw storage_exception(utility::conversions::to_utf8string(error_md5_mismatch));
+            throw storage_exception(protocol::error_md5_mismatch);
         }
     }
 
@@ -227,17 +209,54 @@ namespace wa { namespace storage { namespace protocol {
         cloud_metadata metadata;
 
         auto& headers = response.headers();
-        for (auto iter = headers.begin(); iter != headers.end(); ++iter)
+        for (auto it = headers.begin(); it != headers.end(); ++it)
         {
-            auto key = iter->first;
+            const utility::string_t& key = it->first;
             if ((key.size() > ms_header_metadata_prefix.size()) &&
                 std::equal(ms_header_metadata_prefix.cbegin(), ms_header_metadata_prefix.cend(), key.cbegin()))
             {
-                metadata.insert(std::make_pair(key.substr(ms_header_metadata_prefix.size()), iter->second));
+                metadata.insert(std::make_pair(key.substr(ms_header_metadata_prefix.size()), it->second));
             }
         }
 
         return metadata;
     }
 
-}}} // namespace wa::storage::protocol
+    bool is_matching_content_type(const utility::string_t& actual, const utility::string_t& expected)
+    {
+        // Check if the response's actual content type matches the expected content type.
+        // It is OK if the actual content type has additional parameters (e.g. application/json;odata=minimalmetadata;streaming=true;charset=utf-8).
+        return (actual.size() == expected.size() || (actual.size() > expected.size() && actual.at(expected.size()) == U(';'))) &&
+            std::equal(expected.cbegin(), expected.cend(), actual.cbegin());
+    }
+
+    storage_extended_error parse_extended_error(const web::http::http_response& response)
+    {
+        const web::http::http_headers& headers = response.headers();
+
+        utility::string_t content_type;
+        headers.match(web::http::header_names::content_type, content_type);
+        std::transform(content_type.begin(), content_type.end(), content_type.begin(), core::utility_char_tolower);
+
+        if (is_matching_content_type(content_type, protocol::header_value_content_type_json)) // application/json
+        {
+            web::json::value document = response.extract_json().get();
+            return protocol::parse_table_error(document);
+        }
+        else // application/xml
+        {
+            utility::string_t error_code;
+            utility::string_t error_message;
+            std::unordered_map<utility::string_t, utility::string_t> details;
+
+            concurrency::streams::istream body_stream = response.body();
+
+            protocol::storage_error_reader reader(body_stream);
+            error_code = reader.extract_error_code();
+            error_message = reader.extract_error_message();
+
+            return storage_extended_error(std::move(error_code), std::move(error_message), std::move(details));
+        }
+    }
+
+}}} // namespace azure::storage::protocol

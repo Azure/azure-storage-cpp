@@ -19,7 +19,7 @@
 #include "wascore/util.h"
 #include "was/table.h"
 
-namespace wa { namespace storage {  namespace core {
+namespace azure { namespace storage {  namespace core {
 
     utility::string_t generate_boundary_name(const utility::string_t& prefix)
     {
@@ -53,7 +53,7 @@ namespace wa { namespace storage {  namespace core {
         write_line_break(body_text);
     }
 
-    void write_mime_multipart_headers(utility::string_t& body_text)
+    void write_mime_changeset_headers(utility::string_t& body_text)
     {
         body_text.append(web::http::header_names::content_type);
         body_text.push_back(U(':'));
@@ -82,10 +82,10 @@ namespace wa { namespace storage {  namespace core {
 
     void write_request_headers(utility::string_t& body_text, const web::http::http_headers& headers)
     {
-        for (web::http::http_headers::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
+        for (web::http::http_headers::const_iterator it = headers.begin(); it != headers.end(); ++it)
         {
-            utility::string_t header_name = itr->first;
-            utility::string_t header_value = itr->second;
+            const utility::string_t& header_name = it->first;
+            const utility::string_t& header_value = it->second;
 
             body_text.append(header_name);
             body_text.push_back(U(':'));
@@ -97,32 +97,14 @@ namespace wa { namespace storage {  namespace core {
         write_line_break(body_text);
     }
 
-    /*
-    void write_content_type_request_header(utility::string_t& body_text, const utility::string_t& boundary_name)
-    {
-        body_text.append(web::http::header_names::content_type);
-        body_text.push_back(U(':'));
-        body_text.push_back(U(' '));
-        body_text.append(protocol::header_value_content_type_mime_multipart_prefix);
-        body_text.append(boundary_name);
-        write_line_break(body_text);
-    }
-    */
-
-    /*
-    void write_content_id_request_header(utility::string_t& body_text, int content_id)
-    {
-    }
-    */
-
-    void write_request_payload(utility::string_t& body_text, web::json::value json_object)
+    void write_request_payload(utility::string_t& body_text, const web::json::value& json_object)
     {
         if (!json_object.is_null())
         {
-            body_text.append(json_object.to_string());
+            body_text.append(json_object.serialize());
         }
 
         write_line_break(body_text);
     }
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

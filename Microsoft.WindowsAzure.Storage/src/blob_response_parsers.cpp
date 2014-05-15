@@ -18,7 +18,7 @@
 #include "stdafx.h"
 #include "wascore/protocol.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     cloud_blob_container_properties blob_response_parsers::parse_blob_container_properties(const web::http::http_response& response)
     {
@@ -178,4 +178,4 @@ namespace wa { namespace storage { namespace protocol {
         }
     }
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

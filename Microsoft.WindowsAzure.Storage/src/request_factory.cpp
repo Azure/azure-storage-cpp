@@ -19,13 +19,13 @@
 #include "wascore/protocol.h"
 #include "wascore/constants.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     web::http::http_request base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         if (timeout.count() > 0)
         {
-            uri_builder.append_query(uri_query_timeout, timeout.count());
+            uri_builder.append_query(core::make_query_parameter(uri_query_timeout, timeout.count(), /* do_encoding */ false));
         }
 
         web::http::http_request request(method);
@@ -45,17 +45,25 @@ namespace wa { namespace storage { namespace protocol {
 
     web::http::http_request get_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_service);
-        uri_builder.append_query(uri_query_component, component_properties);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_service, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         return request;
     }
 
     web::http::http_request set_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(uri_query_resource_type, resource_service);
-        uri_builder.append_query(uri_query_component, component_properties);
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_service, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        return request;
+    }
+
+    web::http::http_request get_service_stats(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(uri_query_resource_type, resource_service);
+        uri_builder.append_query(uri_query_component, component_stats);
+        web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         return request;
     }
 
@@ -70,10 +78,15 @@ namespace wa { namespace storage { namespace protocol {
     void add_metadata(web::http::http_request& request, const cloud_metadata& metadata)
     {
         web::http::http_headers& headers = request.headers();
-        for (auto iter = metadata.cbegin(); iter != metadata.cend(); ++iter)
+        for (cloud_metadata::const_iterator it = metadata.cbegin(); it != metadata.cend(); ++it)
         {
-            headers.add(ms_header_metadata_prefix + iter->first, iter->second);
+            if (core::is_empty_or_whitespace(it->second))
+            {
+                throw std::invalid_argument(protocol::error_empty_metadata_value);
+            }
+
+            headers.add(ms_header_metadata_prefix + it->first, it->second);
         }
     }
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

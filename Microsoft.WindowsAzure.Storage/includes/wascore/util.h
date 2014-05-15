@@ -21,16 +21,20 @@
 
 #include "was/core.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
 #pragma region Navigation Helpers
 
     bool use_path_style(const storage_uri& uri);
+    utility::string_t::size_type find_path_start(const web::http::uri& uri);
     bool parse_container_uri(const storage_uri& uri, utility::string_t& container_name);
     bool parse_blob_uri(const storage_uri& uri, utility::string_t& container_name, utility::string_t& blob_name);
+    storage_uri create_stripped_uri(const storage_uri& uri);
+    void parse_query_and_verify(const storage_uri& uri, storage_credentials& credentials, bool require_signed_resource);
     storage_uri verify_blob_uri(const storage_uri& uri, storage_credentials& credentials, utility::string_t& snapshot);
     storage_uri append_path_to_uri(const storage_uri& uri, const utility::string_t& path);
     utility::string_t get_parent_name(utility::string_t name, const utility::string_t& delimiter);
+    bool parse_object_uri(const storage_uri& uri, utility::string_t& object_name);
     storage_uri get_service_client_uri(const storage_uri& uri);
 
 #pragma endregion
@@ -39,30 +43,38 @@ namespace wa { namespace storage { namespace core {
 
     utility::string_t generate_boundary_name(const utility::string_t& prefix);
     void write_boundary(utility::string_t& body_text, const utility::string_t& boundary_name, bool is_closure = false);
-    void write_mime_multipart_headers(utility::string_t& body_text);
+    void write_mime_changeset_headers(utility::string_t& body_text);
     void write_request_line(utility::string_t& body_text, const web::http::method& method, const web::http::uri& uri);
     void write_request_headers(utility::string_t& body_text, const web::http::http_headers& headers);
-    //void write_content_type_request_header(utility::string_t& body_text, const utility::string_t& boundary_name);
-    //void write_content_id_request_header(utility::string_t& body_text, int content_id);
-    //void write_request_header_closure(utility::string_t& body_text);
-    void write_request_payload(utility::string_t& body_text, web::json::value json_object);
+    void write_request_payload(utility::string_t& body_text, const web::json::value& json_object);
 
 #pragma endregion
 
 #pragma region Common Utilities
 
+    utility::string_t make_query_parameter(const utility::string_t& parameter_name, const utility::string_t& parameter_value, bool do_encoding = true);
     utility::size64_t get_remaining_stream_length(concurrency::streams::istream stream);
     pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length);
     pplx::task<void> complete_after(std::chrono::milliseconds timeout);
+    std::vector<utility::string_t> string_split(const utility::string_t& string, const utility::string_t& separator);
+    bool is_empty_or_whitespace(const utility::string_t& value);
     utility::string_t single_quote(const utility::string_t& value);
     bool is_nan(double value);
     bool is_finite(double value);
-    utility::datetime truncate_fractional_seconds(const utility::datetime& value);
-    utility::string_t convert_to_string(int value);
+    bool is_integral(const utility::string_t& value);
+    utility::datetime truncate_fractional_seconds(utility::datetime value);
+    utility::string_t convert_to_string(double value);
     utility::string_t convert_to_string(const std::vector<uint8_t>& value);
-    std::vector<utility::string_t> string_split(const utility::string_t& string, const utility::string_t& separator);
-    utility::string_t convert_to_string(utility::datetime value);
-    utility::datetime parse_datetime(utility::string_t value);
+    utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value);
+    utility::char_t utility_char_tolower(const utility::char_t& character);
+
+    template<typename T>
+    utility::string_t convert_to_string(T value)
+    {
+        utility::ostringstream_t buffer;
+        buffer << value;
+        return buffer.str();
+    }
 
     template<typename T>
     utility::string_t string_join(const std::vector<T>& vector, const utility::string_t& separator)
@@ -83,6 +95,12 @@ namespace wa { namespace storage { namespace core {
         return str.str();
     }
 
+    template<typename T>
+    utility::string_t make_query_parameter(const utility::string_t& parameter_name, T parameter_value, bool do_encoding = true)
+    {
+        return make_query_parameter(parameter_name, convert_to_string(parameter_value), do_encoding);
+    }
+
 #pragma endregion
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

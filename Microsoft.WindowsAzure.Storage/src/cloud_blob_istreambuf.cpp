@@ -18,7 +18,7 @@
 #include "stdafx.h"
 #include "wascore/blobstreams.h"
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     basic_cloud_blob_istreambuf::pos_type basic_cloud_blob_istreambuf::seekpos(basic_cloud_blob_istreambuf::pos_type pos, std::ios_base::openmode direction)
     {
@@ -118,7 +118,7 @@ namespace wa { namespace storage { namespace core {
     {
         m_current_blob_offset = m_next_blob_offset;
 
-        auto read_size = size() - m_current_blob_offset;
+        utility::size64_t read_size = size() - m_current_blob_offset;
         if (read_size == 0)
         {
             return pplx::task_from_result<bool>(false);
@@ -132,7 +132,7 @@ namespace wa { namespace storage { namespace core {
 
         m_next_blob_offset = m_current_blob_offset + read_size;
 
-        auto& internal_buffer = m_buffer.collection();
+        std::vector<char_type>& internal_buffer = m_buffer.collection();
         internal_buffer.resize(static_cast<std::vector<char_type>::size_type>(read_size));
         concurrency::streams::container_buffer<std::vector<char_type>> temp_buffer(std::move(internal_buffer), std::ios_base::out);
         temp_buffer.seekpos(0, std::ios_base::out);
@@ -150,12 +150,12 @@ namespace wa { namespace storage { namespace core {
                 {
                     return this_pointer->m_buffer.create_istream().read_to_end(this_pointer->m_blob_hash).then([this_pointer] (size_t) -> bool
                     {
-                        if (this_pointer->m_next_blob_offset == this_pointer->size())
+                        if (((utility::size64_t) this_pointer->m_next_blob_offset) == this_pointer->size())
                         {
                             this_pointer->m_blob_hash.close().wait();
                             if (this_pointer->m_blob->properties().content_md5() != utility::conversions::to_base64(this_pointer->m_blob_hash.hash()))
                             {
-                                throw storage_exception(utility::conversions::to_utf8string(protocol::error_md5_mismatch));
+                                throw storage_exception(protocol::error_md5_mismatch);
                             }
                         }
 
@@ -176,4 +176,4 @@ namespace wa { namespace storage { namespace core {
         });
     }
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core

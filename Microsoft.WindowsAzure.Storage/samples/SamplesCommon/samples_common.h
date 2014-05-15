@@ -19,9 +19,9 @@
 
 #include "was/common.h"
 
-namespace wa { namespace storage { namespace samples {
+namespace azure { namespace storage { namespace samples {
 
     // TODO: Put your account name and account key here
     utility::string_t storage_connection_string(U("DefaultEndpointsProtocol=https;AccountName=myaccountname;AccountKey=myaccountkey"));
 
-}}} // namespace wa::storage::samples
+}}} // namespace azure::storage::samples

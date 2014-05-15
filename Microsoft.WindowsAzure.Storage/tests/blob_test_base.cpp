@@ -33,7 +33,7 @@ utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<ui
         return std::rand() % UINT8_MAX;
     });
 
-    wa::storage::core::hash_md5_streambuf md5;
+    azure::storage::core::hash_md5_streambuf md5;
     md5.putn(buffer.data() + offset, count).wait();
     md5.close().wait();
     return utility::conversions::to_base64(md5.hash());
@@ -52,7 +52,7 @@ utility::string_t blob_service_test_base::get_random_container_name(size_t lengt
     return utility::conversions::print_string(utility::datetime::utc_now().to_interval()) + name;
 }
 
-void blob_service_test_base::check_parallelism(const wa::storage::operation_context& context, int expected_parallelism)
+void blob_service_test_base::check_parallelism(const azure::storage::operation_context& context, int expected_parallelism)
 {
     typedef std::pair<utility::datetime, bool> request;
     
@@ -88,6 +88,7 @@ void blob_service_test_base::check_parallelism(const wa::storage::operation_cont
         }
     }
     
+    // TODO: Investigate why this is only 5 instead of 6
     CHECK_EQUAL(expected_parallelism, max_count);
 }
 
@@ -103,7 +104,7 @@ web::http::uri blob_service_test_base::defiddler(const web::http::uri& uri)
     return uri;
 }
 
-void blob_service_test_base::check_blob_equal(const wa::storage::cloud_blob& expected, const wa::storage::cloud_blob& actual)
+void blob_service_test_base::check_blob_equal(const azure::storage::cloud_blob& expected, const azure::storage::cloud_blob& actual)
 {
     CHECK(expected.type() == actual.type());
     CHECK_UTF8_EQUAL(expected.uri().primary_uri().to_string(), actual.uri().primary_uri().to_string());
@@ -116,7 +117,7 @@ void blob_service_test_base::check_blob_equal(const wa::storage::cloud_blob& exp
     check_blob_properties_equal(expected.properties(), actual.properties());
 }
 
-void blob_service_test_base::check_blob_copy_state_equal(const wa::storage::copy_state& expected, const wa::storage::copy_state& actual)
+void blob_service_test_base::check_blob_copy_state_equal(const azure::storage::copy_state& expected, const azure::storage::copy_state& actual)
 {
     CHECK(expected.status() == actual.status());
     CHECK_EQUAL(expected.bytes_copied(), actual.bytes_copied());
@@ -127,7 +128,7 @@ void blob_service_test_base::check_blob_copy_state_equal(const wa::storage::copy
     CHECK_UTF8_EQUAL(expected.source().to_string(), actual.source().to_string());
 }
 
-void blob_service_test_base::check_blob_properties_equal(const wa::storage::cloud_blob_properties& expected, const wa::storage::cloud_blob_properties& actual)
+void blob_service_test_base::check_blob_properties_equal(const azure::storage::cloud_blob_properties& expected, const azure::storage::cloud_blob_properties& actual)
 {
     CHECK_UTF8_EQUAL(expected.etag(), actual.etag());
     CHECK(expected.last_modified() == actual.last_modified());

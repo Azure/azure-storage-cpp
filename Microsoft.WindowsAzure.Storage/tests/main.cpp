@@ -31,27 +31,30 @@ int run_tests(const char* suite_name, const char* test_name)
 
 int main(int argc, const char* argv[])
 {
-    wa::storage::operation_context::set_default_log_level(wa::storage::client_log_level::log_level_verbose);
+    azure::storage::operation_context::set_default_log_level(azure::storage::client_log_level::log_level_verbose);
 
+    int failure_count;
     if (argc == 1)
     {
-        return run_tests(NULL, NULL);
+        failure_count = run_tests(NULL, NULL);
     }
-
-    int failure_count = 0;
-    for (int i = 1; i < argc; ++i)
+    else
     {
-        std::string arg(argv[i]);
-        auto colon = arg.find(':');
-        if (colon == std::string::npos)
+        failure_count = 0;
+        for (int i = 1; i < argc; ++i)
         {
-            failure_count += run_tests(argv[i], NULL);
-        }
-        else
-        {
-            auto suite_name = arg.substr(0, colon);
-            auto test_name = arg.substr(colon + 1);
-            failure_count += run_tests(suite_name.c_str(), test_name.c_str());
+            std::string arg(argv[i]);
+            auto colon = arg.find(':');
+            if (colon == std::string::npos)
+            {
+                failure_count += run_tests(argv[i], NULL);
+            }
+            else
+            {
+                auto suite_name = arg.substr(0, colon);
+                auto test_name = arg.substr(colon + 1);
+                failure_count += run_tests(suite_name.c_str(), test_name.c_str());
+            }
         }
     }
 

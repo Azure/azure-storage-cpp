@@ -20,7 +20,7 @@
 #include "wascore/protocol.h"
 #include "wascore/protocol_xml.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     pplx::task<service_properties> cloud_client::download_service_properties_base_async(const request_options& modified_options, operation_context context) const
     {
@@ -32,7 +32,7 @@ namespace wa { namespace storage {
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<service_properties>
         {
             protocol::service_properties_reader reader(response.body());
-            return pplx::task_from_result<service_properties>(std::move(reader.extract_properties()));
+            return pplx::task_from_result<service_properties>(reader.extract_properties());
         });
         return core::executor<service_properties>::execute_async(command, modified_options, context);
     }
@@ -40,7 +40,7 @@ namespace wa { namespace storage {
     pplx::task<void> cloud_client::upload_service_properties_base_async(const service_properties& properties, const service_properties_includes& includes, const request_options& modified_options, operation_context context) const
     {
         protocol::service_properties_writer writer;
-        concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(std::move(writer.write(properties, includes))));
+        concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(writer.write(properties, includes)));
 
         auto command = std::make_shared<core::storage_command<void>>(base_uri());
         command->set_build_request(std::bind(protocol::set_service_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -53,4 +53,20 @@ namespace wa { namespace storage {
         });
     }
 
-}} // namespace wa::storage
+    pplx::task<service_stats> cloud_client::download_service_stats_base_async(const request_options& modified_options, operation_context context) const
+    {
+        auto command = std::make_shared<core::storage_command<service_stats>>(base_uri());
+        command->set_build_request(std::bind(protocol::get_service_stats, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(authentication_handler());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary);
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<service_stats>, service_stats(), std::placeholders::_1, std::placeholders::_2));
+        command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<service_stats>
+        {
+            protocol::service_stats_reader reader(response.body());
+            return pplx::task_from_result<service_stats>(reader.extract_stats());
+        });
+        return core::executor<service_stats>::execute_async(command, modified_options, context);
+    }
+
+}
+} // namespace azure::storage

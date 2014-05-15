@@ -21,14 +21,12 @@
 
 #include "wascore/basic_types.h"
 
-namespace wa { namespace storage { namespace protocol {
+namespace azure { namespace storage { namespace protocol {
 
     // size constants
     const size_t max_block_size = 4 * 1024 * 1024;
     const size_t default_buffer_size = 64 * 1024;
     const utility::size64_t default_single_blob_upload_threshold = 32 * 1024 * 1024;
-    const size_t invalid_size_t = (size_t)-1;
-    const utility::size64_t invalid_size64_t = (utility::size64_t)-1;
 
     // double special values
     const utility::string_t double_not_a_number(U("NaN"));
@@ -37,7 +35,6 @@ namespace wa { namespace storage { namespace protocol {
 
     // duration constants
     const std::chrono::seconds default_retry_interval(3);
-    const std::chrono::seconds default_server_timeout(90);
 
     // uri query parameters
     const utility::string_t uri_query_timeout(U("timeout"));
@@ -77,6 +74,9 @@ namespace wa { namespace storage { namespace protocol {
     const utility::string_t table_query_next_row_key(U("NextRowKey"));
     const utility::string_t table_query_next_table_name(U("NextTableName"));
 
+    // queue query parameters
+    const utility::string_t queue_query_next_marker(U("marker"));
+
     // resource types
     const utility::string_t resource_service(U("service"));
     const utility::string_t resource_container(U("container"));
@@ -87,6 +87,7 @@ namespace wa { namespace storage { namespace protocol {
 
     // components
     const utility::string_t component_list(U("list"));
+    const utility::string_t component_stats(U("stats"));
     const utility::string_t component_properties(U("properties"));
     const utility::string_t component_metadata(U("metadata"));
     const utility::string_t component_snapshot(U("snapshot"));
@@ -109,7 +110,6 @@ namespace wa { namespace storage { namespace protocol {
     const utility::string_t header_content_disposition(U("Content-Disposition"));
     const utility::string_t header_max_data_service_version(U("MaxDataServiceVersion"));
     const utility::string_t header_prefer(U("Prefer"));
-    //const utility::string_t header_http_method(U("X-HTTP-Method"));
     const utility::string_t header_content_transfer_encoding(U("Content-Transfer-Encoding"));
     const utility::string_t header_content_id(U("Content-ID"));
     const utility::string_t ms_header_prefix(U("x-ms-"));
@@ -251,7 +251,10 @@ namespace wa { namespace storage { namespace protocol {
     const utility::string_t xml_name(U("Name"));
     const utility::string_t xml_size(U("Size"));
     const utility::string_t xml_code(U("Code"));
+    const utility::string_t xml_code_table(U("code"));
     const utility::string_t xml_message(U("Message"));
+    const utility::string_t xml_message_table(U("message"));
+    const utility::string_t xml_innererror_table(U("innererror"));
     const utility::string_t xml_block_list(U("BlockList"));
     const utility::string_t xml_latest(U("Latest"));
     const utility::string_t xml_signed_identifiers(U("SignedIdentifiers"));
@@ -281,6 +284,11 @@ namespace wa { namespace storage { namespace protocol {
     const utility::string_t xml_service_properties_exposed_headers(U("ExposedHeaders"));
     const utility::string_t xml_service_properties_allowed_headers(U("AllowedHeaders"));
     const utility::string_t xml_service_properties_default_service_version(U("DefaultServiceVersion"));
+    const utility::string_t xml_service_stats_geo_replication(U("GeoReplication"));
+    const utility::string_t xml_service_stats_geo_replication_status(U("Status"));
+    const utility::string_t xml_service_stats_geo_replication_status_live(U("live"));
+    const utility::string_t xml_service_stats_geo_replication_status_bootstrap(U("bootstrap"));
+    const utility::string_t xml_service_stats_geo_replication_last_sync_time(U("LastSyncTime"));
     const utility::string_t xml_url(U("Url"));
 
     // error codes
@@ -290,9 +298,9 @@ namespace wa { namespace storage { namespace protocol {
 
     // user agent
 #if defined(WIN32)
-    const utility::string_t header_value_user_agent(U("WA-Storage/0.1.0 (Native; Windows)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/0.3.0 (Native; Windows)"));
 #else
-    const utility::string_t header_value_user_agent(U("WA-Storage/0.1.0 (Native)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/0.3.0 (Native)"));
 #endif
 
-}}} // namespace wa::storage::protocol
+}}} // namespace azure::storage::protocol

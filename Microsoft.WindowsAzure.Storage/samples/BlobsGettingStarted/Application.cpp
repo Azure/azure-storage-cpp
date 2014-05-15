@@ -20,86 +20,106 @@
 
 #include "was/storage_account.h"
 #include "was/blob.h"
+#include "cpprest/filestream.h"
+#include "cpprest/containerstream.h"
 
-namespace wa { namespace storage { namespace samples {
+namespace azure { namespace storage { namespace samples {
+
+    utility::string_t to_string(const std::vector<uint8_t>& data)
+    {
+        return utility::string_t(data.cbegin(), data.cend());
+    }
 
     void blobs_getting_started_sample()
     {
         try
         {
             // Initialize storage account
-            wa::storage::cloud_storage_account storage_account = wa::storage::cloud_storage_account::parse(storage_connection_string);
+            azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);
 
             // Create a blob container
-            wa::storage::cloud_blob_client blob_client = storage_account.create_cloud_blob_client();
-            wa::storage::cloud_blob_container container = blob_client.get_container_reference(U("azure-native-client-library-sample-container"));
+            azure::storage::cloud_blob_client blob_client = storage_account.create_cloud_blob_client();
+            azure::storage::cloud_blob_container container = blob_client.get_container_reference(U("my-sample-container"));
             bool created = container.create_if_not_exists();
 
             // Make the blob container publicly accessible
-            wa::storage::blob_container_permissions permissions;
-            permissions.set_public_access(wa::storage::blob_container_public_access_type::blob);
+            azure::storage::blob_container_permissions permissions;
+            permissions.set_public_access(azure::storage::blob_container_public_access_type::blob);
             container.upload_permissions(permissions);
 
-            // Upload some blobs
-            wa::storage::cloud_block_blob blob1 = container.get_block_blob_reference(U("my-blob-1"));
-            blob1.upload_text(U("some text"));
-            wa::storage::cloud_block_blob blob2 = container.get_block_blob_reference(U("my-blob-2"));
+            // Upload a blob from a file
+            concurrency::streams::istream input_stream = concurrency::streams::file_stream<uint8_t>::open_istream(U("DataFile.txt")).get();
+            azure::storage::cloud_block_blob blob1 = container.get_block_blob_reference(U("my-blob-1"));
+            blob1.upload_from_stream(input_stream);
+            input_stream.close().wait();
+
+            // Upload some blobs from text
+            azure::storage::cloud_block_blob blob2 = container.get_block_blob_reference(U("my-blob-2"));
             blob2.upload_text(U("more text"));
-            wa::storage::cloud_block_blob blob3 = container.get_block_blob_reference(U("my-directory/my-sub-directory/my-blob-3"));
+            azure::storage::cloud_block_blob blob3 = container.get_block_blob_reference(U("my-directory/my-sub-directory/my-blob-3"));
             blob3.upload_text(U("other text"));
 
             // List blobs in the blob container
-            wa::storage::blob_continuation_token continuation_token;
+            azure::storage::continuation_token token;
             do
             {
-                wa::storage::blob_result_segment result = container.list_blobs_segmented(continuation_token);
-                std::vector<wa::storage::cloud_blob> blobs = result.blobs();
-                for (std::vector<wa::storage::cloud_blob>::const_iterator itr = blobs.cbegin(); itr != blobs.cend(); ++itr)
+                azure::storage::blob_result_segment result = container.list_blobs_segmented(token);
+                std::vector<azure::storage::cloud_blob> blobs = result.blobs();
+                for (std::vector<azure::storage::cloud_blob>::const_iterator it = blobs.cbegin(); it != blobs.cend(); ++it)
                 {
-                    ucout << U("Blob: ") << itr->uri().primary_uri().to_string() << std::endl;
+                    ucout << U("Blob: ") << it->uri().primary_uri().to_string() << std::endl;
                 }
-                std::vector<wa::storage::cloud_blob_directory> directories = result.directories();
-                for (std::vector<wa::storage::cloud_blob_directory>::const_iterator itr = directories.cbegin(); itr != directories.cend(); ++itr)
+                std::vector<azure::storage::cloud_blob_directory> directories = result.directories();
+                for (std::vector<azure::storage::cloud_blob_directory>::const_iterator it = directories.cbegin(); it != directories.cend(); ++it)
                 {
-                    ucout << U("Directory: ") << itr->uri().primary_uri().to_string() << std::endl;
+                    ucout << U("Directory: ") << it->uri().primary_uri().to_string() << std::endl;
                 }
-                continuation_token = result.continuation_token();
+                token = result.continuation_token();
             }
-            while (!continuation_token.empty());
+            while (!token.empty());
 
-            // Download a blob
-            wa::storage::cloud_block_blob blob4 = container.get_block_blob_reference(U("my-blob-1"));
-            utility::string_t text = blob4.download_text();
+            // Download a blob to a stream
+            concurrency::streams::container_buffer<std::vector<uint8_t>> buffer;
+            concurrency::streams::ostream output_stream(buffer);
+            azure::storage::cloud_block_blob binary_blob = container.get_block_blob_reference(U("my-blob-1"));
+            binary_blob.download_to_stream(output_stream);
+            ucout << U("Stream: ") << to_string(buffer.collection()) << std::endl;
 
-            // Delete a blob
-            wa::storage::cloud_block_blob blob5 = container.get_block_blob_reference(U("my-blob-2"));
-            blob5.delete_blob();
+            // Download a blob as text
+            azure::storage::cloud_block_blob text_blob = container.get_block_blob_reference(U("my-blob-2"));
+            utility::string_t text = text_blob.download_text();
+            ucout << U("Text: ") << text << std::endl;
+
+            // Delete the blobs
+            blob1.delete_blob();
+            blob2.delete_blob();
+            blob3.delete_blob();
 
             // Delete the blob container
             bool deleted = container.delete_container_if_exists();
         }
-        catch (wa::storage::storage_exception& e)
+        catch (const azure::storage::storage_exception& e)
         {
             ucout << U("Error: ") << e.what() << std::endl;
 
-            wa::storage::request_result result = e.result();
-            wa::storage::storage_extended_error extended_error = result.extended_error();
+            azure::storage::request_result result = e.result();
+            azure::storage::storage_extended_error extended_error = result.extended_error();
             if (!extended_error.message().empty())
             {
                 ucout << extended_error.message() << std::endl;
             }
         }
-        catch (std::exception& e)
+        catch (const std::exception& e)
         {
             ucout << U("Error: ") << e.what() << std::endl;
         }
     }
 
-}}} // namespace wa::storage::samples
+}}} // namespace azure::storage::samples
 
 int _tmain(int argc, _TCHAR *argv[])
 {
-    wa::storage::samples::blobs_getting_started_sample();
+    azure::storage::samples::blobs_getting_started_sample();
     return 0;
 }
 

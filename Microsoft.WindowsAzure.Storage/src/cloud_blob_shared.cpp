@@ -20,18 +20,16 @@
 #include "wascore/protocol.h"
 #include "wascore/resources.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     void cloud_blob_container_properties::update_etag_and_last_modified(const cloud_blob_container_properties& parsed_properties)
     {
-        //cloud_blob_container_properties properties(protocol::blob_response_parsers::parse_blob_container_properties(response));
         m_etag = parsed_properties.etag();
         m_last_modified = parsed_properties.last_modified();
     }
 
     void cloud_blob_properties::update_etag_and_last_modified(const cloud_blob_properties& parsed_properties)
     {
-        //cloud_blob_properties properties(protocol::blob_response_parsers::parse_blob_properties(response));
         m_etag = parsed_properties.etag();
         m_last_modified = parsed_properties.last_modified();
     }
@@ -65,7 +63,7 @@ namespace wa { namespace storage {
     {
         if ((type() != blob_type::unspecified) && (type() != parsed_properties.type()))
         {
-            throw storage_exception(utility::conversions::to_utf8string(protocol::error_blob_type_mismatch), false);
+            throw storage_exception(protocol::error_blob_type_mismatch, false);
         }
 
         utility::string_t content_md5(ignore_md5 ? m_content_md5 : parsed_properties.content_md5());
@@ -73,4 +71,4 @@ namespace wa { namespace storage {
         m_content_md5 = content_md5;
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

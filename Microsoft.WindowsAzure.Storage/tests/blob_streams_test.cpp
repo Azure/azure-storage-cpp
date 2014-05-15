@@ -34,18 +34,18 @@ SUITE(Blob)
 {
     TEST_FIXTURE(block_blob_test_base, blob_read_stream_download)
     {
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_stream_read_size_in_bytes(1 * 1024 * 1024);
         options.set_use_transactional_md5(true);
 
         std::vector<uint8_t> buffer;
         buffer.resize(3 * 1024 * 1024);
         fill_buffer_and_get_md5(buffer);
-        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), wa::storage::access_condition(), options, m_context);
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
 
         concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
 
-        auto stream = m_blob.open_read(wa::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_read(azure::storage::access_condition(), options, m_context);
         stream.read_to_end(output_buffer).wait();
         stream.close();
 
@@ -55,37 +55,37 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_read_stream_etag_lock)
     {
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_stream_read_size_in_bytes(1 * 1024 * 1024);
 
         std::vector<uint8_t> buffer;
         buffer.resize(2 * 1024 * 1024);
         fill_buffer_and_get_md5(buffer);
-        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), wa::storage::access_condition(), options, m_context);
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
 
-        auto stream = m_blob.open_read(wa::storage::access_condition(), options, m_context);
-        m_blob.upload_metadata(wa::storage::access_condition(), options, m_context);
-        CHECK_THROW(stream.read().wait(), wa::storage::storage_exception);
+        auto stream = m_blob.open_read(azure::storage::access_condition(), options, m_context);
+        m_blob.upload_metadata(azure::storage::access_condition(), options, m_context);
+        CHECK_THROW(stream.read().wait(), azure::storage::storage_exception);
         stream.close();
 
-        auto condition = wa::storage::access_condition::generate_if_match_condition(U("*"));
+        auto condition = azure::storage::access_condition::generate_if_match_condition(U("*"));
         stream = m_blob.open_read(condition, options, m_context);
-        m_blob.upload_metadata(wa::storage::access_condition(), options, m_context);
-        CHECK_THROW(stream.read().wait(), wa::storage::storage_exception);
+        m_blob.upload_metadata(azure::storage::access_condition(), options, m_context);
+        CHECK_THROW(stream.read().wait(), azure::storage::storage_exception);
         stream.close();
     }
 
     TEST_FIXTURE(block_blob_test_base, blob_read_stream_seek)
     {
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_stream_read_size_in_bytes(2 * 1024 * 1024);
 
         std::vector<uint8_t> buffer;
         buffer.resize(3 * 1024 * 1024);
         fill_buffer_and_get_md5(buffer);
-        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), wa::storage::access_condition(), options, m_context);
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
 
-        auto stream = m_blob.open_read(wa::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_read(azure::storage::access_condition(), options, m_context);
         CHECK(stream.can_seek());
 
         // Because container create, blob upload, and HEAD are also in the request results,
@@ -145,17 +145,17 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, block_blob_write_stream_seek)
     {
-        auto stream = m_blob.open_write(wa::storage::access_condition(), wa::storage::blob_request_options(), m_context);
+        auto stream = m_blob.open_write(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK(!stream.can_seek());
         CHECK_EQUAL(concurrency::streams::ostream::traits::eof(), stream.seek(0));
     }
 
     TEST_FIXTURE(page_blob_test_base, page_blob_write_stream_seek_with_md5)
     {
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_store_blob_content_md5(true);
 
-        auto stream = m_blob.open_write(16 * 1024, wa::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_write(16 * 1024, azure::storage::access_condition(), options, m_context);
         CHECK(!stream.can_seek());
         CHECK_EQUAL(concurrency::streams::ostream::traits::eof(), stream.seek(0));
     }
@@ -166,10 +166,10 @@ SUITE(Blob)
         std::vector<uint8_t> final_blob_contents;
         final_blob_contents.resize(16 * 1024);
 
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_store_blob_content_md5(false);
 
-        auto stream = m_blob.open_write(final_blob_contents.size(), wa::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_write(final_blob_contents.size(), azure::storage::access_condition(), options, m_context);
         CHECK(stream.can_seek());
 
         // Because container create and blob create are also in the request results,
@@ -209,37 +209,37 @@ SUITE(Blob)
         CHECK_EQUAL(attempts, m_context.request_results().size());
 
         concurrency::streams::container_buffer<std::vector<uint8_t>> downloaded_blob;
-        m_blob.download_to_stream(downloaded_blob.create_ostream(), wa::storage::access_condition(), options, m_context);
+        m_blob.download_to_stream(downloaded_blob.create_ostream(), azure::storage::access_condition(), options, m_context);
 
         CHECK_ARRAY_EQUAL(final_blob_contents, downloaded_blob.collection(), final_blob_contents.size());
     }
 
     TEST_FIXTURE(page_blob_test_base, existing_page_blob_write_stream)
     {
-        CHECK_THROW(m_blob.open_write(wa::storage::access_condition(), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_store_blob_content_md5(true);
 
         std::vector<uint8_t> buffer;
         buffer.resize(16 * 1024);
         fill_buffer_and_get_md5(buffer);
-        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), wa::storage::access_condition(), options, m_context);
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
 
-        CHECK_THROW(m_blob.open_write(wa::storage::access_condition(), options, m_context), std::logic_error);
+        CHECK_THROW(m_blob.open_write(azure::storage::access_condition(), options, m_context), std::logic_error);
 
         options.set_store_blob_content_md5(false);
-        auto stream = m_blob.open_write(wa::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_write(azure::storage::access_condition(), options, m_context);
         stream.seek(512);
         stream.streambuf().putn(buffer.data(), 512).wait();
         stream.close().wait();
 
         concurrency::streams::container_buffer<std::vector<uint8_t>> downloaded_blob;
-        CHECK_THROW(m_blob.download_to_stream(downloaded_blob.create_ostream(), wa::storage::access_condition(), options, m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.download_to_stream(downloaded_blob.create_ostream(), azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
 
         downloaded_blob.seekpos(0, std::ios_base::out);
         options.set_disable_content_md5_validation(true);
-        m_blob.download_to_stream(downloaded_blob.create_ostream(), wa::storage::access_condition(), options, m_context);
+        m_blob.download_to_stream(downloaded_blob.create_ostream(), azure::storage::access_condition(), options, m_context);
 
         CHECK_ARRAY_EQUAL(buffer.data(), downloaded_blob.collection().data(), 512);
         CHECK_ARRAY_EQUAL(buffer.data(), downloaded_blob.collection().data() + 512, 512);
@@ -248,108 +248,108 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, block_blob_write_stream_access_condition)
     {
-        m_blob.upload_block_list(std::vector<wa::storage::block_list_item>(), wa::storage::access_condition(), wa::storage::blob_request_options(), m_context);
+        m_blob.upload_block_list(std::vector<azure::storage::block_list_item>(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto missing_blob = m_container.get_block_blob_reference(U("missing_blob1"));
-        CHECK_THROW(missing_blob.open_write(wa::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(missing_blob.open_write(azure::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
         missing_blob = m_container.get_block_blob_reference(U("missing_blob2"));
-        missing_blob.open_write(wa::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
         missing_blob = m_container.get_block_blob_reference(U("missing_blob3"));
-        missing_blob.open_write(wa::storage::access_condition::generate_if_none_match_condition(U("*")), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(U("*")), azure::storage::blob_request_options(), m_context).close().wait();
 
         missing_blob = m_container.get_block_blob_reference(U("missing_blob4"));
-        missing_blob.open_write(wa::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
         missing_blob = m_container.get_block_blob_reference(U("missing_blob5"));
-        missing_blob.open_write(wa::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
-        m_blob.open_write(wa::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(azure::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(wa::storage::access_condition::generate_if_match_condition(missing_blob.properties().etag()), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(azure::storage::access_condition::generate_if_match_condition(missing_blob.properties().etag()), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        m_blob.open_write(wa::storage::access_condition::generate_if_none_match_condition(missing_blob.properties().etag()), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(missing_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(wa::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        auto stream = m_blob.open_write(wa::storage::access_condition::generate_if_none_match_condition(U("*")), wa::storage::blob_request_options(), m_context);
-        CHECK_THROW(stream.close().wait(), wa::storage::storage_exception);
+        auto stream = m_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(U("*")), azure::storage::blob_request_options(), m_context);
+        CHECK_THROW(stream.close().wait(), azure::storage::storage_exception);
 
-        m_blob.open_write(wa::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(wa::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        m_blob.open_write(wa::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(wa::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        stream = m_blob.open_write(wa::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context);
-        m_blob.upload_properties(wa::storage::access_condition(), wa::storage::blob_request_options(), m_context);
-        CHECK_THROW(stream.close().wait(), wa::storage::storage_exception);
+        stream = m_blob.open_write(azure::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_properties(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK_THROW(stream.close().wait(), azure::storage::storage_exception);
 
         missing_blob = m_container.get_block_blob_reference(U("missing_blob6"));
-        stream = missing_blob.open_write(wa::storage::access_condition::generate_if_none_match_condition(U("*")), wa::storage::blob_request_options(), m_context);
-        missing_blob.upload_block_list(std::vector<wa::storage::block_list_item>(), wa::storage::access_condition(), wa::storage::blob_request_options(), m_context);
-        CHECK_THROW(stream.close().wait(), wa::storage::storage_exception);
+        stream = missing_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(U("*")), azure::storage::blob_request_options(), m_context);
+        missing_blob.upload_block_list(std::vector<azure::storage::block_list_item>(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK_THROW(stream.close().wait(), azure::storage::storage_exception);
 
-        stream = m_blob.open_write(wa::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified()), wa::storage::blob_request_options(), m_context);
+        stream = m_blob.open_write(azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified()), azure::storage::blob_request_options(), m_context);
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        m_blob.upload_properties(wa::storage::access_condition(), wa::storage::blob_request_options(), m_context);
-        CHECK_THROW(stream.close().wait(), wa::storage::storage_exception);
+        m_blob.upload_properties(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK_THROW(stream.close().wait(), azure::storage::storage_exception);
     }
 
 
     TEST_FIXTURE(page_blob_test_base, page_blob_write_stream_access_condition)
     {
-        m_blob.create(0, wa::storage::access_condition(), wa::storage::blob_request_options(), m_context);
+        m_blob.create(0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto missing_blob = m_container.get_page_blob_reference(U("missing_blob1"));
-        CHECK_THROW(missing_blob.open_write(0, wa::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(missing_blob.open_write(0, azure::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
         missing_blob = m_container.get_page_blob_reference(U("missing_blob2"));
-        missing_blob.open_write(0, wa::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(0, azure::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
         missing_blob = m_container.get_page_blob_reference(U("missing_blob3"));
-        missing_blob.open_write(0, wa::storage::access_condition::generate_if_none_match_condition(U("*")), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(0, azure::storage::access_condition::generate_if_none_match_condition(U("*")), azure::storage::blob_request_options(), m_context).close().wait();
 
         missing_blob = m_container.get_page_blob_reference(U("missing_blob4"));
-        missing_blob.open_write(0, wa::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(0, azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
         missing_blob = m_container.get_page_blob_reference(U("missing_blob5"));
-        missing_blob.open_write(0, wa::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        missing_blob.open_write(0, azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
-        m_blob.open_write(0, wa::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(0, azure::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(0, wa::storage::access_condition::generate_if_match_condition(missing_blob.properties().etag()), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(0, azure::storage::access_condition::generate_if_match_condition(missing_blob.properties().etag()), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        m_blob.open_write(0, wa::storage::access_condition::generate_if_none_match_condition(missing_blob.properties().etag()), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(0, azure::storage::access_condition::generate_if_none_match_condition(missing_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(0, wa::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(0, azure::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        CHECK_THROW(m_blob.open_write(0, wa::storage::access_condition::generate_if_none_match_condition(U("*")), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(0, azure::storage::access_condition::generate_if_none_match_condition(U("*")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        m_blob.open_write(0, wa::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(0, azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(0, wa::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(0, azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        m_blob.open_write(0, wa::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context).close().wait();
+        m_blob.open_write(0, azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
-        CHECK_THROW(m_blob.open_write(0, wa::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), wa::storage::blob_request_options(), m_context), wa::storage::storage_exception);
+        CHECK_THROW(m_blob.open_write(0, azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
     }
 
     TEST_FIXTURE(block_blob_test_base, block_blob_write_stream_maximum_execution_time)
     {
         std::chrono::seconds duration(10);
 
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_maximum_execution_time(duration);
 
-        auto stream = m_blob.open_write(wa::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_write(azure::storage::access_condition(), options, m_context);
 
         std::this_thread::sleep_for(duration);
 
-        stream.write(0).wait();
+        stream.write(static_cast<uint8_t>(0)).wait();
         stream.close().wait();
     }
 
@@ -357,10 +357,10 @@ SUITE(Blob)
     {
         std::chrono::seconds duration(10);
 
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_maximum_execution_time(duration);
 
-        auto stream = m_blob.open_write(512, wa::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_write(512, azure::storage::access_condition(), options, m_context);
 
         std::this_thread::sleep_for(duration);
 
@@ -375,11 +375,11 @@ SUITE(Blob)
     {
         std::chrono::seconds duration(10);
 
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_maximum_execution_time(duration);
 
-        m_blob.create(512, wa::storage::access_condition(), options, m_context);
-        auto stream = m_blob.open_write(wa::storage::access_condition(), options, m_context);
+        m_blob.create(512, azure::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_write(azure::storage::access_condition(), options, m_context);
 
         std::this_thread::sleep_for(duration);
 
@@ -394,11 +394,11 @@ SUITE(Blob)
     {
         std::chrono::seconds duration(10);
 
-        wa::storage::blob_request_options options;
+        azure::storage::blob_request_options options;
         options.set_maximum_execution_time(duration);
 
-        m_blob.upload_text(U("test"), wa::storage::access_condition(), options, m_context);
-        auto stream = m_blob.open_read(wa::storage::access_condition(), options, m_context);
+        m_blob.upload_text(U("test"), azure::storage::access_condition(), options, m_context);
+        auto stream = m_blob.open_read(azure::storage::access_condition(), options, m_context);
 
         std::this_thread::sleep_for(duration);
 

@@ -19,52 +19,52 @@
 #include "was/blob.h"
 #include "wascore/util.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
-    cloud_blob_directory::cloud_blob_directory(const utility::string_t& name, const cloud_blob_container& container)
-        : m_name(name), m_container(container)
+    cloud_blob_directory::cloud_blob_directory(utility::string_t name, cloud_blob_container container)
+        : m_name(std::move(name)), m_container(std::move(container))
     {
-        auto& delimiter = container.service_client().directory_delimiter();
-        if ((name.size() < delimiter.size()) ||
-            !std::equal(delimiter.crbegin(), delimiter.crend(), name.crbegin()))
+        auto& delimiter = m_container.service_client().directory_delimiter();
+        if ((m_name.size() < delimiter.size()) ||
+            !std::equal(delimiter.crbegin(), delimiter.crend(), m_name.crbegin()))
         {
             m_name.append(delimiter);
         }
 
-        m_uri = core::append_path_to_uri(container.uri(), m_name);
+        m_uri = core::append_path_to_uri(m_container.uri(), m_name);
     }
 
-    cloud_blob cloud_blob_directory::get_blob_reference(const utility::string_t& blob_name) const
+    cloud_blob cloud_blob_directory::get_blob_reference(utility::string_t blob_name) const
     {
-        return get_blob_reference(blob_name, utility::string_t());
+        return get_blob_reference(std::move(blob_name), utility::string_t());
     }
 
-    cloud_blob cloud_blob_directory::get_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const
+    cloud_blob cloud_blob_directory::get_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
     {
-        return cloud_blob(m_name + blob_name, snapshot_time, m_container);
+        return cloud_blob(m_name + blob_name, std::move(snapshot_time), m_container);
     }
 
-    cloud_page_blob cloud_blob_directory::get_page_blob_reference(const utility::string_t& blob_name) const
+    cloud_page_blob cloud_blob_directory::get_page_blob_reference(utility::string_t blob_name) const
     {
-        return get_page_blob_reference(blob_name, utility::string_t());
+        return get_page_blob_reference(std::move(blob_name), utility::string_t());
     }
 
-    cloud_page_blob cloud_blob_directory::get_page_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const
+    cloud_page_blob cloud_blob_directory::get_page_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
     {
-        return cloud_page_blob(m_name + blob_name, snapshot_time, m_container);
+        return cloud_page_blob(m_name + blob_name, std::move(snapshot_time), m_container);
     }
 
-    cloud_block_blob cloud_blob_directory::get_block_blob_reference(const utility::string_t& blob_name) const
+    cloud_block_blob cloud_blob_directory::get_block_blob_reference(utility::string_t blob_name) const
     {
-        return get_block_blob_reference(blob_name, utility::string_t());
+        return get_block_blob_reference(std::move(blob_name), utility::string_t());
     }
 
-    cloud_block_blob cloud_blob_directory::get_block_blob_reference(const utility::string_t& blob_name, const utility::string_t& snapshot_time) const
+    cloud_block_blob cloud_blob_directory::get_block_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
     {
-        return cloud_block_blob(m_name + blob_name, snapshot_time, m_container);
+        return cloud_block_blob(m_name + blob_name, std::move(snapshot_time), m_container);
     }
 
-    cloud_blob_directory cloud_blob_directory::get_subdirectory_reference(const utility::string_t& name) const
+    cloud_blob_directory cloud_blob_directory::get_subdirectory_reference(utility::string_t name) const
     {
         return cloud_blob_directory(m_name + name, m_container);
     }
@@ -82,9 +82,9 @@ namespace wa { namespace storage {
         }
     }
 
-    pplx::task<blob_result_segment> cloud_blob_directory::list_blobs_segmented_async(bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+    pplx::task<blob_result_segment> cloud_blob_directory::list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
-        return m_container.list_blobs_segmented_async(m_name, use_flat_blob_listing, includes, max_results, current_token, options, context);
+        return m_container.list_blobs_segmented_async(m_name, use_flat_blob_listing, includes, max_results, token, options, context);
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

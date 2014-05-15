@@ -20,9 +20,9 @@
 #include "wascore/protocol.h"
 #include "wascore/protocol_xml.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
-    pplx::task<container_result_segment> cloud_blob_client::list_containers_segmented_async(const utility::string_t& prefix, const container_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+    pplx::task<container_result_segment> cloud_blob_client::list_containers_segmented_async(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
@@ -30,29 +30,31 @@ namespace wa { namespace storage {
         auto client = *this;
 
         auto command = std::make_shared<core::storage_command<container_result_segment>>(base_uri());
-        command->set_build_request(std::bind(protocol::list_containers, prefix, includes, max_results, current_token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::list_containers, prefix, includes, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
-        command->set_location_mode(core::command_location_mode::primary_or_secondary, current_token.target_location());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<container_result_segment>, container_result_segment(), std::placeholders::_1, std::placeholders::_2));
         command->set_postprocess_response([client] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<container_result_segment>
         {
             protocol::list_containers_reader reader(response.body());
 
-            std::vector<protocol::cloud_blob_container_list_item> items(std::move(reader.extract_items()));
+            // TODO: Initialize a reasonable capacity for container objects throughout the codebase
+
+            std::vector<protocol::cloud_blob_container_list_item> items(reader.extract_items());
             std::vector<cloud_blob_container> results;
-            for (auto iter = items.begin(); iter != items.end(); ++iter)
+            for (std::vector<protocol::cloud_blob_container_list_item>::iterator iter = items.begin(); iter != items.end(); ++iter)
             {
-                results.push_back(cloud_blob_container(std::move(iter->name()), client, std::move(iter->properties()), std::move(iter->metadata())));
+                results.push_back(cloud_blob_container(iter->name(), client, iter->properties(), iter->metadata()));
             }
 
-            continuation_token token(std::move(reader.extract_next_marker()));
-            token.set_target_location(result.target_location());
-            return pplx::task_from_result(container_result_segment(std::move(results), token));
+            continuation_token next_token(reader.extract_next_marker());
+            next_token.set_target_location(result.target_location());
+            return pplx::task_from_result(container_result_segment(std::move(results), next_token));
         });
         return core::executor<container_result_segment>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<blob_result_segment> cloud_blob_client::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, const blob_listing_includes& includes, int max_results, const blob_continuation_token& current_token, const blob_request_options& options, operation_context context) const
+    pplx::task<blob_result_segment> cloud_blob_client::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
@@ -72,7 +74,7 @@ namespace wa { namespace storage {
         }
 
         auto container = container_name.empty() ? get_root_container_reference() : get_container_reference(container_name);
-        return container.list_blobs_segmented_async(actual_prefix, use_flat_blob_listing, includes, max_results, current_token, modified_options, context);
+        return container.list_blobs_segmented_async(actual_prefix, use_flat_blob_listing, includes, max_results, token, modified_options, context);
     }
 
     pplx::task<service_properties> cloud_blob_client::download_service_properties_async(const blob_request_options& options, operation_context context) const
@@ -91,17 +93,25 @@ namespace wa { namespace storage {
         return upload_service_properties_base_async(properties, includes, modified_options, context);
     }
 
+    pplx::task<service_stats> cloud_blob_client::download_service_stats_async(const blob_request_options& options, operation_context context) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
+
+        return download_service_stats_base_async(modified_options, context);
+    }
+
     cloud_blob_container cloud_blob_client::get_root_container_reference() const
     {
         return get_container_reference(protocol::root_container);
     }
 
-    cloud_blob_container cloud_blob_client::get_container_reference(const utility::string_t& container_name) const
+    cloud_blob_container cloud_blob_client::get_container_reference(utility::string_t container_name) const
     {
-        return cloud_blob_container(container_name, *this);
+        return cloud_blob_container(std::move(container_name), *this);
     }
 
-    void cloud_blob_client::set_authentication_scheme(wa::storage::authentication_scheme value)
+    void cloud_blob_client::set_authentication_scheme(azure::storage::authentication_scheme value)
     {
         cloud_client::set_authentication_scheme(value);
 
@@ -111,20 +121,21 @@ namespace wa { namespace storage {
         storage_credentials creds = credentials();
         if (creds.is_shared_key())
         {
+            utility::string_t account_name = creds.account_name();
             switch (authentication_scheme())
             {
-            case wa::storage::authentication_scheme::shared_key_lite:
-                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_lite_blob_queue_canonicalizer>(creds.account_name()), creds));
+            case azure::storage::authentication_scheme::shared_key_lite:
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_lite_blob_queue_canonicalizer>(std::move(account_name)), std::move(creds)));
                 break;
 
-            default: // wa::storage::authentication_scheme::shared_key
-                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_blob_queue_canonicalizer>(creds.account_name()), creds));
+            default: // azure::storage::authentication_scheme::shared_key
+                set_authentication_handler(std::make_shared<protocol::shared_key_authentication_handler>(std::make_shared<protocol::shared_key_blob_queue_canonicalizer>(std::move(account_name)), std::move(creds)));
                 break;
             }
         }
         else if (creds.is_sas())
         {
-            set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(creds));
+            set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(std::move(creds)));
         }
         else
         {
@@ -132,4 +143,4 @@ namespace wa { namespace storage {
         }
     }
 
-}} // namespace wa::storage
+}} // namespace azure::storage

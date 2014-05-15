@@ -17,24 +17,45 @@
 
 #include "stdafx.h"
 
+#include "wascore/util.h"
 #include "wascore/resources.h"
 #include "was/core.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
-    storage_uri::storage_uri(const web::http::uri& primary_uri, const web::http::uri& secondary_uri)
-        : m_primary_uri(primary_uri), m_secondary_uri(secondary_uri)
+    storage_uri::storage_uri(web::http::uri primary_uri)
+        : m_primary_uri(std::move(primary_uri))
     {
-        if (primary_uri.is_empty())
+        if (m_primary_uri.is_empty())
         {
-            throw std::invalid_argument("primary_uri");
-        }
-
-        if (!secondary_uri.is_empty() &&
-            (primary_uri.resource() != secondary_uri.resource()))
-        {
-            throw std::invalid_argument(utility::conversions::to_utf8string(protocol::error_storage_uri_mismatch));
+            throw std::invalid_argument(protocol::error_storage_uri_empty);
         }
     }
 
-}} // namespace wa::storage
+    storage_uri::storage_uri(web::http::uri primary_uri, web::http::uri secondary_uri)
+        : m_primary_uri(std::move(primary_uri)), m_secondary_uri(std::move(secondary_uri))
+    {
+        if (m_primary_uri.is_empty() && m_secondary_uri.is_empty())
+        {
+            throw std::invalid_argument(protocol::error_storage_uri_empty);
+        }
+
+        // Validate the query and path match if both URIs are supplied
+        if (!m_primary_uri.is_empty() && !m_secondary_uri.is_empty())
+        {
+            if (m_primary_uri.query() != m_secondary_uri.query())
+            {
+                throw std::invalid_argument(protocol::error_storage_uri_mismatch);
+            }
+
+            utility::string_t::size_type primary_path_start = core::find_path_start(m_primary_uri);
+            utility::string_t::size_type secondary_path_start = core::find_path_start(m_secondary_uri);
+            if (m_primary_uri.path().compare(primary_path_start, utility::string_t::npos,
+                m_secondary_uri.path(), secondary_path_start, utility::string_t::npos) != 0)
+            {
+                throw std::invalid_argument(protocol::error_storage_uri_mismatch);
+            }
+        }
+    }
+
+}} // namespace azure::storage

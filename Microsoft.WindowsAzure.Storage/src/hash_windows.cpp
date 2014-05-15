@@ -20,7 +20,7 @@
 
 #ifdef WIN32
 
-namespace wa { namespace storage { namespace core {
+namespace azure { namespace storage { namespace core {
 
     class hash_hmac_sha256_algorithm
     {
@@ -28,10 +28,7 @@ namespace wa { namespace storage { namespace core {
 
         static const hash_hmac_sha256_algorithm& instance()
         {
-            // This is thread-safe in C++11 per ISO C++ Jan 2012 working draft
-            // 6.7 Declaration statement [stmt.dcl] para. 4
-            static hash_hmac_sha256_algorithm singleton_instance;
-            return singleton_instance;
+            return m_instance;
         }
 
         ~hash_hmac_sha256_algorithm()
@@ -56,7 +53,10 @@ namespace wa { namespace storage { namespace core {
         }
 
         BCRYPT_ALG_HANDLE m_algorithm;
+        static hash_hmac_sha256_algorithm m_instance;
     };
+
+    hash_hmac_sha256_algorithm hash_hmac_sha256_algorithm::m_instance;
 
     class hash_md5_algorithm
     {
@@ -64,10 +64,7 @@ namespace wa { namespace storage { namespace core {
 
         static const hash_md5_algorithm& instance()
         {
-            // This is thread-safe in C++11 per ISO C++ Jan 2012 working draft
-            // 6.7 Declaration statement [stmt.dcl] para. 4
-            static hash_md5_algorithm singleton_instance;
-            return singleton_instance;
+            return m_instance;
         }
 
         ~hash_md5_algorithm()
@@ -92,7 +89,10 @@ namespace wa { namespace storage { namespace core {
         }
 
         BCRYPT_ALG_HANDLE m_algorithm;
+        static hash_md5_algorithm m_instance;
     };
+
+    hash_md5_algorithm hash_md5_algorithm::m_instance;
 
     basic_hash_hmac_sha256_streambuf::basic_hash_hmac_sha256_streambuf(const std::vector<unsigned char>& key)
     {
@@ -218,6 +218,6 @@ namespace wa { namespace storage { namespace core {
         return pplx::task_from_result(count);
     }
 
-}}} // namespace wa::storage::core
+}}} // namespace azure::storage::core
 
 #endif // WIN32

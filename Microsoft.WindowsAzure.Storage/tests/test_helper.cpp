@@ -120,7 +120,7 @@ utility::string_t get_object_name(const utility::string_t& object_type_name)
     return object_name;
 }
 
-wa::storage::cloud_table_client get_table_client()
+azure::storage::cloud_table_client get_table_client()
 {
     return test_config::instance().account().create_cloud_table_client();
 }
@@ -130,11 +130,11 @@ utility::string_t get_table_name()
     return get_object_name(table_type_name);
 }
 
-wa::storage::cloud_table get_table(bool create)
+azure::storage::cloud_table get_table(bool create)
 {
-    wa::storage::cloud_table_client client = get_table_client();
+    azure::storage::cloud_table_client client = get_table_client();
     utility::string_t table_name = get_table_name();
-    wa::storage::cloud_table table = client.get_table_reference(table_name);
+    azure::storage::cloud_table table = client.get_table_reference(table_name);
     if (create)
     {
         table.create_if_not_exists();
@@ -142,7 +142,7 @@ wa::storage::cloud_table get_table(bool create)
     return table;
 }
 
-wa::storage::cloud_queue_client get_queue_client()
+azure::storage::cloud_queue_client get_queue_client()
 {
     return test_config::instance().account().create_cloud_queue_client();
 }
@@ -152,11 +152,11 @@ utility::string_t get_queue_name()
     return get_object_name(queue_type_name);
 }
 
-wa::storage::cloud_queue get_queue(bool create)
+azure::storage::cloud_queue get_queue(bool create)
 {
-    wa::storage::cloud_queue_client client = get_queue_client();
+    azure::storage::cloud_queue_client client = get_queue_client();
     utility::string_t queue_name = get_queue_name();
-    wa::storage::cloud_queue queue = client.get_queue_reference(queue_name);
+    azure::storage::cloud_queue queue = client.get_queue_reference(queue_name);
     if (create)
     {
         queue.create_if_not_exists();

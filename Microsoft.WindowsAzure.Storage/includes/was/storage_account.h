@@ -19,7 +19,7 @@
 
 #include "core.h"
 
-namespace wa { namespace storage {
+namespace azure { namespace storage {
 
     class cloud_blob_client;
     class cloud_queue_client;
@@ -39,12 +39,12 @@ namespace wa { namespace storage {
         /// Initializes a new instance of the <see cref="cloud_storage_account" /> class.
         /// </summary>
         cloud_storage_account()
-            : m_initialized(false)
+            : m_initialized(false), m_is_development_storage_account(false), m_default_endpoints(false)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_storage_account" /> class using the specified
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class using the specified
         /// credentials and service endpoints.
         /// </summary>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
@@ -54,10 +54,11 @@ namespace wa { namespace storage {
         cloud_storage_account(const storage_credentials& credentials, const storage_uri& blob_endpoint, const storage_uri& queue_endpoint, const storage_uri& table_endpoint)
             : m_initialized(true), m_is_development_storage_account(false), m_credentials(credentials), m_blob_endpoint(blob_endpoint), m_queue_endpoint(queue_endpoint), m_table_endpoint(table_endpoint), m_default_endpoints(false)
         {
+            // TODO: Consider validating that path-style endpoints all contain the account name in the path
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_storage_account" /> class using the specified
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class using the specified
         /// credentials and the default service endpoints.
         /// </summary>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
@@ -69,7 +70,7 @@ namespace wa { namespace storage {
         }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="wa::storage::cloud_storage_account" /> class using the specified
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class using the specified
         /// credentials and the default service endpoints.
         /// </summary>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
@@ -82,11 +83,11 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Parses a connection string and returns a <see cref="wa::storage::cloud_storage_account" /> created
+        /// Parses a connection string and returns a <see cref="azure::storage::cloud_storage_account" /> created
         /// from the connection string.
         /// </summary>
         /// <param name="connection_string">A valid connection string.</param>
-        /// <returns>A <see cref="wa::storage::cloud_storage_account" /> object constructed from the values provided in the connection string.</returns>
+        /// <returns>A <see cref="azure::storage::cloud_storage_account" /> object constructed from the values provided in the connection string.</returns>
         WASTORAGE_API static cloud_storage_account parse(const utility::string_t& connection_string);
         
         /// <summary>
@@ -142,7 +143,7 @@ namespace wa { namespace storage {
         WASTORAGE_API utility::string_t to_string(bool export_secrets);
 
         /// <summary>
-        /// Gets a <see cref="wa::storage::cloud_storage_account" /> object that references the development storage account.
+        /// Gets a <see cref="azure::storage::cloud_storage_account" /> object that references the development storage account.
         /// </summary>
         /// <returns>A reference to the development storage account.</returns>
         WASTORAGE_API static cloud_storage_account development_storage_account();
@@ -175,9 +176,9 @@ namespace wa { namespace storage {
         }
 
         /// <summary>
-        /// Gets the credentials used to create this <see cref="wa::storage::cloud_storage_account" /> object.
+        /// Gets the credentials used to create this <see cref="azure::storage::cloud_storage_account" /> object.
         /// </summary>
-        /// <returns>The credentials used to create the <see cref="wa::storage::cloud_storage_account" /> object.</returns>
+        /// <returns>The credentials used to create the <see cref="azure::storage::cloud_storage_account" /> object.</returns>
         const storage_credentials& credentials() const
         {
             return m_credentials;
@@ -211,4 +212,4 @@ namespace wa { namespace storage {
         std::map<utility::string_t, utility::string_t> m_settings;
     };
 
-}} // namespace wa::storage
+}} // namespace azure::storage

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.props" Condition="Exists('..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -22,6 +23,8 @@
     <ProjectGuid>{DCFF75B0-B142-4EC8-992F-3E48F2E3EECE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MicrosoftWindowsAzureStorage</RootNamespace>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -100,7 +103,7 @@
       <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>-Zm129 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm129 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -118,7 +121,7 @@
       <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>-Zm129 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm129 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -139,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>-Zm122 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm122 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -162,7 +165,7 @@
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>-Zm122 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm122 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -175,6 +178,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="includes\wascore\protocol_json.h" />
     <ClInclude Include="includes\was\auth.h" />
     <ClInclude Include="includes\was\blob.h" />
     <ClInclude Include="includes\was\common.h" />
@@ -229,6 +233,7 @@
     <ClCompile Include="src\logging_windows.cpp" />
     <ClCompile Include="src\mime_multipart_helper.cpp" />
     <ClCompile Include="src\operation_context.cpp" />
+    <ClCompile Include="src\protocol_json.cpp" />
     <ClCompile Include="src\queue_request_factory.cpp" />
     <ClCompile Include="src\retry_policies.cpp" />
     <ClCompile Include="src\shared_access_signature.cpp" />
@@ -253,14 +258,14 @@
     <ClCompile Include="src\xmlhelpers.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="version.rc" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\cpprestsdk.redist.1.3.1\build\native\cpprestsdk.redist.targets" Condition="Exists('..\packages\cpprestsdk.redist.1.3.1\build\native\cpprestsdk.redist.targets')" />
-    <Import Project="..\packages\cpprestsdk.1.3.1\build\native\cpprestsdk.targets" Condition="Exists('..\packages\cpprestsdk.1.3.1\build\native\cpprestsdk.targets')" />
+    <Import Project="..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.targets" Condition="Exists('..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.targets')" />
+    <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   </ImportGroup>
 </Project>

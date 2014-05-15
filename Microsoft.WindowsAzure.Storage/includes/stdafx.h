@@ -36,13 +36,13 @@
 #include <limits>
 #include <functional>
 #include <iomanip>
-#include <locale>
 #include <mutex>
 #include <random>
 #include <string>
 #include <vector>
 
 #include "cpprest/http_client.h"
+#include "cpprest/filestream.h"
 #include "cpprest/producerconsumerstream.h"
 
 #pragma warning(pop)

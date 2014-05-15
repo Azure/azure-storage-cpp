@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "wascore/basic_types.h"
+#include "wascore/resources.h"
 
 namespace utility {
 
@@ -29,7 +30,7 @@ namespace utility {
         status = UuidCreate(&uuid);
         if (status != RPC_S_OK && status != RPC_S_UUID_LOCAL_ONLY && status != RPC_S_UUID_NO_ADDRESS)
         {
-            throw std::runtime_error("An error occurred creating the UUID.");
+            throw std::runtime_error(azure::storage::protocol::error_create_uuid);
         }
 #else
         uuid_t uuid;
@@ -48,7 +49,7 @@ namespace utility {
         status = UuidToStringW(&value, &rpc_string);
         if (status != RPC_S_OK)
         {
-            throw std::runtime_error("An error occurred serializing the UUID.");
+            throw std::runtime_error(azure::storage::protocol::error_serialize_uuid);
         }
 
         std::wstring result(reinterpret_cast<wchar_t*>(rpc_string));
@@ -56,7 +57,7 @@ namespace utility {
         status = RpcStringFree(&rpc_string);
         if (status != RPC_S_OK)
         {
-            throw std::runtime_error("An error occurred freeing the UUID string.");
+            throw std::runtime_error(azure::storage::protocol::error_free_uuid);
         }
 #else
         char uuid_string[37];
@@ -79,14 +80,14 @@ namespace utility {
         status = UuidFromStringW(rpc_string, &result);
         if (status != RPC_S_OK)
         {
-            throw std::runtime_error("An error occurred parsing the UUID.");
+            throw std::runtime_error(azure::storage::protocol::error_parse_uuid);
         }
 #else
         uuid_t result;
         int status_code = uuid_parse(value.c_str(), result);
         if (status_code != 0)
         {
-            throw std::runtime_error("An error occurred parsing the UUID.");
+            throw std::runtime_error(azure::storage::protocol::error_parse_uuid);
         }
 #endif
 

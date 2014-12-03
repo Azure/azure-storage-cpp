@@ -158,7 +158,7 @@ SUITE(Queue)
         azure::storage::cloud_queue_message message(content);
 
         CHECK(message.content_as_string().size() >= content.size());
-        CHECK_ARRAY_EQUAL(content, message.content_as_binary(), content.size());
+        CHECK_ARRAY_EQUAL(content, message.content_as_binary(), (int)content.size());
         CHECK(message.id().empty());
         CHECK(message.pop_receipt().empty());
         CHECK(!message.expiration_time().is_initialized());
@@ -170,7 +170,7 @@ SUITE(Queue)
         message.set_content(content);
 
         CHECK(message.content_as_string().size() >= content.size());
-        CHECK_ARRAY_EQUAL(content, message.content_as_binary(), content.size());
+        CHECK_ARRAY_EQUAL(content, message.content_as_binary(), (int)content.size());
         CHECK(message.id().empty());
         CHECK(message.pop_receipt().empty());
         CHECK(!message.expiration_time().is_initialized());
@@ -1746,6 +1746,9 @@ SUITE(Queue)
 
             utility::string_t old_pop_recepit = message2.pop_receipt();
             utility::datetime old_next_visible_time = message2.next_visibile_time();
+
+            UNREFERENCED_PARAMETER(old_pop_recepit);
+            UNREFERENCED_PARAMETER(old_next_visible_time);
 
             std::chrono::seconds visibility_timeout;
             bool update_content;

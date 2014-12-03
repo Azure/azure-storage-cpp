@@ -33,21 +33,21 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::list_containers, prefix, includes, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<container_result_segment>, container_result_segment(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<container_result_segment>, container_result_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([client] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<container_result_segment>
         {
             protocol::list_containers_reader reader(response.body());
 
             // TODO: Initialize a reasonable capacity for container objects throughout the codebase
 
-            std::vector<protocol::cloud_blob_container_list_item> items(reader.extract_items());
+            std::vector<protocol::cloud_blob_container_list_item> items(reader.move_items());
             std::vector<cloud_blob_container> results;
             for (std::vector<protocol::cloud_blob_container_list_item>::iterator iter = items.begin(); iter != items.end(); ++iter)
             {
-                results.push_back(cloud_blob_container(iter->name(), client, iter->properties(), iter->metadata()));
+                results.push_back(cloud_blob_container(iter->move_name(), client, iter->move_properties(), iter->move_metadata()));
             }
 
-            continuation_token next_token(reader.extract_next_marker());
+            continuation_token next_token(reader.move_next_marker());
             next_token.set_target_location(result.target_location());
             return pplx::task_from_result(container_result_segment(std::move(results), next_token));
         });

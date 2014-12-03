@@ -26,7 +26,7 @@ size_t seek_read_and_compare(concurrency::streams::istream stream, std::vector<u
     stream.seek(offset);
     auto read_count = stream.streambuf().getn(buffer.data(), count).get();
     CHECK_EQUAL(expected_read_count, read_count);
-    CHECK_ARRAY_EQUAL(buffer_to_compare.data() + offset, buffer.data(), read_count);
+    CHECK_ARRAY_EQUAL(buffer_to_compare.data() + offset, buffer.data(), (int)read_count);
     return read_count;
 }
 
@@ -50,7 +50,7 @@ SUITE(Blob)
         stream.close();
 
         CHECK_EQUAL(buffer.size(), output_buffer.collection().size());
-        CHECK_ARRAY_EQUAL(buffer, output_buffer.collection(), output_buffer.collection().size());
+        CHECK_ARRAY_EQUAL(buffer, output_buffer.collection(), (int)output_buffer.collection().size());
     }
 
     TEST_FIXTURE(block_blob_test_base, blob_read_stream_etag_lock)
@@ -211,7 +211,7 @@ SUITE(Blob)
         concurrency::streams::container_buffer<std::vector<uint8_t>> downloaded_blob;
         m_blob.download_to_stream(downloaded_blob.create_ostream(), azure::storage::access_condition(), options, m_context);
 
-        CHECK_ARRAY_EQUAL(final_blob_contents, downloaded_blob.collection(), final_blob_contents.size());
+        CHECK_ARRAY_EQUAL(final_blob_contents, downloaded_blob.collection(), (int)final_blob_contents.size());
     }
 
     TEST_FIXTURE(page_blob_test_base, existing_page_blob_write_stream)
@@ -243,7 +243,7 @@ SUITE(Blob)
 
         CHECK_ARRAY_EQUAL(buffer.data(), downloaded_blob.collection().data(), 512);
         CHECK_ARRAY_EQUAL(buffer.data(), downloaded_blob.collection().data() + 512, 512);
-        CHECK_ARRAY_EQUAL(buffer.data() + 1024, downloaded_blob.collection().data() + 1024, buffer.size() - 1024);
+        CHECK_ARRAY_EQUAL(buffer.data() + 1024, downloaded_blob.collection().data() + 1024, (int)(buffer.size()) - 1024);
     }
 
     TEST_FIXTURE(block_blob_test_base, block_blob_write_stream_access_condition)

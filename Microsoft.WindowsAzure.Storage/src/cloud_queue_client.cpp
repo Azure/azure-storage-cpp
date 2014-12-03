@@ -61,27 +61,28 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::list_queues, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<queue_result_segment>, queue_result_segment(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<queue_result_segment>, queue_result_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([this, get_metadata] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<queue_result_segment>
         {
+            UNREFERENCED_PARAMETER(context);
             protocol::list_queues_reader reader(response.body());
-            std::vector<protocol::cloud_queue_list_item> queue_items = reader.extract_items();
+            std::vector<protocol::cloud_queue_list_item> queue_items = reader.move_items();
 
             std::vector<cloud_queue> results;
             results.reserve(queue_items.size());
 
             for (std::vector<protocol::cloud_queue_list_item>::iterator it = queue_items.begin(); it != queue_items.end(); ++it)
             {
-                cloud_queue queue = get_queue_reference(it->name());
+                cloud_queue queue = get_queue_reference(it->move_name());
                 if (get_metadata)
                 {
-                    queue.set_metadata(it->metadata());
+                    queue.set_metadata(it->move_metadata());
                 }
 
                 results.push_back(std::move(queue));
             }
 
-            utility::string_t next_marker = reader.extract_next_marker();
+            utility::string_t next_marker = reader.move_next_marker();
             if (!next_marker.empty())
             {
                 next_marker = core::make_query_parameter(protocol::queue_query_next_marker, next_marker);

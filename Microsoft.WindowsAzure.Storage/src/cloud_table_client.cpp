@@ -67,7 +67,7 @@ namespace azure { namespace storage {
         {
             utility::string_t filter_string = table_query::combine_filter_conditions(
                 table_query::generate_filter_condition(U("TableName"), query_comparison_operator::greater_than_or_equal, prefix), 
-                query_logical_operator::and, 
+                query_logical_operator::op_and, 
                 table_query::generate_filter_condition(U("TableName"), query_comparison_operator::less_than, prefix + U('{')));
             query.set_filter_string(filter_string);
         }

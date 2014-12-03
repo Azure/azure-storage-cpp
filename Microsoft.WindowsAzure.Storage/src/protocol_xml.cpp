@@ -114,13 +114,13 @@ namespace azure { namespace storage { namespace protocol {
     {
         if (element_name == xml_container && get_parent_element_name() == xml_containers)
         {
-            cloud_metadata metadata;
-            metadata.swap(m_metadata);
-
             // End of the data for a Container. Create an item and add it to the list
-            m_items.push_back(cloud_blob_container_list_item(std::move(m_uri), std::move(m_name), std::move(metadata), std::move(m_properties)));
+            m_items.push_back(cloud_blob_container_list_item(std::move(m_uri), std::move(m_name), std::move(m_metadata), std::move(m_properties)));
 
-            m_properties = cloud_blob_container_properties();
+            m_uri = web::uri();
+            m_name = utility::string_t();
+            m_metadata = azure::storage::cloud_metadata();
+            m_properties = azure::storage::cloud_blob_container_properties();
         }
     }
 
@@ -305,20 +305,22 @@ namespace azure { namespace storage { namespace protocol {
     {
         if (get_parent_element_name() == xml_blobs)
         {
-            cloud_metadata metadata;
-            metadata.swap(m_metadata);
-
             if (element_name == xml_blob)
             {
-                m_blob_items.push_back(cloud_blob_list_item(std::move(m_uri), std::move(m_name), std::move(m_snapshot_time), std::move(metadata), std::move(m_properties), std::move(m_copy_state)));
+                m_blob_items.push_back(cloud_blob_list_item(std::move(m_uri), std::move(m_name), std::move(m_snapshot_time), std::move(m_metadata), std::move(m_properties), std::move(m_copy_state)));
+                m_uri = web::uri();
+                m_name = utility::string_t();
+                m_snapshot_time = utility::string_t();
+                m_metadata = azure::storage::cloud_metadata();
+                m_properties = azure::storage::cloud_blob_properties();
+                m_copy_state = azure::storage::copy_state();
             }
             else if (element_name == xml_blob_prefix)
             {
                 m_blob_prefix_items.push_back(cloud_blob_prefix_list_item(std::move(m_uri), std::move(m_name)));
+                m_uri = web::uri();
+                m_name = utility::string_t();
             }
-
-            m_properties = cloud_blob_properties();
-            m_snapshot_time = utility::string_t();
         }
     }
 
@@ -336,15 +338,16 @@ namespace azure { namespace storage { namespace protocol {
 
     void page_list_reader::handle_end_element(const utility::string_t& element_name)
     {
-        if (m_start != -1 && m_end != -1)
+        if (element_name == xml_page_range)
         {
-            if (element_name == xml_page_range)
+            if (m_start != -1 && m_end != -1)
             {
                 page_range range(m_start, m_end);
                 m_page_list.push_back(range);
-                m_start = -1;
-                m_end = -1;
             }
+
+            m_start = -1;
+            m_end = -1;
         }
     }
 
@@ -357,11 +360,6 @@ namespace azure { namespace storage { namespace protocol {
         else if (element_name == xml_uncommitted_blocks)
         {
             m_handling_what = 2;
-        }
-        else if (m_handling_what != 0 && element_name == xml_block)
-        {
-            m_size = std::numeric_limits<size_t>::max();
-            m_name.clear();
         }
     }
 
@@ -392,8 +390,11 @@ namespace azure { namespace storage { namespace protocol {
             {
                 if (!m_name.empty() && (m_size != std::numeric_limits<size_t>::max()))
                 {
-                    m_block_list.push_back(block_list_item(m_name, m_size, m_handling_what == 1));
+                    m_block_list.push_back(block_list_item(std::move(m_name), m_size, m_handling_what == 1));
                 }
+
+                m_size = std::numeric_limits<size_t>::max();
+                m_name = utility::string_t();
             }
         }
     }
@@ -560,16 +561,6 @@ namespace azure { namespace storage { namespace protocol {
         return outstream.str();
     }
 
-    void list_queues_reader::handle_begin_element(const utility::string_t& element_name)
-    {
-        if (element_name == U("Queues"))
-        {
-            m_name.clear();
-            //m_uri = web::http::uri();
-            m_metadata.clear();
-        }
-    }
-
     void list_queues_reader::handle_element(const utility::string_t& element_name)
     {
         if (element_name == xml_name)
@@ -595,25 +586,10 @@ namespace azure { namespace storage { namespace protocol {
     {
         if (element_name == U("Queue") && get_parent_element_name() == U("Queues"))
         {
-            cloud_metadata metadata;
-            metadata.swap(m_metadata);
-            //cloud_queue_list_item item(std::move(m_name), std::move(m_uri), std::move(metadata));
-            cloud_queue_list_item item(std::move(m_name), std::move(metadata));
+            cloud_queue_list_item item(std::move(m_name), std::move(m_metadata));
             m_items.push_back(item);
-        }
-    }
-
-    void message_reader::handle_begin_element(const utility::string_t& element_name)
-    {
-        if (element_name == U("QueueMessage"))
-        {
-            m_content.clear();
-            m_id.clear();
-            m_pop_receipt.clear();
-            m_insertion_time = utility::datetime();
-            m_expiration_time = utility::datetime();
-            m_next_visible_time = utility::datetime();
-            m_dequeue_count = 0;
+            m_name = utility::string_t();
+            m_metadata = cloud_metadata();
         }
     }
 
@@ -621,7 +597,7 @@ namespace azure { namespace storage { namespace protocol {
     {
         if (element_name == U("MessageText"))
         {
-			m_content = get_current_element_text();
+            m_content = get_current_element_text();
         }
         else if (element_name == U("MessageId"))
         {
@@ -656,6 +632,13 @@ namespace azure { namespace storage { namespace protocol {
         {
             cloud_message_list_item item(std::move(m_content), std::move(m_id), std::move(m_pop_receipt), m_insertion_time, m_expiration_time, m_next_visible_time, m_dequeue_count);
             m_items.push_back(item);
+            m_content = utility::string_t();
+            m_id = utility::string_t();
+            m_pop_receipt = utility::string_t();
+            m_insertion_time = utility::datetime();
+            m_expiration_time = utility::datetime();
+            m_next_visible_time = utility::datetime();
+            m_dequeue_count = 0;
         }
     }
 
@@ -735,7 +718,12 @@ namespace azure { namespace storage { namespace protocol {
     {
         write_element(xml_service_properties_version, metrics.version());
         write_element(xml_service_properties_enabled, metrics.enabled() ? header_value_true : header_value_false);
-        write_element(xml_service_properties_include_apis, metrics.include_apis() ? header_value_true : header_value_false);
+        
+        if (metrics.enabled())
+        {
+            write_element(xml_service_properties_include_apis, metrics.include_apis() ? header_value_true : header_value_false);
+        }
+
         write_retention_policy(metrics.retention_policy_enabled(), metrics.retention_days());
     }
 

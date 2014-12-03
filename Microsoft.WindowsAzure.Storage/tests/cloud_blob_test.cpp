@@ -99,7 +99,7 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
 
     concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
     blob.download_to_stream(output_buffer.create_ostream(), azure::storage::access_condition(), download_options, context);
-    CHECK_ARRAY_EQUAL(buffer.data() + buffer_offset, output_buffer.collection().data(), blob_size == 0 ? (buffer_size - buffer_offset) : blob_size);
+    CHECK_ARRAY_EQUAL(buffer.data() + buffer_offset, output_buffer.collection().data(),(int) (blob_size == 0 ? (buffer_size - buffer_offset) : blob_size));
 
     context.set_sending_request(std::function<void(web::http::http_request &, azure::storage::operation_context)>());
     return context;
@@ -239,7 +239,7 @@ SUITE(Blob)
         blob.create(1024, azure::storage::access_condition(), options, m_context);
         CHECK_EQUAL(1024, blob.properties().size());
         CHECK(!blob.properties().etag().empty());
-        CHECK((utility::datetime::utc_now() - blob.properties().last_modified()) < utility::datetime::from_minutes(5));
+        CHECK((utility::datetime::utc_now() - blob.properties().last_modified()) < (int64_t)utility::datetime::from_minutes(5));
         CHECK(blob.properties().cache_control().empty());
         CHECK(blob.properties().content_disposition().empty());
         CHECK(blob.properties().content_encoding().empty());

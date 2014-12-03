@@ -26,11 +26,11 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials)
     {
-        auto utf8_string_to_hash = utility::conversions::to_utf8string(string_to_hash);
-        auto hash_streambuf = core::hash_hmac_sha256_streambuf(credentials.account_key());
-        hash_streambuf.putn(reinterpret_cast<const uint8_t*>(utf8_string_to_hash.data()), utf8_string_to_hash.size()).wait();
-        hash_streambuf.close().wait();
-        return utility::conversions::to_base64(hash_streambuf.hash());
+        std::string utf8_string_to_hash = utility::conversions::to_utf8string(string_to_hash);
+        core::hash_provider provider = core::hash_provider::create_hmac_sha256_hash_provider(credentials.account_key());
+        provider.write(reinterpret_cast<const uint8_t*>(utf8_string_to_hash.data()), utf8_string_to_hash.size());
+        provider.close();
+        return provider.hash();
     }
 
     void sas_authentication_handler::sign_request(web::http::http_request& request, operation_context context) const

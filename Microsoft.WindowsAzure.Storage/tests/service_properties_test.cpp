@@ -42,6 +42,23 @@ void add_metrics_2(azure::storage::service_properties::metrics_properties& metri
     metrics.set_retention_policy_enabled(false);
 }
 
+void add_metrics_3(azure::storage::service_properties::metrics_properties& metrics)
+{
+    metrics = azure::storage::service_properties::metrics_properties();
+    metrics.set_version(U("1.0"));
+    metrics.set_enabled(false);
+    metrics.set_include_apis(true);
+    metrics.set_retention_policy_enabled(false);
+}
+
+void add_metrics_4(azure::storage::service_properties::metrics_properties& metrics)
+{
+    metrics = azure::storage::service_properties::metrics_properties();
+    metrics.set_version(U("1.0"));
+    metrics.set_enabled(false);
+    metrics.set_retention_policy_enabled(false);
+}
+
 void add_logging_1(azure::storage::service_properties::logging_properties& logging)
 {
     logging = azure::storage::service_properties::logging_properties();
@@ -97,13 +114,19 @@ void check_service_properties(const azure::storage::service_properties& a, const
 
     CHECK_UTF8_EQUAL(a.hour_metrics().version(), b.hour_metrics().version());
     CHECK_EQUAL(a.hour_metrics().enabled(), b.hour_metrics().enabled());
-    CHECK_EQUAL(a.hour_metrics().include_apis(), b.hour_metrics().include_apis());
+    if (a.hour_metrics().enabled())
+    {
+        CHECK_EQUAL(a.hour_metrics().include_apis(), b.hour_metrics().include_apis());
+    }
     CHECK_EQUAL(a.hour_metrics().retention_policy_enabled(), b.hour_metrics().retention_policy_enabled());
     CHECK_EQUAL(a.hour_metrics().retention_days(), b.hour_metrics().retention_days());
 
     CHECK_UTF8_EQUAL(a.minute_metrics().version(), b.minute_metrics().version());
     CHECK_EQUAL(a.minute_metrics().enabled(), b.minute_metrics().enabled());
-    CHECK_EQUAL(a.minute_metrics().include_apis(), b.minute_metrics().include_apis());
+    if (a.minute_metrics().enabled())
+    {
+        CHECK_EQUAL(a.minute_metrics().include_apis(), b.minute_metrics().include_apis());
+    }
     CHECK_EQUAL(a.minute_metrics().retention_policy_enabled(), b.minute_metrics().retention_policy_enabled());
     CHECK_EQUAL(a.minute_metrics().retention_days(), b.minute_metrics().retention_days());
 
@@ -188,6 +211,20 @@ void test_service_properties(const Client& client, const Options& options, azure
         client.upload_service_properties(temp_props, includes, options, context);
         add_metrics_1(props.hour_metrics());
         add_metrics_2(props.minute_metrics());
+        props.cors().clear();
+        check_service_properties(props, client.download_service_properties(options, context));
+    }
+
+    {
+        azure::storage::service_properties_includes includes;
+        includes.set_hour_metrics(true);
+        includes.set_minute_metrics(true);
+        includes.set_cors(true);
+        add_metrics_3(temp_props.hour_metrics());
+        add_metrics_4(temp_props.minute_metrics());
+        client.upload_service_properties(temp_props, includes, options, context);
+        add_metrics_3(props.hour_metrics());
+        add_metrics_4(props.minute_metrics());
         props.cors().clear();
         check_service_properties(props, client.download_service_properties(options, context));
     }

@@ -24,6 +24,7 @@
 #include "util.h"
 #include "streams.h"
 #include "was/auth.h"
+#include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace core {
 
@@ -48,32 +49,23 @@ namespace azure { namespace storage { namespace core {
                 return pplx::task_from_result(istream_descriptor(stream, length, utility::string_t()));
             }
 
+            hash_provider provider = calculate_md5 ? core::hash_provider::create_md5_hash_provider() : core::hash_provider();
             concurrency::streams::container_buffer<std::vector<uint8_t>> temp_buffer;
             concurrency::streams::ostream temp_stream;
-            hash_streambuf hash_buffer;
 
             if (calculate_md5)
             {
-                // If MD5 is needed, a splitter_streambuf will act as a proxy to forward incoming data to
-                // a hash_md5_streambuf and the in-memory container_buffer
-                hash_buffer = hash_md5_streambuf();
-                temp_stream = splitter_streambuf<concurrency::streams::ostream::traits::char_type>(temp_buffer, hash_buffer).create_ostream();
+                temp_stream = hash_wrapper_streambuf<concurrency::streams::ostream::traits::char_type>(temp_buffer, provider).create_ostream();
             }
             else
             {
                 temp_stream = temp_buffer.create_ostream();
             }
 
-            return stream_copy_async(stream, temp_stream, length).then([temp_buffer, hash_buffer] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
+            return stream_copy_async(stream, temp_stream, length).then([temp_buffer, provider] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
             {
-                utility::string_t md5;
-                if (hash_buffer)
-                {
-                    hash_buffer.close().wait();
-                    md5 = utility::conversions::to_base64(hash_buffer.hash());
-                }
-
-                return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(temp_buffer.collection()), buffer_task.get(), md5);
+                provider.close();
+                return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(temp_buffer.collection()), buffer_task.get(), provider.hash());
             });
         }
 
@@ -185,12 +177,12 @@ namespace azure { namespace storage { namespace core {
             m_calculate_response_body_md5 = value;
         }
 
-        void set_build_request(std::function<web::http::http_request (web::http::uri_builder, const std::chrono::seconds&, operation_context)> value)
+        void set_build_request(std::function<web::http::http_request(web::http::uri_builder, const std::chrono::seconds&, operation_context)> value)
         {
             m_build_request = value;
         }
 
-        void set_custom_sign_request(std::function<void (web::http::http_request &, operation_context)> value)
+        void set_custom_sign_request(std::function<void(web::http::http_request &, operation_context)> value)
         {
             m_sign_request = value;
         }
@@ -200,17 +192,17 @@ namespace azure { namespace storage { namespace core {
             set_custom_sign_request(std::bind(&protocol::authentication_handler::sign_request, handler, std::placeholders::_1, std::placeholders::_2));
         }
 
-        void set_recover_request(std::function<bool (operation_context)> value)
+        void set_recover_request(std::function<bool(utility::size64_t, operation_context)> value)
         {
             m_recover_request = value;
         }
 
-        void set_preprocess_response(std::function<T (const web::http::http_response &, operation_context)> value)
+        void set_preprocess_response(std::function<T(const web::http::http_response &, const request_result&, operation_context)> value)
         {
             m_preprocess_response = value;
         }
 
-        void set_postprocess_response(std::function<pplx::task<T> (const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> value)
+        void set_postprocess_response(std::function<pplx::task<T>(const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> value)
         {
             m_postprocess_response = value;
         }
@@ -252,10 +244,10 @@ namespace azure { namespace storage { namespace core {
         command_location_mode m_location_mode;
 
         std::function<web::http::http_request (web::http::uri_builder, const std::chrono::seconds&, operation_context)> m_build_request;
-        std::function<void(web::http::http_request &, operation_context)> m_sign_request;
-        std::function<bool (operation_context)> m_recover_request;
-        std::function<T (const web::http::http_response &, operation_context)> m_preprocess_response;
-        std::function<pplx::task<T> (const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> m_postprocess_response;
+        std::function<void(web::http::http_request&, operation_context)> m_sign_request;
+        std::function<bool(utility::size64_t, operation_context)> m_recover_request;
+        std::function<T (const web::http::http_response&, const request_result&, operation_context)> m_preprocess_response;
+        std::function<pplx::task<T> (const web::http::http_response&, const request_result&, const ostream_descriptor&, operation_context)> m_postprocess_response;
 
         friend class executor<T>;
     };
@@ -266,8 +258,8 @@ namespace azure { namespace storage { namespace core {
     public:
 
         executor(std::shared_ptr<storage_command<T>> command, const request_options& options, operation_context context)
-            : m_command(command), m_request_options(options), m_context(context),
-            m_retry_count(0), m_current_location(get_first_location(options.location_mode())),
+            : m_command(command), m_request_options(options), m_context(context), m_is_hashing_started(false),
+            m_total_downloaded(0), m_retry_count(0), m_current_location(get_first_location(options.location_mode())),
             m_current_location_mode(options.location_mode()), m_retry_policy(options.retry_policy().clone())
         {
         }
@@ -283,7 +275,7 @@ namespace azure { namespace storage { namespace core {
             // TODO: Reduce usage of auto variable types
 
             auto instance = std::make_shared<executor<T>>(command, options, context);
-            return pplx::details::do_while([instance] () -> pplx::task<bool>
+            return pplx::details::do_while([instance]() -> pplx::task<bool>
             {
                 // 0. Begin request 
                 instance->validate_location_mode();
@@ -320,24 +312,34 @@ namespace azure { namespace storage { namespace core {
                     instance->m_command->m_request_body.rewind();
                     instance->m_request.set_body(instance->m_command->m_request_body.stream(), instance->m_command->m_request_body.length(), utility::string_t());
                 }
+                else
+                {
+                    // TODO: Remove the following when we can take a dependency on Casablanca 2.3.  This line fo code is a workaround for a bug in 2.2.
+                    if ((((utility::string_t)instance->m_request.method()) == U("HEAD")) || (((utility::string_t)instance->m_request.method()) == U("DELETE")) || (((utility::string_t)instance->m_request.method()) == U("GET")))
+                    {
+                        instance->m_request.headers().add(protocol::xml_content_length, 0);
+                    }
+                }
 
                 // If the command wants to copy the response body to a stream, set it
                 // on the http_request object
                 if (instance->m_command->m_destination_stream)
                 {
-                    // If MD5 is needed, a splitter_streambuf will act as a proxy to forward incoming data to
-                    // a hash_md5_streambuf and the destination stream provided by the command
-                    if (instance->m_command->m_calculate_response_body_md5)
+                    // Calculate the length and MD5 hash if needed as the incoming data is read
+                    if (!instance->m_is_hashing_started)
                     {
-                        instance->m_hash_streambuf = hash_md5_streambuf();
-                        instance->m_response_streambuf = splitter_streambuf<concurrency::streams::ostream::traits::char_type>(instance->m_command->m_destination_stream.streambuf(), instance->m_hash_streambuf);
-                    }
-                    else
-                    {
-                        instance->m_hash_streambuf = hash_streambuf();
-                        instance->m_response_streambuf = splitter_streambuf<concurrency::streams::ostream::traits::char_type>(instance->m_command->m_destination_stream.streambuf(), null_streambuf<concurrency::streams::ostream::traits::char_type>());
+                        if (instance->m_command->m_calculate_response_body_md5)
+                        {
+                            instance->m_hash_provider = hash_provider::create_md5_hash_provider();
+                        }
+
+                        instance->m_total_downloaded = 0;
+                        instance->m_is_hashing_started = true;
+
+                        // TODO: Consider using hash_provider::is_enabled instead of m_is_hashing_started to signal when the hash provider has been closed
                     }
 
+                    instance->m_response_streambuf = hash_wrapper_streambuf<concurrency::streams::ostream::traits::char_type>(instance->m_command->m_destination_stream.streambuf(), instance->m_hash_provider);
                     instance->m_request.set_response_stream(instance->m_response_streambuf.create_ostream());
                 }
 
@@ -351,13 +353,27 @@ namespace azure { namespace storage { namespace core {
                 // 3. Sign Request
                 instance->m_command->m_sign_request(instance->m_request, instance->m_context);
 
-                // 4. Set timeout
+                // 4. Set HTTP client configuration
                 web::http::client::http_client_config config;
                 config.set_timeout(instance->remaining_time());
 
+                // TODO: Remove the following when we can take a dependency on Casablanca 2.3.  This line fo code is a workaround for a bug in 2.2.
+#ifndef WIN32
+                if (config.timeout() < std::chrono::seconds(1))
+                {
+                    config.set_timeout(std::chrono::seconds(1));
+                }
+#endif
+
+                size_t http_buffer_size = instance->m_request_options.http_buffer_size();
+                if (http_buffer_size > 0)
+                {
+                    config.set_chunksize(http_buffer_size);
+                }
+
                 // 5-6. Potentially upload data and get response
                 web::http::client::http_client client(instance->m_request.request_uri().authority(), config);
-                return client.request(instance->m_request).then([instance] (pplx::task<web::http::http_response> get_headers_task) -> pplx::task<web::http::http_response>
+                return client.request(instance->m_request).then([instance](pplx::task<web::http::http_response> get_headers_task) -> pplx::task<web::http::http_response>
                 {
                     // Headers are ready. It should be noted that http_client will
                     // continue to download the response body in parallel.
@@ -382,8 +398,8 @@ namespace azure { namespace storage { namespace core {
                         // 7. Do Response parsing (headers etc, no stream available here)
                         // This is when the status code will be checked and m_preprocess_response
                         // will throw a storage_exception if it is not expected.
-                        instance->m_result = instance->m_command->m_preprocess_response(response, instance->m_context);
                         instance->m_request_result = request_result(instance->m_start_time, instance->m_current_location, response, false);
+                        instance->m_result = instance->m_command->m_preprocess_response(response, instance->m_request_result, instance->m_context);
 
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                         {
@@ -407,7 +423,7 @@ namespace azure { namespace storage { namespace core {
                         // is seekable and thus it cannot be read back to parse the error.
                         if (!instance->m_command->m_destination_stream)
                         {
-                            return response.content_ready().then([instance] (pplx::task<web::http::http_response> get_error_body_task) -> web::http::http_response
+                            return response.content_ready().then([instance](pplx::task<web::http::http_response> get_error_body_task) -> web::http::http_response
                             {
                                 auto response = get_error_body_task.get();
                                 instance->m_request_result = request_result(instance->m_start_time, instance->m_current_location, response, true);
@@ -424,10 +440,21 @@ namespace azure { namespace storage { namespace core {
                         // In the worst case, storage_exception will just contain the HTTP error message
                         throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
                     }
-                }).then([instance] (pplx::task<web::http::http_response> get_body_task) -> pplx::task<void>
+                }).then([instance](pplx::task<web::http::http_response> get_body_task) -> pplx::task<void>
                 {
                     // 9. Evaluate response & parse results
                     auto response = get_body_task.get();
+
+                    if (instance->m_command->m_destination_stream)
+                    {
+                        utility::size64_t current_total_downloaded = instance->m_response_streambuf.total_written();
+                        utility::size64_t content_length = instance->m_request_result.content_length();
+                        if (content_length != -1 && current_total_downloaded != content_length)
+                        {
+                            // The download was interrupted before it could complete
+                            throw storage_exception(protocol::error_incorrect_length);
+                        }
+                    }
 
                     // If the command asked for post-processing, it is now time to call m_postprocess_response
                     if (instance->m_command->m_postprocess_response)
@@ -437,22 +464,18 @@ namespace azure { namespace storage { namespace core {
                             logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Processing response body"));
                         }
 
-                        // Get the MD5 hash if MD5 was calculated.
-                        utility::string_t md5;
-                        if (instance->m_hash_streambuf)
-                        {
-                            // It is ok to wait this call, as all hash_streambuf implementations are synchronous anyway.
-                            instance->m_hash_streambuf.close().wait();
-                            md5 = utility::conversions::to_base64(instance->m_hash_streambuf.hash());
-                        }
+                        // Finish the MD5 hash if MD5 was being calculated
+                        instance->m_hash_provider.close();
+                        instance->m_is_hashing_started = false;
 
                         ostream_descriptor descriptor;
                         if (instance->m_response_streambuf)
                         {
-                            descriptor = ostream_descriptor(instance->m_response_streambuf.total_written(), md5);
+                            utility::size64_t total_downloaded = instance->m_total_downloaded + instance->m_response_streambuf.total_written();
+                            descriptor = ostream_descriptor(total_downloaded, instance->m_hash_provider.hash());
                         }
 
-                        return instance->m_command->m_postprocess_response(response, instance->m_request_result, descriptor, instance->m_context).then([instance] (pplx::task<T> result_task)
+                        return instance->m_command->m_postprocess_response(response, instance->m_request_result, descriptor, instance->m_context).then([instance](pplx::task<T> result_task)
                         {
                             try
                             {
@@ -475,7 +498,7 @@ namespace azure { namespace storage { namespace core {
                     {
                         return pplx::task_from_result();
                     }
-                }).then([instance] (pplx::task<void> final_task) -> pplx::task<bool>
+                }).then([instance](pplx::task<void> final_task) -> pplx::task<bool>
                 {
                     bool retryable_exception = true;
                     instance->m_context._get_impl()->add_request_result(instance->m_request_result);
@@ -525,10 +548,15 @@ namespace azure { namespace storage { namespace core {
                         instance->m_current_location = retry.target_location();
                         instance->m_current_location_mode = retry.updated_location_mode();
 
+                        if (instance->m_response_streambuf)
+                        {
+                            instance->m_total_downloaded += instance->m_response_streambuf.total_written();
+                        }
+
                         // Try to recover the request. If it cannot be recovered, it cannot be retried
                         // even if the retry policy allowed for a retry.
                         if (instance->m_command->m_recover_request &&
-                            !instance->m_command->m_recover_request(instance->m_context))
+                            !instance->m_command->m_recover_request(instance->m_total_downloaded, instance->m_context))
                         {
                             if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
                             {
@@ -545,7 +573,7 @@ namespace azure { namespace storage { namespace core {
                             logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
                         }
 
-                        return complete_after(retry.retry_interval()).then([] () -> bool
+                        return complete_after(retry.retry_interval()).then([]() -> bool
                         {
                             // Returning true here will tell the outer do_while loop to loop one more time.
                             return true;
@@ -555,7 +583,7 @@ namespace azure { namespace storage { namespace core {
                     // Returning false here will cause do_while to exit.
                     return pplx::task_from_result<bool>(false);
                 });
-            }).then([instance] (pplx::task<bool> loop_task) -> T
+            }).then([instance](pplx::task<bool> loop_task) -> T
             {
                 instance->m_context.set_end_time(utility::datetime::utc_now());
                 loop_task.wait();
@@ -690,8 +718,10 @@ namespace azure { namespace storage { namespace core {
         web::http::uri_builder m_uri_builder;
         web::http::http_request m_request;
         request_result m_request_result;
-        hash_streambuf m_hash_streambuf;
-        splitter_streambuf<concurrency::streams::ostream::traits::char_type> m_response_streambuf;
+        bool m_is_hashing_started;
+        hash_provider m_hash_provider;
+        hash_wrapper_streambuf<concurrency::streams::ostream::traits::char_type> m_response_streambuf;
+        utility::size64_t m_total_downloaded;
         retry_policy m_retry_policy;
         int m_retry_count;
         storage_location m_current_location;
@@ -712,11 +742,11 @@ namespace azure { namespace storage { namespace core {
         {
         }
 
-        void set_preprocess_response(std::function<void (const web::http::http_response &, operation_context)> value)
+        void set_preprocess_response(std::function<void (const web::http::http_response &, const request_result&, operation_context)> value)
         {
-            storage_command<void_command_type>::set_preprocess_response([value] (const web::http::http_response& response, operation_context context) -> void_command_type
+            storage_command<void_command_type>::set_preprocess_response([value] (const web::http::http_response& response, const request_result& result, operation_context context) -> void_command_type
             {
-                value(response, context);
+                value(response, result, context);
                 return VOID_COMMAND_RESULT;
             });
         }

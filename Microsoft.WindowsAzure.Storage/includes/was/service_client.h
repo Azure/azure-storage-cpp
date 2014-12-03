@@ -81,6 +81,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the service client class using the specified service endpoint.
         /// </summary>
         cloud_client()
+            : m_authentication_scheme(azure::storage::authentication_scheme::shared_key)
         {
         }
 
@@ -89,7 +90,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="base_uri">A <see cref="storage_uri" /> object containing the service endpoint for all locations.</param>
         explicit cloud_client(storage_uri base_uri)
-            : m_base_uri(std::move(base_uri))
+            : m_base_uri(std::move(base_uri)), m_authentication_scheme(azure::storage::authentication_scheme::shared_key)
         {
         }
 
@@ -99,7 +100,7 @@ namespace azure { namespace storage {
         /// <param name="base_uri">A <see cref="storage_uri" /> object containing the service endpoint for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
         cloud_client(storage_uri base_uri, azure::storage::storage_credentials credentials)
-            : m_base_uri(std::move(base_uri)), m_credentials(std::move(credentials))
+            : m_base_uri(std::move(base_uri)), m_credentials(std::move(credentials)), m_authentication_scheme(azure::storage::authentication_scheme::shared_key)
         {
         }
 

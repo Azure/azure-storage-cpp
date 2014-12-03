@@ -36,9 +36,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::put_page, range, page_write::clear, utility::string_t(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
 
             auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
             properties->update_etag_and_last_modified(parsed_properties);
@@ -58,9 +58,9 @@ namespace azure { namespace storage {
         
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
 
             auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
             properties->update_etag_and_last_modified(parsed_properties);
@@ -158,9 +158,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::put_page_blob, size, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties, size] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties, size] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             properties->m_size = size;
         });
@@ -178,9 +178,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::resize_page_blob, size, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties, size] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties, size] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
 
             auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
             properties->update_etag_and_last_modified(parsed_properties);
@@ -201,9 +201,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::set_page_blob_sequence_number, sequence_number, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
 
             auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
             properties->update_etag_and_last_modified(parsed_properties);
@@ -223,9 +223,9 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_page_ranges, offset, length, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context) -> std::vector<page_range>
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> std::vector<page_range>
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             
             auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
             properties->update_etag_and_last_modified(parsed_properties);
@@ -234,8 +234,9 @@ namespace azure { namespace storage {
         });
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<std::vector<page_range>>
         {
+            UNREFERENCED_PARAMETER(context);
             protocol::page_list_reader reader(response.body());
-            return pplx::task_from_result(reader.extract_result());
+            return pplx::task_from_result(reader.move_result());
         });
         return core::executor<std::vector<page_range>>::execute_async(command, modified_options, context);
     }

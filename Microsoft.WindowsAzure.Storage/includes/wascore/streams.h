@@ -20,84 +20,32 @@
 #include "wascore/basic_types.h"
 #include "streambuf.h"
 
-#ifdef WIN32
-#include "hash_windows.h"
-#else
-#include "hash_linux.h"
-#endif
-
 namespace azure { namespace storage { namespace core {
 
     template<typename _CharType>
-    class splitter_streambuf : public concurrency::streams::streambuf<_CharType>
+    class hash_wrapper_streambuf : public concurrency::streams::streambuf<_CharType>
     {
     public:
-        splitter_streambuf()
+        hash_wrapper_streambuf()
             : concurrency::streams::streambuf<_CharType>()
         {
         }
 
-        splitter_streambuf(concurrency::streams::streambuf<_CharType> streambuf1, concurrency::streams::streambuf<_CharType> streambuf2)
-            : concurrency::streams::streambuf<_CharType>(std::make_shared<basic_splitter_streambuf<_CharType>>(streambuf1, streambuf2))
+        hash_wrapper_streambuf(concurrency::streams::streambuf<_CharType> inner_streambuf, hash_provider provider)
+            : concurrency::streams::streambuf<_CharType>(std::make_shared<basic_hash_wrapper_streambuf<_CharType>>(inner_streambuf, provider))
         {
         }
 
         utility::size64_t total_written() const
         {
-            auto base = static_cast<basic_splitter_streambuf<_CharType>*>(get_base().get());
+            const basic_hash_wrapper_streambuf<_CharType>* base = static_cast<basic_hash_wrapper_streambuf<_CharType>*>(Concurrency::streams::streambuf<_CharType>::get_base().get());
             return base->total_written();
         }
-    };
 
-    template<typename _CharType>
-    class null_streambuf : public concurrency::streams::streambuf<_CharType>
-    {
-    public:
-
-        null_streambuf()
-            : concurrency::streams::streambuf<_CharType>(std::make_shared<basic_null_streambuf<_CharType>>())
+        utility::string_t hash() const
         {
-        }
-    };
-
-    class hash_streambuf : public concurrency::streams::streambuf<basic_hash_streambuf::char_type>
-    {
-    public:
-
-        hash_streambuf()
-            : concurrency::streams::streambuf<basic_hash_streambuf::char_type>()
-        {
-        }
-
-        explicit hash_streambuf(const std::shared_ptr<basic_hash_streambuf> &ptr)
-            : concurrency::streams::streambuf<basic_hash_streambuf::char_type>(ptr)
-        {
-        }
-
-        const std::vector<unsigned char>& hash() const
-        {
-            auto base = static_cast<basic_hash_streambuf*>(get_base().get());
+            const basic_hash_wrapper_streambuf<_CharType>* base = static_cast<basic_hash_wrapper_streambuf<_CharType>*>(Concurrency::streams::streambuf<_CharType>::get_base().get());
             return base->hash();
-        }
-    };
-
-    class hash_hmac_sha256_streambuf : public hash_streambuf
-    {
-    public:
-
-        explicit hash_hmac_sha256_streambuf(std::vector<unsigned char> key)
-            : hash_streambuf(std::make_shared<basic_hash_hmac_sha256_streambuf>(std::move(key)))
-        {
-        }
-    };
-
-    class hash_md5_streambuf : public hash_streambuf
-    {
-    public:
-
-        hash_md5_streambuf()
-            : hash_streambuf(std::make_shared<basic_hash_md5_streambuf>())
-        {
         }
     };
 

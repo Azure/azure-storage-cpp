@@ -33,7 +33,9 @@ namespace azure { namespace storage { namespace samples {
             // Create a table
             azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();
             azure::storage::cloud_table table = table_client.get_table_reference(U("MySampleTable"));
-            bool created = table.create_if_not_exists();
+
+            // Return value is true if the table did not exist and was successfully created.
+            table.create_if_not_exists();
 
             // Insert some table entities
             azure::storage::table_batch_operation batch_operation;
@@ -47,7 +49,7 @@ namespace azure { namespace storage { namespace samples {
                 properties[U("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
                 properties[U("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
                 properties[U("Int32Property")] = azure::storage::entity_property(1234567890);
-                properties[U("Int64Property")] = azure::storage::entity_property(1234567890123456789LL);
+                properties[U("Int64Property")] = azure::storage::entity_property((int64_t) 1234567890123456789LL);
                 properties[U("DoubleProperty")] = azure::storage::entity_property(9.1234567890123456789);
                 properties[U("BooleanProperty")] = azure::storage::entity_property(true);
                 properties[U("BinaryProperty")] = azure::storage::entity_property(std::vector<uint8_t>(10, 'X'));
@@ -87,7 +89,8 @@ namespace azure { namespace storage { namespace samples {
             }
 
             // Delete the table
-            bool deleted = table.delete_table_if_exists();
+            // Return value is true if the table did exist and was successfully deleted.
+            table.delete_table_if_exists();
         }
         catch (const azure::storage::storage_exception& e)
         {
@@ -108,7 +111,7 @@ namespace azure { namespace storage { namespace samples {
 
 }}} // namespace azure::storage::samples
 
-int _tmain(int argc, _TCHAR *argv[])
+int main(int argc, const char *argv[])
 {
     azure::storage::samples::tables_getting_started_sample();
     return 0;

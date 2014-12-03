@@ -1,6 +1,22 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v0.4:
+- Now supports building on Linux
+- Added http_buffer_size request option to control the internal buffer size used in the HTTP layer when downloading data. The default size is 64KB.
+- Blob downloads that are interrupted resume automatically from where the download left off when being retried.
+- Performance improvement when uploading and downloading blobs.
+- Added const version of the operation_context::user_headers() function.
+- Fixed incorrect initialization of some members in the cloud_blob_container_properties and retry_info classes.
+- Added a default of 24 days for a maximum execution time for an operation
+- Changed the exception type if you upload a blob from a seekable stream but the stream is too short for the desired blob length.  
+       - Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
+       - Now checks for this case explicitly before the upload is started.
+       - Non-seekable streams still throw std::invalid_argument as before.
+- Fixed several bugs, including incorrect uses of std::move and compile-time differences between Visual Studio and g++.
+- Added client request ID into log lines.
+- Upgraded Casablanca dependency to 2.3.0
+
 Changes in v0.3:
 - Changed namespace to azure::storage.
 - Added support for secondary location access in Azure Storage Emulator.

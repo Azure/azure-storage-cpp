@@ -33,13 +33,13 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        utility::string_t extract_error_code()
+        utility::string_t move_error_code()
         {
             parse();
             return std::move(m_error_code);
         }
 
-        utility::string_t extract_error_message()
+        utility::string_t move_error_message()
         {
             parse();
             return std::move(m_error_message);
@@ -62,22 +62,22 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        web::http::uri uri()
+        web::http::uri move_uri()
         {
             return std::move(m_uri);
         }
 
-        utility::string_t name()
+        utility::string_t move_name()
         {
             return std::move(m_name);
         }
 
-        cloud_metadata metadata()
+        cloud_metadata move_metadata()
         {
             return std::move(m_metadata);
         }
 
-        cloud_blob_container_properties properties()
+        cloud_blob_container_properties move_properties()
         {
             return std::move(m_properties);
         }
@@ -99,13 +99,13 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        std::vector<cloud_blob_container_list_item> extract_items()
+        std::vector<cloud_blob_container_list_item> move_items()
         {
             parse();
             return std::move(m_items);
         }
 
-        utility::string_t extract_next_marker()
+        utility::string_t move_next_marker()
         {
             parse();
             return std::move(m_next_marker);
@@ -136,32 +136,32 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        web::http::uri uri()
+        web::http::uri move_uri()
         {
             return std::move(m_uri);
         }
 
-        utility::string_t name()
+        utility::string_t move_name()
         {
             return std::move(m_name);
         }
 
-        utility::string_t snapshot_time()
+        utility::string_t move_snapshot_time()
         {
             return std::move(m_snapshot_time);
         }
 
-        cloud_metadata metadata()
+        cloud_metadata move_metadata()
         {
             return std::move(m_metadata);
         }
 
-        cloud_blob_properties properties()
+        cloud_blob_properties move_properties()
         {
             return std::move(m_properties);
         }
 
-        copy_state copy_state()
+        copy_state move_copy_state()
         {
             return std::move(m_copy_state);
         }
@@ -185,12 +185,12 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        web::http::uri uri()
+        web::http::uri move_uri()
         {
             return std::move(m_uri);
         }
 
-        utility::string_t name()
+        utility::string_t move_name()
         {
             return std::move(m_name);
         }
@@ -210,19 +210,19 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        std::vector<cloud_blob_list_item> extract_blob_items()
+        std::vector<cloud_blob_list_item> move_blob_items()
         {
             parse();
             return std::move(m_blob_items);
         }
 
-        std::vector<cloud_blob_prefix_list_item> extract_blob_prefix_items()
+        std::vector<cloud_blob_prefix_list_item> move_blob_prefix_items()
         {
             parse();
             return std::move(m_blob_prefix_items);
         }
 
-        utility::string_t extract_next_marker()
+        utility::string_t move_next_marker()
         {
             parse();
             return std::move(m_next_marker);
@@ -257,7 +257,7 @@ namespace azure { namespace storage { namespace protocol {
         }
 
         // Extracts the result. This method can only be called once on this reader
-        std::vector<page_range> extract_result()
+        std::vector<page_range> move_result()
         {
             parse();
             return std::move(m_page_list);
@@ -283,7 +283,7 @@ namespace azure { namespace storage { namespace protocol {
         }
 
         // Extracts the result. This method can only be called once on this reader
-        std::vector<block_list_item> extract_result()
+        std::vector<block_list_item> move_result()
         {
             parse();
             return std::move(m_block_list);
@@ -325,7 +325,7 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        shared_access_policies<Policy> extract_policies()
+        shared_access_policies<Policy> move_policies()
         {
             parse();
             return std::move(m_policies);
@@ -427,12 +427,12 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        utility::string_t name()
+        utility::string_t move_name()
         {
             return std::move(m_name);
         }
 
-        cloud_metadata metadata()
+        cloud_metadata move_metadata()
         {
             return std::move(m_metadata);
         }
@@ -452,13 +452,13 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        std::vector<cloud_queue_list_item> extract_items()
+        std::vector<cloud_queue_list_item> move_items()
         {
             parse();
             return std::move(m_items);
         }
 
-        utility::string_t extract_next_marker()
+        utility::string_t move_next_marker()
         {
             parse();
             return std::move(m_next_marker);
@@ -466,7 +466,6 @@ namespace azure { namespace storage { namespace protocol {
 
     protected:
 
-        virtual void handle_begin_element(const utility::string_t& element_name);
         virtual void handle_element(const utility::string_t& element_name);
         virtual void handle_end_element(const utility::string_t& element_name);
 
@@ -486,17 +485,17 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        utility::string_t content()
+        utility::string_t move_content()
         {
             return std::move(m_content);
         }
 
-        utility::string_t id()
+        utility::string_t move_id()
         {
             return std::move(m_id);
         }
 
-        utility::string_t pop_receipt()
+        utility::string_t move_pop_receipt()
         {
             return std::move(m_pop_receipt);
         }
@@ -537,11 +536,11 @@ namespace azure { namespace storage { namespace protocol {
     public:
 
         explicit message_reader(concurrency::streams::istream stream)
-            : xml_reader(stream)
+            : xml_reader(stream), m_dequeue_count(0)
         {
         }
 
-        std::vector<cloud_message_list_item> extract_items()
+        std::vector<cloud_message_list_item> move_items()
         {
             parse();
             return std::move(m_items);
@@ -549,7 +548,6 @@ namespace azure { namespace storage { namespace protocol {
 
     protected:
 
-        virtual void handle_begin_element(const utility::string_t& element_name);
         virtual void handle_element(const utility::string_t& element_name);
         virtual void handle_end_element(const utility::string_t& element_name);
 
@@ -580,11 +578,11 @@ namespace azure { namespace storage { namespace protocol {
     public:
 
         explicit service_properties_reader(concurrency::streams::istream stream)
-            : xml_reader(stream), m_current_retention_policy_days(0)
+            : xml_reader(stream), m_current_retention_policy_days(0), m_current_retention_policy_enabled(false)
         {
         }
 
-        service_properties extract_properties()
+        service_properties move_properties()
         {
             parse();
             return std::move(m_service_properties);
@@ -634,7 +632,7 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        service_stats extract_stats()
+        service_stats move_stats()
         {
             parse();
             return std::move(m_service_stats);

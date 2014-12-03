@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "wascore/blobstreams.h"
+#include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace core {
 
@@ -36,7 +37,7 @@ namespace azure { namespace storage { namespace core {
                 m_current_blob_offset = pos;
                 m_next_blob_offset = m_current_blob_offset;
                 m_buffer = concurrency::streams::container_buffer<std::vector<char_type>>(std::ios_base::in);
-                m_blob_hash = hash_streambuf();
+                m_blob_hash_provider = hash_provider();
                 return pos;
             }
         }
@@ -146,27 +147,23 @@ namespace azure { namespace storage { namespace core {
                 this_pointer->m_buffer = concurrency::streams::container_buffer<std::vector<char_type>>(std::move(temp_buffer.collection()), std::ios_base::in);
                 this_pointer->m_buffer.seekpos(0, std::ios_base::in);
 
-                if (this_pointer->m_blob_hash && this_pointer->m_blob_hash.is_open())
+                // Validate the blob's content MD5 hash
+                if (this_pointer->m_blob_hash_provider.is_enabled())
                 {
-                    return this_pointer->m_buffer.create_istream().read_to_end(this_pointer->m_blob_hash).then([this_pointer] (size_t) -> bool
-                    {
-                        if (((utility::size64_t) this_pointer->m_next_blob_offset) == this_pointer->size())
-                        {
-                            this_pointer->m_blob_hash.close().wait();
-                            if (this_pointer->m_blob->properties().content_md5() != utility::conversions::to_base64(this_pointer->m_blob_hash.hash()))
-                            {
-                                throw storage_exception(protocol::error_md5_mismatch);
-                            }
-                        }
+                    std::vector<char_type>& result_buffer = this_pointer->m_buffer.collection();
+                    this_pointer->m_blob_hash_provider.write(result_buffer.data(), result_buffer.size());
 
-                        this_pointer->m_buffer.seekpos(0, std::ios_base::in);
-                        return true;
-                    });
+                    if (((utility::size64_t) this_pointer->m_next_blob_offset) == this_pointer->size())
+                    {
+                        this_pointer->m_blob_hash_provider.close();
+                        if (this_pointer->m_blob->properties().content_md5() != this_pointer->m_blob_hash_provider.hash())
+                        {
+                            throw storage_exception(protocol::error_md5_mismatch);
+                        }
+                    }
                 }
-                else
-                {
-                    return pplx::task_from_result<bool>(true);
-                }
+
+                return pplx::task_from_result<bool>(true);
             }
             catch (const std::exception&)
             {

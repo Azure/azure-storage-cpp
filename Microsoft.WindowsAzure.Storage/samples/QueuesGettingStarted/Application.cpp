@@ -33,7 +33,9 @@ namespace azure { namespace storage { namespace samples {
             // Create a queue
             azure::storage::cloud_queue_client queue_client = storage_account.create_cloud_queue_client();
             azure::storage::cloud_queue queue = queue_client.get_queue_reference(U("my-sample-queue"));
-            bool created = queue.create_if_not_exists();
+            
+            // Return value is true if the queue did not exist and was successfully created.
+            queue.create_if_not_exists();
 
             // Insert some queue messages
             azure::storage::cloud_queue_message message1(U("some message"));
@@ -76,10 +78,11 @@ namespace azure { namespace storage { namespace samples {
 
             // Get the approximate queue size
             queue.download_attributes();
-            int message_count = queue.approximate_message_count();
+            ucout << U("Approximate message count: ") << queue.approximate_message_count() << std::endl;
 
             // Delete the queue
-            bool deleted = queue.delete_queue_if_exists();
+            // Return value is true if the queue did exist and was succesfully deleted.
+            queue.delete_queue_if_exists();
         }
         catch (const azure::storage::storage_exception& e)
         {
@@ -100,7 +103,7 @@ namespace azure { namespace storage { namespace samples {
 
 }}} // namespace azure::storage::samples
 
-int _tmain(int argc, _TCHAR *argv[])
+int main(int argc, const char *argv[])
 {
     azure::storage::samples::queues_getting_started_sample();
     return 0;

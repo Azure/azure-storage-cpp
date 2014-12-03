@@ -114,7 +114,7 @@ SUITE(Table)
 
         CHECK(property.property_type() == azure::storage::edm_type::binary);
         CHECK(!property.is_null());
-        CHECK_ARRAY_EQUAL(value, property.binary_value(), value.size());
+        CHECK_ARRAY_EQUAL(value, property.binary_value(), (int)value.size());
 
         CHECK_THROW(property.boolean_value(), std::runtime_error);
         CHECK_THROW(property.datetime_value(), std::runtime_error);
@@ -131,7 +131,7 @@ SUITE(Table)
 
         CHECK(property.property_type() == azure::storage::edm_type::binary);
         CHECK(!property.is_null());
-        CHECK_ARRAY_EQUAL(value, property.binary_value(), value.size());
+        CHECK_ARRAY_EQUAL(value, property.binary_value(), (int)value.size());
 
         CHECK_THROW(property.boolean_value(), std::runtime_error);
         CHECK_THROW(property.datetime_value(), std::runtime_error);
@@ -367,7 +367,7 @@ SUITE(Table)
 
         CHECK(property.property_type() == azure::storage::edm_type::guid);
         CHECK(!property.is_null());
-        CHECK(property.guid_value() == value);
+        CHECK(utility::uuid_equal(property.guid_value(), value));
 
         CHECK_THROW(property.binary_value(), std::runtime_error);
         CHECK_THROW(property.boolean_value(), std::runtime_error);
@@ -384,7 +384,7 @@ SUITE(Table)
 
         CHECK(property.property_type() == azure::storage::edm_type::guid);
         CHECK(!property.is_null());
-        CHECK(property.guid_value() == value);
+        CHECK(utility::uuid_equal(property.guid_value(), value));
 
         CHECK_THROW(property.binary_value(), std::runtime_error);
         CHECK_THROW(property.boolean_value(), std::runtime_error);
@@ -1395,7 +1395,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
 
@@ -1663,7 +1663,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
 
@@ -1767,7 +1767,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
             CHECK(result.entity().properties().find(U("PropertyI")) != result.entity().properties().cend());
@@ -1875,7 +1875,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
             CHECK(result.entity().properties().find(U("PropertyI")) != result.entity().properties().cend());
@@ -2088,7 +2088,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
 
@@ -2188,7 +2188,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
             CHECK(result.entity().properties().find(U("PropertyI")) != result.entity().properties().cend());
@@ -2292,7 +2292,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
             CHECK(result.entity().properties().find(U("PropertyK")) != result.entity().properties().cend());
@@ -2505,7 +2505,7 @@ SUITE(Table)
             CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
             CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), binary_value.size());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
             CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
             CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
 
@@ -3305,7 +3305,6 @@ SUITE(Table)
         azure::storage::cloud_table table = get_table();
 
         utility::string_t partition_key = get_random_string();
-        utility::string_t row_keys[BATCH_SIZE];
 
         {
             azure::storage::table_batch_operation operation;
@@ -3479,7 +3478,7 @@ SUITE(Table)
 
                     for (int row2 = 0; row2 < 26; ++row2)
                     {
-                        utility::string_t row_key = get_string('a' + row1, 'a' + row2);
+                        utility::string_t row_key = get_string((utility::char_t)('a' + row1), (utility::char_t)('a' + row2));
 
                         azure::storage::table_entity entity(partition_key, row_key);
 
@@ -3513,6 +3512,19 @@ SUITE(Table)
             }
         }
 
+        utility::string_t uuid_string = U("12345678-abcd-efab-cdef-1234567890ab");
+        utility::uuid uuid_to_use = utility::string_to_uuid(uuid_string);
+        utility::string_t converted_uuid_string = utility::uuid_to_string(uuid_to_use);
+
+        // Explicit checks to ensure that UUIDs behave as we would expect per platform
+        // After this check, we can jsut use converted_uuid_string.
+#ifdef WIN32
+        CHECK(uuid_string.compare(converted_uuid_string) == 0);
+#else
+        utility::string_t capital_uuid_string = U("12345678-ABCD-EFAB-CDEF-1234567890AB");
+        CHECK((capital_uuid_string).compare(converted_uuid_string) == 0);
+#endif // WIN32
+
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
@@ -3535,31 +3547,31 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, 1234567890123456789LL)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, utility::string_to_uuid(U("12345678-abcd-efab-cdef-1234567890ab"))));
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'12345678-abcd-efab-cdef-1234567890ab')"));
+            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
@@ -3648,31 +3660,31 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, 1234567890123456789LL)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, utility::string_to_uuid(U("12345678-abcd-efab-cdef-1234567890ab"))));
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'12345678-abcd-efab-cdef-1234567890ab')"));
+            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
@@ -3762,7 +3774,7 @@ SUITE(Table)
 
                     for (int row2 = 0; row2 < 26; ++row2)
                     {
-                        utility::string_t row_key = get_string('a' + row1, 'a' + row2);
+                        utility::string_t row_key = get_string((utility::char_t)('a' + row1), (utility::char_t)('a' + row2));
 
                         azure::storage::table_entity entity(partition_key, row_key);
 
@@ -3796,6 +3808,10 @@ SUITE(Table)
             }
         }
 
+        utility::string_t uuid_string = U("12345678-abcd-efab-cdef-1234567890ab");
+        utility::uuid uuid_to_use = utility::string_to_uuid(uuid_string);
+        utility::string_t converted_uuid_string = utility::uuid_to_string(uuid_to_use);
+
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
@@ -3818,31 +3834,31 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, 1234567890123456789LL)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, utility::string_to_uuid(U("12345678-abcd-efab-cdef-1234567890ab"))));
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'12345678-abcd-efab-cdef-1234567890ab')"));
+            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
@@ -3932,31 +3948,31 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, 1234567890123456789LL)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
-                azure::storage::query_logical_operator::and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, utility::string_to_uuid(U("12345678-abcd-efab-cdef-1234567890ab"))));
+                azure::storage::query_logical_operator::op_and, 
+                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'12345678-abcd-efab-cdef-1234567890ab')"));
+            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
@@ -3981,7 +3997,6 @@ SUITE(Table)
                 query_segment = table.execute_query_segmented(query, token, options, context);
                 std::vector<azure::storage::table_entity> results = query_segment.results();
 
-                CHECK(results.size() >= 0);
                 CHECK((int)results.size() <= take_count);
 
                 for (std::vector<azure::storage::table_entity>::const_iterator entity_iterator = results.cbegin(); entity_iterator != results.cend(); ++entity_iterator)

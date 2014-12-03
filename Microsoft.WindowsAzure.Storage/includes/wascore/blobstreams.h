@@ -37,7 +37,7 @@ namespace azure { namespace storage { namespace core {
         {
             if (!options.disable_content_md5_validation() && !m_blob->properties().content_md5().empty())
             {
-                m_blob_hash = hash_md5_streambuf();
+                m_blob_hash_provider = hash_provider::create_md5_hash_provider();
             }
         }
 
@@ -156,7 +156,7 @@ namespace azure { namespace storage { namespace core {
         access_condition m_condition;
         blob_request_options m_options;
         operation_context m_context;
-        hash_streambuf m_blob_hash;
+        hash_provider m_blob_hash_provider;
         off_type m_current_blob_offset;
         off_type m_next_blob_offset;
         size_t m_buffer_size;
@@ -185,12 +185,12 @@ namespace azure { namespace storage { namespace core {
         {
             if (options.use_transactional_md5())
             {
-                m_block_hash = hash_md5_streambuf();
+                m_block_hash_provider = hash_provider::create_md5_hash_provider();
             }
 
             if (options.store_blob_content_md5())
             {
-                m_blob_hash = hash_md5_streambuf();
+                m_blob_hash_provider = hash_provider::create_md5_hash_provider();
             }
         }
 
@@ -307,15 +307,17 @@ namespace azure { namespace storage { namespace core {
 
         private:
 
-            concurrency::streams::istream m_stream;
+            // Note: m_size must be initialized before m_stream, and thus must be listed first in this list.
+            // This is because we use std::move to initialize m_stream, but we need to get the size first.
             utility::size64_t m_size;
             utility::string_t m_content_md5;
+            concurrency::streams::istream m_stream;
         };
 
         concurrency::streams::container_buffer<std::vector<char_type>> m_buffer;
         pos_type m_current_streambuf_offset;
-        hash_streambuf m_blob_hash;
-        hash_streambuf m_block_hash;
+        hash_provider m_blob_hash_provider;
+        hash_provider m_block_hash_provider;
         access_condition m_condition;
         blob_request_options m_options;
         operation_context m_context;

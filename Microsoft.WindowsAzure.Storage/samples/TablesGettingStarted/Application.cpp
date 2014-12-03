@@ -33,7 +33,9 @@ namespace azure { namespace storage { namespace samples {
             // Create a table
             azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();
             azure::storage::cloud_table table = table_client.get_table_reference(U("MySampleTable"));
-            bool created = table.create_if_not_exists();
+            
+            // Return value is true if the table did not exist and was successfully created.
+            table.create_if_not_exists();
 
             // Insert a table entity
             azure::storage::table_entity entity(U("MyPartitionKey"), U("MyRowKey"));
@@ -43,7 +45,7 @@ namespace azure { namespace storage { namespace samples {
             properties[U("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
             properties[U("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
             properties[U("Int32Property")] = azure::storage::entity_property(1234567890);
-            properties[U("Int64Property")] = azure::storage::entity_property(1234567890123456789LL);
+            properties[U("Int64Property")] = azure::storage::entity_property((int64_t) 1234567890123456789LL);
             properties[U("DoubleProperty")] = azure::storage::entity_property(9.1234567890123456789);
             properties[U("BooleanProperty")] = azure::storage::entity_property(true);
             properties[U("BinaryProperty")] = azure::storage::entity_property(std::vector<uint8_t>(10, 'X'));
@@ -75,7 +77,7 @@ namespace azure { namespace storage { namespace samples {
             azure::storage::table_query query;
             query.set_filter_string(azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, U("MyPartitionKey")), 
-                azure::storage::query_logical_operator::and, 
+                azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("MyRowKey5"))));
             std::vector<azure::storage::table_entity> entities = table.execute_query(query);
             for (std::vector<azure::storage::table_entity>::const_iterator it = entities.cbegin(); it != entities.cend(); ++it)
@@ -89,7 +91,8 @@ namespace azure { namespace storage { namespace samples {
             azure::storage::table_result delete_result = table.execute(delete_operation);
 
             // Delete the table
-            bool deleted = table.delete_table_if_exists();
+            // Return value is true if the table did exist and was successfully deleted.
+            table.delete_table_if_exists();
         }
         catch (const azure::storage::storage_exception& e)
         {
@@ -110,7 +113,7 @@ namespace azure { namespace storage { namespace samples {
 
 }}} // namespace azure::storage::samples
 
-int _tmain(int argc, _TCHAR *argv[])
+int main(int argc, const char *argv[])
 {
     azure::storage::samples::tables_getting_started_sample();
     return 0;

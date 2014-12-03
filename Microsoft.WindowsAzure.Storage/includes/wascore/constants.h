@@ -35,6 +35,13 @@ namespace azure { namespace storage { namespace protocol {
 
     // duration constants
     const std::chrono::seconds default_retry_interval(3);
+    // The following value must be less than 2147482, which is the highest 
+    // that Casablanca 2.2.0 on Linux can accept, which is derived from 
+    // the maximum value for a signed long on g++, divided by 1000.
+    // Choosing to set it to 24 days to align with .NET.
+    const std::chrono::seconds default_maximum_execution_time(24 * 24 * 60 * 60);
+    // For the following value, "0" means "don't send a timeout to the service"
+    const std::chrono::seconds default_server_timeout(0);
 
     // uri query parameters
     const utility::string_t uri_query_timeout(U("timeout"));
@@ -298,9 +305,9 @@ namespace azure { namespace storage { namespace protocol {
 
     // user agent
 #if defined(WIN32)
-    const utility::string_t header_value_user_agent(U("Azure-Storage/0.3.0 (Native; Windows)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/0.4.0 (Native; Windows)"));
 #else
-    const utility::string_t header_value_user_agent(U("Azure-Storage/0.3.0 (Native)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/0.4.0 (Native)"));
 #endif
 
 }}} // namespace azure::storage::protocol

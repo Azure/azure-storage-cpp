@@ -143,7 +143,7 @@ namespace azure { namespace storage { namespace protocol {
 
                 web::json::value document = web::json::value::parse(utility::conversions::to_string_t(error_string));
                 storage_extended_error extended_error = protocol::parse_table_error(document);
-                request_result request_result(utility::datetime(), storage_location::unspecified, response, status_code, extended_error);
+                request_result request_result(utility::datetime(), storage_location::unspecified, response, (web::http::status_code) status_code, extended_error);
                 throw storage_exception(status_message, request_result);
             }
         }
@@ -220,7 +220,7 @@ namespace azure { namespace storage { namespace protocol {
 
                     web::json::value document = web::json::value::parse(utility::conversions::to_string_t(error_string));
                     storage_extended_error extended_error = protocol::parse_table_error(document);
-                    request_result request_result(utility::datetime(), storage_location::unspecified, response, status_code, extended_error);
+                    request_result request_result(utility::datetime(), storage_location::unspecified, response, (web::http::status_code) status_code, extended_error);
                     throw storage_exception(status_message, request_result);
                 }
             }

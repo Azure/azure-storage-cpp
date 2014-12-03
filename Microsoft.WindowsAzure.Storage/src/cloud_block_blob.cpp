@@ -32,7 +32,7 @@ namespace azure { namespace storage {
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::istream_descriptor::create(block_data, needs_md5).then([command, context, block_id, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<void>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
@@ -56,9 +56,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::put_block_list, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
         });
         return core::istream_descriptor::create(stream).then([command, context, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
@@ -79,16 +79,16 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_block_list, listing_filter, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context) -> std::vector<block_list_item>
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> std::vector<block_list_item>
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             return std::vector<block_list_item>();
         });
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<std::vector<block_list_item>>
         {
             protocol::block_list_reader reader(response.body());
-            return pplx::task_from_result(reader.extract_result());
+            return pplx::task_from_result(reader.move_result());
         });
         return core::executor<std::vector<block_list_item>>::execute_async(command, modified_options, context);
     }
@@ -143,9 +143,20 @@ namespace azure { namespace storage {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
+        // This will be std::numeric_limits<utility::size64_t>::max() if the stream is not seekable.
+        utility::size64_t remaining_stream_length = core::get_remaining_stream_length(source);
+
+        // Before this line, 'length = max' means "no length was given by the user."  After this line, 'length = max' means "no length was given, and the stream is not seekable."
         if (length == std::numeric_limits<utility::size64_t>::max())
         {
-            length = core::get_remaining_stream_length(source);
+            length = remaining_stream_length;
+        }
+
+        // If the stream is seekable, check for the case where the stream is too short.
+        // If the stream is not seekable, this will be caught later, when we run out of bytes in the stream when uploading.
+        if (source.can_seek() && (length > remaining_stream_length))
+        {
+            throw std::invalid_argument(protocol::error_stream_short);
         }
 
         if ((length != std::numeric_limits<utility::size64_t>::max()) &&
@@ -162,9 +173,9 @@ namespace azure { namespace storage {
 
             auto command = std::make_shared<core::storage_command<void>>(uri());
             command->set_authentication_handler(service_client().authentication_handler());
-            command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+            command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
             {
-                protocol::preprocess_response(response, context);
+                protocol::preprocess_response_void(response, result, context);
                 properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             });
             return core::istream_descriptor::create(source, modified_options.store_blob_content_md5(), length).then([command, context, properties, metadata, condition, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>

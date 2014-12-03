@@ -40,7 +40,9 @@ namespace azure { namespace storage { namespace samples {
             // Create a blob container
             azure::storage::cloud_blob_client blob_client = storage_account.create_cloud_blob_client();
             azure::storage::cloud_blob_container container = blob_client.get_container_reference(U("my-sample-container"));
-            bool created = container.create_if_not_exists();
+           
+            // Return value is true if the container did not exist and was successfully created.
+            container.create_if_not_exists();
 
             // Make the blob container publicly accessible
             azure::storage::blob_container_permissions permissions;
@@ -96,7 +98,8 @@ namespace azure { namespace storage { namespace samples {
             blob3.delete_blob();
 
             // Delete the blob container
-            bool deleted = container.delete_container_if_exists();
+            // Return value is true if the container did exist and was successfully deleted.
+            container.delete_container_if_exists();
         }
         catch (const azure::storage::storage_exception& e)
         {
@@ -117,7 +120,7 @@ namespace azure { namespace storage { namespace samples {
 
 }}} // namespace azure::storage::samples
 
-int _tmain(int argc, _TCHAR *argv[])
+int main(int argc, const char *argv[])
 {
     azure::storage::samples::blobs_getting_started_sample();
     return 0;

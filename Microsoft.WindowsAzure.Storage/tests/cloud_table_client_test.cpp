@@ -135,6 +135,10 @@ SUITE(TableClient)
         CHECK(context.request_results()[0].extended_error().code().empty());
         CHECK(context.request_results()[0].extended_error().message().empty());
         CHECK(context.request_results()[0].extended_error().details().empty());
+        for (int i = 0; i < TABLE_COUNT; ++i)
+        {
+            CHECK(is_found[i]);
+        }
 
         for (int i = 0; i < TABLE_COUNT; ++i)
         {
@@ -172,7 +176,6 @@ SUITE(TableClient)
             result_segment = client.list_tables_segmented(prefix, max_results, token, options, context);
             std::vector<azure::storage::cloud_table> results = result_segment.results();
 
-            CHECK(results.size() >= 0);
             CHECK((int)results.size() <= max_results);
 
             for (std::vector<azure::storage::cloud_table>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
@@ -216,6 +219,10 @@ SUITE(TableClient)
         while (!token.empty());
 
         CHECK(segment_count > 1);
+        for (int i = 0; i < TABLE_COUNT; ++i)
+        {
+            CHECK(is_found[i]);
+        }
 
         for (int i = 0; i < TABLE_COUNT; ++i)
         {

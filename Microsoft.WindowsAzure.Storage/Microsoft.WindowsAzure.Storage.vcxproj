@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.props" Condition="Exists('..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.props')" />
+  <Import Project="..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.props" Condition="Exists('..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.props')" />
+  <Import Project="..\packages\openssl.1.0.1.25\build\native\openssl.props" Condition="Exists('..\packages\openssl.1.0.1.25\build\native\openssl.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -103,7 +104,7 @@
       <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>/we4100 /Zm129 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm150 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -121,7 +122,7 @@
       <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>/we4100 /Zm129 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm150 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -142,7 +143,7 @@
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>/we4100 /Zm122 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm150 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -165,7 +166,7 @@
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
-      <AdditionalOptions>/we4100 /Zm122 %(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AdditionalOptions>/we4100 /Zm150 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
     </ClCompile>
@@ -193,7 +194,7 @@
     <ClInclude Include="includes\wascore\blobstreams.h" />
     <ClInclude Include="includes\wascore\constants.h" />
     <ClInclude Include="includes\wascore\executor.h" />
-    <ClInclude Include="includes\wascore\hash_windows.h" />
+    <ClInclude Include="includes\wascore\hashing.h" />
     <ClInclude Include="includes\wascore\logging.h" />
     <ClInclude Include="includes\wascore\protocol.h" />
     <ClInclude Include="includes\wascore\protocol_xml.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="src\cloud_blob_directory.cpp" />
     <ClCompile Include="src\cloud_block_blob.cpp" />
     <ClCompile Include="src\cloud_client.cpp" />
+    <ClCompile Include="src\cloud_common.cpp" />
     <ClCompile Include="src\cloud_core.cpp" />
     <ClCompile Include="src\cloud_page_blob.cpp" />
     <ClCompile Include="src\cloud_queue.cpp" />
@@ -229,8 +231,8 @@
     <ClCompile Include="src\cloud_storage_account.cpp" />
     <ClCompile Include="src\cloud_table.cpp" />
     <ClCompile Include="src\cloud_table_client.cpp" />
-    <ClCompile Include="src\hash_windows.cpp" />
-    <ClCompile Include="src\logging_windows.cpp" />
+    <ClCompile Include="src\hashing.cpp" />
+    <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\mime_multipart_helper.cpp" />
     <ClCompile Include="src\operation_context.cpp" />
     <ClCompile Include="src\protocol_json.cpp" />
@@ -254,7 +256,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\util_windows.cpp" />
     <ClCompile Include="src\xmlhelpers.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -265,7 +266,11 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets" Condition="Exists('..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets')" />
+    <Import Project="..\packages\zlib.1.2.8.7\build\native\zlib.targets" Condition="Exists('..\packages\zlib.1.2.8.7\build\native\zlib.targets')" />
+    <Import Project="..\packages\openssl.redist.1.0.1.25\build\native\openssl.redist.targets" Condition="Exists('..\packages\openssl.redist.1.0.1.25\build\native\openssl.redist.targets')" />
+    <Import Project="..\packages\openssl.1.0.1.25\build\native\openssl.targets" Condition="Exists('..\packages\openssl.1.0.1.25\build\native\openssl.targets')" />
+    <Import Project="..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.targets" Condition="Exists('..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.targets')" />
     <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-    <Import Project="..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.targets" Condition="Exists('..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.targets')" />
   </ImportGroup>
 </Project>

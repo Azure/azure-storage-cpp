@@ -24,22 +24,9 @@
 
 namespace azure { namespace storage { namespace protocol {
 
-    void preprocess_response(const web::http::http_response& response, operation_context context)
+    void preprocess_response_void(const web::http::http_response& response, const request_result& result, operation_context context)
     {
-        preprocess_response<char>(0, response, context);
-    }
-
-    void check_stream_length_and_md5(utility::size64_t length, const utility::string_t& content_md5, const core::ostream_descriptor& descriptor)
-    {
-        if (length != descriptor.length())
-        {
-            throw storage_exception(protocol::error_incorrect_length);
-        }
-
-        if (!content_md5.empty() && !descriptor.content_md5().empty() && (content_md5 != descriptor.content_md5()))
-        {
-            throw storage_exception(protocol::error_md5_mismatch);
-        }
+        preprocess_response<char>(0, response, result, context);
     }
 
     utility::string_t get_header_value(const web::http::http_headers& headers, const utility::string_t& header)
@@ -252,8 +239,8 @@ namespace azure { namespace storage { namespace protocol {
             concurrency::streams::istream body_stream = response.body();
 
             protocol::storage_error_reader reader(body_stream);
-            error_code = reader.extract_error_code();
-            error_message = reader.extract_error_message();
+            error_code = reader.move_error_code();
+            error_message = reader.move_error_message();
 
             return storage_extended_error(std::move(error_code), std::move(error_message), std::move(details));
         }

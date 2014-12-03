@@ -67,6 +67,24 @@ std::vector<azure::storage::cloud_blob> blob_service_test_base::list_all_blobs_f
 
 SUITE(Blob)
 {
+    TEST_FIXTURE(blob_service_test_base, get_container_reference)
+    {
+        utility::string_t container_name = get_random_container_name();
+        azure::storage::cloud_blob_container container = m_client.get_container_reference(container_name);
+
+        CHECK(!container.service_client().base_uri().primary_uri().is_empty());
+        CHECK(container.service_client().credentials().is_shared_key());
+        CHECK(container.name() == container_name);
+        CHECK(!container.uri().primary_uri().is_empty());
+        CHECK(container.metadata().empty());
+        CHECK(container.properties().etag().empty());
+        CHECK(!container.properties().last_modified().is_initialized());
+        CHECK(container.properties().lease_status() == azure::storage::lease_status::unspecified);
+        CHECK(container.properties().lease_state() == azure::storage::lease_state::unspecified);
+        CHECK(container.properties().lease_duration() == azure::storage::lease_duration::unspecified);
+        CHECK(container.is_valid());
+    }
+
     TEST_FIXTURE(blob_service_test_base_with_objects_to_delete, list_containers_with_prefix)
     {
         auto prefix = get_random_container_name();
@@ -120,7 +138,7 @@ SUITE(Blob)
 
         std::vector<azure::storage::cloud_blob_container> containers(m_containers_to_delete);
 
-        auto listing = list_all_containers(utility::string_t(), azure::storage::container_listing_details::all, 1, azure::storage::blob_request_options());
+        auto listing = list_all_containers(utility::string_t(), azure::storage::container_listing_details::all, 5000, azure::storage::blob_request_options());
         for (auto listing_iter = listing.begin(); listing_iter != listing.end(); ++listing_iter)
         {
             for (auto iter = containers.begin(); iter != containers.end(); ++iter)

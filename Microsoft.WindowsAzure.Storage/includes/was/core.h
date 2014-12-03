@@ -355,7 +355,7 @@ namespace azure { namespace storage {
         /// <param name="fallback_value">The fallback value.</param>
         void merge(const option_with_default<T>& value, const T& fallback_value)
         {
-            merge(value.m_has_value ? value : fallback_value);
+            merge(value.m_has_value ? (const T&)value : fallback_value);
         }
 
     private:
@@ -437,7 +437,8 @@ namespace azure { namespace storage {
         request_result()
             : m_is_response_available(false),
             m_target_location(storage_location::unspecified),
-            m_http_status_code(0)
+            m_http_status_code(0),
+            m_content_length(-1)
         {
         }
 
@@ -451,7 +452,8 @@ namespace azure { namespace storage {
             m_start_time(start_time),
             m_target_location(target_location),
             m_end_time(utility::datetime::utc_now()),
-            m_http_status_code(0)
+            m_http_status_code(0),
+            m_content_length(-1)
         {
         }
 
@@ -547,9 +549,18 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the content-MD5 hash for the request.
+        /// Gets the content length for the request.
         /// </summary>
-        /// <returns>The content-MD5 hash for the request.</returns>
+        /// <returns>The content length for the request.</returns>
+        utility::size64_t content_length() const
+        {
+            return m_content_length;
+        }
+
+        /// <summary>
+        /// Gets the content MD5 hash for the request.
+        /// </summary>
+        /// <returns>The content MD5 hash for the request.</returns>
         const utility::string_t& content_md5() const
         {
             return m_content_md5;
@@ -594,6 +605,7 @@ namespace azure { namespace storage {
         web::http::status_code m_http_status_code;
         utility::string_t m_service_request_id;
         utility::datetime m_request_date;
+        utility::size64_t m_content_length;
         utility::string_t m_content_md5;
         utility::string_t m_etag;
         storage_extended_error m_extended_error;
@@ -670,24 +682,6 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the target location for the next retry.
-        /// </summary>
-        /// <returns>The target location for the next retry.</returns>
-        storage_location next_location() const
-        {
-            return m_next_location;
-        }
-
-        /// <summary>
-        /// Gets the location mode for subsequent retries.
-        /// </summary>
-        /// <returns>The location mode for subsequent retries.</returns>
-        location_mode current_location_mode() const
-        {
-            return m_current_location_mode;
-        }
-
-        /// <summary>
         /// Gets the number of retries for the given operation.
         /// </summary>
         /// <returns>The number of retries for the given operation.</returns>
@@ -705,12 +699,30 @@ namespace azure { namespace storage {
             return m_last_request_result;
         }
 
+        /// <summary>
+        /// Gets the target location for the next retry.
+        /// </summary>
+        /// <returns>The target location for the next retry.</returns>
+        storage_location next_location() const
+        {
+            return m_next_location;
+        }
+
+        /// <summary>
+        /// Gets the location mode for subsequent retries.
+        /// </summary>
+        /// <returns>The location mode for subsequent retries.</returns>
+        location_mode current_location_mode() const
+        {
+            return m_current_location_mode;
+        }
+
     private:
 
-        storage_location m_next_location;
-        location_mode m_current_location_mode;
         int m_current_retry_count;
         request_result m_last_request_result;
+        storage_location m_next_location;
+        location_mode m_current_location_mode;
     };
 
     /// <summary>
@@ -724,7 +736,8 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::retry_info"/> class.
         /// </summary>
         retry_info()
-            : m_should_retry(false)
+            : m_should_retry(false), m_target_location(storage_location::unspecified),
+            m_updated_location_mode(location_mode::unspecified), m_retry_interval()
         {
         }
 
@@ -733,11 +746,18 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="retryContext">The <see cref="azure::storage::retry_context"/> object that was passed in to the retry policy.</param>
         explicit retry_info(const retry_context& context)
-            : m_should_retry(true),
-            m_target_location(context.next_location()),
-            m_updated_location_mode(context.current_location_mode()),
-            m_retry_interval(protocol::default_retry_interval)
+            : m_should_retry(true), m_target_location(context.next_location()),
+            m_updated_location_mode(context.current_location_mode()), m_retry_interval(protocol::default_retry_interval)
         {
+        }
+
+        /// <summary>
+        /// Indicates that the request should be retried.
+        /// </summary>
+        /// <returns><c>true</c> if the request should be retried.</returns>
+        bool should_retry() const
+        {
+            return m_should_retry;
         }
 
         /// <summary>
@@ -794,21 +814,12 @@ namespace azure { namespace storage {
             m_retry_interval = value;
         }
 
-        /// <summary>
-        /// Indicates that the request should be retried.
-        /// </summary>
-        /// <returns><c>true</c> if the request should be retried.</returns>
-        bool should_retry() const
-        {
-            return m_should_retry;
-        }
-
     private:
 
         bool m_should_retry;
-        std::chrono::milliseconds m_retry_interval;
         storage_location m_target_location;
         location_mode m_updated_location_mode;
+        std::chrono::milliseconds m_retry_interval;
     };
 
     class retry_policy;
@@ -885,3 +896,7 @@ namespace azure { namespace storage {
     };
 
 }} // namespace azure::storage
+
+#ifndef WIN32
+#define UNREFERENCED_PARAMETER(P) (P)
+#endif

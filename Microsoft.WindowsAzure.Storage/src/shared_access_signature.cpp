@@ -22,6 +22,7 @@
 #include "was/queue.h"
 #include "was/table.h"
 #include "wascore/util.h"
+#include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace protocol {
 
@@ -58,16 +59,14 @@ namespace azure { namespace storage { namespace protocol {
         return builder;
     }
 
-    utility::ostringstream_t get_sas_string_to_sign(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource)
+    void get_sas_string_to_sign(utility::ostringstream_t& str, const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource)
     {
-        utility::ostringstream_t str;
         str << policy.permissions_to_string() << U('\n');
         str << convert_datetime_if_initialized(policy.start()) << U('\n');
         str << convert_datetime_if_initialized(policy.expiry()) << U('\n');
         str << resource << U('\n');
         str << identifier << U('\n');
         str << header_value_storage_version;
-        return str;
     }
 
     storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource)
@@ -94,7 +93,7 @@ namespace azure { namespace storage { namespace protocol {
             protocol::uri_query_sas_signature,
         };
 
-        const int sas_parameters_size = sizeof(sas_parameters) / sizeof(sas_parameters[0]);
+        const int sas_parameters_size = (int) (sizeof(sas_parameters) / sizeof(sas_parameters[0]));
 
         auto splitted_query = web::http::uri::split_query(uri.query());
 
@@ -131,8 +130,8 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_blob_sas_string_to_sign(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource, const storage_credentials& credentials)
     {
-        auto str = get_sas_string_to_sign(identifier, policy, resource);
-
+        utility::ostringstream_t str;
+        get_sas_string_to_sign(str, identifier, policy, resource);
         str << U('\n') << headers.cache_control();
         str << U('\n') << headers.content_disposition();
         str << U('\n') << headers.content_encoding();
@@ -163,7 +162,8 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_queue_sas_string_to_sign(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials)
     {
-        auto str = get_sas_string_to_sign(identifier, policy, resource);
+        utility::ostringstream_t str;
+        get_sas_string_to_sign(str, identifier, policy, resource);
 
         return calculate_hmac_sha256_hash(str.str(), credentials);
     }
@@ -182,7 +182,8 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_table_sas_string_to_sign(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials)
     {
-        auto str = get_sas_string_to_sign(identifier, policy, resource);
+        utility::ostringstream_t str;
+        get_sas_string_to_sign(str, identifier, policy, resource);
 
         str << U('\n') << start_partition_key;
         str << U('\n') << start_row_key;

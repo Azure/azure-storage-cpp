@@ -28,11 +28,11 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_service_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<service_properties>, service_properties(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<service_properties>, service_properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<service_properties>
         {
             protocol::service_properties_reader reader(response.body());
-            return pplx::task_from_result<service_properties>(reader.extract_properties());
+            return pplx::task_from_result<service_properties>(reader.move_properties());
         });
         return core::executor<service_properties>::execute_async(command, modified_options, context);
     }
@@ -45,7 +45,7 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(base_uri());
         command->set_build_request(std::bind(protocol::set_service_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::istream_descriptor::create(stream).then([command, context, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
         {
             command->set_request_body(request_body);
@@ -59,11 +59,11 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_service_stats, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<service_stats>, service_stats(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<service_stats>, service_stats(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<service_stats>
         {
             protocol::service_stats_reader reader(response.body());
-            return pplx::task_from_result<service_stats>(reader.extract_stats());
+            return pplx::task_from_result<service_stats>(reader.move_stats());
         });
         return core::executor<service_stats>::execute_async(command, modified_options, context);
     }

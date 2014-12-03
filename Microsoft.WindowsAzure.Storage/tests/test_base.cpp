@@ -31,7 +31,7 @@ test_config::test_config()
     auto target_name = config[U("target")].as_string();
     web::json::value& tenants = config[U("tenants")];
 
-	for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
+    for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
     {
         const web::json::value& name_obj = it->at(U("name"));
         if (name_obj.as_string() == target_name)

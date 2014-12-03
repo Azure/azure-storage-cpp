@@ -110,6 +110,34 @@ static azure::storage::retry_info create_fake_retry_info(azure::storage::storage
 
 SUITE(Core)
 {
+    TEST(retry_info)
+    {
+        {
+            azure::storage::retry_info info;
+
+            CHECK(!info.should_retry());
+            CHECK(info.target_location() == azure::storage::storage_location::unspecified);
+            CHECK(info.updated_location_mode() == azure::storage::location_mode::unspecified);
+            CHECK(info.retry_interval() == std::chrono::milliseconds());
+        }
+
+        {
+            int current_retry_count = 2;
+            azure::storage::request_result last_request_result;
+            azure::storage::storage_location next_location = azure::storage::storage_location::secondary;
+            azure::storage::location_mode current_location_mode = azure::storage::location_mode::secondary_only;
+
+            azure::storage::retry_context context(current_retry_count, last_request_result, next_location, current_location_mode);
+
+            azure::storage::retry_info info(context);
+
+            CHECK(info.should_retry());
+            CHECK(info.target_location() == next_location);
+            CHECK(info.updated_location_mode() == current_location_mode);
+            CHECK(info.retry_interval() > std::chrono::milliseconds());
+        }
+    }
+
     TEST(no_retry_results)
     {
         auto allowed_delta = [] (int retry_count) -> std::chrono::milliseconds

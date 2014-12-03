@@ -254,7 +254,7 @@ namespace azure { namespace storage {
     enum class delete_snapshots_option
     {
         /// <summary>
-        /// Delete blobs but not snapshots.
+        /// Delete the blob only. If the blob has snapshots, this option will result in an error from the service.
         /// </summary>
         none,
 
@@ -997,9 +997,14 @@ namespace azure { namespace storage {
         /// </summary>
         cloud_blob_properties()
             : m_type(blob_type::unspecified), m_page_blob_sequence_number(0),
-            m_lease_state(lease_state::unspecified), m_lease_status(lease_status::unspecified),
-            m_lease_duration(lease_duration::unspecified), m_size(0)
+            m_lease_state(azure::storage::lease_state::unspecified), m_lease_status(azure::storage::lease_status::unspecified),
+            m_lease_duration(azure::storage::lease_duration::unspecified), m_size(0)
         {
+        }
+
+        cloud_blob_properties(const cloud_blob_properties& other)
+        {
+            *this = other;
         }
 
         /// <summary>
@@ -1008,8 +1013,26 @@ namespace azure { namespace storage {
         /// <param name="other">A reference to a set of <see cref="cloud_blob_properties" /> on which to base the new instance.</param>
         cloud_blob_properties(cloud_blob_properties&& other)
         {
-            // TODO: Double check that the following std::move call is needed
             *this = std::move(other);
+        }
+
+        cloud_blob_properties& operator=(const cloud_blob_properties& other)
+        {
+            m_size = other.m_size;
+            m_etag = other.m_etag;
+            m_last_modified = other.m_last_modified;
+            m_type = other.m_type;
+            m_lease_duration = other.m_lease_duration;
+            m_lease_state = other.m_lease_state;
+            m_lease_status = other.m_lease_status;
+            m_page_blob_sequence_number = other.m_page_blob_sequence_number;
+            m_cache_control = other.m_cache_control;
+            m_content_disposition = other.m_content_disposition;
+            m_content_encoding = other.m_content_encoding;
+            m_content_language = other.m_content_language;
+            m_content_md5 = other.m_content_md5;
+            m_content_type = other.m_content_type;
+            return *this;
         }
 
         /// <summary>
@@ -1603,7 +1626,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="id">The block name.</param>
         /// <param name="mode">A <see cref="block_mode" /> value that indicates which block lists to search for the block.</param>
-        block_list_item(utility::string_t& id, block_mode mode)
+        block_list_item(utility::string_t id, block_mode mode)
             : m_id(std::move(id)), m_size(std::numeric_limits<size_t>::max()), m_mode(mode)
         {
         }
@@ -1784,9 +1807,8 @@ namespace azure { namespace storage {
     private:
 
         sequence_number(sequence_number_action action, int64_t value)
+            : m_action(action), m_value(value)
         {
-            m_action = action;
-            m_value = value;
         }
 
         sequence_number_action m_action;
@@ -1802,7 +1824,11 @@ namespace azure { namespace storage {
         /// <summary>
         /// Initializes a new instance of the <see cref="cloud_blob_container_properties"/> class.
         /// </summary>
-        cloud_blob_container_properties() {}
+        cloud_blob_container_properties()
+            : m_lease_status(azure::storage::lease_status::unspecified), m_lease_state(azure::storage::lease_state::unspecified),
+            m_lease_duration(azure::storage::lease_duration::unspecified)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="cloud_blob_container_properties"/> class.
@@ -2237,7 +2263,7 @@ namespace azure { namespace storage {
 
         void initialize()
         {
-            set_authentication_scheme(authentication_scheme::shared_key);
+            set_authentication_scheme(azure::storage::authentication_scheme::shared_key);
             m_directory_delimiter = protocol::directory_delimiter;
         }
 

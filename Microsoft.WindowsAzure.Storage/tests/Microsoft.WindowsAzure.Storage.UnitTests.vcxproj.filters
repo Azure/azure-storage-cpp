@@ -50,7 +50,7 @@
     <ClCompile Include="cloud_block_blob_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\hash_windows.cpp">
+    <ClCompile Include="..\src\hashing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="blob_test_base.cpp">

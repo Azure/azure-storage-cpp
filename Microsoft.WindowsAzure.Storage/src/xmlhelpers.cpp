@@ -467,7 +467,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
             throw utility::details::create_system_error(error);
         }
 #else
-        UNUSED_PARAMETER(namespaceUri);
+        UNREFERENCED_PARAMETER(namespaceUri);
         if (prefix == U("xmlns"))
         {
             m_elementStack.top()->set_namespace_declaration(

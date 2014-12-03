@@ -53,7 +53,10 @@ namespace utility {
 #ifdef WIN32
     typedef UUID uuid;
 #else
-    typedef uuid_t uuid;
+    typedef struct
+    {
+            uuid_t data;
+    } uuid;
 #endif
 
     /// <summary>

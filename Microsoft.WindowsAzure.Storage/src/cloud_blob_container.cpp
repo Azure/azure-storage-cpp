@@ -122,9 +122,9 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_blob_container_properties, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties, metadata] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties, metadata] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             *properties = protocol::blob_response_parsers::parse_blob_container_properties(response);
             *metadata = protocol::parse_metadata(response);
         });
@@ -141,9 +141,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::set_blob_container_metadata, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
         return core::executor<void>::execute_async(command, modified_options, context);
@@ -159,9 +159,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_acquire, proposed_lease_id, duration, lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return protocol::parse_lease_id(response);
         });
@@ -183,9 +183,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_renew, utility::string_t(), lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
         return core::executor<void>::execute_async(command, modified_options, context);
@@ -206,9 +206,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_change, proposed_lease_id, lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return protocol::parse_lease_id(response);
         });
@@ -230,9 +230,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_release, utility::string_t(), lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
         return core::executor<void>::execute_async(command, modified_options, context);
@@ -248,9 +248,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<std::chrono::seconds>>(uri());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_break, utility::string_t(), lease_time(), break_period, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context) -> std::chrono::seconds
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> std::chrono::seconds
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return protocol::parse_lease_time(response);
         });
@@ -267,9 +267,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::create_blob_container, public_access, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
         return core::executor<void>::execute_async(command, modified_options, context);
@@ -323,7 +323,7 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::delete_blob_container, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
@@ -389,26 +389,26 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::list_blobs, prefix, delimiter, includes, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<blob_result_segment>, blob_result_segment(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<blob_result_segment>, blob_result_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([container, delimiter] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<blob_result_segment>
         {
             protocol::list_blobs_reader reader(response.body());
 
-            std::vector<protocol::cloud_blob_list_item> blob_items(reader.extract_blob_items());
+            std::vector<protocol::cloud_blob_list_item> blob_items(reader.move_blob_items());
             std::vector<cloud_blob> blobs;
             for (std::vector<protocol::cloud_blob_list_item>::iterator iter = blob_items.begin(); iter != blob_items.end(); ++iter)
             {
-                blobs.push_back(cloud_blob(iter->name(), iter->snapshot_time(), container, iter->properties(), iter->metadata(), iter->copy_state()));
+                blobs.push_back(cloud_blob(iter->move_name(), iter->move_snapshot_time(), container, iter->move_properties(), iter->move_metadata(), iter->move_copy_state()));
             }
 
-            std::vector<protocol::cloud_blob_prefix_list_item> blob_prefix_items(reader.extract_blob_prefix_items());
+            std::vector<protocol::cloud_blob_prefix_list_item> blob_prefix_items(reader.move_blob_prefix_items());
             std::vector<cloud_blob_directory> directories;
             for (auto iter = blob_prefix_items.begin(); iter != blob_prefix_items.end(); ++iter)
             {
-                directories.push_back(cloud_blob_directory(iter->name(), container));
+                directories.push_back(cloud_blob_directory(iter->move_name(), container));
             }
 
-            continuation_token next_token(reader.extract_next_marker());
+            continuation_token next_token(reader.move_next_marker());
             next_token.set_target_location(result.target_location());
             return pplx::task_from_result(blob_result_segment(std::move(blobs), std::move(directories), next_token));
         });
@@ -428,9 +428,9 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::set_blob_container_acl, permissions.public_access(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
         return core::istream_descriptor::create(stream).then([command, context, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
@@ -451,9 +451,9 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_blob_container_acl, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties] (const web::http::http_response& response, operation_context context) -> blob_container_permissions
+        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> blob_container_permissions
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return blob_container_permissions();
         });
@@ -461,7 +461,7 @@ namespace azure { namespace storage {
         {
             blob_container_permissions permissions;
             protocol::access_policy_reader<blob_shared_access_policy> reader(response.body());
-            permissions.set_policies(reader.extract_policies());
+            permissions.set_policies(reader.move_policies());
             permissions.set_public_access(protocol::blob_response_parsers::parse_public_access_type(response));
             return pplx::task_from_result<blob_container_permissions>(permissions);
         });
@@ -480,14 +480,14 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_blob_container_properties, access_condition(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(primary_only ? core::command_location_mode::primary_only : core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties, metadata] (const web::http::http_response& response, operation_context context) -> bool
+        command->set_preprocess_response([properties, metadata] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (response.status_code() == web::http::status_codes::NotFound)
             {
                 return false;
             }
 
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             *properties = protocol::blob_response_parsers::parse_blob_container_properties(response);
             *metadata = protocol::parse_metadata(response);
             return true;

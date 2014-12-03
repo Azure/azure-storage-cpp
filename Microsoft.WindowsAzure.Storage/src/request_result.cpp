@@ -28,7 +28,8 @@ namespace azure { namespace storage {
         m_start_time(start_time),
         m_target_location(target_location),
         m_end_time(utility::datetime::utc_now()),
-        m_http_status_code(response.status_code())
+        m_http_status_code(response.status_code()),
+        m_content_length(-1)
     {
         parse_headers(response.headers());
         if (parse_body_as_error)
@@ -43,7 +44,8 @@ namespace azure { namespace storage {
         m_target_location(target_location),
         m_end_time(utility::datetime::utc_now()),
         m_http_status_code(http_status_code),
-        m_extended_error(std::move(extended_error))
+        m_extended_error(std::move(extended_error)),
+        m_content_length(-1)
     {
         parse_headers(response.headers());
     }
@@ -51,6 +53,7 @@ namespace azure { namespace storage {
     void request_result::parse_headers(const web::http::http_headers& headers)
     {
         headers.match(protocol::ms_header_request_id, m_service_request_id);
+        headers.match(web::http::header_names::content_length, m_content_length);
         headers.match(web::http::header_names::content_md5, m_content_md5);
         headers.match(web::http::header_names::etag, m_etag);
 

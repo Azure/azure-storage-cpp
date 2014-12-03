@@ -19,6 +19,17 @@
 
 #include "was/blob.h"
 
+#ifndef WIN32
+
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+
+#endif
+
+
 int run_tests(const char* suite_name, const char* test_name)
 {
     UnitTest::TestReporterStdout reporter;
@@ -32,6 +43,20 @@ int run_tests(const char* suite_name, const char* test_name)
 int main(int argc, const char* argv[])
 {
     azure::storage::operation_context::set_default_log_level(azure::storage::client_log_level::log_level_verbose);
+
+#ifndef WIN32
+    boost::log::add_common_attributes();
+    boost::log::add_file_log
+    (
+        boost::log::keywords::file_name = "test_log.log",
+        boost::log::keywords::format = 
+        (
+            boost::log::expressions::stream << "<Sev: " << boost::log::trivial::severity
+            << "> " << boost::log::expressions::smessage
+        )
+    );
+
+#endif
 
     int failure_count;
     if (argc == 1)

@@ -22,6 +22,12 @@
 #include "core.h"
 #include "retry_policies.h"
 
+#ifndef WIN32
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#endif
+
 namespace azure { namespace storage {
 
     namespace protocol
@@ -150,7 +156,7 @@ namespace azure { namespace storage {
         /// Gets the continuation token used to retrieve the next segment of results.
         /// </summary>
         /// <returns>The continuation token.</returns>
-        const continuation_token& continuation_token() const
+        const azure::storage::continuation_token& continuation_token() const
         {
             return m_continuation_token;
         }
@@ -1053,6 +1059,15 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the user headers provided for the request.
+        /// </summary>
+        /// <returns>A <see cref="web::http::http_headers" /> object containing user headers.</returns>
+        const web::http::http_headers& user_headers() const
+        {
+            return m_user_headers;
+        }
+
+        /// <summary>
         /// Gets the results of the request.
         /// </summary>
         /// <returns>An enumerable collection of <see cref="request_result" /> objects.</returns>
@@ -1111,6 +1126,35 @@ namespace azure { namespace storage {
             m_response_received = value;
         }
 
+#ifndef WIN32
+        /// <summary>
+        /// Gets the logger object on this op_context.
+        /// </summary>
+        /// <returns>The logger object used by this op_context.</returns>
+        boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger()
+        {
+            return m_logger;
+        }
+
+        /// <summary>
+        /// Gets the logger object on this op_context.
+        /// </summary>
+        /// <returns>The logger object used by this op_context.</returns>
+        const boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger() const
+        {
+            return m_logger;
+        }
+
+        /// <summary>
+        /// Sets the logger object on this op_context.
+        /// </summary>
+        /// <param name="logger">The logger object to use for requests made by this op_context.</param>
+        void set_logger(boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger)
+        {
+            m_logger = std::move(logger);
+        }
+#endif
+
     private:
 
         std::function<void(web::http::http_request &, operation_context)> m_sending_request;
@@ -1122,6 +1166,9 @@ namespace azure { namespace storage {
         client_log_level m_log_level;
         std::vector<request_result> m_request_results;
         pplx::extensibility::critical_section_t m_request_results_lock;
+#ifndef WIN32
+        boost::log::sources::severity_logger<boost::log::trivial::severity_level> m_logger;
+#endif
     };
 
     /// <summary>
@@ -1250,6 +1297,15 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets or sets additional headers on the request, for example, for proxy or logging information.
+        /// </summary>
+        /// <returns>A <see cref="web::http::http_headers"/> reference containing additional header information.</returns>
+        const web::http::http_headers& user_headers() const
+        {
+            return m_impl->user_headers();
+        }
+
+        /// <summary>
         /// Gets the set of request results that the current operation has created.
         /// </summary>
         /// <returns>A <see cref="std::vector"/> object that contains <see cref="azure::storage::request_result"/> objects that represent the request results created by the current operation.</returns>
@@ -1277,6 +1333,35 @@ namespace azure { namespace storage {
         {
             m_impl->set_response_received(value);
         }
+
+#ifndef WIN32
+        /// <summary>
+        /// Gets the logger object on this op_context.
+        /// </summary>
+        /// <returns>The logger object used by this op_context.</returns>
+        boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger()
+        {
+            return m_impl->logger();
+        }
+
+        /// <summary>
+        /// Gets the logger object on this op_context.
+        /// </summary>
+        /// <returns>The logger object used by this op_context.</returns>
+        const boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger() const
+        {
+            return m_impl->logger();
+        }
+
+        /// <summary>
+        /// Sets the logger object on this op_context.
+        /// </summary>
+        /// <param name="logger">The logger object to use for requests made by this op_context.</param>
+        void set_logger(boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger)
+        {
+            m_impl->set_logger(std::move(logger));
+        }
+#endif
 
         std::shared_ptr<_operation_context> _get_impl() const
         {
@@ -1633,6 +1718,30 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the number of bytes to buffer when reading from and writing to a network stream.
+        /// </summary>
+        /// <returns>The number of bytes to buffer when reading from and writing to a network stream.</returns>
+        /// <remarks>
+        /// Using a larger buffer size is more efficient when downloading and uploading larger blobs because it will reduce CPU usage.
+        /// </remarks>
+        size_t http_buffer_size() const
+        {
+            return m_http_buffer_size;
+        }
+
+        /// <summary>
+        /// Sets the number of bytes to buffer when reading from and writing to a network stream.
+        /// </summary>
+        /// <param name="http_buffer_size">The number of bytes to buffer when reading from and writing to a network stream.</param>
+        /// <remarks>
+        /// Using a larger buffer size is more efficient when downloading and uploading larger blobs because it will reduce CPU usage.
+        /// </remarks>
+        void set_http_buffer_size(size_t http_buffer_size)
+        {
+            m_http_buffer_size = http_buffer_size;
+        }
+
+        /// <summary>
         /// Gets the expiry time across all potential retries for the request.
         /// </summary>
         /// <returns>The expiry time.</returns>
@@ -1646,11 +1755,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Initializes a new instance of the <see cref="request_options"/> class.
         /// </summary>
-        request_options()
-            : m_location_mode(location_mode::primary_only),
-            m_retry_policy(exponential_retry_policy())
-        {
-        }
+        WASTORAGE_API request_options();
 
         /// <summary>
         /// Applies the default set of request options.
@@ -1668,6 +1773,7 @@ namespace azure { namespace storage {
             m_server_timeout.merge(other.m_server_timeout);
             m_maximum_execution_time.merge(other.m_maximum_execution_time);
             m_location_mode.merge(other.m_location_mode);
+            m_http_buffer_size.merge(other.m_http_buffer_size);
 
             if (apply_expiry)
             {
@@ -1690,6 +1796,7 @@ namespace azure { namespace storage {
         option_with_default<std::chrono::seconds> m_server_timeout;
         option_with_default<std::chrono::seconds> m_maximum_execution_time;
         option_with_default<azure::storage::location_mode> m_location_mode;
+        option_with_default<size_t> m_http_buffer_size;
     };
 
 }} // namespace azure::storage

@@ -361,7 +361,7 @@ SUITE(Blob)
         downloaded_file.close().wait();
 
         CHECK_EQUAL(original_file_buffer.collection().size(), downloaded_file_buffer.collection().size());
-        CHECK_ARRAY_EQUAL(original_file_buffer.collection(), downloaded_file_buffer.collection(), downloaded_file_buffer.collection().size());
+        CHECK_ARRAY_EQUAL(original_file_buffer.collection(), downloaded_file_buffer.collection(), (int)downloaded_file_buffer.collection().size());
 
         m_blob.properties().set_content_md5(dummy_md5);
         m_blob.upload_properties();

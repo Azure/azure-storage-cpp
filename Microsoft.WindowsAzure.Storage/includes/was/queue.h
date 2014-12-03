@@ -707,7 +707,7 @@ namespace azure { namespace storage {
 
         void initialize()
         {
-            set_authentication_scheme(authentication_scheme::shared_key);
+            set_authentication_scheme(azure::storage::authentication_scheme::shared_key);
         }
 
         queue_request_options get_modified_options(const queue_request_options& options) const;

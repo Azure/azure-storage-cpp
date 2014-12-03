@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.props" Condition="Exists('..\..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.props')" />
+  <Import Project="..\..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.props" Condition="Exists('..\..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.props')" />
+  <Import Project="..\..\packages\openssl.1.0.1.25\build\native\openssl.props" Condition="Exists('..\..\packages\openssl.1.0.1.25\build\native\openssl.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -100,7 +101,7 @@
     <ClInclude Include="test_helper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\hash_windows.cpp" />
+    <ClCompile Include="..\src\hashing.cpp" />
     <ClCompile Include="blob_lease_test.cpp" />
     <ClCompile Include="blob_streams_test.cpp" />
     <ClCompile Include="blob_test_base.cpp" />
@@ -152,7 +153,11 @@
   </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets" Condition="Exists('..\..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets')" />
+    <Import Project="..\..\packages\zlib.1.2.8.7\build\native\zlib.targets" Condition="Exists('..\..\packages\zlib.1.2.8.7\build\native\zlib.targets')" />
+    <Import Project="..\..\packages\openssl.redist.1.0.1.25\build\native\openssl.redist.targets" Condition="Exists('..\..\packages\openssl.redist.1.0.1.25\build\native\openssl.redist.targets')" />
+    <Import Project="..\..\packages\openssl.1.0.1.25\build\native\openssl.targets" Condition="Exists('..\..\packages\openssl.1.0.1.25\build\native\openssl.targets')" />
+    <Import Project="..\..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.targets" Condition="Exists('..\..\packages\cpprestsdk.2.3.0\build\native\cpprestsdk.targets')" />
     <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-    <Import Project="..\..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.targets" Condition="Exists('..\..\packages\cpprestsdk.2.0.1\build\native\cpprestsdk.targets')" />
   </ImportGroup>
 </Project>

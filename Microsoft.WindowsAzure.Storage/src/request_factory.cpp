@@ -23,6 +23,7 @@ namespace azure { namespace storage { namespace protocol {
 
     web::http::http_request base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
+        UNREFERENCED_PARAMETER(context);
         if (timeout.count() > 0)
         {
             uri_builder.append_query(core::make_query_parameter(uri_query_timeout, timeout.count(), /* do_encoding */ false));

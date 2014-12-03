@@ -81,7 +81,7 @@ utility::string_t get_random_string()
     result.reserve(SIZE);
     for (int i = 0; i < SIZE; ++i)
     {
-        result.push_back(U('0') + rand() % 10);
+        result.push_back((utility::char_t) (U('0') + rand() % 10));
     }
     return result;
 }
@@ -100,7 +100,7 @@ std::vector<uint8_t> get_random_binary_data()
     result.reserve(SIZE);
     for (int i = 0; i < SIZE; ++i)
     {
-        result.push_back(rand() % 256);
+        result.push_back((unsigned char)(rand() % 256));
     }
     return result;
 }

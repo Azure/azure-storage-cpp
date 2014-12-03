@@ -22,12 +22,19 @@
 #include "wascore/resources.h"
 
 #ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <float.h>
+#include <windows.h>
+#include <rpc.h>
+#include <agents.h>
+#else
+#include <chrono>
+#include <thread>
 #endif
 
 namespace azure { namespace storage {  namespace core {
 
-    const wchar_t hex_alphabet[16] = {U('0'), U('1'), U('2'), U('3'), U('4'), U('5'), U('6'), U('7'), U('8'), U('9'), U('a'), U('b'), U('c'), U('d'), U('e'), U('f')};
+    const utility::char_t hex_alphabet[16] = {U('0'), U('1'), U('2'), U('3'), U('4'), U('5'), U('6'), U('7'), U('8'), U('9'), U('a'), U('b'), U('c'), U('d'), U('e'), U('f')};
     const utility::datetime::interval_type second_interval = 10000000;
 
     utility::string_t make_query_parameter_impl(const utility::string_t& parameter_name, const utility::string_t& parameter_value)
@@ -340,13 +347,83 @@ namespace azure { namespace storage {  namespace core {
         }
         else
         {
-            strftime(output, sizeof(output),
-                format == RFC_1123 ? "%a, %d %b %Y %H:%M:%S GMT" : "%Y-%m-%dT%H:%M:%SZ",
-                &datetime);
+            strftime(output, sizeof(output), "%Y-%m-%dT%H:%M:%SZ", &datetime);
         }
 
         return std::string(output);
 #endif
+    }
+
+#ifdef WIN32
+    class delay_event
+    {
+    public:
+        delay_event(std::chrono::milliseconds timeout)
+            : m_callback(new concurrency::call<int>(std::function<void(int)>(std::bind(&delay_event::timer_fired, this, std::placeholders::_1)))), m_timer(static_cast<unsigned int>(timeout.count()), 0, m_callback, false)
+        {
+        }
+
+        ~delay_event()
+        {
+            delete m_callback;
+        }
+
+        void start()
+        {
+            m_timer.start();
+        }
+
+        pplx::task<void> create_task()
+        {
+            return pplx::task<void>(m_completion_event);
+        }
+
+    private:
+        concurrency::call<int>* m_callback;
+        pplx::task_completion_event<void> m_completion_event;
+        concurrency::timer<int> m_timer;
+
+        void timer_fired(const int& dummy)
+        {
+            UNREFERENCED_PARAMETER(dummy);
+
+            m_completion_event.set();
+        }
+    };
+#else
+    class delay_event
+    {
+    public:
+        delay_event(std::chrono::milliseconds timeout)
+            : m_timeout(timeout)
+        {
+        }
+
+        void start()
+        {
+            // TODO: Consider using boost::asio::deadline_timer and implementing a threadpool
+            std::this_thread::sleep_for(m_timeout);
+        }
+
+        pplx::task<void> create_task()
+        {
+            return pplx::task_from_result();
+        }
+
+    private:
+        std::chrono::milliseconds m_timeout;
+    };
+#endif
+
+    pplx::task<void> complete_after(std::chrono::milliseconds timeout)
+    {
+        delay_event* event = new delay_event(timeout);
+        event->start();
+
+        return event->create_task().then([event]()
+        {
+            delete event;
+        });
     }
 
 }}} // namespace azure::storage::core

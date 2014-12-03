@@ -23,21 +23,21 @@ namespace utility {
 
     utility::uuid __cdecl new_uuid()
     {
+        uuid result;
+
 #ifdef WIN32
         RPC_STATUS status;
 
-        UUID uuid;
-        status = UuidCreate(&uuid);
+        status = UuidCreate(&result);
         if (status != RPC_S_OK && status != RPC_S_UUID_LOCAL_ONLY && status != RPC_S_UUID_NO_ADDRESS)
         {
             throw std::runtime_error(azure::storage::protocol::error_create_uuid);
         }
 #else
-        uuid_t uuid;
-        uuid_generate_random(uuid);
+        uuid_generate_random(result.data);
 #endif
 
-        return uuid;
+        return result;
     }
 
     utility::string_t __cdecl uuid_to_string(const utility::uuid& value)
@@ -61,9 +61,9 @@ namespace utility {
         }
 #else
         char uuid_string[37];
-        uuid_unparse_upper(value, uuid_string);
+        uuid_unparse_upper(value.data, uuid_string);
 
-        std::string result(&uuid_string);
+        std::string result(uuid_string);
 #endif
 
         return result;
@@ -71,20 +71,20 @@ namespace utility {
 
     utility::uuid __cdecl string_to_uuid(const utility::string_t& value)
     {
+        uuid result;
+
 #ifdef WIN32
         RPC_STATUS status;
 
         RPC_WSTR rpc_string = reinterpret_cast<RPC_WSTR>(const_cast<wchar_t*>(value.c_str()));
 
-        UUID result;
         status = UuidFromStringW(rpc_string, &result);
         if (status != RPC_S_OK)
         {
             throw std::runtime_error(azure::storage::protocol::error_parse_uuid);
         }
 #else
-        uuid_t result;
-        int status_code = uuid_parse(value.c_str(), result);
+        int status_code = uuid_parse(value.c_str(), result.data);
         if (status_code != 0)
         {
             throw std::runtime_error(azure::storage::protocol::error_parse_uuid);
@@ -99,7 +99,7 @@ namespace utility {
 #ifdef WIN32
         return value1 == value2;
 #else
-        return uuid_compare(value1, value2) == 0;
+        return uuid_compare(value1.data, value2.data) == 0;
 #endif
     }
 

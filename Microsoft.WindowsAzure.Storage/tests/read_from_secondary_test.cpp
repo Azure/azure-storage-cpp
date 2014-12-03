@@ -68,7 +68,7 @@ public:
     multi_location_test_helper(const azure::storage::storage_uri& uri, azure::storage::storage_location initial_location, azure::storage::operation_context context, const std::vector<azure::storage::retry_context>& expected_retry_context_list, const std::vector<azure::storage::retry_info>& retry_info_list)
         : m_uri(uri), m_initial_location(initial_location), m_retry_info_list(retry_info_list),
         m_policy(std::make_shared<basic_always_retry_policy>(expected_retry_context_list, retry_info_list)),
-        m_request_counter(0), m_error(false), m_context(context), m_context_results_offset(context.request_results().size())
+        m_request_counter(0), m_error(false), m_context(context), m_context_results_offset((int)context.request_results().size())
     {
         m_context.set_sending_request([this] (web::http::http_request& request, azure::storage::operation_context)
         {

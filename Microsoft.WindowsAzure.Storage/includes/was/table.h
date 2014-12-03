@@ -1054,17 +1054,17 @@ namespace azure { namespace storage {
         /// <summary>
         /// Represents the And operator.
         /// </summary>
-        WASTORAGE_API const static utility::string_t and;
+        WASTORAGE_API const static utility::string_t op_and;
 
         /// <summary>
         /// Represents the Not operator.
         /// </summary>
-        WASTORAGE_API const static utility::string_t not;
+        WASTORAGE_API const static utility::string_t op_not;
 
         /// <summary>
         /// Represents the Or operator.
         /// </summary>
-        WASTORAGE_API const static utility::string_t or;
+        WASTORAGE_API const static utility::string_t op_or;
     };
 
     /// <summary>
@@ -1794,7 +1794,7 @@ namespace azure { namespace storage {
 
         void initialize()
         {
-            set_authentication_scheme(authentication_scheme::shared_key);
+            set_authentication_scheme(azure::storage::authentication_scheme::shared_key);
         }
 
         table_request_options get_modified_options(const table_request_options& options) const;

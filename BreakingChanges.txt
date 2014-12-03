@@ -1,6 +1,9 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
 
+Breaking Changes in v0.4:
+- Upgraded Casablanca dependency to 2.3.0
+
 Breaking changes in v0.3:
 - Changed namespace to azure::storage.
 - The SAS token returned by the get_shared_access_signature functions does not include a question mark (?) prefix.

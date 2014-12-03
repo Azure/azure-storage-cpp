@@ -142,6 +142,10 @@ SUITE(QueueClient)
             CHECK(context.request_results()[0].extended_error().code().empty());
             CHECK(context.request_results()[0].extended_error().message().empty());
             CHECK(context.request_results()[0].extended_error().details().empty());
+            for (int i = 0; i < QUEUE_COUNT; ++i)
+            {
+                CHECK(is_found[i]);
+            }
         }
 
         {
@@ -235,7 +239,6 @@ SUITE(QueueClient)
             result_segment = client.list_queues_segmented(prefix, get_metadata, max_results, token, options, context);
             std::vector<azure::storage::cloud_queue> results = result_segment.results();
 
-            CHECK(results.size() >= 0);
             CHECK((int)results.size() <= max_results);
 
             for (std::vector<azure::storage::cloud_queue>::const_iterator itr = results.cbegin(); itr != results.cend(); ++itr)
@@ -279,6 +282,10 @@ SUITE(QueueClient)
         while (!token.empty());
 
         CHECK(segment_count > 1);
+        for (int i = 0; i < QUEUE_COUNT; ++i)
+        {
+            CHECK(is_found[i]);
+        }
 
         for (int i = 0; i < QUEUE_COUNT; ++i)
         {

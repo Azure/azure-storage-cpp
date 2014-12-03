@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "wascore/blobstreams.h"
+#include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace core {
 
@@ -30,9 +31,9 @@ namespace azure { namespace storage { namespace core {
         m_committed = true;
         basic_ostreambuf<basic_cloud_blob_ostreambuf::char_type>::_close_write().wait();
         
-        if (m_blob_hash)
+        if (m_blob_hash_provider.is_enabled())
         {
-            m_blob_hash.close().wait();
+            m_blob_hash_provider.close();
         }
 
         return commit_blob();
@@ -59,11 +60,11 @@ namespace azure { namespace storage { namespace core {
     std::shared_ptr<basic_cloud_blob_ostreambuf::buffer_to_upload> basic_cloud_blob_ostreambuf::prepare_buffer()
     {
         utility::string_t block_md5;
-        if (m_block_hash)
+        if (m_block_hash_provider.is_enabled())
         {
-            m_block_hash.close().wait();
-            block_md5 = utility::conversions::to_base64(m_block_hash.hash());
-            m_block_hash = hash_md5_streambuf();
+            m_block_hash_provider.close();
+            block_md5 = m_block_hash_provider.hash();
+            m_block_hash_provider = hash_provider::create_md5_hash_provider();
         }
 
         auto buffer = std::make_shared<basic_cloud_blob_ostreambuf::buffer_to_upload>(m_buffer, block_md5);
@@ -102,19 +103,17 @@ namespace azure { namespace storage { namespace core {
                 write_size = remaining;
             }
 
-            // All streambuf puts below are waited, because one is a memory buffer and the others
-            // are hash buffers. Hence, there is no async IO involved.
-
-            if (m_block_hash)
+            if (m_block_hash_provider.is_enabled())
             {
-                m_block_hash.putn(ptr, write_size).wait();
+                m_block_hash_provider.write(ptr, write_size);
             }
 
-            if (m_blob_hash)
+            if (m_blob_hash_provider.is_enabled())
             {
-                m_blob_hash.putn(ptr, write_size).wait();
+                m_blob_hash_provider.write(ptr, write_size);
             }
 
+            // The streambuf is waited because it is a memory buffer, so does not involve async I/O
             m_buffer.putn(ptr, write_size).wait();
             if (m_buffer_size == m_buffer.size())
             {
@@ -178,9 +177,9 @@ namespace azure { namespace storage { namespace core {
         auto this_pointer = std::dynamic_pointer_cast<basic_cloud_block_blob_ostreambuf>(shared_from_this());
         return _sync().then([this_pointer] (bool) -> pplx::task<void>
         {
-            if (this_pointer->m_blob_hash)
+            if (this_pointer->m_blob_hash_provider.is_enabled())
             {
-                this_pointer->m_blob->properties().set_content_md5(utility::conversions::to_base64(this_pointer->m_blob_hash.hash()));
+                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_blob_hash_provider.hash());
             }
 
             return this_pointer->m_blob->upload_block_list_async(this_pointer->m_block_list, this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
@@ -243,12 +242,12 @@ namespace azure { namespace storage { namespace core {
 
     pplx::task<void> basic_cloud_page_blob_ostreambuf::commit_blob()
     {
-        if (m_blob_hash)
+        if (m_blob_hash_provider.is_enabled())
         {
             auto this_pointer = std::dynamic_pointer_cast<basic_cloud_page_blob_ostreambuf>(shared_from_this());
             return _sync().then([this_pointer] (bool) -> pplx::task<void>
             {
-                this_pointer->m_blob->properties().set_content_md5(utility::conversions::to_base64(this_pointer->m_blob_hash.hash()));
+                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_blob_hash_provider.hash());
                 return this_pointer->m_blob->upload_properties_async(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
             });
         }

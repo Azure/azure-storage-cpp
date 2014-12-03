@@ -87,7 +87,7 @@ SUITE(Blob)
         });
 
         options.set_use_transactional_md5(false);
-        for (int i = 0; i < 3; ++i)
+        for (uint16_t i = 0; i < 3; ++i)
         {
             fill_buffer_and_get_md5(buffer);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
@@ -103,7 +103,7 @@ SUITE(Blob)
         uncommitted_blocks.clear();
 
         options.set_use_transactional_md5(false);
-        for (int i = 3; i < 6; ++i)
+        for (uint16_t i = 3; i < 6; ++i)
         {
             auto md5 = fill_buffer_and_get_md5(buffer);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
@@ -119,7 +119,7 @@ SUITE(Blob)
         uncommitted_blocks.clear();
 
         options.set_use_transactional_md5(true);
-        for (int i = 6; i < 9; ++i)
+        for (uint16_t i = 6; i < 9; ++i)
         {
             auto md5 = fill_buffer_and_get_md5(buffer);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
@@ -191,6 +191,55 @@ SUITE(Blob)
         options.set_parallelism_factor(8);
         options.set_store_blob_content_md5(true);
         check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 7, true), 6);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_store_blob_content_md5(false);
+        options.set_use_transactional_md5(false);
+        options.set_parallelism_factor(1);
+        options.set_http_buffer_size(512 * 1024);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_stream_write_size_in_bytes(4 * 1024 * 1024);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_store_blob_content_md5(true);
+        options.set_single_blob_upload_threshold_in_bytes(32 * 1024 * 1024);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true), 1);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_parallelism_factor(4);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true), 2);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_store_blob_content_md5(false);
+        options.set_parallelism_factor(1);
+        options.set_stream_write_size_in_bytes(1 * 1024 * 1024);
+        options.set_single_blob_upload_threshold_in_bytes(6 * 1024 * 1024);
+        options.set_http_buffer_size(0);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_stream_write_size_in_bytes(4 * 1024 * 1024);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_store_blob_content_md5(true);
+        options.set_single_blob_upload_threshold_in_bytes(32 * 1024 * 1024);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true), 1);
+        m_blob.delete_blob();
+        m_blob.properties().set_content_md5(utility::string_t());
+
+        options.set_parallelism_factor(4);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true), 2);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
     }
@@ -324,9 +373,9 @@ SUITE(Blob)
         const size_t buffer_size = 2 * 1024 * 1024;
         azure::storage::blob_request_options options;
         options.set_store_blob_content_md5(false);
-        CHECK_THROW(upload_and_download(m_blob, buffer_size, 0, buffer_size + 1, true, options, 0, false), azure::storage::storage_exception);
+        CHECK_THROW(upload_and_download(m_blob, buffer_size, 0, buffer_size + 1, true, options, 0, false), std::invalid_argument);
         CHECK_THROW(upload_and_download(m_blob, buffer_size, 0, buffer_size + 1, false, options, 0, false), std::invalid_argument);
-        CHECK_THROW(upload_and_download(m_blob, buffer_size, 1024, buffer_size - 1023, true, options, 0, false), azure::storage::storage_exception);
+        CHECK_THROW(upload_and_download(m_blob, buffer_size, 1024, buffer_size - 1023, true, options, 0, false), std::invalid_argument);
         CHECK_THROW(upload_and_download(m_blob, buffer_size, 1024, buffer_size - 1023, false, options, 0, false), std::invalid_argument);
     }
 
@@ -383,7 +432,7 @@ SUITE(Blob)
         downloaded_file.close().wait();
 
         CHECK_EQUAL(original_file_buffer.collection().size(), downloaded_file_buffer.collection().size());
-        CHECK_ARRAY_EQUAL(original_file_buffer.collection(), downloaded_file_buffer.collection(), downloaded_file_buffer.collection().size());
+        CHECK_ARRAY_EQUAL(original_file_buffer.collection(), downloaded_file_buffer.collection(), (int) downloaded_file_buffer.collection().size());
 
         m_blob.properties().set_content_md5(dummy_md5);
         m_blob.upload_properties();
@@ -491,11 +540,10 @@ SUITE(Blob)
         m_blob.properties().set_content_type(U("text/plain; charset=utf-8"));
 
         std::vector<azure::storage::block_list_item> blocks;
-        for (int i = 0; i < 10; i++)
+        for (uint16_t i = 0; i < 10; i++)
         {
             auto id = get_block_id(i);
             auto utf8_body = utility::conversions::to_utf8string(utility::conversions::print_string(i));
-            auto length = utf8_body.size();
             auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
             m_blob.upload_block(id, stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blocks.push_back(azure::storage::block_list_item(id));
@@ -516,7 +564,6 @@ SUITE(Blob)
 
         auto id = get_block_id(4);
         auto utf8_body = utility::conversions::to_utf8string(utility::conversions::print_string(4));
-        auto length = utf8_body.size();
         auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
         m_blob.upload_block(id, stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         blocks.insert(blocks.begin(), azure::storage::block_list_item(id));

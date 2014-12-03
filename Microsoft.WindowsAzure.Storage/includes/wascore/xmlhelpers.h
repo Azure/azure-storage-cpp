@@ -54,6 +54,7 @@
 
 #include <string>
 #include "cpprest/basic_types.h"
+#include "was/core.h"
 
 namespace azure { namespace storage { namespace core { namespace xml {
 

@@ -33,9 +33,9 @@ namespace azure { namespace storage {
     const utility::string_t query_comparison_operator::less_than = U("lt");
     const utility::string_t query_comparison_operator::less_than_or_equal = U("le");
 
-    const utility::string_t query_logical_operator::and = U("and");
-    const utility::string_t query_logical_operator::not = U("not");
-    const utility::string_t query_logical_operator::or = U("or");
+    const utility::string_t query_logical_operator::op_and = U("and");
+    const utility::string_t query_logical_operator::op_not = U("not");
+    const utility::string_t query_logical_operator::op_or = U("or");
 
     cloud_table::cloud_table(const storage_uri& uri)
         : m_client(create_service_client(uri, storage_credentials())), m_name(read_table_name(uri)), m_uri(create_uri(uri))
@@ -109,16 +109,17 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::execute_operation, operation, options.payload_format(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(operation.operation_type() == azure::storage::table_operation_type::retrieve_operation ? core::command_location_mode::primary_or_secondary : core::command_location_mode::primary_only);
-        command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, operation_context context) -> table_result
+        command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, const request_result& result, operation_context context) -> table_result
         {
             if (!allow_not_found || response.status_code() != web::http::status_codes::NotFound)
             {
-                protocol::preprocess_response(response, context);
+                protocol::preprocess_response_void(response, result, context);
             }
             return table_result();
         });
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<table_result>
         {
+            UNREFERENCED_PARAMETER(context);
             int status_code = response.status_code();
             utility::string_t etag = protocol::table_response_parsers::parse_etag(response);
 
@@ -196,10 +197,11 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::execute_batch_operation, response_buffer, *this, operation, options.payload_format(), is_query, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(is_query ? core::command_location_mode::primary_or_secondary : core::command_location_mode::primary_only);
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<table_result>>, std::vector<table_result>(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<table_result>>, std::vector<table_result>(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([response_buffer, operations, is_query] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) mutable -> pplx::task<std::vector<table_result>>
         {
-            return response.content_ready().then([response_buffer, operations, is_query] (const web::http::http_response& response) mutable -> pplx::task<std::vector<table_result>>
+            UNREFERENCED_PARAMETER(context);
+            return response.content_ready().then([response_buffer, operations, is_query](const web::http::http_response& response) mutable -> pplx::task<std::vector<table_result>>
             {
                 std::vector<table_result> batch_result = protocol::table_response_parsers::parse_batch_results(response, response_buffer, is_query, operations.size());
                 return pplx::task_from_result(batch_result);
@@ -237,9 +239,10 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::execute_query, options.payload_format(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<table_query_segment>, table_query_segment(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<table_query_segment>, table_query_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<table_query_segment>
         {
+            UNREFERENCED_PARAMETER(context);
             continuation_token next_token = protocol::table_response_parsers::parse_continuation_token(response, result);
 
             return response.extract_json().then([next_token] (const web::json::value& obj) -> table_query_segment
@@ -306,14 +309,14 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri);
         command->set_build_request(std::bind(protocol::execute_table_operation, *this, table_operation_type::insert_operation, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([allow_conflict] (const web::http::http_response& response, operation_context context) -> bool
+        command->set_preprocess_response([allow_conflict] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (allow_conflict && response.status_code() == web::http::status_codes::Conflict)
             {
                 return false;
             }
 
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             return true;
         });
         return core::executor<bool>::execute_async(command, modified_options, context);
@@ -327,14 +330,14 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri);
         command->set_build_request(std::bind(protocol::execute_table_operation, *this, table_operation_type::delete_operation, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, operation_context context) -> bool
+        command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (allow_not_found && response.status_code() == web::http::status_codes::NotFound)
             {
                 return false;
             }
 
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             return true;
         });
         return core::executor<bool>::execute_async(command, modified_options, context);
@@ -349,11 +352,11 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::execute_table_operation, *this, table_operation_type::retrieve_operation, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(allow_secondary ? core::command_location_mode::primary_or_secondary : core::command_location_mode::primary_only);
-        command->set_preprocess_response([] (const web::http::http_response& response, operation_context context) -> bool
+        command->set_preprocess_response([] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (response.status_code() != web::http::status_codes::NotFound)
             {
-                protocol::preprocess_response(response, context);
+                protocol::preprocess_response_void(response, result, context);
                 return true;
             }
 
@@ -371,12 +374,13 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_table_acl, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<table_permissions>, table_permissions(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<table_permissions>, table_permissions(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<table_permissions>
         {
+            UNREFERENCED_PARAMETER(context);
             table_permissions permissions;
             protocol::access_policy_reader<table_shared_access_policy> reader(response.body());
-            permissions.set_policies(reader.extract_policies());
+            permissions.set_policies(reader.move_policies());
             return pplx::task_from_result<table_permissions>(permissions);
         });
         return core::executor<table_permissions>::execute_async(command, modified_options, context);
@@ -393,7 +397,7 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::set_table_acl, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::istream_descriptor::create(stream).then([command, context, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
         {
             command->set_request_body(request_body);

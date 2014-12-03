@@ -106,7 +106,7 @@ namespace azure { namespace storage { namespace protocol {
     // Common response parsers
 
     template<typename T>
-    T preprocess_response(T return_value, const web::http::http_response& response, operation_context context)
+    T preprocess_response(T return_value, const web::http::http_response& response, const request_result&, operation_context)
     {
         switch (response.status_code())
         {
@@ -126,8 +126,7 @@ namespace azure { namespace storage { namespace protocol {
         return return_value;
     }
 
-    void preprocess_response(const web::http::http_response& response, operation_context context);
-    void check_stream_length_and_md5(utility::size64_t length, const utility::string_t& content_md5, const core::ostream_descriptor& descriptor);
+    void preprocess_response_void(const web::http::http_response& response, const request_result& result, operation_context context);
 
     utility::datetime parse_last_modified(const utility::string_t& value);
     utility::string_t parse_lease_id(const utility::string_t& value);

@@ -113,7 +113,7 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::add_message, message, time_to_live, initial_visibility_timeout, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
@@ -135,16 +135,17 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<cloud_queue_message>> command = std::make_shared<core::storage_command<cloud_queue_message>>(uri);
         command->set_build_request(std::bind(protocol::get_messages, 1U, visibility_timeout, /* is_peek */ false, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<cloud_queue_message>, cloud_queue_message(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<cloud_queue_message>, cloud_queue_message(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<cloud_queue_message>
         {
+            UNREFERENCED_PARAMETER(context);
             protocol::message_reader reader(response.body());
-            std::vector<protocol::cloud_message_list_item> queue_items = reader.extract_items();
+            std::vector<protocol::cloud_message_list_item> queue_items = reader.move_items();
 
             if (!queue_items.empty())
             {
                 protocol::cloud_message_list_item& item = queue_items.front();
-                cloud_queue_message message(item.content(), item.id(), item.pop_receipt(), item.insertion_time(), item.expiration_time(), item.next_visible_time(), item.dequeue_count());
+                cloud_queue_message message(item.move_content(), item.move_id(), item.move_pop_receipt(), item.insertion_time(), item.expiration_time(), item.next_visible_time(), item.dequeue_count());
                 return pplx::task_from_result(message);
             }
 
@@ -176,18 +177,19 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<std::vector<cloud_queue_message>>> command = std::make_shared<core::storage_command<std::vector<cloud_queue_message>>>(uri);
         command->set_build_request(std::bind(protocol::get_messages, message_count, visibility_timeout, /* is_peek */ false, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<cloud_queue_message>>, std::vector<cloud_queue_message>(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<cloud_queue_message>>, std::vector<cloud_queue_message>(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<std::vector<cloud_queue_message>>
         {
+            UNREFERENCED_PARAMETER(context);
             protocol::message_reader reader(response.body());
-            std::vector<protocol::cloud_message_list_item> queue_items = reader.extract_items();
+            std::vector<protocol::cloud_message_list_item> queue_items = reader.move_items();
 
             std::vector<cloud_queue_message> results;
             results.reserve(queue_items.size());
 
             for (std::vector<protocol::cloud_message_list_item>::iterator it = queue_items.begin(); it != queue_items.end(); ++it)
             {
-                cloud_queue_message message(it->content(), it->id(), it->pop_receipt(), it->insertion_time(), it->expiration_time(), it->next_visible_time(), it->dequeue_count());
+                cloud_queue_message message(it->move_content(), it->move_id(), it->move_pop_receipt(), it->insertion_time(), it->expiration_time(), it->next_visible_time(), it->dequeue_count());
                 results.push_back(message);
             }
 
@@ -204,16 +206,17 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<cloud_queue_message>> command = std::make_shared<core::storage_command<cloud_queue_message>>(uri);
         command->set_build_request(std::bind(protocol::get_messages, 1U, std::chrono::seconds(0LL), /* is_peek */ true, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<cloud_queue_message>, cloud_queue_message(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<cloud_queue_message>, cloud_queue_message(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<cloud_queue_message>
         {
+            UNREFERENCED_PARAMETER(context);
             protocol::message_reader reader(response.body());
-            std::vector<protocol::cloud_message_list_item> queue_items = reader.extract_items();
+            std::vector<protocol::cloud_message_list_item> queue_items = reader.move_items();
 
             if (!queue_items.empty())
             {
                 protocol::cloud_message_list_item& item = queue_items.front();
-                cloud_queue_message message(item.content(), item.id(), item.pop_receipt(), item.insertion_time(), item.expiration_time(), item.next_visible_time(), item.dequeue_count());
+                cloud_queue_message message(item.move_content(), item.move_id(), item.move_pop_receipt(), item.insertion_time(), item.expiration_time(), item.next_visible_time(), item.dequeue_count());
                 return pplx::task_from_result(message);
             }
 
@@ -230,18 +233,19 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<std::vector<cloud_queue_message>>> command = std::make_shared<core::storage_command<std::vector<cloud_queue_message>>>(uri);
         command->set_build_request(std::bind(protocol::get_messages, message_count, std::chrono::seconds(0LL), /* is_peek */ true, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<cloud_queue_message>>, std::vector<cloud_queue_message>(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<cloud_queue_message>>, std::vector<cloud_queue_message>(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<std::vector<cloud_queue_message>>
         {
+            UNREFERENCED_PARAMETER(context);
             protocol::message_reader reader(response.body());
-            std::vector<protocol::cloud_message_list_item> queue_items = reader.extract_items();
+            std::vector<protocol::cloud_message_list_item> queue_items = reader.move_items();
 
             std::vector<cloud_queue_message> results;
             results.reserve(queue_items.size());
 
             for (std::vector<protocol::cloud_message_list_item>::iterator it = queue_items.begin(); it != queue_items.end(); ++it)
             {
-                cloud_queue_message message(it->content(), it->id(), it->pop_receipt(), it->insertion_time(), it->expiration_time(), it->next_visible_time(), it->dequeue_count());
+                cloud_queue_message message(it->move_content(), it->move_id(), it->move_pop_receipt(), it->insertion_time(), it->expiration_time(), it->next_visible_time(), it->dequeue_count());
                 results.push_back(message);
             }
 
@@ -278,9 +282,9 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::update_message, message, visibility_timeout, update_content, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([&message] (const web::http::http_response& response, operation_context context) mutable
+        command->set_preprocess_response([&message] (const web::http::http_response& response, const request_result& result, operation_context context) mutable
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             message.set_pop_receipt(protocol::parse_pop_receipt(response));
             message.set_next_visible_time(protocol::parse_next_visible_time(response));
         });
@@ -295,7 +299,7 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::delete_message, message, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
@@ -307,7 +311,7 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::clear_messages, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
@@ -320,9 +324,9 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::download_queue_metadata, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([this](const web::http::http_response& response, operation_context context)
+        command->set_preprocess_response([this](const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             m_metadata = protocol::parse_metadata(response);
             m_approximate_message_count = protocol::parse_approximate_messages_count(response);
         });
@@ -337,7 +341,7 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::upload_queue_metadata, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
@@ -350,12 +354,13 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::get_queue_acl, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<queue_permissions>, queue_permissions(), std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<queue_permissions>, queue_permissions(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<queue_permissions>
         {
+            UNREFERENCED_PARAMETER(context);
             queue_permissions permissions;
             protocol::access_policy_reader<queue_shared_access_policy> reader(response.body());
-            permissions.set_policies(reader.extract_policies());
+            permissions.set_policies(reader.move_policies());
             return pplx::task_from_result<queue_permissions>(permissions);
         });
         return core::executor<queue_permissions>::execute_async(command, modified_options, context);
@@ -372,7 +377,7 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::set_queue_acl, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response, std::placeholders::_1, std::placeholders::_2));
+        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::istream_descriptor::create(stream).then([command, context, modified_options](core::istream_descriptor request_body) -> pplx::task<void>
         {
             command->set_request_body(request_body);
@@ -432,14 +437,14 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri);
         command->set_build_request(std::bind(protocol::create_queue, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([allow_conflict] (const web::http::http_response& response, operation_context context) -> bool
+        command->set_preprocess_response([allow_conflict] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if ((allow_conflict && response.status_code() == web::http::status_codes::Conflict) || response.status_code() == web::http::status_codes::NoContent)
             {
                 return false;
             }
 
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             return true;
         });
         return core::executor<bool>::execute_async(command, modified_options, context);
@@ -453,14 +458,14 @@ namespace azure { namespace storage {
         std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri);
         command->set_build_request(std::bind(protocol::delete_queue, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, operation_context context) -> bool
+        command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (allow_not_found && response.status_code() == web::http::status_codes::NotFound)
             {
                 return false;
             }
 
-            protocol::preprocess_response(response, context);
+            protocol::preprocess_response_void(response, result, context);
             return true;
         });
         return core::executor<bool>::execute_async(command, modified_options, context);
@@ -475,11 +480,11 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::download_queue_metadata, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(allow_secondary ? core::command_location_mode::primary_or_secondary : core::command_location_mode::primary_only);
-        command->set_preprocess_response([] (const web::http::http_response& response, operation_context context) -> bool
+        command->set_preprocess_response([] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (response.status_code() != web::http::status_codes::NotFound)
             {
-                protocol::preprocess_response(response, context);
+                protocol::preprocess_response_void(response, result, context);
                 return true;
             }
 

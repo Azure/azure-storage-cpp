@@ -30,13 +30,13 @@ utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<ui
 {
     std::generate_n(buffer.begin(), buffer.size(), [] () -> uint8_t
     {
-        return std::rand() % UINT8_MAX;
+        return (uint8_t)(std::rand() % (int)UINT8_MAX);
     });
 
-    azure::storage::core::hash_md5_streambuf md5;
-    md5.putn(buffer.data() + offset, count).wait();
-    md5.close().wait();
-    return utility::conversions::to_base64(md5.hash());
+    azure::storage::core::hash_provider provider = azure::storage::core::hash_provider::create_md5_hash_provider();
+    provider.write(buffer.data() + offset, count);
+    provider.close();
+    return provider.hash();
 }
 
 utility::string_t blob_service_test_base::get_random_container_name(size_t length)

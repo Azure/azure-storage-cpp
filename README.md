@@ -46,7 +46,7 @@ For general suggestions about Azure please use our [UserVoice forum](http://www.
 To get the source code of the SDK via git just type:
 
 ```bash
-git clone git://github.com/WindowsAzure/azure-storage-cpp.git
+git clone https://github.com/Azure/azure-storage-cpp.git
 cd azure-storage-cpp
 ```
 
@@ -57,6 +57,12 @@ within your project you can also have them installed by the package manager [NuG
 Download the [NuGet Package](http://www.nuget.org/packages/wastorage).
 
 `Install-Package wastorage -Pre`
+
+## Dependencies
+
+### C++ REST SDK
+
+This library depends on the C++ REST SDK (codename "Casablanca") 2.3.0. It can be installed through [NuGet](http://www.nuget.org/packages/cpprestsdk/2.3.0) or downloaded directly from [CodePlex](http://casablanca.codeplex.com/releases/view/129408).
 
 ## Code Samples
 

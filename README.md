@@ -67,3 +67,49 @@ This library depends on the C++ REST SDK (codename "Casablanca") 2.3.0. It can b
 ## Code Samples
 
 How-Tos focused around accomplishing specific tasks are available in the [samples folder](Microsoft.WindowsAzure.Storage/samples/).
+
+## Getting Started on Linux
+As mentioned above, the library depends on Casablanca.  Follow the instrucitons [here](https://casablanca.codeplex.com/wikipage?title=Setup%20and%20Build%20on%20Linux&referringTitle=Documentation) to compile it.  The Storage Client 0.4.0 depends on Casablanca version 2.3.0.
+
+Once this is done:
+
+- Clone the project using git:
+```bash
+git clone https://github.com/Azure/azure-storage-cpp.git
+```
+It will be stored in a folder called “azure-storage-cpp”.  You will want to use the master branch, which will contain the latest release.
+- Install additional dependencies:
+```bash
+sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev
+```
+- Build the SDK for Release:
+```bash
+cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage
+mkdir build.release
+cd build.release
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+```
+Note that you will need to replace =<path to Casablanca> to where you have Casablanca installed.  For example, if the file libcpprest.so exists at location ~/Github/Casablanca/casablanca/Release/build.release/Binaries/libcpprest.so, then your cmake command would be:
+```bash
+CASABLANCA_DIR=~/Github/Casablanca/casablanca CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+The library will be under azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/.
+
+Once you have the library built, the samples should work equally well for Windows and Linux.  If you like, you can build the samples as well:
+```bash
+cd ../samples
+vi SamplesCommon/samples_common.h – edit this file to include your storage account name and key
+mkdir build.release
+cd build.release
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+Make
+```
+To run the samples:
+```bash
+cd Binaries
+cp ../../BlobsGettingStarted/DataFile.txt .            (this is required to run the blobs sample)
+./samplesblobs            (run the blobs sample)
+./samplestables           (run the tables sample)
+./samplesqueues           (run the queues sample)
+```

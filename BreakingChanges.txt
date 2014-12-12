@@ -3,6 +3,8 @@ History of Breaking Changes
 
 Breaking Changes in v0.4:
 - Upgraded Casablanca dependency to 2.3.0
+- Changed the exception type in some cases if you upload a blob from a seekable stream but the stream is too short for the desired blob length.
+        - Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
 
 Breaking changes in v0.3:
 - Changed namespace to azure::storage.
@@ -13,9 +15,9 @@ Breaking changes in v0.3:
 - Removed the constness from the return values of filter_string and select_columns functions in table_query class.
 - Changed many functions to accept pass-by-reference arguments or return references as a performance improvement.
 - Made some constructors explicit to avoid implicit conversions. This affects these classes:
-	canonicalizer, shared_key_blob_queue_canonicalizer, shared_key_lite_blob_queue_canonicalizer,  shared_key_table_canonicalizer, shared_key_lite_table_canonicalizer, 
-	sas_authentication_handler, shared_key_authentication_handler, continuation_token, retry_info, retry_policy, cloud_queue_message, cloud_queue_client, 
-	basic_common_retry_policy, cloud_client
+    canonicalizer, shared_key_blob_queue_canonicalizer, shared_key_lite_blob_queue_canonicalizer,  shared_key_table_canonicalizer, shared_key_lite_table_canonicalizer, 
+    sas_authentication_handler, shared_key_authentication_handler, continuation_token, retry_info, retry_policy, cloud_queue_message, cloud_queue_client, 
+    basic_common_retry_policy, cloud_client
 
 Breaking changes in v0.2:
 - Removed blob_continuation_token typedef (use continuation_token instead).

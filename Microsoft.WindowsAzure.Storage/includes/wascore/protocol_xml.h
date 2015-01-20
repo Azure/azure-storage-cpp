@@ -45,12 +45,19 @@ namespace azure { namespace storage { namespace protocol {
             return std::move(m_error_message);
         }
 
+        std::unordered_map<utility::string_t, utility::string_t> move_details()
+        {
+            parse();
+            return std::move(m_details);
+        }
+
     protected:
 
         virtual void handle_element(const utility::string_t& element_name);
 
         utility::string_t m_error_code;
         utility::string_t m_error_message;
+        std::unordered_map<utility::string_t, utility::string_t> m_details;
     };
 
     class cloud_blob_container_list_item

@@ -78,6 +78,9 @@
     <ClInclude Include="includes\was\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\was\error_code_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="includes\was\queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>

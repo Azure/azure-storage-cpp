@@ -16,7 +16,7 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "test_helper.h"
+#include "table_test_base.h"
 #include "was/table.h"
 #include "was/storage_account.h"
 
@@ -24,7 +24,7 @@
 
 SUITE(Table)
 {
-    TEST(Table_Empty)
+    TEST_FIXTURE(table_service_test_base, Table_Empty)
     {
         azure::storage::cloud_table table;
 
@@ -36,7 +36,7 @@ SUITE(Table)
         CHECK(table.uri().secondary_uri().is_empty());
     }
 
-    TEST(Table_Uri)
+    TEST_FIXTURE(table_service_test_base, Table_Uri)
     {
         azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable")));
 
@@ -67,7 +67,7 @@ SUITE(Table)
         CHECK(table2.uri().secondary_uri() == uri.secondary_uri());
     }
 
-    TEST(Table_UriAndCredentials)
+    TEST_FIXTURE(table_service_test_base, Table_UriAndCredentials)
     {
         azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable")));
         azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
@@ -107,7 +107,7 @@ SUITE(Table)
         CHECK_THROW(azure::storage::cloud_table(sas_uri, credentials), std::invalid_argument);
     }
 
-    TEST(EntityProperty_Binary)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_Binary)
     {
         std::vector<uint8_t> value = get_random_binary_data();
         azure::storage::entity_property property(value);
@@ -171,7 +171,7 @@ SUITE(Table)
         CHECK(property.str().size() > 0);
     }
 
-    TEST(EntityProperty_Boolean)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_Boolean)
     {
         bool value = get_random_boolean();
         azure::storage::entity_property property(value);
@@ -244,7 +244,7 @@ SUITE(Table)
         CHECK_EQUAL(0, property.str().size());
     }
 
-    TEST(EntityProperty_DateTime)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_DateTime)
     {
         utility::datetime value = get_random_datetime();
         azure::storage::entity_property property(value);
@@ -281,7 +281,7 @@ SUITE(Table)
         CHECK(property.str().size() > 0);
     }
 
-    TEST(EntityProperty_Double)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_Double)
     {
         double value = get_random_double();
         azure::storage::entity_property property(value);
@@ -360,7 +360,7 @@ SUITE(Table)
         CHECK(property.str().size() > 0);
     }
 
-    TEST(EntityProperty_Guid)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_Guid)
     {
         utility::uuid value = get_random_guid();
         azure::storage::entity_property property(value);
@@ -424,7 +424,7 @@ SUITE(Table)
         CHECK(property.str().size() > 0);
     }
 
-    TEST(EntityProperty_Int32)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_Int32)
     {
         int32_t value = get_random_int32();
         azure::storage::entity_property property(value);
@@ -479,7 +479,7 @@ SUITE(Table)
         CHECK(property.str().size() > 0);
     }
 
-    TEST(EntityProperty_Int64)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_Int64)
     {
         int64_t value = get_random_int64();
         azure::storage::entity_property property(value);
@@ -516,7 +516,7 @@ SUITE(Table)
         CHECK(property.str().size() > 0);
     }
 
-    TEST(EntityProperty_String)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_String)
     {
         {
             utility::string_t value = get_random_string();
@@ -591,7 +591,7 @@ SUITE(Table)
         }
     }
 
-    TEST(EntityProperty_Null)
+    TEST_FIXTURE(table_service_test_base, EntityProperty_Null)
     {
         azure::storage::entity_property property;
 
@@ -665,7 +665,7 @@ SUITE(Table)
         CHECK_THROW(property.string_value(), std::runtime_error);
     }
 
-    TEST(Entity_PartitionKeyAndRowKey)
+    TEST_FIXTURE(table_service_test_base, Entity_PartitionKeyAndRowKey)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -699,7 +699,7 @@ SUITE(Table)
         CHECK(entity.properties().size() == 2U);
     }
 
-    TEST(Entity_PartitionKeyAndRowKeyAndETagAndProperties)
+    TEST_FIXTURE(table_service_test_base, Entity_PartitionKeyAndRowKeyAndETagAndProperties)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -740,7 +740,7 @@ SUITE(Table)
         CHECK(entity.properties().size() == 5U);
     }
 
-    TEST(Operation_Delete)
+    TEST_FIXTURE(table_service_test_base, Operation_Delete)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -755,7 +755,7 @@ SUITE(Table)
         CHECK(operation.operation_type() == azure::storage::table_operation_type::delete_operation);
     }
 
-    TEST(Operation_Insert)
+    TEST_FIXTURE(table_service_test_base, Operation_Insert)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -770,7 +770,7 @@ SUITE(Table)
         CHECK(operation.operation_type() == azure::storage::table_operation_type::insert_operation);
     }
 
-    TEST(Operation_InsertOrMerge)
+    TEST_FIXTURE(table_service_test_base, Operation_InsertOrMerge)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -785,7 +785,7 @@ SUITE(Table)
         CHECK(operation.operation_type() == azure::storage::table_operation_type::insert_or_merge_operation);
     }
 
-    TEST(Operation_InsertOrReplace)
+    TEST_FIXTURE(table_service_test_base, Operation_InsertOrReplace)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -800,7 +800,7 @@ SUITE(Table)
         CHECK(operation.operation_type() == azure::storage::table_operation_type::insert_or_replace_operation);
     }
 
-    TEST(Operation_Merge)
+    TEST_FIXTURE(table_service_test_base, Operation_Merge)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -815,7 +815,7 @@ SUITE(Table)
         CHECK(operation.operation_type() == azure::storage::table_operation_type::merge_operation);
     }
 
-    TEST(Operation_Replace)
+    TEST_FIXTURE(table_service_test_base, Operation_Replace)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -830,7 +830,7 @@ SUITE(Table)
         CHECK(operation.operation_type() == azure::storage::table_operation_type::replace_operation);
     }
 
-    TEST(Operation_Retrieve)
+    TEST_FIXTURE(table_service_test_base, Operation_Retrieve)
     {
         utility::string_t partition_key = get_random_string();
         utility::string_t row_key = get_random_string();
@@ -844,7 +844,7 @@ SUITE(Table)
         CHECK(operation.operation_type() == azure::storage::table_operation_type::retrieve_operation);
     }
 
-    TEST(Query_Normal)
+    TEST_FIXTURE(table_service_test_base, Query_Normal)
     {
         azure::storage::table_query query;
 
@@ -875,7 +875,7 @@ SUITE(Table)
         CHECK(query.select_columns()[2].compare(U("PropertyC")) == 0);
     }
 
-    TEST(TableRequestOptions_Normal)
+    TEST_FIXTURE(table_service_test_base, TableRequestOptions_Normal)
     {
         azure::storage::table_request_options options;
 
@@ -887,7 +887,7 @@ SUITE(Table)
         CHECK(options.payload_format() == payload_format);
     }
 
-    TEST(Table_CreateAndDelete)
+    TEST_FIXTURE(table_service_test_base, Table_CreateAndDelete)
     {
         utility::string_t table_name = get_table_name();
         azure::storage::cloud_table_client client = get_table_client();
@@ -958,7 +958,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::Conflict, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("TableAlreadyExists")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -976,7 +975,6 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("TableAlreadyExists")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         {
@@ -1043,7 +1041,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -1061,11 +1058,10 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
     }
 
-    TEST(Table_CreateIfNotExistsAndDeleteIfExists)
+    TEST_FIXTURE(table_service_test_base, Table_CreateIfNotExistsAndDeleteIfExists)
     {
         utility::string_t table_name = get_table_name();
         azure::storage::cloud_table_client client = get_table_client();
@@ -1253,7 +1249,7 @@ SUITE(Table)
         }
     }
 
-    TEST(Table_NotFound)
+    TEST_FIXTURE(table_service_test_base, Table_NotFound)
     {
         utility::string_t table_name = get_table_name();
         azure::storage::cloud_table_client client = get_table_client();
@@ -1286,7 +1282,6 @@ SUITE(Table)
             CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
             CHECK(e.result().extended_error().code().compare(U("TableNotFound")) == 0);
             CHECK(!e.result().extended_error().message().empty());
-            CHECK(e.result().extended_error().details().empty());
         }
 
         CHECK(!context.client_request_id().empty());
@@ -1304,10 +1299,9 @@ SUITE(Table)
         CHECK(context.request_results()[0].etag().empty());
         CHECK(context.request_results()[0].extended_error().code().compare(U("TableNotFound")) == 0);
         CHECK(!context.request_results()[0].extended_error().message().empty());
-        CHECK(context.request_results()[0].extended_error().details().empty());
     }
 
-    TEST(EntityOperation_InsertAndDelete)
+    TEST_FIXTURE(table_service_test_base, EntityOperation_InsertAndDelete)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -1444,7 +1438,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::Conflict, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("EntityAlreadyExists")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -1462,7 +1455,6 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("EntityAlreadyExists")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         {
@@ -1551,7 +1543,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -1569,13 +1560,12 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         table.delete_table();
     }
 
-    TEST(EntityOperation_InsertAndMerge)
+    TEST_FIXTURE(table_service_test_base, EntityOperation_InsertAndMerge)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -1976,7 +1966,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -1994,13 +1983,12 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         table.delete_table();
     }
 
-    TEST(EntityOperation_InsertAndReplace)
+    TEST_FIXTURE(table_service_test_base, EntityOperation_InsertAndReplace)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -2389,7 +2377,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -2407,13 +2394,12 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         table.delete_table();
     }
 
-    TEST(EntityOperation_Timeout)
+    TEST_FIXTURE(table_service_test_base, EntityOperation_Timeout)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -2530,7 +2516,7 @@ SUITE(Table)
         table.delete_table();
     }
 
-    TEST(EntityOperation_InvalidValueType)
+    TEST_FIXTURE(table_service_test_base, EntityOperation_InvalidValueType)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -2560,7 +2546,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -2578,13 +2563,12 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         table.delete_table();
     }
 
-    TEST(EntityOperation_DoubleSpecialValues)
+    TEST_FIXTURE(table_service_test_base, EntityOperation_DoubleSpecialValues)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -2682,7 +2666,7 @@ SUITE(Table)
         table.delete_table();
     }
 
-    TEST(Casablanca_DoubleJsonParsing)
+    TEST_FIXTURE(table_service_test_base, Casablanca_DoubleJsonParsing)
     {
         for (int i = 0; i < 50000; ++i)
         {
@@ -2697,7 +2681,7 @@ SUITE(Table)
             web::json::value input_document = web::json::value::object(fields);
             utility::string_t message = input_document.serialize();
             web::json::value output_document = web::json::value::parse(message);
-
+            
             CHECK(output_document.is_object());
             CHECK(output_document.as_object().find(U("DoubleProperty")) != output_document.as_object().cend());
             CHECK_EQUAL(web::json::value::value_type::Number, output_document.as_object().find(U("DoubleProperty"))->second.type());
@@ -2706,7 +2690,7 @@ SUITE(Table)
         }
     }
 
-    TEST(EntityBatch_Normal)
+    TEST_FIXTURE(table_service_test_base, EntityBatch_Normal)
     {
         const int BATCH_SIZE = 3;
 
@@ -3298,7 +3282,7 @@ SUITE(Table)
         table.delete_table();
     }
 
-    TEST(EntityBatch_InvalidInput)
+    TEST_FIXTURE(table_service_test_base, EntityBatch_InvalidInput)
     {
         const int BATCH_SIZE = 3;
 
@@ -3334,7 +3318,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -3352,7 +3335,6 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         {
@@ -3374,7 +3356,6 @@ SUITE(Table)
                 CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -3392,13 +3373,12 @@ SUITE(Table)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         table.delete_table();
     }
 
-    TEST(EntityBatch_PartitionKeyMismatch)
+    TEST_FIXTURE(table_service_test_base, EntityBatch_PartitionKeyMismatch)
     {
         azure::storage::cloud_table table = get_table(false);
 
@@ -3420,7 +3400,7 @@ SUITE(Table)
         CHECK_THROW(table.execute_batch(operation, options, context), std::invalid_argument);
     }
 
-    TEST(EntityBatch_MultipleRetrieve)
+    TEST_FIXTURE(table_service_test_base, EntityBatch_MultipleRetrieve)
     {
         azure::storage::cloud_table table = get_table(false);
 
@@ -3438,7 +3418,7 @@ SUITE(Table)
         CHECK_THROW(table.execute_batch(operation, options, context), std::invalid_argument);
     }
 
-    TEST(EntityBatch_RetrieveMixture)
+    TEST_FIXTURE(table_service_test_base, EntityBatch_RetrieveMixture)
     {
         azure::storage::cloud_table table = get_table(false);
 
@@ -3458,7 +3438,7 @@ SUITE(Table)
         CHECK_THROW(table.execute_batch(operation, options, context), std::invalid_argument);
     }
 
-    TEST(EntityQuery_Normal)
+    TEST_FIXTURE(table_service_test_base, EntityQuery_Normal)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -3753,7 +3733,7 @@ SUITE(Table)
         table.delete_table();
     }
 
-    TEST(EntityQuery_Segmented)
+    TEST_FIXTURE(table_service_test_base, EntityQuery_Segmented)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -4050,7 +4030,7 @@ SUITE(Table)
         table.delete_table();
     }
 
-    TEST(EntityQuery_Empty)
+    TEST_FIXTURE(table_service_test_base, EntityQuery_Empty)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -4092,7 +4072,7 @@ SUITE(Table)
         table.delete_table();
     }
 
-    TEST(EntityQuery_InvalidInput)
+    TEST_FIXTURE(table_service_test_base, EntityQuery_InvalidInput)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -4116,7 +4096,6 @@ SUITE(Table)
             CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
             CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
             CHECK(!e.result().extended_error().message().empty());
-            CHECK(e.result().extended_error().details().empty());
         }
 
         CHECK(!context.client_request_id().empty());
@@ -4134,12 +4113,11 @@ SUITE(Table)
         CHECK(context.request_results()[0].etag().empty());
         CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
         CHECK(!context.request_results()[0].extended_error().message().empty());
-        CHECK(context.request_results()[0].extended_error().details().empty());
 
         table.delete_table();
     }
 
-    TEST(EntityQuery_UriEncoding)
+    TEST_FIXTURE(table_service_test_base, EntityQuery_UriEncoding)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -4240,7 +4218,7 @@ SUITE(Table)
         table.delete_table();
     }
 
-    TEST(Table_Permissions)
+    TEST_FIXTURE(table_service_test_base, Table_Permissions)
     {
         azure::storage::cloud_table table = get_table();
 
@@ -4419,7 +4397,7 @@ SUITE(Table)
         }
     }
 
-    TEST(Table_SharedAccessSignature)
+    TEST_FIXTURE(table_service_test_base, Table_SharedAccessSignature)
     {
         azure::storage::cloud_table table1 = get_table();
 
@@ -4488,7 +4466,7 @@ SUITE(Table)
         }
     }
 
-    TEST(Table_TruncatedDateTime)
+    TEST_FIXTURE(table_service_test_base, Table_TruncatedDateTime)
     {
         azure::storage::cloud_table table = get_table();
 

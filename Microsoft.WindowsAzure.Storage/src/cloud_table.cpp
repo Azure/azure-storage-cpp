@@ -61,14 +61,15 @@ namespace azure { namespace storage {
 
     pplx::task<bool> cloud_table::create_if_not_exists_async(const table_request_options& options, operation_context context)
     {
-        return exists_async_impl(options, context, /* allow_secondary */ false).then([this, options, context] (bool exists) -> pplx::task<bool>
+        auto instance = std::make_shared<cloud_table>(*this);
+        return exists_async_impl(options, context, /* allow_secondary */ false).then([instance, options, context] (bool exists) -> pplx::task<bool>
         {
             if (exists)
             {
                 return pplx::task_from_result(false);
             }
 
-            return create_async_impl(options, context, /* allow_conflict */ true);
+            return instance->create_async_impl(options, context, /* allow_conflict */ true);
         });
     }
 
@@ -81,14 +82,15 @@ namespace azure { namespace storage {
 
     pplx::task<bool> cloud_table::delete_table_if_exists_async(const table_request_options& options, operation_context context)
     {
-        return exists_async_impl(options, context, /* allow_secondary */ false).then([this, options, context] (bool exists) -> pplx::task<bool>
+        auto instance = std::make_shared<cloud_table>(*this);
+        return exists_async_impl(options, context, /* allow_secondary */ false).then([instance, options, context] (bool exists) -> pplx::task<bool>
         {
             if (!exists)
             {
                 return pplx::task_from_result(false);
             }
 
-            return delete_async_impl(options, context, /* allow_not_found */ true);
+            return instance->delete_async_impl(options, context, /* allow_not_found */ true);
         });
     }
 
@@ -215,9 +217,10 @@ namespace azure { namespace storage {
         std::shared_ptr<std::vector<table_entity>> results = std::make_shared<std::vector<table_entity>>();
         std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
 
-        return pplx::details::do_while([this, results, query, token, options, context] () mutable -> pplx::task<bool>
+        auto instance = std::make_shared<cloud_table>(*this);
+        return pplx::details::do_while([instance, results, query, token, options, context] () mutable -> pplx::task<bool>
         {
-            return execute_query_segmented_async(query, *token, options, context).then([results, token] (table_query_segment query_segment) mutable -> bool
+            return instance->execute_query_segmented_async(query, *token, options, context).then([results, token] (table_query_segment query_segment) mutable -> bool
             {
                 std::vector<table_entity> partial_results = query_segment.results();
                 results->insert(results->end(), partial_results.begin(), partial_results.end());
@@ -264,8 +267,11 @@ namespace azure { namespace storage {
             throw std::logic_error(protocol::error_sas_missing_credentials);
         }
 
+        utility::string_t table_name = name();
+        std::transform(table_name.begin(), table_name.end(), table_name.begin(), core::utility_char_tolower);
+
         utility::ostringstream_t resource_str;
-        resource_str << U('/') << service_client().credentials().account_name() << U('/') << name();
+        resource_str << U('/') << service_client().credentials().account_name() << U('/') << table_name;
 
         return protocol::get_table_sas_token(stored_policy_identifier, policy, name(), start_partition_key, start_row_key, end_partition_key, end_row_key, resource_str.str(), service_client().credentials());
     }

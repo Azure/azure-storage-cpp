@@ -20,6 +20,9 @@
 #include "test_base.h"
 #include "cpprest/json.h"
 
+utility::string_t test_base::object_name_prefix = utility::string_t(U("nativeclientlibraryunittest"));
+bool test_base::is_random_initialized = false;
+
 test_config::test_config()
 {
     utility::ifstream_t config_file;
@@ -59,5 +62,105 @@ void test_base::print_client_request_id(const azure::storage::operation_context&
 {
     std::string suite_name(UnitTest::CurrentTest::Details()->suiteName);
     std::string test_name(UnitTest::CurrentTest::Details()->testName);
-    ucout << utility::conversions::to_string_t(suite_name) << U("::") << utility::conversions::to_string_t(test_name) << U(": ") << purpose << U(" client request ID: ") << context.client_request_id() << std::endl;
+    ucout << utility::conversions::to_string_t(suite_name) << U(":") << utility::conversions::to_string_t(test_name) << U(": ") << purpose << U(" client request ID: ") << context.client_request_id() << std::endl;
+}
+
+utility::string_t test_base::get_string(utility::char_t value1, utility::char_t value2)
+{
+    utility::ostringstream_t result;
+    result << value1 << value2;
+    return result.str();
+}
+
+void test_base::initialize_random()
+{
+    if (!is_random_initialized)
+    {
+        srand((unsigned int)time(NULL));
+        is_random_initialized = true;
+    }
+}
+
+bool test_base::get_random_boolean()
+{
+    initialize_random();
+    return (rand() & 0x1) == 0;
+}
+
+int32_t test_base::get_random_int32()
+{
+    initialize_random();
+    return (int32_t)rand() << 16 | (int32_t)rand();
+}
+
+int64_t test_base::get_random_int64()
+{
+    initialize_random();
+    return (int64_t)rand() << 48 | (int64_t)rand() << 32 | (int64_t)rand() << 16 | (int64_t)rand();
+}
+
+double test_base::get_random_double()
+{
+    initialize_random();
+    return (double)rand() / RAND_MAX;
+}
+
+utility::string_t test_base::get_random_string(const std::vector<utility::char_t> charset, size_t size)
+{
+    initialize_random();
+    utility::string_t result;
+    result.reserve(size);
+    for (size_t i = 0; i < size; ++i)
+    {
+        result.push_back(charset[rand() % charset.size()]);
+    }
+
+    return result;
+}
+
+utility::string_t test_base::get_random_string()
+{
+    initialize_random();
+    const int SIZE = 10;
+    utility::string_t result;
+    result.reserve(SIZE);
+    for (int i = 0; i < SIZE; ++i)
+    {
+        result.push_back((utility::char_t) (U('0') + rand() % 10));
+    }
+    return result;
+}
+
+utility::datetime test_base::get_random_datetime()
+{
+    initialize_random();
+    return utility::datetime::utc_now() + rand();
+}
+
+std::vector<uint8_t> test_base::get_random_binary_data()
+{
+    initialize_random();
+    const int SIZE = 100;
+    std::vector<uint8_t> result;
+    result.reserve(SIZE);
+    for (int i = 0; i < SIZE; ++i)
+    {
+        result.push_back((unsigned char)(rand() % 256));
+    }
+    return result;
+}
+
+utility::uuid test_base::get_random_guid()
+{
+    return utility::new_uuid();
+}
+
+utility::string_t test_base::get_object_name(const utility::string_t& object_type_name)
+{
+    utility::string_t object_name;
+    object_name.reserve(37U + object_type_name.size());
+    object_name.append(object_name_prefix);
+    object_name.append(object_type_name);
+    object_name.append(get_random_string());
+    return object_name;
 }

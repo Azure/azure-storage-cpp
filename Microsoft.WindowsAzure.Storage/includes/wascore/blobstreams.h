@@ -117,7 +117,7 @@ namespace azure { namespace storage { namespace core {
                     break;
                 }
 
-                return seekpos((pos_type)offset, direction);
+                return seekpos(new_pos, direction);
             }
              
             return (pos_type)traits::eof();
@@ -250,7 +250,7 @@ namespace azure { namespace storage { namespace core {
                     break;
                 }
 
-                return seekpos((pos_type)offset, direction);
+                return seekpos(new_pos, direction);
             }
          
             return (pos_type)traits::eof();
@@ -418,9 +418,9 @@ namespace azure { namespace storage { namespace core {
         {
             if (can_seek() && (direction == std::ios_base::out))
             {
-                if ((pos < (pos_type)0) || (pos >= (pos_type)size()))
+                if ((pos < (pos_type)0) || (pos > (pos_type)size()))
                 {
-                    throw std::invalid_argument("pos");
+                    return (pos_type)traits::eof();
                 }
 
                 sync().wait();

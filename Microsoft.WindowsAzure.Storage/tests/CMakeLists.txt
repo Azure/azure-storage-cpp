@@ -19,12 +19,14 @@ if(UNIX)
      cloud_table_test.cpp
      executor_test.cpp
      main.cpp
+     queue_test_base.cpp
      read_from_secondary_test.cpp
      retry_policy_test.cpp
      service_properties_test.cpp
      stdafx.cpp
+     storage_exception_test.cpp
+     table_test_base.cpp
      test_base.cpp
-     test_helper.cpp
     )
   if(APPLE)
     # set(SOURCES ${SOURCES} apple.cpp)
@@ -51,12 +53,14 @@ elseif(WIN32)
      cloud_table_test.cpp
      executor_test.cpp
      main.cpp
+     queue_test_base.cpp
      read_from_secondary_test.cpp
      retry_policy_test.cpp
      service_properties_test.cpp
      stdafx.cpp
+     storage_exception_test.cpp
+     table_test_base.cpp
      test_base.cpp
-     test_helper.cpp
     )
   add_definitions(
     -D_ASYNCRT_EXPORT
@@ -95,3 +99,5 @@ else()
     SOVERSION ${AZURESTORAGE_VERSION_MAJOR}.${AZURESTORAGE_VERSION_MINOR})
 endif()
 
+# Copy test configuration to output directory
+file(COPY test_configurations.json DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

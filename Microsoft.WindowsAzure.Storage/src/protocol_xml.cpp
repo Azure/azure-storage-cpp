@@ -23,19 +23,18 @@ namespace azure { namespace storage { namespace protocol {
 
     void storage_error_reader::handle_element(const utility::string_t& element_name)
     {
-        if (get_parent_element_name() != xml_innererror_table)
+        if (element_name == xml_code && get_parent_element_name() == xml_error_root)
         {
-            if (element_name == xml_code || element_name == xml_code_table)
-            {
-                m_error_code = get_current_element_text();
-            }
-            else if (element_name == xml_message || element_name == xml_message_table)
-            {
-                m_error_message = get_current_element_text();
-            }
+            m_error_code = get_current_element_text();
         }
-
-        // TODO parse details
+        else if (element_name == xml_message && get_parent_element_name() == xml_error_root)
+        {
+            m_error_message = get_current_element_text();
+        }
+        else
+        {
+            m_details.insert(std::make_pair(element_name, get_current_element_text()));
+        }
     }
 
     void list_containers_reader::handle_begin_element(const utility::string_t& element_name)

@@ -1,6 +1,33 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v0.5:
+- Default REST API version is 2014-02-14
+- Added parameter sequence_number to the following functions:
+  - cloud_page_blob::create_async
+  - cloud_page_blob::open_write_async
+  - cloud_page_blob::upload_from_stream_async
+  - cloud_page_blob::upload_from_file_async
+  - cloud_page_blob::create
+  - cloud_page_blob::open_write
+  - cloud_page_blob::upload_from_stream
+  - cloud_page_blob::upload_from_file
+- The client checks blob lease times and throws std::invalid_argument for invalid lease times. Previously, this would have been checked on the service and azure::storage::storage_exception would have been thrown.
+- Several bug fixes:
+  - Corrected the usage of "this" in async closures
+  - Fixed issue when generating SAS tokens for tables with upper-case letters in table name
+  - Fixed the issue of handling XML responses without BOM
+  - Removed setting Content-MD5 af PUT page blob for clearing
+  - Fixed incorrect streambuf posistion which causes cloud blob stream doesn't work properly after seek() method being called
+- Improvements on error handling:
+  - More detailed information in http_exeption
+  - More descriptive messages per StorageErrorCode
+  - More details about errors parsed from XML/JSON responses
+- Improvements on Unit Tests:
+  - All test cases now print out test name and client reqeust ID
+  - Added new cases for containers listing and continuation token
+  - test_configuration.json is copied to output directory after build
+
 Changes in v0.4:
 - Now supports building on Linux
 - Added http_buffer_size request option to control the internal buffer size used in the HTTP layer when downloading data. The default size is 64KB.
@@ -10,9 +37,9 @@ Changes in v0.4:
 - Fixed incorrect initialization of some members in the cloud_blob_container_properties and retry_info classes.
 - Added a default of 24 days for a maximum execution time for an operation
 - Changed the exception type if you upload a blob from a seekable stream but the stream is too short for the desired blob length.  
-       - Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
-       - Now checks for this case explicitly before the upload is started.
-       - Non-seekable streams still throw std::invalid_argument as before.
+  - Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
+  - Now checks for this case explicitly before the upload is started.
+  - Non-seekable streams still throw std::invalid_argument as before.
 - Fixed several bugs, including incorrect uses of std::move and compile-time differences between Visual Studio and g++.
 - Added client request ID into log lines.
 - Upgraded Casablanca dependency to 2.3.0

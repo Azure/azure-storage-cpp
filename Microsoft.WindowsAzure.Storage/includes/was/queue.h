@@ -726,7 +726,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="cloud_queue"/> class.
         /// </summary>
         cloud_queue()
-            : m_approximate_message_count(-1)
+            : m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
         {
         }
 
@@ -1447,7 +1447,7 @@ namespace azure { namespace storage {
         /// <remarks>Call the download_attributes function to retrieve this data from the queue service.</remarks>
         int approximate_message_count() const
         {
-            return m_approximate_message_count;
+            return *m_approximate_message_count;
         }
 
         /// <summary>
@@ -1457,7 +1457,7 @@ namespace azure { namespace storage {
         /// <remarks>Call the download_attributes function to retrieve this data from the queue service.</remarks>
         cloud_metadata& metadata()
         {
-            return m_metadata;
+            return *m_metadata;
         }
 
         /// <summary>
@@ -1467,7 +1467,7 @@ namespace azure { namespace storage {
         /// <remarks>Call the download_attributes function to retrieve this data from the queue service.</remarks>
         const cloud_metadata& metadata() const
         {
-            return m_metadata;
+            return *m_metadata;
         }
 
         /// <summary>
@@ -1477,7 +1477,7 @@ namespace azure { namespace storage {
         /// <remarks>Call the upload_attributes function to save this data to the queue service.</remarks>
         void set_metadata(cloud_metadata value)
         {
-            m_metadata = std::move(value);
+            *m_metadata = std::move(value);
         }
 
     private:
@@ -1495,8 +1495,8 @@ namespace azure { namespace storage {
         cloud_queue_client m_client;
         utility::string_t m_name;
         storage_uri m_uri;
-        int m_approximate_message_count;
-        cloud_metadata m_metadata;
+        std::shared_ptr<int> m_approximate_message_count;        
+        std::shared_ptr<cloud_metadata> m_metadata;
 
         friend class cloud_queue_client;
     };

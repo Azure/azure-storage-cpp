@@ -66,7 +66,7 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(parsed_properties);
             properties->update_page_blob_sequence_number(parsed_properties);
         });
-        return core::istream_descriptor::create(page_data, needs_md5).then([command, context, start_offset, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(page_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_block_size).then([command, context, start_offset, content_md5, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             auto end_offset = start_offset + request_body.length() - 1;
@@ -95,20 +95,20 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<concurrency::streams::ostream> cloud_page_blob::open_write_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<concurrency::streams::ostream> cloud_page_blob::open_write_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type(), false);
 
         auto instance = std::make_shared<cloud_page_blob>(*this);
-        return instance->create_async(size, condition, modified_options, context).then([instance, size, condition, modified_options, context] () -> concurrency::streams::ostream
+        return instance->create_async(size, sequence_number, condition, modified_options, context).then([instance, size, condition, modified_options, context]() -> concurrency::streams::ostream
         {
             return core::cloud_page_blob_ostreambuf(instance, size, condition, modified_options, context).create_ostream();
         });
     }
 
-    pplx::task<void> cloud_page_blob::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_page_blob::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -123,7 +123,7 @@ namespace azure { namespace storage {
             }
         }
 
-        return open_write_async(length, condition, modified_options, context).then([source, length] (concurrency::streams::ostream blob_stream) -> pplx::task<void>
+        return open_write_async(length, sequence_number, condition, modified_options, context).then([source, length](concurrency::streams::ostream blob_stream) -> pplx::task<void>
         {
             return core::stream_copy_async(source, blob_stream, length).then([blob_stream] (utility::size64_t) -> pplx::task<void>
             {
@@ -132,12 +132,12 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<void> cloud_page_blob::upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_page_blob::upload_from_file_async(const utility::string_t& path, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         auto instance = std::make_shared<cloud_page_blob>(*this);
-        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context] (concurrency::streams::istream stream) -> pplx::task<void>
+        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, sequence_number, condition, options, context](concurrency::streams::istream stream) -> pplx::task<void>
         {
-            return instance->upload_from_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> upload_task) -> pplx::task<void>
+            return instance->upload_from_stream_async(stream, sequence_number, condition, options, context).then([stream](pplx::task<void> upload_task) -> pplx::task<void>
             {
                 return stream.close().then([upload_task] ()
                 {
@@ -147,7 +147,7 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<void> cloud_page_blob::create_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_page_blob::create_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -156,7 +156,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::put_page_blob, size, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::put_page_blob, size, sequence_number, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, size] (const web::http::http_response& response, const request_result& result, operation_context context)
         {

@@ -76,7 +76,8 @@ namespace azure { namespace storage { namespace core {
     pplx::task<basic_cloud_blob_ostreambuf::int_type> basic_cloud_blob_ostreambuf::_putc(concurrency::streams::ostream::traits::char_type ch)
     {
         pplx::task<void> upload_task = pplx::task_from_result();
-        
+
+        m_current_streambuf_offset += 1;
         auto result = m_buffer.putc(ch).get();
         if (m_buffer_size == m_buffer.in_avail())
         {

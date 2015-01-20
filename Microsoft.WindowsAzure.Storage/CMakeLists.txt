@@ -99,4 +99,4 @@ set(AZURESTORAGE_LIBRARIES ${AZURESTORAGE_LIBRARY} ${CASABLANCA_LIBRARIES} ${Boo
 include_directories(${AZURESTORAGE_INCLUDE_DIRS})
 
 add_subdirectory(src)
-#add_subdirectory(tests)
+add_subdirectory(tests) 

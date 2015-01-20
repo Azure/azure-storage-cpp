@@ -16,12 +16,12 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "test_helper.h"
+#include "table_test_base.h"
 #include "was/table.h"
 
 SUITE(TableClient)
 {
-    TEST(TableClient_Empty)
+    TEST_FIXTURE(table_service_test_base, TableClient_Empty)
     {
         azure::storage::cloud_table_client client;
 
@@ -31,7 +31,7 @@ SUITE(TableClient)
         CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json);
     }
 
-    TEST(TableClient_BaseUri)
+    TEST_FIXTURE(table_service_test_base, TableClient_BaseUri)
     {
         azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
 
@@ -43,7 +43,7 @@ SUITE(TableClient)
         CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json);
     }
 
-    TEST(TableClient_BaseUriAndCredentials)
+    TEST_FIXTURE(table_service_test_base, TableClient_BaseUriAndCredentials)
     {
         azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
         azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
@@ -57,7 +57,7 @@ SUITE(TableClient)
         CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json);
     }
 
-    TEST(TableClient_BaseUriAndCredentialsAndDefaultRequestOptions)
+    TEST_FIXTURE(table_service_test_base, TableClient_BaseUriAndCredentialsAndDefaultRequestOptions)
     {
         azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
         azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
@@ -77,7 +77,7 @@ SUITE(TableClient)
         CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json_no_metadata);
     }
 
-    TEST(ListTables_Normal)
+    TEST_FIXTURE(table_service_test_base, ListTables_Normal)
     {
         const int TABLE_COUNT = 5;
 
@@ -146,7 +146,7 @@ SUITE(TableClient)
         }
     }
 
-    TEST(ListTables_Segmented)
+    TEST_FIXTURE(table_service_test_base, ListTables_Segmented)
     {
         const int TABLE_COUNT = 5;
 

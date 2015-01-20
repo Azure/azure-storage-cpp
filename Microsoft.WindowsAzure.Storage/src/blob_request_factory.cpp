@@ -311,12 +311,12 @@ namespace azure { namespace storage { namespace protocol {
 
         web::http::http_headers& headers = request.headers();
         headers.add(ms_header_range, range.to_string());
-        headers.add(web::http::header_names::content_md5, content_md5);
 
         switch (write)
         {
         case page_write::update:
             headers.add(ms_header_page_write, header_value_page_write_update);
+            add_optional_header(headers, web::http::header_names::content_md5, content_md5);
             break;
 
         case page_write::clear:
@@ -339,13 +339,13 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_page_blob(utility::size64_t size, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_page_blob(utility::size64_t size, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         web::http::http_headers& headers = request.headers();
         headers.add(ms_header_blob_type, header_value_blob_type_page);
         headers.add(ms_header_blob_content_length, size);
-        headers.add(ms_header_blob_sequence_number, properties.page_blob_sequence_number());
+        headers.add(ms_header_blob_sequence_number, sequence_number);
         add_properties(request, properties);
         add_metadata(request, metadata);
         add_access_condition(request, condition);
@@ -544,7 +544,7 @@ namespace azure { namespace storage { namespace protocol {
 
         if (!condition.lease_id().empty())
         {
-            throw storage_exception(protocol::error_lease_id_on_source);
+            throw storage_exception(protocol::error_lease_id_on_source, false);
         }
     }
 

@@ -123,7 +123,7 @@ target_link_libraries(${AZURESTORAGE_LIBRARY}
 
 # Portions specific to cpprest binary versioning.
 set (AZURESTORAGE_VERSION_MAJOR 0)
-set (AZURESTORAGE_VERSION_MINOR 4)
+set (AZURESTORAGE_VERSION_MINOR 5)
 set (AZURESTORAGE_VERSION_REVISION 0)
 if(WIN32)
   set_target_properties(${AZURESTORAGE_LIBRARY} PROPERTIES

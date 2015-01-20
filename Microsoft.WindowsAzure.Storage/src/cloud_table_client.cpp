@@ -33,9 +33,10 @@ namespace azure { namespace storage {
         std::shared_ptr<std::vector<cloud_table>> results = std::make_shared<std::vector<cloud_table>>();
         std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
 
-        return pplx::details::do_while([this, results, prefix, token, options, context] () mutable -> pplx::task<bool>
+        auto instance = std::make_shared<cloud_table_client>(*this);
+        return pplx::details::do_while([instance, results, prefix, token, options, context] () mutable -> pplx::task<bool>
         {
-            return list_tables_segmented_async(prefix, -1, *token, options, context).then([results, token] (table_result_segment result_segment) mutable -> bool
+            return instance->list_tables_segmented_async(prefix, -1, *token, options, context).then([results, token] (table_result_segment result_segment) mutable -> bool
             {
                 std::vector<azure::storage::cloud_table> partial_results = result_segment.results();
                 results->insert(results->end(), partial_results.begin(), partial_results.end());
@@ -72,7 +73,8 @@ namespace azure { namespace storage {
             query.set_filter_string(filter_string);
         }
 
-        return table.execute_query_segmented_async(query, token, options, context).then([this] (table_query_segment query_segment) -> table_result_segment
+        auto instance = std::make_shared<cloud_table_client>(*this);
+        return table.execute_query_segmented_async(query, token, options, context).then([instance] (table_query_segment query_segment) -> table_result_segment
         {
             std::vector<table_entity> query_results = query_segment.results();
 
@@ -85,7 +87,7 @@ namespace azure { namespace storage {
                 table_entity entity = *itr;
 
                 utility::string_t table_name = entity.properties()[U("TableName")].string_value();
-                cloud_table current_table = get_table_reference(std::move(table_name));
+                cloud_table current_table = instance->get_table_reference(std::move(table_name));
                 table_results.push_back(std::move(current_table));
             }
 

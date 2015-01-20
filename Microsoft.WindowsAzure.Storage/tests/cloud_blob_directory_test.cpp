@@ -58,7 +58,7 @@ void create_blob_tree(const azure::storage::cloud_blob_container& container, con
         if (iter->type() == azure::storage::blob_type::page_blob)
         {
             azure::storage::cloud_page_blob page_blob(blob);
-            page_blob.create(0, azure::storage::access_condition(), azure::storage::blob_request_options(), context);
+            page_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), context);
         }
         else
         {

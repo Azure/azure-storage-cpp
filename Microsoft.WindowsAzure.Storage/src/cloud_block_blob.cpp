@@ -33,7 +33,7 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-        return core::istream_descriptor::create(block_data, needs_md5).then([command, context, block_id, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(block_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_block_size).then([command, context, block_id, content_md5, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             command->set_build_request(std::bind(protocol::put_block, block_id, md5, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));

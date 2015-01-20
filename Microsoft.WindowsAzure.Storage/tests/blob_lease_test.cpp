@@ -147,8 +147,8 @@ SUITE(Blob)
     {
         m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
-        CHECK_THROW(m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(14)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
-        CHECK_THROW(m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(61)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        CHECK_THROW(m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(14)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
+        CHECK_THROW(m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(61)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
     }
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_renew)
@@ -294,8 +294,8 @@ SUITE(Blob)
     {
         m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
 
-        CHECK_THROW(m_container.acquire_lease(azure::storage::lease_time(std::chrono::seconds(14)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
-        CHECK_THROW(m_container.acquire_lease(azure::storage::lease_time(std::chrono::seconds(61)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        CHECK_THROW(m_container.acquire_lease(azure::storage::lease_time(std::chrono::seconds(14)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
+        CHECK_THROW(m_container.acquire_lease(azure::storage::lease_time(std::chrono::seconds(61)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
     }
 
     TEST_FIXTURE(container_test_base, container_lease_renew)
@@ -387,5 +387,42 @@ SUITE(Blob)
 
         std::this_thread::sleep_for(std::chrono::seconds(40));
         check_lease_access(m_container, azure::storage::lease_state::broken, lease_id, false, true);
+    }
+
+    TEST_FIXTURE(blob_test_base, lease_time_constructor)
+    {
+        azure::storage::lease_time lease_time1;
+        CHECK_EQUAL(-1, lease_time1.seconds().count());
+
+        int valid_times[] = { -1, 15, 20, 60 };
+        for (int valid_time : valid_times)
+        {
+            CHECK_EQUAL(valid_time, azure::storage::lease_time(std::chrono::seconds(valid_time)).seconds().count());
+        }
+
+        int invalid_times[] = { -2, 0, 1, 14, 61 };
+        for (int invalid_time : invalid_times)
+        {
+            CHECK_THROW(azure::storage::lease_time(std::chrono::seconds(invalid_time)), std::invalid_argument);
+        }
+    }
+
+    TEST_FIXTURE(blob_test_base, lease_break_period_constructor)
+    {
+        CHECK_EQUAL(std::numeric_limits<std::chrono::seconds::rep>::max(), azure::storage::lease_break_period().seconds().count());
+        CHECK_EQUAL(std::numeric_limits<std::chrono::seconds::rep>::max(), azure::storage::lease_break_period(std::chrono::seconds(std::numeric_limits<std::chrono::seconds::rep>::max())).seconds().count());
+        CHECK_THROW(azure::storage::lease_break_period(std::chrono::seconds(std::numeric_limits<std::chrono::seconds::rep>::min())), std::invalid_argument);
+
+        int valid_periods[] = { 0, 1, 60};
+        for (int valid_period : valid_periods)
+        {
+            CHECK_EQUAL(valid_period, azure::storage::lease_break_period(std::chrono::seconds(valid_period)).seconds().count());
+        }
+
+        int invalid_periods[] = { -1, -2, 61 };
+        for (int invalid_period : invalid_periods)
+        {
+            CHECK_THROW(azure::storage::lease_break_period(std::chrono::seconds(invalid_period)), std::invalid_argument);
+        }
     }
 }

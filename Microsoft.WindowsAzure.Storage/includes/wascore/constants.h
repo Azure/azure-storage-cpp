@@ -43,6 +43,12 @@ namespace azure { namespace storage { namespace protocol {
     // For the following value, "0" means "don't send a timeout to the service"
     const std::chrono::seconds default_server_timeout(0);
 
+    // lease break period and duration constants
+    const std::chrono::seconds minimum_lease_break_period(0);
+    const std::chrono::seconds maximum_lease_break_period(60);
+    const std::chrono::seconds minimum_fixed_lease_duration(15);
+    const std::chrono::seconds maximum_fixed_lease_duration(60);
+
     // uri query parameters
     const utility::string_t uri_query_timeout(U("timeout"));
     const utility::string_t uri_query_resource_type(U("restype"));
@@ -75,6 +81,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t uri_query_sas_content_encoding(U("rsce"));
     const utility::string_t uri_query_sas_content_language(U("rscl"));
     const utility::string_t uri_query_sas_content_disposition(U("rscd"));
+    const utility::string_t uri_query_sas_api_version(U("api-version"));
 
     // table query parameters
     const utility::string_t table_query_next_partition_key(U("NextPartitionKey"));
@@ -171,7 +178,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t ms_header_time_next_visible(U("x-ms-time-next-visible"));
 
     // header values
-    const utility::string_t header_value_storage_version(U("2013-08-15"));
+    const utility::string_t header_value_storage_version(U("2014-02-14"));
     const utility::string_t header_value_true(U("true"));
     const utility::string_t header_value_false(U("false"));
     const utility::string_t header_value_locked(U("locked"));
@@ -257,6 +264,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t xml_block(U("Block"));
     const utility::string_t xml_name(U("Name"));
     const utility::string_t xml_size(U("Size"));
+    const utility::string_t xml_error_root(U("Error"));
     const utility::string_t xml_code(U("Code"));
     const utility::string_t xml_code_table(U("code"));
     const utility::string_t xml_message(U("Message"));
@@ -298,16 +306,11 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t xml_service_stats_geo_replication_last_sync_time(U("LastSyncTime"));
     const utility::string_t xml_url(U("Url"));
 
-    // error codes
-    const utility::string_t error_code_container_already_exists(U("ContainerAlreadyExists"));
-    const utility::string_t error_code_container_not_found(U("ContainerNotFound"));
-    const utility::string_t error_code_blob_not_found(U("BlobNotFound"));
-
     // user agent
 #if defined(WIN32)
-    const utility::string_t header_value_user_agent(U("Azure-Storage/0.4.0 (Native; Windows)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/0.5.0 (Native; Windows)"));
 #else
-    const utility::string_t header_value_user_agent(U("Azure-Storage/0.4.0 (Native)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/0.5.0 (Native)"));
 #endif
 
 }}} // namespace azure::storage::protocol

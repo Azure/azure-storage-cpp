@@ -163,6 +163,9 @@ App_Data/*.ldf
 # Microsoft Fakes
 FakesAssemblies/
 
+# Nuget packages
+*.nupkg
+
 # =========================
 # Windows detritus
 # =========================
@@ -176,3 +179,7 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+
+# build folders under Linux
+Microsoft.WindowsAzure.Storage/build.*/
+

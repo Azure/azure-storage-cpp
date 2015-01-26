@@ -60,4 +60,21 @@ protected:
     static void print_client_request_id(const azure::storage::operation_context& context, const utility::string_t& purpose);
   
     azure::storage::operation_context m_context;
+    
+    static utility::string_t object_name_prefix;
+    static bool is_random_initialized;
+
+    static utility::string_t get_string(utility::char_t value1, utility::char_t value2);
+    static void initialize_random();
+    static bool get_random_boolean();
+    static int32_t get_random_int32();
+    static int64_t get_random_int64();
+    static double get_random_double();
+    static utility::string_t get_random_string(const std::vector<utility::char_t> charset, size_t size);
+    static utility::string_t get_random_string();
+    static utility::datetime get_random_datetime();
+    static std::vector<uint8_t> get_random_binary_data();
+    static utility::uuid get_random_guid();
+    static azure::storage::storage_credentials get_credentials();
+    static utility::string_t get_object_name(const utility::string_t& object_type_name);
 };

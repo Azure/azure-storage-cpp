@@ -59,8 +59,6 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_reader::initialize(streams::istream stream)
     {
-        remove_bom(stream);
-
 #ifdef WIN32
         HRESULT hr;
         CComPtr<IStream> pInputStream;
@@ -105,23 +103,6 @@ namespace azure { namespace storage { namespace core { namespace xml {
         else
             m_reader.reset(new xmlpp::TextReader(reinterpret_cast<const unsigned char*>(m_data.data()), static_cast<unsigned int>(m_data.size())));
 #endif
-    }
-
-    /// <summary>
-    /// Remove Byte Order Mark from the stream
-    /// </summary>
-    void xml_reader::remove_bom(streams::istream stream)
-    {
-        // Synchronous.
-        if (stream.peek().get() == 0xEF
-            && stream.peek().get() == 0xBB
-            && stream.peek().get() == 0xBF)
-        {
-            stream.read().get();
-            stream.read().get();
-            stream.read().get();
-            return;
-        }
     }
 
     bool xml_reader::parse()

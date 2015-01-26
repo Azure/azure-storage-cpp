@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "was/blob.h"
+#include "was/error_code_strings.h"
 #include "wascore/protocol.h"
 #include "wascore/resources.h"
 #include "wascore/blobstreams.h"

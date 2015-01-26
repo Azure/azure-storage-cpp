@@ -83,11 +83,11 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
         azure::storage::cloud_page_blob page_blob(blob);
         if (blob_size == 0)
         {
-            page_blob.upload_from_stream(stream, azure::storage::access_condition(), options, context);
+            page_blob.upload_from_stream(stream, 0, azure::storage::access_condition(), options, context);
         }
         else
         {
-            page_blob.upload_from_stream(stream, blob_size, azure::storage::access_condition(), options, context);
+            page_blob.upload_from_stream(stream, blob_size, 0, azure::storage::access_condition(), options, context);
         }
     }
 
@@ -220,7 +220,7 @@ SUITE(Blob)
         auto blob = m_container.get_page_blob_reference(U("pageblob"));
 
         CHECK(!blob.exists(azure::storage::blob_request_options(), m_context));
-        blob.create(1024, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        blob.create(1024, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto same_blob = m_container.get_page_blob_reference(U("pageblob"));
 
@@ -236,7 +236,7 @@ SUITE(Blob)
         auto blob = m_container.get_page_blob_reference(U("pageblob"));
         CHECK_THROW(blob.download_attributes(azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
 
-        blob.create(1024, azure::storage::access_condition(), options, m_context);
+        blob.create(1024, 0, azure::storage::access_condition(), options, m_context);
         CHECK_EQUAL(1024, blob.properties().size());
         CHECK(!blob.properties().etag().empty());
         CHECK((utility::datetime::utc_now() - blob.properties().last_modified()) < (int64_t)utility::datetime::from_minutes(5));
@@ -289,7 +289,7 @@ SUITE(Blob)
     {
         auto page_blob = m_container.get_page_blob_reference(U("pageblob"));
         CHECK(azure::storage::blob_type::page_blob == page_blob.type());
-        page_blob.create(0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        page_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto block_blob = m_container.get_block_blob_reference(U("blockblob"));
         CHECK(azure::storage::blob_type::block_blob == block_blob.type());

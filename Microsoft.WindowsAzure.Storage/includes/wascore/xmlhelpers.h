@@ -140,7 +140,7 @@ protected:
     bool move_to_first_attribute();
 
     /// <summary>
-    /// Moves to the first attribute in the node
+    /// Moves to the next attribute in the node
     /// </summary>
     bool move_to_next_attribute();
 
@@ -158,11 +158,6 @@ protected:
     /// Initialize the reader
     /// </summary>
     void initialize(concurrency::streams::istream stream);
-
-    /// <summary>
-    /// Remove Byte Order Mark from the stream
-    /// </summary>
-    void remove_bom(concurrency::streams::istream stream);
 
     /// <summary>
     /// Can be called by the derived classes in the handle_* routines, to cause the parse routine to exit early,

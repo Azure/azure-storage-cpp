@@ -1,6 +1,31 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v0.5:
+- Default REST API version is 2014-02-14
+- Added parameter sequence_number to the following functions:
+  - cloud_page_blob::create_async
+  - cloud_page_blob::open_write_async
+  - cloud_page_blob::upload_from_stream_async
+  - cloud_page_blob::upload_from_file_async
+  - cloud_page_blob::create
+  - cloud_page_blob::open_write
+  - cloud_page_blob::upload_from_stream
+  - cloud_page_blob::upload_from_file
+- The client checks blob lease times and throws std::invalid_argument for invalid lease times. Previously, this would have been checked on the service and azure::storage::storage_exception would have been thrown.
+- Improvements on error handling:
+  - azure::storage::storage_exception now has inner_exception populated with the actual underlying exception thrown
+  - azure::storage::storage_exception now has more information about errors on storage service side
+  - was/error_code_strings.h is added including messages for all possible error codes from storage service
+- Improvements on Unit Tests:
+  - All test cases now print out test name and client reqeust ID
+  - Added new cases for containers listing and continuation token
+  - Unit Test configuraiton file is copied to output directory via CMake now, so no need to copy it manually under Linux
+- Several fixes for bugs:
+  - Cannot generate SAS tokens for tables with upper-case letters in table name
+  - cloud_blob_istreambuf and cloud_blob_ostreambuf is set to a wrong position after seek() method is called.
+  - Content-MD5 header is incorrectly set when sending Put Page requests with page-write set to clear
+
 Changes in v0.4:
 - Now supports building on Linux
 - Added http_buffer_size request option to control the internal buffer size used in the HTTP layer when downloading data. The default size is 64KB.
@@ -10,9 +35,9 @@ Changes in v0.4:
 - Fixed incorrect initialization of some members in the cloud_blob_container_properties and retry_info classes.
 - Added a default of 24 days for a maximum execution time for an operation
 - Changed the exception type if you upload a blob from a seekable stream but the stream is too short for the desired blob length.  
-       - Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
-       - Now checks for this case explicitly before the upload is started.
-       - Non-seekable streams still throw std::invalid_argument as before.
+  - Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
+  - Now checks for this case explicitly before the upload is started.
+  - Non-seekable streams still throw std::invalid_argument as before.
 - Fixed several bugs, including incorrect uses of std::move and compile-time differences between Visual Studio and g++.
 - Added client request ID into log lines.
 - Upgraded Casablanca dependency to 2.3.0
@@ -40,10 +65,10 @@ Changes in v0.3:
 - Removed the constness from the return values of filter_string and select_columns functions in table_query class.
 - Changed many functions to accept pass-by-value arguments to support move semantics.
 - Changed many functions to accept pass-by-reference arguments or return references as a performance improvement.
-- Made some constructors explicit to avoid implicit conversions. This affects these classes:
-	canonicalizer, shared_key_blob_queue_canonicalizer, shared_key_lite_blob_queue_canonicalizer, shared_key_table_canonicalizer, shared_key_lite_table_canonicalizer, 
-	sas_authentication_handler, shared_key_authentication_handler, continuation_token, retry_info, retry_policy, cloud_queue_message, cloud_queue_client, 
-	basic_common_retry_policy, cloud_client
+- Made some constructors explicit to avoid implicit conversions. This affects these classes: 
+  canonicalizer, shared_key_blob_queue_canonicalizer, shared_key_lite_blob_queue_canonicalizer, shared_key_table_canonicalizer,
+  shared_key_lite_table_canonicalizer, sas_authentication_handler, shared_key_authentication_handler, continuation_token,
+  retry_info, retry_policy, cloud_queue_message, cloud_queue_client, basic_common_retry_policy, cloud_client
 - Major performance improvement when executing many requests in parallel.
 - Minor bug fixes and performance improvements.
 

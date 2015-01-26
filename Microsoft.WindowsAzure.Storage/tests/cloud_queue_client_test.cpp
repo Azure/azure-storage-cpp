@@ -16,12 +16,12 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "test_helper.h"
+#include "queue_test_base.h"
 #include "was/queue.h"
 
 SUITE(QueueClient)
 {
-    TEST(QueueClient_Empty)
+    TEST_FIXTURE(queue_service_test_base, QueueClient_Empty)
     {
         azure::storage::cloud_queue_client client;
 
@@ -30,7 +30,7 @@ SUITE(QueueClient)
         CHECK(client.credentials().is_anonymous());
     }
 
-    TEST(QueueClient_BaseUri)
+    TEST_FIXTURE(queue_service_test_base, QueueClient_BaseUri)
     {
         azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
 
@@ -41,7 +41,7 @@ SUITE(QueueClient)
         CHECK(client.credentials().is_anonymous());
     }
 
-    TEST(QueueClient_BaseUriAndCredentials)
+    TEST_FIXTURE(queue_service_test_base, QueueClient_BaseUriAndCredentials)
     {
         azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
         azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
@@ -54,7 +54,7 @@ SUITE(QueueClient)
         CHECK(client.credentials().is_shared_key());
     }
 
-    TEST(QueueClient_BaseUriAndCredentialsAndDefaultRequestOptions)
+    TEST_FIXTURE(queue_service_test_base, QueueClient_BaseUriAndCredentialsAndDefaultRequestOptions)
     {
         azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
         azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
@@ -73,7 +73,7 @@ SUITE(QueueClient)
         CHECK(client.default_request_options().location_mode() == azure::storage::location_mode::secondary_only);
     }
 
-    TEST(ListQueues_Normal)
+    TEST_FIXTURE(queue_service_test_base, ListQueues_Normal)
     {
         const int QUEUE_COUNT = 5;
 
@@ -207,7 +207,7 @@ SUITE(QueueClient)
         }
     }
 
-    TEST(ListQueues_Segmented)
+    TEST_FIXTURE(queue_service_test_base, ListQueues_Segmented)
     {
         const int QUEUE_COUNT = 5;
 

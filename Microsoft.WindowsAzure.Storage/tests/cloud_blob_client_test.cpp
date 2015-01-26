@@ -21,6 +21,87 @@
 
 #pragma region Fixture
 
+void blob_service_test_base_with_objects_to_delete::create_containers(const utility::string_t& prefix, std::size_t num)
+{
+    for (std::size_t i = 0; i < num; ++i)
+    {
+        auto index = utility::conversions::print_string(i);
+        auto container = m_client.get_container_reference(prefix + index);
+        m_containers_to_delete.push_back(container);
+        container.metadata()[U("index")] = index;
+        container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+    }
+}
+
+void blob_service_test_base_with_objects_to_delete::create_blobs(const azure::storage::cloud_blob_container& container, const utility::string_t& prefix, std::size_t num)
+{
+    for (std::size_t i = 0; i < num; i++)
+    {
+        auto index = utility::conversions::print_string(i);
+        auto blob = container.get_block_blob_reference(prefix + index);
+        m_blobs_to_delete.push_back(blob);
+        blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+    }
+}
+
+void blob_service_test_base_with_objects_to_delete::check_container_list(const std::vector<azure::storage::cloud_blob_container>& list, const utility::string_t& prefix, bool check_found)
+{
+    auto container_list_sorted = std::is_sorted(list.cbegin(), list.cend(), [](const azure::storage::cloud_blob_container& a, const azure::storage::cloud_blob_container& b)
+    {
+        return a.name() < b.name();
+    });
+    CHECK(container_list_sorted);
+
+    std::vector<azure::storage::cloud_blob_container> containers(m_containers_to_delete);
+
+    for (auto list_iter = list.begin(); list_iter != list.end(); ++list_iter)
+    {
+        bool found = false;
+        for (auto iter = containers.begin(); iter != containers.end(); ++iter)
+        {
+            if (iter->name() == list_iter->name())
+            {
+                auto index_str = list_iter->metadata().find(U("index"));
+                CHECK(index_str != list_iter->metadata().end());
+                CHECK_UTF8_EQUAL(iter->name(), prefix + index_str->second);
+                containers.erase(iter);
+                found = true;
+                break;
+            }
+        }
+        if (check_found)
+        {
+            CHECK(found);
+        }
+    }
+    CHECK(containers.empty());
+}
+
+void blob_service_test_base_with_objects_to_delete::check_blob_list(const std::vector<azure::storage::cloud_blob>& list)
+{
+    auto blob_list_sorted = std::is_sorted(list.cbegin(), list.cend(), [](const azure::storage::cloud_blob& a, const azure::storage::cloud_blob& b)
+    {
+        return a.name() < b.name();
+    });
+    CHECK(blob_list_sorted);
+
+    std::vector<azure::storage::cloud_blob> blobs(m_blobs_to_delete);
+
+    for (auto list_iter = list.begin(); list_iter != list.end(); ++list_iter)
+    {
+        for (auto iter = blobs.begin(); iter != blobs.end(); ++iter)
+        {
+            if (iter->name() == list_iter->name())
+            {
+                blobs.erase(iter);
+                break;
+            }
+        }
+    }
+
+    CHECK(blobs.empty());
+}
+
 std::vector<azure::storage::cloud_blob_container> blob_service_test_base::list_all_containers(const utility::string_t& prefix, azure::storage::container_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options)
 {
     std::vector<azure::storage::cloud_blob_container> containers;
@@ -89,72 +170,33 @@ SUITE(Blob)
     {
         auto prefix = get_random_container_name();
 
-        for (int i = 0; i < 1; i++)
-        {
-            auto index = utility::conversions::print_string(i);
-            auto container = m_client.get_container_reference(prefix + index);
-            m_containers_to_delete.push_back(container);
-            container.metadata()[U("index")] = index;
-            container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
-        }
-
-        std::vector<azure::storage::cloud_blob_container> containers(m_containers_to_delete);
+        create_containers(prefix, 1);
 
         auto listing = list_all_containers(prefix, azure::storage::container_listing_details::all, 1, azure::storage::blob_request_options());
-        for (auto listing_iter = listing.begin(); listing_iter != listing.end(); ++listing_iter)
-        {
-            bool found = false;
-            for (auto iter = containers.begin(); iter != containers.end(); ++iter)
-            {
-                if (iter->name() == listing_iter->name())
-                {
-                    auto index_str = listing_iter->metadata().find(U("index"));
-                    CHECK(index_str != listing_iter->metadata().end());
-                    CHECK_UTF8_EQUAL(iter->name(), prefix + index_str->second);
-                    containers.erase(iter);
-                    found = true;
-                    break;
-                }
-            }
-
-            CHECK(found);
-        }
-
-        CHECK(containers.empty());
+        
+        check_container_list(listing, prefix, true);
     }
 
     TEST_FIXTURE(blob_service_test_base_with_objects_to_delete, list_containers)
     {
         auto prefix = get_random_container_name();
 
-        for (int i = 0; i < 1; i++)
-        {
-            auto index = utility::conversions::print_string(i);
-            auto container = m_client.get_container_reference(prefix + index);
-            m_containers_to_delete.push_back(container);
-            container.metadata()[U("index")] = index;
-            container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
-        }
+        create_containers(prefix, 1);
 
-        std::vector<azure::storage::cloud_blob_container> containers(m_containers_to_delete);
+        auto listing = list_all_containers(utility::string_t(), azure::storage::container_listing_details::all, 5001, azure::storage::blob_request_options());
+        
+        check_container_list(listing, prefix, false);
+    }
 
-        auto listing = list_all_containers(utility::string_t(), azure::storage::container_listing_details::all, 5000, azure::storage::blob_request_options());
-        for (auto listing_iter = listing.begin(); listing_iter != listing.end(); ++listing_iter)
-        {
-            for (auto iter = containers.begin(); iter != containers.end(); ++iter)
-            {
-                if (iter->name() == listing_iter->name())
-                {
-                    auto index_str = listing_iter->metadata().find(U("index"));
-                    CHECK(index_str != listing_iter->metadata().end());
-                    CHECK_UTF8_EQUAL(iter->name(), prefix + index_str->second);
-                    containers.erase(iter);
-                    break;
-                }
-            }
-        }
+    TEST_FIXTURE(blob_service_test_base_with_objects_to_delete, list_containers_with_continuation_token)
+    {
+        auto prefix = get_random_container_name();
 
-        CHECK(containers.empty());
+        create_containers(prefix, 10);
+
+        auto listing = list_all_containers(prefix, azure::storage::container_listing_details::all, 3, azure::storage::blob_request_options());
+
+        check_container_list(listing, prefix, true);
     }
 
     TEST_FIXTURE(blob_service_test_base_with_objects_to_delete, list_blobs_from_client_root)
@@ -164,30 +206,11 @@ SUITE(Blob)
 
         auto prefix = get_random_container_name();
 
-        for (int i = 0; i < 1; i++)
-        {
-            auto index = utility::conversions::print_string(i);
-            auto blob = root_container.get_block_blob_reference(prefix + index);
-            m_blobs_to_delete.push_back(blob);
-            blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        }
-
-        std::vector<azure::storage::cloud_blob> blobs(m_blobs_to_delete);
+        create_blobs(root_container, prefix, 1);
 
         auto listing = list_all_blobs_from_client(prefix, azure::storage::blob_listing_details::none, 1, azure::storage::blob_request_options());
-        for (auto listing_iter = listing.begin(); listing_iter != listing.end(); ++listing_iter)
-        {
-            for (auto iter = blobs.begin(); iter != blobs.end(); ++iter)
-            {
-                if (iter->name() == listing_iter->name())
-                {
-                    blobs.erase(iter);
-                    break;
-                }
-            }
-        }
-
-        CHECK(blobs.empty());
+        
+        check_blob_list(listing);
     }
 
     TEST_FIXTURE(blob_test_base, list_blobs_from_client)

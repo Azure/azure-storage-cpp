@@ -110,7 +110,7 @@ static azure::storage::retry_info create_fake_retry_info(azure::storage::storage
 
 SUITE(Core)
 {
-    TEST(retry_info)
+    TEST_FIXTURE(test_base, retry_info)
     {
         {
             azure::storage::retry_info info;
@@ -138,7 +138,7 @@ SUITE(Core)
         }
     }
 
-    TEST(no_retry_results)
+    TEST_FIXTURE(test_base, no_retry_results)
     {
         auto allowed_delta = [] (int retry_count) -> std::chrono::milliseconds
         {
@@ -192,7 +192,7 @@ SUITE(Core)
         }
     }
 
-    TEST(exponential_retry_results)
+    TEST_FIXTURE(test_base, exponential_retry_results)
     {
         auto allowed_delta = [] (int retry_count) -> std::chrono::milliseconds
         {
@@ -274,7 +274,7 @@ SUITE(Core)
         }
     }
 
-    TEST(linear_retry_results)
+    TEST_FIXTURE(test_base, linear_retry_results)
     {
         auto allowed_delta = [] (int retry_count) -> std::chrono::milliseconds
         {

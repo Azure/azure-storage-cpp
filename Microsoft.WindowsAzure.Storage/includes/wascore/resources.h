@@ -34,6 +34,7 @@ namespace azure { namespace storage { namespace protocol {
     const std::string error_cannot_modify_snapshot("Cannot perform this operation on a blob representing a snapshot.");
     const std::string error_page_blob_size_unknown("The size of the page blob could not be determined, because stream is not seekable and a length argument is not provided.");
     const std::string error_stream_short("The requested number of bytes exceeds the length of the stream remaining from the specified position.");
+    const std::string error_stream_length("The length of the stream exceeds the permitted length.");
     const std::string error_unsupported_text_blob("Only plain text with utf-8 encoding is supported.");
     const std::string error_multiple_snapshots("Cannot provide snapshot time as part of the address and as constructor parameter. Either pass in the address or use a different constructor.");
     const std::string error_multiple_credentials("Cannot provide credentials as part of the address and as constructor parameter. Either pass in the address or use a different constructor.");

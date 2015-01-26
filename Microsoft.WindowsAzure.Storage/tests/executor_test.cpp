@@ -21,7 +21,7 @@
 
 SUITE(Core)
 {
-    TEST(timeout)
+    TEST_FIXTURE(test_base, timeout)
     {
         azure::storage::cloud_blob_client client = test_config::instance().account().create_cloud_blob_client();
         azure::storage::cloud_blob_container container = client.get_container_reference(U("this-container-does-not-exist"));
@@ -62,7 +62,7 @@ SUITE(Core)
         }
     }
 
-    TEST(operation_context)
+    TEST_FIXTURE(test_base, operation_context)
     {
         auto client = test_config::instance().account().create_cloud_blob_client();
 
@@ -104,7 +104,7 @@ SUITE(Core)
         CHECK(result.end_time().to_interval() > result.start_time().to_interval());
     }
 
-    TEST(storage_uri)
+    TEST_FIXTURE(test_base, storage_uri)
     {
         azure::storage::storage_uri(U("http://www.microsoft.com/test1"));
         azure::storage::storage_uri(U("http://www.microsoft.com/test1"), U("http://www.microsoft.com/test1"));
@@ -139,5 +139,33 @@ SUITE(Core)
         CHECK_THROW(azure::storage::storage_uri(U("http://www.microsoft.com/test1"), U("http://127.0.0.1:10000/account/test2")), std::invalid_argument);
         CHECK_THROW(azure::storage::storage_uri(U("http://www.microsoft.com/test1/example1"), U("http://127.0.0.1:10000/account/test2/example2")), std::invalid_argument);
         CHECK_THROW(azure::storage::storage_uri(U("http://www.microsoft.com/test1?parameter=value1"), U("http://127.0.0.1:10000/account/test1?parameter=value2")), std::invalid_argument);
+    }
+
+    TEST(storage_exception)
+    {
+        azure::storage::cloud_blob blob(azure::storage::storage_uri(U("http://www.nonexistenthost.com/test1")));
+
+        bool caught_storage_exception = false;
+        bool caught_http_exception = false;
+        try
+        {
+            blob.exists();
+        }
+        catch (const azure::storage::storage_exception& ex1)
+        {
+            caught_storage_exception = true;
+
+            try
+            {
+                std::rethrow_exception(ex1.inner_exception());
+            }
+            catch (web::http::http_exception&)
+            {
+                caught_http_exception = true;
+            }
+        }
+
+        CHECK_EQUAL(true, caught_storage_exception);
+        CHECK_EQUAL(true, caught_http_exception);
     }
 }

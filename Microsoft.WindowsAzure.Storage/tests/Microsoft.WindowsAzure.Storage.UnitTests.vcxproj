@@ -95,10 +95,11 @@
   <ItemGroup>
     <ClInclude Include="blob_test_base.h" />
     <ClInclude Include="check_macros.h" />
+    <ClInclude Include="queue_test_base.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="table_test_base.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="test_base.h" />
-    <ClInclude Include="test_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\hashing.cpp" />
@@ -111,6 +112,7 @@
     <ClCompile Include="cloud_blob_test.cpp" />
     <ClCompile Include="cloud_block_blob_test.cpp" />
     <ClCompile Include="executor_test.cpp" />
+    <ClCompile Include="queue_test_base.cpp" />
     <ClCompile Include="service_properties_test.cpp" />
     <ClCompile Include="cloud_page_blob_test.cpp" />
     <ClCompile Include="cloud_queue_client_test.cpp" />
@@ -125,8 +127,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="storage_exception_test.cpp" />
+    <ClCompile Include="table_test_base.cpp" />
     <ClCompile Include="test_base.cpp" />
-    <ClCompile Include="test_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.WindowsAzure.Storage.vcxproj">

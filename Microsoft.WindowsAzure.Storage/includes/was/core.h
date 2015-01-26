@@ -211,6 +211,18 @@ namespace azure { namespace storage {
             {
                 m_sas_token = m_sas_token.substr(1);
             }
+            
+            auto splitted_query = web::uri::split_query(m_sas_token);
+            if (!splitted_query.empty())
+            {
+                splitted_query[protocol::uri_query_sas_api_version] = protocol::header_value_storage_version; 
+                web::uri_builder builder;
+                for (const auto& kv : splitted_query)
+                {
+                    builder.append_query(kv.first, kv.second, false);
+                }
+                m_sas_token_with_api_version = builder.query();
+            }
         }
 
         /// <summary>
@@ -224,7 +236,7 @@ namespace azure { namespace storage {
 
             if (is_sas() && !resource_uri.is_empty())
             {
-                return web::http::uri_builder(resource_uri).append_query(m_sas_token).to_uri();
+                return web::http::uri_builder(resource_uri).append_query(m_sas_token_with_api_version).to_uri();
             }
 
             return resource_uri;
@@ -287,6 +299,7 @@ namespace azure { namespace storage {
     private:
 
         utility::string_t m_sas_token;
+        utility::string_t m_sas_token_with_api_version;
         utility::string_t m_account_name;
         std::vector<uint8_t> m_account_key;
     };
@@ -631,10 +644,33 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="storage_exception"/> class.
         /// </summary>
         /// <param name="message">The error message.</param>
+        /// <param name="inner_exception">The inner exception.</param>
+        /// <param name="retryable">Indicates whether the request is retryable.</param>
+        storage_exception(const std::string& message, std::exception_ptr inner_exception, bool retryable = true)
+            : std::runtime_error(message), m_retryable(retryable), m_inner_exception(inner_exception)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="storage_exception"/> class.
+        /// </summary>
+        /// <param name="message">The error message.</param>
         /// <param name="result">The request result.</param>
         /// <param name="retryable">Indicates whether the request is retryable.</param>
         storage_exception(const std::string& message, request_result result, bool retryable = true)
             : std::runtime_error(message), m_result(std::move(result)), m_retryable(retryable)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="storage_exception"/> class.
+        /// </summary>
+        /// <param name="message">The error message.</param>
+        /// <param name="result">The request result.</param>
+        /// <param name="inner_exception">The inner exception.</param>
+        /// <param name="retryable">Indicates whether the request is retryable.</param>
+        storage_exception(const std::string& message, request_result result, std::exception_ptr inner_exception, bool retryable = true)
+            : std::runtime_error(message), m_result(std::move(result)), m_retryable(retryable), m_inner_exception(inner_exception)
         {
         }
 
@@ -656,10 +692,24 @@ namespace azure { namespace storage {
             return m_retryable;
         }
 
+        /// <summary>
+        /// Gets the inner exception object that is the cause for the current <see cref="storage_exception"/>.
+        /// </summary>
+        /// <returns>
+        /// An exception_ptr object. It points to the inner exception that is the cause for the current
+        /// <see cref="storage_exception"/>. A null exception_ptr is returned if there is no inner exception
+        /// object.
+        /// </returns>
+        std::exception_ptr inner_exception() const
+        {
+            return m_inner_exception;
+        }
+
     private:
 
         request_result m_result;
         bool m_retryable;
+        std::exception_ptr m_inner_exception;
     };
 
     /// <summary>

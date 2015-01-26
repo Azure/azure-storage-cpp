@@ -99,6 +99,9 @@
     <ClInclude Include="includes\wascore\hashing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\was\error_code_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\async_semaphore.cpp">

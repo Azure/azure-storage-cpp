@@ -37,9 +37,10 @@ namespace azure { namespace storage {
         std::shared_ptr<std::vector<cloud_queue>> results = std::make_shared<std::vector<cloud_queue>>();
         std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
 
-        return pplx::details::do_while([this, results, prefix, get_metadata, token, options, context] () mutable -> pplx::task<bool>
+        auto instance = std::make_shared<cloud_queue_client>(*this);
+        return pplx::details::do_while([instance, results, prefix, get_metadata, token, options, context]() mutable -> pplx::task<bool>
         {
-            return list_queues_segmented_async(prefix, get_metadata, -1, *token, options, context).then([results, token] (queue_result_segment result_segment) mutable -> bool
+            return instance->list_queues_segmented_async(prefix, get_metadata, -1, *token, options, context).then([results, token](queue_result_segment result_segment) mutable -> bool
             {
                 std::vector<azure::storage::cloud_queue> partial_results = result_segment.results();
                 results->insert(results->end(), partial_results.begin(), partial_results.end());
@@ -57,12 +58,13 @@ namespace azure { namespace storage {
         queue_request_options modified_options = get_modified_options(options);
         storage_uri uri = protocol::generate_queue_uri(*this, prefix, get_metadata, max_results, token);
 
+        auto instance = std::make_shared<cloud_queue_client>(*this);
         std::shared_ptr<core::storage_command<queue_result_segment>> command = std::make_shared<core::storage_command<queue_result_segment>>(uri);
         command->set_build_request(std::bind(protocol::list_queues, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<queue_result_segment>, queue_result_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-        command->set_postprocess_response([this, get_metadata] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<queue_result_segment>
+        command->set_postprocess_response([instance, get_metadata] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<queue_result_segment>
         {
             UNREFERENCED_PARAMETER(context);
             protocol::list_queues_reader reader(response.body());
@@ -73,7 +75,7 @@ namespace azure { namespace storage {
 
             for (std::vector<protocol::cloud_queue_list_item>::iterator it = queue_items.begin(); it != queue_items.end(); ++it)
             {
-                cloud_queue queue = get_queue_reference(it->move_name());
+                cloud_queue queue = instance->get_queue_reference(it->move_name());
                 if (get_metadata)
                 {
                     queue.set_metadata(it->move_metadata());

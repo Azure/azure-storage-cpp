@@ -77,10 +77,15 @@ namespace azure { namespace storage {  namespace core {
         return std::numeric_limits<utility::size64_t>::max();
     }
 
-    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length)
+    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length, utility::size64_t max_length)
     {
         size_t buffer_size(protocol::default_buffer_size);
         utility::size64_t istream_length = length == std::numeric_limits<utility::size64_t>::max() ? get_remaining_stream_length(istream) : length;
+        if ((istream_length != std::numeric_limits<utility::size64_t>::max()) && (istream_length > max_length))
+        {
+            throw std::invalid_argument(protocol::error_stream_length);
+        }
+
         if ((istream_length != std::numeric_limits<utility::size64_t>::max()) && (istream_length < buffer_size))
         {
             buffer_size = static_cast<size_t>(istream_length);
@@ -89,7 +94,7 @@ namespace azure { namespace storage {  namespace core {
         auto obuffer = ostream.streambuf();
         auto length_ptr = (length != std::numeric_limits<utility::size64_t>::max()) ? std::make_shared<utility::size64_t>(length) : nullptr;
         auto total_ptr = std::make_shared<utility::size64_t>(0);
-        return pplx::details::do_while([istream, obuffer, buffer_size, length_ptr, total_ptr] () -> pplx::task<bool>
+        return pplx::details::do_while([istream, obuffer, buffer_size, length_ptr, total_ptr, max_length] () -> pplx::task<bool>
         {
             size_t read_length = buffer_size;
             if ((length_ptr != nullptr) && (*length_ptr < read_length))
@@ -97,12 +102,17 @@ namespace azure { namespace storage {  namespace core {
                 read_length = static_cast<size_t>(*length_ptr);
             }
 
-            return istream.read(obuffer, read_length).then([length_ptr, total_ptr] (size_t count) -> bool
+            return istream.read(obuffer, read_length).then([length_ptr, total_ptr, max_length] (size_t count) -> bool
             {
                 *total_ptr += count;
                 if (length_ptr != nullptr)
                 {
                     *length_ptr -= count;
+                }
+
+                if (*total_ptr > max_length)
+                {
+                    throw std::invalid_argument(protocol::error_stream_length);
                 }
 
                 return (count > 0) && (length_ptr == nullptr || *length_ptr > 0);

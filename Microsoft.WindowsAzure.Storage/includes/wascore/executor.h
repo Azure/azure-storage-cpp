@@ -37,11 +37,16 @@ namespace azure { namespace storage { namespace core {
         {
         }
         
-        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = std::numeric_limits<utility::size64_t>::max())
+        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = std::numeric_limits<utility::size64_t>::max(), utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max())
         {
             if (length == std::numeric_limits<utility::size64_t>::max())
             {
                 length = get_remaining_stream_length(stream);
+            }
+
+            if (length != std::numeric_limits<utility::size64_t>::max() && length > max_length)
+            {
+                throw std::invalid_argument(protocol::error_stream_length);
             }
 
             if (!calculate_md5 && stream.can_seek())
@@ -62,7 +67,7 @@ namespace azure { namespace storage { namespace core {
                 temp_stream = temp_buffer.create_ostream();
             }
 
-            return stream_copy_async(stream, temp_stream, length).then([temp_buffer, provider] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
+            return stream_copy_async(stream, temp_stream, length, max_length).then([temp_buffer, provider] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
             {
                 provider.close();
                 return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(temp_buffer.collection()), buffer_task.get(), provider.hash());
@@ -312,14 +317,6 @@ namespace azure { namespace storage { namespace core {
                     instance->m_command->m_request_body.rewind();
                     instance->m_request.set_body(instance->m_command->m_request_body.stream(), instance->m_command->m_request_body.length(), utility::string_t());
                 }
-                else
-                {
-                    // TODO: Remove the following when we can take a dependency on Casablanca 2.3.  This line fo code is a workaround for a bug in 2.2.
-                    if ((((utility::string_t)instance->m_request.method()) == U("HEAD")) || (((utility::string_t)instance->m_request.method()) == U("DELETE")) || (((utility::string_t)instance->m_request.method()) == U("GET")))
-                    {
-                        instance->m_request.headers().add(protocol::xml_content_length, 0);
-                    }
-                }
 
                 // If the command wants to copy the response body to a stream, set it
                 // on the http_request object
@@ -356,14 +353,6 @@ namespace azure { namespace storage { namespace core {
                 // 4. Set HTTP client configuration
                 web::http::client::http_client_config config;
                 config.set_timeout(instance->remaining_time());
-
-                // TODO: Remove the following when we can take a dependency on Casablanca 2.3.  This line fo code is a workaround for a bug in 2.2.
-#ifndef WIN32
-                if (config.timeout() < std::chrono::seconds(1))
-                {
-                    config.set_timeout(std::chrono::seconds(1));
-                }
-#endif
 
                 size_t http_buffer_size = instance->m_request_options.http_buffer_size();
                 if (http_buffer_size > 0)
@@ -517,6 +506,10 @@ namespace azure { namespace storage { namespace core {
                     }
                     catch (const std::exception& e)
                     {
+                        //
+                        // exception thrown by previous steps are handled here below
+                        //
+
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_warning))
                         {
                             logger::instance().log(instance->m_context, client_log_level::log_level_warning, U("Exception thrown while processing response: ") + utility::conversions::to_string_t(e.what()));
@@ -529,7 +522,7 @@ namespace azure { namespace storage { namespace core {
                                 logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Exception was not retryable: ") + utility::conversions::to_string_t(e.what()));
                             }
 
-                            throw storage_exception(e.what(), instance->m_request_result, false);
+                            throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
                         }
 
                         // An exception occured and thus the request might be retried. Ask the retry policy.
@@ -542,7 +535,7 @@ namespace azure { namespace storage { namespace core {
                                 logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Retry policy did not allow for a retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
                             }
 
-                            throw storage_exception(e.what(), instance->m_request_result, false);
+                            throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
                         }
 
                         instance->m_current_location = retry.target_location();
@@ -563,7 +556,7 @@ namespace azure { namespace storage { namespace core {
                                 logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Cannot recover request for retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
                             }
 
-                            throw storage_exception(e.what(), instance->m_request_result, false);
+                            throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
                         }
 
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
@@ -709,6 +702,17 @@ namespace azure { namespace storage { namespace core {
                 m_current_location = storage_location::secondary;
                 break;
             }
+        }
+
+        static std::exception_ptr capture_inner_exception(const std::exception& exception)
+        {
+            if (nullptr == dynamic_cast<const storage_exception*>(&exception))
+            {
+                // exception other than storage_exception is captured as inner exception.
+                return std::current_exception();
+            }
+
+            return nullptr;
         }
 
         std::shared_ptr<storage_command<T>> m_command;

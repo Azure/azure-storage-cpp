@@ -237,10 +237,10 @@ namespace azure { namespace storage { namespace protocol {
             std::unordered_map<utility::string_t, utility::string_t> details;
 
             concurrency::streams::istream body_stream = response.body();
-
             protocol::storage_error_reader reader(body_stream);
             error_code = reader.move_error_code();
             error_message = reader.move_error_message();
+            details = reader.move_details();
 
             return storage_extended_error(std::move(error_code), std::move(error_message), std::move(details));
         }

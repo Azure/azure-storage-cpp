@@ -54,7 +54,7 @@ namespace azure { namespace storage { namespace core {
 
     utility::string_t make_query_parameter(const utility::string_t& parameter_name, const utility::string_t& parameter_value, bool do_encoding = true);
     utility::size64_t get_remaining_stream_length(concurrency::streams::istream stream);
-    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length);
+    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length, utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max());
     pplx::task<void> complete_after(std::chrono::milliseconds timeout);
     std::vector<utility::string_t> string_split(const utility::string_t& string, const utility::string_t& separator);
     bool is_empty_or_whitespace(const utility::string_t& value);

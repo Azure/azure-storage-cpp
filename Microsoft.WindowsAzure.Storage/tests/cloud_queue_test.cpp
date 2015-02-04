@@ -16,12 +16,12 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "test_helper.h"
+#include "queue_test_base.h"
 #include "was/queue.h"
 
 SUITE(Queue)
 {
-    TEST(Queue_Empty)
+    TEST_FIXTURE(queue_service_test_base, Queue_Empty)
     {
         azure::storage::cloud_queue queue;
 
@@ -34,7 +34,7 @@ SUITE(Queue)
         CHECK_EQUAL(-1, queue.approximate_message_count());
     }
 
-    TEST(Queue_Uri)
+    TEST_FIXTURE(queue_service_test_base, Queue_Uri)
     {
         azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.queue.core.windows.net/myqueue")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net/myqueue")));
 
@@ -67,7 +67,7 @@ SUITE(Queue)
         CHECK_EQUAL(-1, queue2.approximate_message_count());
     }
 
-    TEST(Queue_UriAndCredentials)
+    TEST_FIXTURE(queue_service_test_base, Queue_UriAndCredentials)
     {
         azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.queue.core.windows.net/myqueue")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net/myqueue")));
         azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
@@ -109,7 +109,7 @@ SUITE(Queue)
         CHECK_THROW(azure::storage::cloud_queue(sas_uri, credentials), std::invalid_argument);
     }
  
-    TEST(Message_Empty)
+    TEST_FIXTURE(queue_service_test_base, Message_Empty)
     {
         azure::storage::cloud_queue_message message;
 
@@ -123,7 +123,7 @@ SUITE(Queue)
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
-    TEST(Message_String)
+    TEST_FIXTURE(queue_service_test_base, Message_String)
     {
         utility::string_t content = get_random_string();
 
@@ -151,7 +151,7 @@ SUITE(Queue)
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
-    TEST(Message_Binary)
+    TEST_FIXTURE(queue_service_test_base, Message_Binary)
     {
         std::vector<uint8_t> content = get_random_binary_data();
 
@@ -179,7 +179,7 @@ SUITE(Queue)
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
-    TEST(Message_IdAndPopReceipt)
+    TEST_FIXTURE(queue_service_test_base, Message_IdAndPopReceipt)
     {
         utility::string_t id = get_random_string();
         utility::string_t pop_receipt = get_random_string();
@@ -196,14 +196,14 @@ SUITE(Queue)
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
-    TEST(QueueRequestOptions_Normal)
+    TEST_FIXTURE(queue_service_test_base, QueueRequestOptions_Normal)
     {
         azure::storage::queue_request_options options;
 
         CHECK(options.location_mode() == azure::storage::location_mode::primary_only);
     }
 
-    TEST(Queue_CreateAndDelete)
+    TEST_FIXTURE(queue_service_test_base, Queue_CreateAndDelete)
     {
         utility::string_t queue_name1 = get_queue_name();
         utility::string_t queue_name2 = get_queue_name();
@@ -309,7 +309,6 @@ SUITE(Queue)
                 CHECK_EQUAL(web::http::status_codes::Conflict, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("QueueAlreadyExists")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -327,7 +326,6 @@ SUITE(Queue)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("QueueAlreadyExists")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
 
         {
@@ -394,7 +392,6 @@ SUITE(Queue)
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
                 CHECK(e.result().extended_error().code().compare(U("QueueNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
-                CHECK(e.result().extended_error().details().empty());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -412,11 +409,10 @@ SUITE(Queue)
             CHECK(context.request_results()[0].etag().empty());
             CHECK(context.request_results()[0].extended_error().code().compare(U("QueueNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
-            CHECK(context.request_results()[0].extended_error().details().empty());
         }
     }
 
-    TEST(Queue_CreateIfNotExistsAndDeleteIfExists)
+    TEST_FIXTURE(queue_service_test_base, Queue_CreateIfNotExistsAndDeleteIfExists)
     {
         utility::string_t queue_name = get_queue_name();
         azure::storage::cloud_queue_client client = get_queue_client();
@@ -604,7 +600,7 @@ SUITE(Queue)
         }
     }
 
-    TEST(Queue_ApproximateMessageCount)
+    TEST_FIXTURE(queue_service_test_base, Queue_ApproximateMessageCount)
     {
         const int MESSAGE_COUNT = 3;
 
@@ -642,7 +638,7 @@ SUITE(Queue)
         queue.delete_queue();
     }
 
-    TEST(Queue_Metadata)
+    TEST_FIXTURE(queue_service_test_base, Queue_Metadata)
     {
         azure::storage::cloud_queue_client client = get_queue_client();
         utility::string_t queue_name = get_queue_name();
@@ -730,7 +726,7 @@ SUITE(Queue)
         queue1.delete_queue();
     }
 
-    TEST(Queue_NotFound)
+    TEST_FIXTURE(queue_service_test_base, Queue_NotFound)
     {
         utility::string_t queue_name = get_queue_name();
         azure::storage::cloud_queue_client client = get_queue_client();
@@ -755,7 +751,6 @@ SUITE(Queue)
             CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
             CHECK(e.result().extended_error().code().compare(U("QueueNotFound")) == 0);
             CHECK(!e.result().extended_error().message().empty());
-            CHECK(e.result().extended_error().details().empty());
         }
 
         CHECK(!context.client_request_id().empty());
@@ -773,10 +768,9 @@ SUITE(Queue)
         CHECK(context.request_results()[0].etag().empty());
         CHECK(context.request_results()[0].extended_error().code().compare(U("QueueNotFound")) == 0);
         CHECK(!context.request_results()[0].extended_error().message().empty());
-        CHECK(context.request_results()[0].extended_error().details().empty());
     }
 
-    TEST(Queue_Messages)
+    TEST_FIXTURE(queue_service_test_base, Queue_Messages)
     {
         azure::storage::cloud_queue queue = get_queue();
 
@@ -1362,7 +1356,7 @@ SUITE(Queue)
         queue.delete_queue();
     }
 
-    TEST(Queue_InvalidMessages)
+    TEST_FIXTURE(queue_service_test_base, Queue_InvalidMessages)
     {
         azure::storage::cloud_queue queue = get_queue();
 
@@ -1538,7 +1532,7 @@ SUITE(Queue)
         }
     }
 
-    TEST(Queue_Permissions)
+    TEST_FIXTURE(queue_service_test_base, Queue_Permissions)
     {
         azure::storage::cloud_queue queue = get_queue();
 
@@ -1694,7 +1688,7 @@ SUITE(Queue)
         }
     }
 
-    TEST(Queue_SharedAccessSignature)
+    TEST_FIXTURE(queue_service_test_base, Queue_SharedAccessSignature)
     {
         azure::storage::cloud_queue queue1 = get_queue();
 
@@ -1724,7 +1718,7 @@ SUITE(Queue)
         CHECK_THROW(queue2.update_message(message2, std::chrono::seconds(0), /* update_content */ false), azure::storage::storage_exception);
     }
 
-    TEST(Queue_RepeatedAddAndGetAndUpdateMessage)
+    TEST_FIXTURE(queue_service_test_base, Queue_RepeatedAddAndGetAndUpdateMessage)
     {
         azure::storage::cloud_queue queue = get_queue();
 

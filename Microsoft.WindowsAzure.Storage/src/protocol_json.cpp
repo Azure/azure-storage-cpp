@@ -193,22 +193,38 @@ namespace azure { namespace storage { namespace protocol {
             if (error_it != result_obj.cend() && error_it->second.is_object())
             {
                 const web::json::object& error_obj = error_it->second.as_object();
-
-                web::json::object::const_iterator code_it = error_obj.find(U("code"));
-                if (code_it != error_obj.cend() && code_it->second.is_string())
+                for (auto prop_it = error_obj.cbegin(); prop_it != error_obj.cend(); ++prop_it)
                 {
-                    error_code = code_it->second.as_string();
-                }
-
-                web::json::object::const_iterator message_it = error_obj.find(U("message"));
-                if (message_it != error_obj.cend() && message_it->second.is_object())
-                {
-                    const web::json::object& message_obj = message_it->second.as_object();
-
-                    web::json::object::const_iterator message_text_it = message_obj.find(U("value"));
-                    if (message_text_it != message_obj.cend() && message_text_it->second.is_string())
+                    auto prop_name = prop_it->first;
+                    if (prop_name == U("code") && prop_it->second.is_string())
                     {
-                        error_message = message_text_it->second.as_string();
+                        error_code = prop_it->second.as_string();
+                    }
+                    else if (prop_name == U("message") && prop_it->second.is_object())
+                    {
+                        const web::json::object& message_obj = prop_it->second.as_object();
+
+                        web::json::object::const_iterator message_text_it = message_obj.find(U("value"));
+                        if (message_text_it != message_obj.cend() && message_text_it->second.is_string())
+                        {
+                            error_message = message_text_it->second.as_string();
+                        }
+                    }
+                    else if (prop_name == U("innererror"))
+                    {
+                        const web::json::object& inner_error_obj = prop_it->second.as_object();
+                        for (auto details_it = inner_error_obj.cbegin(); details_it != inner_error_obj.cend(); ++details_it)
+                        {
+                            if (details_it->second.is_string())
+                            {
+                                details.insert(std::make_pair(details_it->first, details_it->second.as_string()));
+                            }
+                        }
+                    }
+                    else if (prop_name.find_first_of(U('.')) != utility::string_t::npos)
+                    {
+                        // annotation property
+                        // TODO: parse annotation property and add it to details
                     }
                 }
             }

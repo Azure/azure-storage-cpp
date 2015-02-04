@@ -1,6 +1,19 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
 
+Breaking Changes in v0.5:
+- Added parameter sequence_number to the following functions:
+  - cloud_page_blob::create_async
+  - cloud_page_blob::open_write_async
+  - cloud_page_blob::upload_from_stream_async
+  - cloud_page_blob::upload_from_file_async
+  - cloud_page_blob::create
+  - cloud_page_blob::open_write
+  - cloud_page_blob::upload_from_stream
+  - cloud_page_blob::upload_from_file
+- The client checks blob lease times and throws std::invalid_argument for invalid lease times.  Previously, this would have been checked on the service
+    and azure::storage::storage_exception would have been thrown.
+
 Breaking Changes in v0.4:
 - Upgraded Casablanca dependency to 2.3.0
 - Changed the exception type in some cases if you upload a blob from a seekable stream but the stream is too short for the desired blob length.

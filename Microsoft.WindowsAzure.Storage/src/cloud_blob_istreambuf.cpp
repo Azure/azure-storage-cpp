@@ -32,8 +32,9 @@ namespace azure { namespace storage { namespace core {
             }
 
             pos_type end(size());
-            if ((pos >= 0) && (pos < end))
+            if ((pos >= 0) && (pos <= end))
             {
+                // Do not allow read beyond the end.
                 m_current_blob_offset = pos;
                 m_next_blob_offset = m_current_blob_offset;
                 m_buffer = concurrency::streams::container_buffer<std::vector<char_type>>(std::ios_base::in);

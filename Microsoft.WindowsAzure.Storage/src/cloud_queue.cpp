@@ -25,17 +25,17 @@
 namespace azure { namespace storage {
 
     cloud_queue::cloud_queue(const storage_uri& uri)
-        : m_client(create_service_client(uri, storage_credentials())), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_approximate_message_count(-1)
+        : m_client(create_service_client(uri, storage_credentials())), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
     {
     }
 
     cloud_queue::cloud_queue(const storage_uri& uri, storage_credentials credentials)
-        : m_client(create_service_client(uri, std::move(credentials))), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_approximate_message_count(-1)
+        : m_client(create_service_client(uri, std::move(credentials))), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
     {
     }
 
     cloud_queue::cloud_queue(cloud_queue_client client, utility::string_t name)
-        : m_client(std::move(client)), m_name(std::move(name)), m_uri(core::append_path_to_uri(m_client.base_uri(), m_name)), m_approximate_message_count(-1)
+        : m_client(std::move(client)), m_name(std::move(name)), m_uri(core::append_path_to_uri(m_client.base_uri(), m_name)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
     {
     }
 
@@ -49,14 +49,15 @@ namespace azure { namespace storage {
 
     pplx::task<bool> cloud_queue::create_if_not_exists_async(const queue_request_options& options, operation_context context)
     {
-        return exists_async_impl(options, context, /* allow_secondary */ false).then([this, options, context] (bool exists) -> pplx::task<bool>
+        auto instance = std::make_shared<cloud_queue>(*this);
+        return exists_async_impl(options, context, /* allow_secondary */ false).then([instance, options, context] (bool exists) -> pplx::task<bool>
         {
             if (exists)
             {
                 return pplx::task_from_result(false);
             }
 
-            return create_async_impl(options, context, /* allow_conflict */ true);
+            return instance->create_async_impl(options, context, /* allow_conflict */ true);
         });
     }
 
@@ -69,14 +70,15 @@ namespace azure { namespace storage {
 
     pplx::task<bool> cloud_queue::delete_queue_if_exists_async(const queue_request_options& options, operation_context context)
     {
-        return exists_async_impl(options, context, /* allow_secondary */ false).then([this, options, context] (bool exists) -> pplx::task<bool>
+        auto instance = std::make_shared<cloud_queue>(*this);
+        return exists_async_impl(options, context, /* allow_secondary */ false).then([instance, options, context] (bool exists) -> pplx::task<bool>
         {
             if (!exists)
             {
                 return pplx::task_from_result(false);
             }
 
-            return delete_async_impl(options, context, /* allow_not_found */ true);
+            return instance->delete_async_impl(options, context, /* allow_not_found */ true);
         });
     }
 
@@ -320,15 +322,17 @@ namespace azure { namespace storage {
         queue_request_options modified_options = get_modified_options(options);
         storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
+        auto metadata = m_metadata;
+        auto approximate_message_count = m_approximate_message_count;
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
         command->set_build_request(std::bind(protocol::download_queue_metadata, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([this](const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([metadata, approximate_message_count](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
-            m_metadata = protocol::parse_metadata(response);
-            m_approximate_message_count = protocol::parse_approximate_messages_count(response);
+            *metadata = protocol::parse_metadata(response);
+            *approximate_message_count = protocol::parse_approximate_messages_count(response);
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }

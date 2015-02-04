@@ -203,7 +203,7 @@ SUITE(Blob)
             auto blob = m_container.get_page_blob_reference(U("pageblob") + index);
             blob.metadata()[U("index")] = index;
             
-            blob.create(i * 512, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            blob.create(i * 512, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blobs[blob.name()] = blob;
         }
 

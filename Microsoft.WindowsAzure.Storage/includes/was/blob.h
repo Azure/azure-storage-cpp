@@ -800,7 +800,10 @@ namespace azure { namespace storage {
         lease_break_period(const std::chrono::seconds& seconds)
             : m_seconds(seconds)
         {
-            utility::assert_in_bounds(U("seconds"), seconds, std::chrono::seconds::zero());
+            if (seconds != std::chrono::seconds::max())
+            {
+                utility::assert_in_bounds(U("seconds"), seconds, protocol::minimum_lease_break_period, protocol::maximum_lease_break_period);
+            }
         }
 
         /// <summary>
@@ -870,6 +873,10 @@ namespace azure { namespace storage {
         lease_time(const std::chrono::seconds& seconds)
             : m_seconds(seconds)
         {
+            if (seconds.count() != -1)
+            {
+                utility::assert_in_bounds(U("seconds"), seconds, protocol::minimum_fixed_lease_duration, protocol::maximum_fixed_lease_duration);
+            }
         }
 
         /// <summary>
@@ -1553,18 +1560,18 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the block size for writing to a block blob.
+        /// Gets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <returns>The size of a block, in bytes, ranging from between 16 KB and 4 MB inclusive.</returns>
+        /// <returns>The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</returns>
         size_t stream_write_size_in_bytes() const
         {
             return m_stream_write_size;
         }
 
         /// <summary>
-        /// Sets the block size for writing to a block blob.
+        /// Sets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <param name="value">The size of a block, in bytes, ranging from between 16 KB and 4 MB inclusive.</param>
+        /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</param>
         void set_stream_write_size_in_bytes(size_t value)
         {
             utility::assert_in_bounds<size_t>(U("value"), value, 16 * 1024, 4 * 1024 * 1024);
@@ -4900,13 +4907,14 @@ namespace azure { namespace storage {
         /// Opens a stream for writing to a new page blob.
         /// </summary>
         /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A stream to be used for writing to the blob.</returns>
-        concurrency::streams::ostream open_write(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
+        concurrency::streams::ostream open_write(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return open_write_async(size, condition, options, context).get();
+            return open_write_async(size, sequence_number, condition, options, context).get();
         }
 
         /// <summary>
@@ -4934,18 +4942,19 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         pplx::task<concurrency::streams::ostream> open_write_async(utility::size64_t size)
         {
-            return open_write_async(size, access_condition(), blob_request_options(), operation_context());
+            return open_write_async(size, 0, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
         /// Intitiates an asynchronous operation to open a stream for writing to a new page blob.
         /// </summary>
         /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Clears pages from a page blob.
@@ -5147,12 +5156,13 @@ namespace azure { namespace storage {
         /// Uploads a stream to a page blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void upload_from_stream(concurrency::streams::istream source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        void upload_from_stream(concurrency::streams::istream source, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            upload_from_stream_async(source, condition, options, context).wait();
+            upload_from_stream_async(source, sequence_number, condition, options, context).wait();
         }
 
         /// <summary>
@@ -5170,12 +5180,13 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void upload_from_stream(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+        void upload_from_stream(concurrency::streams::istream source, utility::size64_t length, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            upload_from_stream_async(source, length, condition, options, context).wait();
+            upload_from_stream_async(source, length, sequence_number, condition, options, context).wait();
         }
 
         /// <summary>
@@ -5192,13 +5203,14 @@ namespace azure { namespace storage {
         /// Intitiates an asynchronous operation to upload a stream to a page blob.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return upload_from_stream_async(source, std::numeric_limits<utility::size64_t>::max(), condition, options, context);
+            return upload_from_stream_async(source, std::numeric_limits<utility::size64_t>::max(), sequence_number, condition, options, context);
         }
 
         /// <summary>
@@ -5209,7 +5221,7 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length)
         {
-            return upload_from_stream_async(source, length, access_condition(), blob_request_options(), operation_context());
+            return upload_from_stream_async(source, length, 0, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
@@ -5217,11 +5229,12 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Uploads a file to a page blob.
@@ -5236,12 +5249,13 @@ namespace azure { namespace storage {
         /// Uploads a file to a page blob.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void upload_from_file(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        void upload_from_file(const utility::string_t &path, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            upload_from_file_async(path, condition, options, context).wait();
+            upload_from_file_async(path, sequence_number, condition, options, context).wait();
         }
 
         /// <summary>
@@ -5251,18 +5265,19 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_from_file_async(const utility::string_t &path)
         {
-            return upload_from_file_async(path, access_condition(), blob_request_options(), operation_context());
+            return upload_from_file_async(path, 0, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
         /// Intitiates an asynchronous operation to upload a file to a page blob.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Creates a page blob.
@@ -5277,12 +5292,13 @@ namespace azure { namespace storage {
         /// Creates a page blob.
         /// </summary>
         /// <param name="size">The maximum size of the page blob, in bytes.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void create(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
+        void create(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            create_async(size, condition, options, context).wait();
+            create_async(size, sequence_number, condition, options, context).wait();
         }
 
         /// <summary>
@@ -5292,18 +5308,19 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> create_async(utility::size64_t size)
         {
-            return create_async(size, access_condition(), blob_request_options(), operation_context());
+            return create_async(size, 0, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
         /// Intitiates an asynchronous operation to create a page blob.
         /// </summary>
         /// <param name="size">The maximum size of the page blob, in bytes.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> create_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> create_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Resizes the page blob to the specified size.

@@ -114,6 +114,35 @@ namespace azure { namespace storage {
         /// <param name="secondary_uri">The endpoint for the secondary location.</param>
         WASTORAGE_API storage_uri(web::http::uri primary_uri, web::http::uri secondary_uri);
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="storage_uri"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="storage_uri" /> on which to base the new instance.</param>
+        storage_uri(storage_uri&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="storage_uri" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="storage_uri" /> to use to set properties.</param>
+        /// <returns>A <see cref="storage_uri" /> object with properties set.</returns>
+        storage_uri& operator=(storage_uri&& other)
+        {
+            if (this != &other)
+            {
+                m_primary_uri = std::move(other.m_primary_uri);
+                m_secondary_uri = std::move(other.m_secondary_uri);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets the primary endpoint.
         /// </summary>
@@ -225,6 +254,37 @@ namespace azure { namespace storage {
             }
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="storage_credentials"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="storage_credentials" /> on which to base the new instance.</param>
+        storage_credentials(storage_credentials&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="storage_credentials" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="storage_credentials" /> to use to set properties.</param>
+        /// <returns>A <see cref="storage_credentials" /> object with properties set.</returns>
+        storage_credentials& operator=(storage_credentials&& other)
+        {
+            if (this != &other)
+            {
+                m_sas_token = std::move(other.m_sas_token);
+                m_sas_token_with_api_version = std::move(other.m_sas_token_with_api_version);
+                m_account_name = std::move(other.m_account_name);
+                m_account_key = std::move(other.m_account_key);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Transforms a resource URI into a shared access signature URI, by appending a shared access token.
         /// </summary>
@@ -328,6 +388,35 @@ namespace azure { namespace storage {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="option_with_default"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="option_with_default" /> on which to base the new instance.</param>
+        option_with_default(option_with_default&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="option_with_default" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="option_with_default" /> to use to set properties.</param>
+        /// <returns>A <see cref="option_with_default" /> object with properties set.</returns>
+        option_with_default& operator=(option_with_default&& other)
+        {
+            if (this != &other)
+            {
+                m_value = std::move(other.m_value);
+                m_has_value = std::move(other.m_has_value);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Returns a reference to a request option set to the specified value.
         /// </summary>
@@ -403,6 +492,36 @@ namespace azure { namespace storage {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="storage_extended_error"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="storage_extended_error" /> on which to base the new instance.</param>
+        storage_extended_error(storage_extended_error&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="storage_extended_error" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="storage_extended_error" /> to use to set properties.</param>
+        /// <returns>A <see cref="storage_extended_error" /> object with properties set.</returns>
+        storage_extended_error& operator=(storage_extended_error&& other)
+        {
+            if (this != &other)
+            {
+                m_code = std::move(other.m_code);
+                m_message = std::move(other.m_message);
+                m_details = std::move(other.m_details);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets the error code.
         /// </summary>
@@ -451,7 +570,7 @@ namespace azure { namespace storage {
             : m_is_response_available(false),
             m_target_location(storage_location::unspecified),
             m_http_status_code(0),
-            m_content_length(-1)
+            m_content_length(std::numeric_limits<utility::size64_t>::max())
         {
         }
 
@@ -466,7 +585,7 @@ namespace azure { namespace storage {
             m_target_location(target_location),
             m_end_time(utility::datetime::utc_now()),
             m_http_status_code(0),
-            m_content_length(-1)
+            m_content_length(std::numeric_limits<utility::size64_t>::max())
         {
         }
 
@@ -488,6 +607,44 @@ namespace azure { namespace storage {
         /// <param name="http_status_code">The HTTP status code for the request.</param>
         /// <param name="extended_error">The extended error information for the request.</param>
         WASTORAGE_API request_result(utility::datetime start_time, storage_location target_location, const web::http::http_response& response, web::http::status_code http_status_code, storage_extended_error extended_error);
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="request_result"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="request_result" /> on which to base the new instance.</param>
+        request_result(request_result&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="request_result" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="request_result" /> to use to set properties.</param>
+        /// <returns>A <see cref="request_result" /> object with properties set.</returns>
+        request_result& operator=(request_result&& other)
+        {
+            if (this != &other)
+            {
+                m_is_response_available = std::move(other.m_is_response_available);
+                m_start_time = std::move(other.m_start_time);
+                m_target_location = std::move(other.m_target_location);
+                m_end_time = std::move(other.m_end_time);
+                m_http_status_code = std::move(other.m_http_status_code);
+                m_service_request_id = std::move(other.m_service_request_id);
+                m_request_date = std::move(other.m_request_date);
+                m_content_length = std::move(other.m_content_length);
+                m_content_md5 = std::move(other.m_content_md5);
+                m_etag = std::move(other.m_etag);
+                m_extended_error = std::move(other.m_extended_error);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Indicates whether a response is available for the request.
@@ -731,6 +888,37 @@ namespace azure { namespace storage {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="retry_context"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="retry_context" /> on which to base the new instance.</param>
+        retry_context(retry_context&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="retry_context" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="retry_context" /> to use to set properties.</param>
+        /// <returns>A <see cref="retry_context" /> object with properties set.</returns>
+        retry_context& operator=(retry_context&& other)
+        {
+            if (this != &other)
+            {
+                m_current_retry_count = std::move(other.m_current_retry_count);
+                m_last_request_result = std::move(other.m_last_request_result);
+                m_next_location = std::move(other.m_next_location);
+                m_current_location_mode = std::move(other.m_current_location_mode);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets the number of retries for the given operation.
         /// </summary>
@@ -800,6 +988,37 @@ namespace azure { namespace storage {
             m_updated_location_mode(context.current_location_mode()), m_retry_interval(protocol::default_retry_interval)
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="retry_info"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="retry_info" /> on which to base the new instance.</param>
+        retry_info(retry_info&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="retry_info" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="retry_info" /> to use to set properties.</param>
+        /// <returns>A <see cref="retry_info" /> object with properties set.</returns>
+        retry_info& operator=(retry_info&& other)
+        {
+            if (this != &other)
+            {
+                m_should_retry = std::move(other.m_should_retry);
+                m_target_location = std::move(other.m_target_location);
+                m_updated_location_mode = std::move(other.m_updated_location_mode);
+                m_retry_interval = std::move(other.m_retry_interval);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Indicates that the request should be retried.

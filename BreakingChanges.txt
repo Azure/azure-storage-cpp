@@ -1,6 +1,17 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
 
+Breaking Changes in v0.6:
+- Removed following functions:
+  - cloud_queue_client::list_queues
+  - cloud_queue_client::list_queues_async
+  - cloud_table_client::list_tables
+  - cloud_table_client::list_tables_async
+  - cloud_table::execute_query
+  - cloud_table::execute_query_async
+- Changed table_entity::set_timestamp to a private method as timestamp is read-only
+- Upgraded Casablanca dependency to 2.4.0
+
 Breaking Changes in v0.5:
 - Added parameter sequence_number to the following functions:
   - cloud_page_blob::create_async
@@ -17,7 +28,7 @@ Breaking Changes in v0.5:
 Breaking Changes in v0.4:
 - Upgraded Casablanca dependency to 2.3.0
 - Changed the exception type in some cases if you upload a blob from a seekable stream but the stream is too short for the desired blob length.
-        - Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
+- Used to throw azure::storage::storage_exception in some cases, now throws std::invalid_argument always.
 
 Breaking changes in v0.3:
 - Changed namespace to azure::storage.

@@ -95,7 +95,7 @@ namespace azure { namespace storage { namespace samples {
             // Delete the blobs
             blob1.delete_blob();
             blob2.delete_blob();
-            blob3.delete_blob();
+            blob3.delete_blob();            
 
             // Delete the blob container
             // Return value is true if the container did exist and was successfully deleted.

@@ -19,6 +19,26 @@
 #include "queue_test_base.h"
 #include "was/queue.h"
 
+std::vector < azure::storage::cloud_queue> list_all_queues(
+    const azure::storage::cloud_queue_client& queue_client,
+    const utility::string_t& prefix,
+    bool get_metadata,
+    const azure::storage::queue_request_options& options, azure::storage::operation_context context)
+{
+    std::vector<azure::storage::cloud_queue> results;
+
+    int max_results_per_segment = 5000;
+    azure::storage::continuation_token token;
+    do
+    {
+        azure::storage::queue_result_segment result_segment = queue_client.list_queues_segmented(prefix, get_metadata, max_results_per_segment, token, options, context);
+        results.insert(results.end(), result_segment.results().begin(), result_segment.results().end());
+        token = result_segment.continuation_token();
+    } while (!token.empty());
+
+    return results;
+}
+
 SUITE(QueueClient)
 {
     TEST_FIXTURE(queue_service_test_base, QueueClient_Empty)
@@ -102,7 +122,7 @@ SUITE(QueueClient)
             prefix = object_name_prefix;
             get_metadata = false;
 
-            std::vector<azure::storage::cloud_queue> results = client.list_queues(prefix, get_metadata, options, context);
+            std::vector<azure::storage::cloud_queue> results = list_all_queues(client, prefix, get_metadata, options, context);
 
             CHECK(results.size() >= QUEUE_COUNT);
 
@@ -129,7 +149,7 @@ SUITE(QueueClient)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -157,7 +177,7 @@ SUITE(QueueClient)
             prefix = object_name_prefix;
             get_metadata = true;
 
-            std::vector<azure::storage::cloud_queue> results = client.list_queues(prefix, get_metadata, options, context);
+            std::vector<azure::storage::cloud_queue> results = list_all_queues(client, prefix, get_metadata, options, context);
 
             CHECK(results.size() >= QUEUE_COUNT);
 
@@ -186,7 +206,7 @@ SUITE(QueueClient)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -232,7 +252,7 @@ SUITE(QueueClient)
         get_metadata = false;
         max_results = 3;
 
-        int segment_count = 0;
+        size_t segment_count = 0;
         azure::storage::queue_result_segment result_segment;
         do
         {

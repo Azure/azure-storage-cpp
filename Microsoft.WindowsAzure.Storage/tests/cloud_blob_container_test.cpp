@@ -151,7 +151,7 @@ SUITE(Blob)
         auto same_container = m_client.get_container_reference(m_container.name());
         CHECK(same_container.metadata().empty());
         same_container.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(2, same_container.metadata().size());
+        CHECK_EQUAL(2U, same_container.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), same_container.metadata()[U("key1")]);
         CHECK_UTF8_EQUAL(U("value2"), same_container.metadata()[U("key2")]);
 
@@ -159,7 +159,7 @@ SUITE(Blob)
         same_container.metadata()[U("key3")] = U("value3");
         same_container.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         m_container.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(3, same_container.metadata().size());
+        CHECK_EQUAL(3U, same_container.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), m_container.metadata()[U("key1")]);
         CHECK_UTF8_EQUAL(U("value2"), m_container.metadata()[U("key2")]);
         CHECK_UTF8_EQUAL(U("value3"), m_container.metadata()[U("key3")]);
@@ -169,7 +169,7 @@ SUITE(Blob)
         m_container.metadata()[U("key4")] = U("value4");
         m_container.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         same_container.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(1, same_container.metadata().size());
+        CHECK_EQUAL(1U, same_container.metadata().size());
         CHECK_UTF8_EQUAL(U("value4"), same_container.metadata()[U("key4")]);
 
         // Clear all pairs
@@ -238,10 +238,10 @@ SUITE(Blob)
             blobs.erase(blob);
         }
 
-        CHECK_EQUAL(0, blobs.size());
+        CHECK_EQUAL(0U, blobs.size());
 
         auto listing2 = list_all_blobs(U("block"), azure::storage::blob_listing_details::none, 10, azure::storage::blob_request_options());
-        CHECK_EQUAL(4, listing2.size());
+        CHECK_EQUAL(4U, listing2.size());
         for (auto iter = listing2.begin(); iter != listing2.end(); ++iter)
         {
             CHECK(iter->metadata().empty());
@@ -274,7 +274,7 @@ SUITE(Blob)
         check_access(sas_token, azure::storage::blob_shared_access_policy::permissions::write, azure::storage::cloud_blob_shared_access_headers(), blob);
 
         stored_permissions = m_container.download_permissions(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(1, stored_permissions.policies().size());
+        CHECK_EQUAL(1U, stored_permissions.policies().size());
         auto stored_policy = stored_permissions.policies().find(U("id1"));
         CHECK(stored_policy != stored_permissions.policies().end());
         CHECK_EQUAL(policy.permission(), stored_policy->second.permission());

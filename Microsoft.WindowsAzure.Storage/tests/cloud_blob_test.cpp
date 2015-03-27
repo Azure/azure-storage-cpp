@@ -323,7 +323,7 @@ SUITE(Blob)
         auto same_blob = m_container.get_blob_reference(blob.name());
         CHECK(same_blob.metadata().empty());
         same_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(2, same_blob.metadata().size());
+        CHECK_EQUAL(2U, same_blob.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), same_blob.metadata()[U("key1")]);
         CHECK_UTF8_EQUAL(U("value2"), same_blob.metadata()[U("key2")]);
 
@@ -331,7 +331,7 @@ SUITE(Blob)
         same_blob.metadata()[U("key3")] = U("value3");
         same_blob.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(3, same_blob.metadata().size());
+        CHECK_EQUAL(3U, same_blob.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), blob.metadata()[U("key1")]);
         CHECK_UTF8_EQUAL(U("value2"), blob.metadata()[U("key2")]);
         CHECK_UTF8_EQUAL(U("value3"), blob.metadata()[U("key3")]);
@@ -341,7 +341,7 @@ SUITE(Blob)
         blob.metadata()[U("key4")] = U("value4");
         blob.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         same_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(1, same_blob.metadata().size());
+        CHECK_EQUAL(1U, same_blob.metadata().size());
         CHECK_UTF8_EQUAL(U("value4"), same_blob.metadata()[U("key4")]);
 
         // Clear all pairs
@@ -387,9 +387,9 @@ SUITE(Blob)
 
     TEST_FIXTURE(blob_test_base, container_sas_combinations)
     {
-        for (int i = 0; i < 16; i++)
+        for (uint8_t i = 0; i < 16; i++)
         {
-            auto permissions = static_cast<azure::storage::blob_shared_access_policy::permissions>(i);
+            auto permissions = i;
 
             azure::storage::blob_shared_access_policy policy;
             policy.set_permissions(permissions);
@@ -411,9 +411,9 @@ SUITE(Blob)
 
     TEST_FIXTURE(blob_test_base, blob_sas_combinations)
     {
-        for (int i = 0; i < 8; i++)
+        for (uint8_t i = 0; i < 8; i++)
         {
-            auto permissions = static_cast<azure::storage::blob_shared_access_policy::permissions>(i);
+            auto permissions = i;
 
             azure::storage::blob_shared_access_policy policy;
             policy.set_permissions(permissions);
@@ -531,7 +531,7 @@ SUITE(Blob)
         CHECK_UTF8_EQUAL(U("1"), snapshot1_copy.download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
 
         auto blobs = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, azure::storage::blob_request_options());
-        CHECK_EQUAL(4, blobs.size());
+        CHECK_EQUAL(4U, blobs.size());
         check_blob_equal(snapshot1, blobs[0]);
         check_blob_equal(snapshot2, blobs[1]);
         check_blob_equal(m_blob, blobs[2]);

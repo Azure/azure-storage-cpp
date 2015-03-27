@@ -140,7 +140,7 @@ SUITE(Core)
 
     TEST_FIXTURE(test_base, no_retry_results)
     {
-        auto allowed_delta = [] (int retry_count) -> std::chrono::milliseconds
+        auto allowed_delta = [] (int) -> std::chrono::milliseconds
         {
             return std::chrono::milliseconds();
         };
@@ -276,7 +276,7 @@ SUITE(Core)
 
     TEST_FIXTURE(test_base, linear_retry_results)
     {
-        auto allowed_delta = [] (int retry_count) -> std::chrono::milliseconds
+        auto allowed_delta = [] (int) -> std::chrono::milliseconds
         {
             return std::chrono::milliseconds(100);
         };

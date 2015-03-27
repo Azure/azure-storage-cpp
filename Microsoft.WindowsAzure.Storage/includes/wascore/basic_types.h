@@ -16,8 +16,9 @@
 // -----------------------------------------------------------------------------------------
 
 #pragma once
+#pragma warning(disable: 4634)
 
-#include "cpprest/basic_types.h"
+#include "cpprest/details/basic_types.h"
 
 #ifdef _NO_WASTORAGE_API
     #define WASTORAGE_API

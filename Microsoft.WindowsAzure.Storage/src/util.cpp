@@ -21,6 +21,10 @@
 #include "wascore/constants.h"
 #include "wascore/resources.h"
 
+#ifndef WIN32
+#include "pplx/threadpool.h"
+#endif
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <float.h>
@@ -275,7 +279,7 @@ namespace azure { namespace storage {  namespace core {
     {
         // TODO: Remove this function if Casablanca changes their datetime serialization to not trim trailing zeros in the fractional seconds component of a time
 
-#ifdef _MS_WINDOWS
+#ifdef WIN32
         int status;
 
         ULARGE_INTEGER largeInt;
@@ -364,10 +368,10 @@ namespace azure { namespace storage {  namespace core {
 #endif
     }
 
-#ifdef WIN32
     class delay_event
     {
     public:
+#ifdef WIN32
         delay_event(std::chrono::milliseconds timeout)
             : m_callback(new concurrency::call<int>(std::function<void(int)>(std::bind(&delay_event::timer_fired, this, std::placeholders::_1)))), m_timer(static_cast<unsigned int>(timeout.count()), 0, m_callback, false)
         {
@@ -382,48 +386,42 @@ namespace azure { namespace storage {  namespace core {
         {
             m_timer.start();
         }
+#else
+        delay_event(std::chrono::milliseconds timeout)
+            : m_timer(crossplat::threadpool::shared_instance().service(), boost::posix_time::milliseconds(timeout.count()))
+        {
+        }
 
+        void start()
+        {
+            m_timer.async_wait(std::bind(&delay_event::timer_fired, this, std::placeholders::_1));
+        }
+#endif
         pplx::task<void> create_task()
         {
             return pplx::task<void>(m_completion_event);
         }
 
     private:
-        concurrency::call<int>* m_callback;
         pplx::task_completion_event<void> m_completion_event;
+#ifdef WIN32
+        concurrency::call<int>* m_callback;
         concurrency::timer<int> m_timer;
+#else
+        boost::asio::deadline_timer m_timer;
+#endif
 
+#ifdef WIN32
         void timer_fired(const int& dummy)
+#else
+        void timer_fired(const boost::system::error_code& dummy)
+#endif
         {
             UNREFERENCED_PARAMETER(dummy);
 
             m_completion_event.set();
         }
     };
-#else
-    class delay_event
-    {
-    public:
-        delay_event(std::chrono::milliseconds timeout)
-            : m_timeout(timeout)
-        {
-        }
-
-        void start()
-        {
-            // TODO: Consider using boost::asio::deadline_timer and implementing a threadpool
-            std::this_thread::sleep_for(m_timeout);
-        }
-
-        pplx::task<void> create_task()
-        {
-            return pplx::task_from_result();
-        }
-
-    private:
-        std::chrono::milliseconds m_timeout;
-    };
-#endif
 
     pplx::task<void> complete_after(std::chrono::milliseconds timeout)
     {

@@ -65,28 +65,34 @@ namespace azure { namespace storage { namespace samples {
             // Query for the table entities
             azure::storage::table_query query;
             azure::storage::operation_context context;
-            std::vector<azure::storage::table_entity> entities = table.execute_query(query, options, context);
-            for (std::vector<azure::storage::table_entity>::iterator it = entities.begin(); it != entities.end(); ++it)
+            azure::storage::continuation_token token;
+            do
             {
-                azure::storage::table_entity::properties_type& properties = it->properties();
+                azure::storage::table_query_segment segment = table.execute_query_segmented(query, token);
+                for (std::vector<azure::storage::table_entity>::const_iterator it = segment.results().cbegin(); it != segment.results().cend(); ++it)
+                {
+                    azure::storage::table_entity::properties_type properties = it->properties();
 
-                // Explictly set the property types for datetime, guid, int64, and binary properties because these cannot be automatically inferred when the "no metadata" option is used
-                properties.at(U("DateTimeProperty")).set_property_type(azure::storage::edm_type::datetime);
-                properties.at(U("GuidProperty")).set_property_type(azure::storage::edm_type::guid);
-                properties.at(U("Int64Property")).set_property_type(azure::storage::edm_type::int64);
-                properties.at(U("BinaryProperty")).set_property_type(azure::storage::edm_type::binary);
+                    // Explictly set the property types for datetime, guid, int64, and binary properties because these cannot be automatically inferred when the "no metadata" option is used
+                    properties.at(U("DateTimeProperty")).set_property_type(azure::storage::edm_type::datetime);
+                    properties.at(U("GuidProperty")).set_property_type(azure::storage::edm_type::guid);
+                    properties.at(U("Int64Property")).set_property_type(azure::storage::edm_type::int64);
+                    properties.at(U("BinaryProperty")).set_property_type(azure::storage::edm_type::binary);
 
-                // Print all property values
-                ucout << U("PK: ") << it->partition_key() << U(", RK: ") << it->row_key() << U(", TS: ") << it->timestamp().to_string(utility::datetime::ISO_8601) << std::endl;
-                ucout << U("StringProperty:   ") << properties.at(U("StringProperty")).string_value() << std::endl;
-                ucout << U("DateTimeProperty: ") << properties.at(U("DateTimeProperty")).datetime_value().to_string(utility::datetime::ISO_8601) << std::endl;
-                ucout << U("GuidProperty:     ") << utility::uuid_to_string(properties.at(U("GuidProperty")).guid_value()) << std::endl;
-                ucout << U("Int32Property:    ") << properties.at(U("Int32Property")).int32_value() << std::endl;
-                ucout << U("Int64Property:    ") << properties.at(U("Int64Property")).int64_value() << std::endl;
-                ucout << U("DoubleProperty:   ") << properties.at(U("DoubleProperty")).double_value() << std::endl;
-                ucout << U("BooleanProperty:  ") << properties.at(U("BooleanProperty")).boolean_value() << std::endl;
-                ucout << U("BinaryProperty:   ") << utility::conversions::to_base64(properties.at(U("BinaryProperty")).binary_value()) << std::endl;
-            }
+                    // Print all property values
+                    ucout << U("PK: ") << it->partition_key() << U(", RK: ") << it->row_key() << U(", TS: ") << it->timestamp().to_string(utility::datetime::ISO_8601) << std::endl;
+                    ucout << U("StringProperty:   ") << properties.at(U("StringProperty")).string_value() << std::endl;
+                    ucout << U("DateTimeProperty: ") << properties.at(U("DateTimeProperty")).datetime_value().to_string(utility::datetime::ISO_8601) << std::endl;
+                    ucout << U("GuidProperty:     ") << utility::uuid_to_string(properties.at(U("GuidProperty")).guid_value()) << std::endl;
+                    ucout << U("Int32Property:    ") << properties.at(U("Int32Property")).int32_value() << std::endl;
+                    ucout << U("Int64Property:    ") << properties.at(U("Int64Property")).int64_value() << std::endl;
+                    ucout << U("DoubleProperty:   ") << properties.at(U("DoubleProperty")).double_value() << std::endl;
+                    ucout << U("BooleanProperty:  ") << properties.at(U("BooleanProperty")).boolean_value() << std::endl;
+                    ucout << U("BinaryProperty:   ") << utility::conversions::to_base64(properties.at(U("BinaryProperty")).binary_value()) << std::endl;
+                }
+
+                token = segment.continuation_token();
+            } while (!token.empty());
 
             // Delete the table
             // Return value is true if the table did exist and was successfully deleted.

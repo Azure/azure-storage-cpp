@@ -43,7 +43,6 @@ namespace azure { namespace storage {
     {
         return create_async_impl(options, context, /* allow_conflict */ false).then([] (bool)
         {
-            // TODO: Consider making it an error or otherwise communicating it to the caller when this call succeeds because the queue already exists with the same metadata
         });
     }
 

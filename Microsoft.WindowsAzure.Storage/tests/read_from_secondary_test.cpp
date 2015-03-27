@@ -250,21 +250,21 @@ SUITE(Core)
 
         options.set_location_mode(azure::storage::location_mode::primary_only);
         auto results = m_container.list_blobs_segmented(utility::string_t(), true, azure::storage::blob_listing_details::none, 1, azure::storage::continuation_token(), options, m_context);
-        CHECK_EQUAL(4, m_context.request_results().size());
+        CHECK_EQUAL(4U, m_context.request_results().size());
 
         azure::storage::continuation_token token = results.continuation_token();
         options.set_location_mode(azure::storage::location_mode::secondary_only);
         CHECK_THROW(m_container.list_blobs_segmented(utility::string_t(), true, azure::storage::blob_listing_details::none, 1, token, options, m_context), azure::storage::storage_exception);
-        CHECK_EQUAL(4, m_context.request_results().size());
+        CHECK_EQUAL(4U, m_context.request_results().size());
 
         auto container = m_client.get_container_reference(m_container.name() + U("-missing"));
 
         token.set_target_location(azure::storage::storage_location::secondary);
         CHECK_THROW(container.list_blobs_segmented(utility::string_t(), true, azure::storage::blob_listing_details::none, 1, token, options, m_context), azure::storage::storage_exception);
-        CHECK_EQUAL(5, m_context.request_results().size());
+        CHECK_EQUAL(5U, m_context.request_results().size());
 
         options.set_location_mode(azure::storage::location_mode::primary_only);
         CHECK_THROW(container.list_blobs_segmented(utility::string_t(), true, azure::storage::blob_listing_details::none, 1, token, options, m_context), azure::storage::storage_exception);
-        CHECK_EQUAL(5, m_context.request_results().size());
+        CHECK_EQUAL(5U, m_context.request_results().size());
     }
 }

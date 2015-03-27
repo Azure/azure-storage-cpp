@@ -57,21 +57,21 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
+    utility::string_t get_etag_from_timestamp(const utility::string_t& timestampStr)
+    {
+        utility::ostringstream_t value;
+        value << U("W/\"datetime'") << web::http::uri::encode_data_string(timestampStr) << U("'\"");
+        return value.str();
+    }
+
     table_entity parse_table_entity(const web::json::value& document)
     {
         table_entity entity;
 
-        // TODO: Choose a smart estimate of the number of properties to avoid rehashes
-        /*
-        if (obj.size() > 3)
-        {
-        entity.properties().reserve((obj.size() - 2U) / 2U);
-        }
-        */
-
         if (document.is_object())
         {
             const web::json::object& entity_obj = document.as_object();
+            utility::string_t timestamp_str;
 
             for (web::json::object::const_iterator it = entity_obj.cbegin(); it != entity_obj.cend(); ++it)
             {
@@ -121,10 +121,15 @@ namespace azure { namespace storage { namespace protocol {
                     {
                         // The object is the Timestamp
 
-                        if (property_obj.is_string() && !entity.timestamp().is_initialized())
+                        if (property_obj.is_string())
                         {
-                            utility::datetime timestamp = utility::datetime::from_string(property_obj.as_string(), utility::datetime::ISO_8601);
-                            entity.set_timestamp(timestamp);
+                            timestamp_str = property_obj.as_string();
+
+                            if (!entity.timestamp().is_initialized())
+                            {
+                                utility::datetime timestamp = utility::datetime::from_string(timestamp_str, utility::datetime::ISO_8601);
+                                entity.set_timestamp(timestamp);
+                            }
                         }
                     }
                     else
@@ -172,9 +177,13 @@ namespace azure { namespace storage { namespace protocol {
                     }
                 }
             }
-        }
 
-        // TODO: Generate the ETag from the Timestamp if it was not in the response header or the response body
+            // Generate the ETag from the Timestamp if it was not in the response header or the response body
+            if (entity.etag().empty() && !timestamp_str.empty())
+            {
+                entity.set_etag(get_etag_from_timestamp(timestamp_str));
+            }
+        }
 
         return entity;
     }

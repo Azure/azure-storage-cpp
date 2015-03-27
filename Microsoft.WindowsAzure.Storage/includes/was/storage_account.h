@@ -54,7 +54,6 @@ namespace azure { namespace storage {
         cloud_storage_account(const storage_credentials& credentials, const storage_uri& blob_endpoint, const storage_uri& queue_endpoint, const storage_uri& table_endpoint)
             : m_initialized(true), m_is_development_storage_account(false), m_credentials(credentials), m_blob_endpoint(blob_endpoint), m_queue_endpoint(queue_endpoint), m_table_endpoint(table_endpoint), m_default_endpoints(false)
         {
-            // TODO: Consider validating that path-style endpoints all contain the account name in the path
         }
 
         /// <summary>
@@ -81,6 +80,42 @@ namespace azure { namespace storage {
         {
             initialize_default_endpoints(use_https);
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_storage_account"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_storage_account" /> on which to base the new instance.</param>
+        cloud_storage_account(cloud_storage_account&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_storage_account" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_storage_account" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_storage_account" /> object with properties set.</returns>
+        cloud_storage_account& operator=(cloud_storage_account&& other)
+        {
+            if (this != &other)
+            {
+                m_initialized = std::move(other.m_initialized);
+                m_default_endpoints = std::move(other.m_default_endpoints);
+                m_is_development_storage_account = std::move(other.m_is_development_storage_account);
+                m_blob_endpoint = std::move(other.m_blob_endpoint);
+                m_queue_endpoint = std::move(other.m_queue_endpoint);
+                m_table_endpoint = std::move(other.m_table_endpoint);
+                m_credentials = std::move(other.m_credentials);
+                m_endpoint_suffix = std::move(other.m_endpoint_suffix);
+                m_settings = std::move(other.m_settings);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Parses a connection string and returns a <see cref="azure::storage::cloud_storage_account" /> created

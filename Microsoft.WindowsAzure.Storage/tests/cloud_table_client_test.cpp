@@ -19,6 +19,26 @@
 #include "table_test_base.h"
 #include "was/table.h"
 
+std::vector<azure::storage::cloud_table> list_all_tables(
+    const azure::storage::cloud_table_client& table_client,
+    const utility::string_t& prefix,
+    const azure::storage::table_request_options& options,
+    azure::storage::operation_context context)
+{
+    std::vector<azure::storage::cloud_table> results;
+
+    int max_results_per_segment = 1000;
+    azure::storage::continuation_token token;
+    do
+    {
+        azure::storage::table_result_segment result_segment = table_client.list_tables_segmented(prefix, max_results_per_segment, token, options, context);
+        results.insert(results.end(), result_segment.results().begin(), result_segment.results().end());
+        token = result_segment.continuation_token();
+    } while (!token.empty());
+
+    return results;
+}
+
 SUITE(TableClient)
 {
     TEST_FIXTURE(table_service_test_base, TableClient_Empty)
@@ -97,7 +117,7 @@ SUITE(TableClient)
 
         prefix = object_name_prefix;
 
-        std::vector<azure::storage::cloud_table> results = client.list_tables(prefix, options, context);
+        std::vector<azure::storage::cloud_table> results = list_all_tables(client, prefix, options, context);
 
         CHECK(results.size() >= TABLE_COUNT);
 
@@ -122,7 +142,7 @@ SUITE(TableClient)
         CHECK(!context.client_request_id().empty());
         CHECK(context.start_time().is_initialized());
         CHECK(context.end_time().is_initialized());
-        CHECK_EQUAL(1, context.request_results().size());
+        CHECK_EQUAL(1U, context.request_results().size());
         CHECK(context.request_results()[0].is_response_available());
         CHECK(context.request_results()[0].start_time().is_initialized());
         CHECK(context.request_results()[0].end_time().is_initialized());
@@ -169,7 +189,7 @@ SUITE(TableClient)
         prefix = object_name_prefix;
         max_results = 3;
 
-        int segment_count = 0;
+        size_t segment_count = 0;
         azure::storage::table_result_segment result_segment;
         do
         {

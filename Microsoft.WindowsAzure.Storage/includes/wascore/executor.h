@@ -302,13 +302,13 @@ namespace azure { namespace storage { namespace core {
                 auto& client_request_id = instance->m_context.client_request_id();
                 if (!client_request_id.empty())
                 {
-                    instance->m_request.headers().add(protocol::ms_header_client_request_id, client_request_id);
+                    instance->add_request_header(protocol::ms_header_client_request_id, client_request_id);
                 }
 
                 auto& user_headers = instance->m_context.user_headers();
                 for (auto iter = user_headers.begin(); iter != user_headers.end(); ++iter)
                 {
-                    instance->m_request.headers().add(iter->first, iter->second);
+                    instance->add_request_header(iter->first, iter->second);
                 }
 
                 // If the command provided a request body, set it on the http_request object
@@ -408,26 +408,32 @@ namespace azure { namespace storage { namespace core {
                         }
 
                         // Otherwise, response body might contain an error coming from the Storage service.
-                        // However, if the command has a destination stream, there is no guarantee that it
-                        // is seekable and thus it cannot be read back to parse the error.
-                        if (!instance->m_command->m_destination_stream)
+
+                        return response.content_ready().then([instance](pplx::task<web::http::http_response> get_error_body_task) -> web::http::http_response
                         {
-                            return response.content_ready().then([instance](pplx::task<web::http::http_response> get_error_body_task) -> web::http::http_response
+                            auto response = get_error_body_task.get();
+
+                            if (!instance->m_command->m_destination_stream)
                             {
-                                auto response = get_error_body_task.get();
+                                // However, if the command has a destination stream, there is no guarantee that it
+                                // is seekable and thus it cannot be read back to parse the error.
                                 instance->m_request_result = request_result(instance->m_start_time, instance->m_current_location, response, true);
+                            }
+                            else
+                            {
+                                // Command has a destination stream. In this case, error information
+                                // contained in response body might have been written into the destination
+                                // stream. Need recreate the hash_provider since a retry might be needed.
+                                instance->m_is_hashing_started = false;
+                            }
 
-                                if (logger::instance().should_log(instance->m_context, client_log_level::log_level_warning))
-                                {
-                                    logger::instance().log(instance->m_context, client_log_level::log_level_warning, U("Failed request ID = ") + instance->m_request_result.service_request_id());
-                                }
+                            if (logger::instance().should_log(instance->m_context, client_log_level::log_level_warning))
+                            {
+                                logger::instance().log(instance->m_context, client_log_level::log_level_warning, U("Failed request ID = ") + instance->m_request_result.service_request_id());
+                            }
 
-                                throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
-                            });
-                        }
-
-                        // In the worst case, storage_exception will just contain the HTTP error message
-                        throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
+                            throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
+                        });
                     }
                 }).then([instance](pplx::task<web::http::http_response> get_body_task) -> pplx::task<void>
                 {
@@ -704,6 +710,18 @@ namespace azure { namespace storage { namespace core {
             }
         }
 
+        template<typename Value>
+        void add_request_header(const web::http::http_headers::key_type& name, const Value& value)
+        {
+            auto& headers = m_request.headers();
+            if (headers.has(name))
+            {
+                headers.remove(name);
+            }
+
+            headers.add(name, value);
+        }
+        
         static std::exception_ptr capture_inner_exception(const std::exception& exception)
         {
             if (nullptr == dynamic_cast<const storage_exception*>(&exception))

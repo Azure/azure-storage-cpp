@@ -105,10 +105,9 @@ namespace azure { namespace storage {
         return cloud_block_blob(std::move(blob_name), std::move(snapshot_time), *this);
     }
 
-    cloud_blob_directory cloud_blob_container::get_directory_reference(utility::string_t name) const
+    cloud_blob_directory cloud_blob_container::get_directory_reference(utility::string_t directory_name) const
     {
-        // TODO: Consider renaming the parameter to directory_name for consistency
-        return cloud_blob_directory(std::move(name), *this);
+        return cloud_blob_directory(std::move(directory_name), *this);
     }
 
     pplx::task<void> cloud_blob_container::download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context)
@@ -397,6 +396,8 @@ namespace azure { namespace storage {
 
             std::vector<protocol::cloud_blob_list_item> blob_items(reader.move_blob_items());
             std::vector<cloud_blob> blobs;
+            blobs.reserve(blob_items.size());
+
             for (std::vector<protocol::cloud_blob_list_item>::iterator iter = blob_items.begin(); iter != blob_items.end(); ++iter)
             {
                 blobs.push_back(cloud_blob(iter->move_name(), iter->move_snapshot_time(), container, iter->move_properties(), iter->move_metadata(), iter->move_copy_state()));
@@ -404,6 +405,8 @@ namespace azure { namespace storage {
 
             std::vector<protocol::cloud_blob_prefix_list_item> blob_prefix_items(reader.move_blob_prefix_items());
             std::vector<cloud_blob_directory> directories;
+            directories.reserve(blob_prefix_items.size());
+
             for (auto iter = blob_prefix_items.begin(); iter != blob_prefix_items.end(); ++iter)
             {
                 directories.push_back(cloud_blob_directory(iter->move_name(), container));

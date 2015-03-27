@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props" Condition="Exists('..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -38,7 +39,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <NuGetPackageImportStamp>0ebdaa86</NuGetPackageImportStamp>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
@@ -98,5 +101,17 @@
     <Import Project="packages\cpprestsdk.1.3.1\build\native\cpprestsdk.targets" Condition="Exists('packages\cpprestsdk.1.3.1\build\native\cpprestsdk.targets')" />
     <Import Project="packages\wastorage.redist.0.2.0-preview\build\native\wastorage.redist.targets" Condition="Exists('packages\wastorage.redist.0.2.0-preview\build\native\wastorage.redist.targets')" />
     <Import Project="packages\wastorage.0.2.0-preview\build\native\wastorage.targets" Condition="Exists('packages\wastorage.0.2.0-preview\build\native\wastorage.targets')" />
+    <Import Project="..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets" Condition="Exists('..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" />
+    <Import Project="..\..\..\packages\wastorage.redist.0.6.0-preview\build\native\wastorage.redist.targets" Condition="Exists('..\..\..\packages\wastorage.redist.0.6.0-preview\build\native\wastorage.redist.targets')" />
+    <Import Project="..\..\..\packages\wastorage.0.6.0-preview\build\native\wastorage.targets" Condition="Exists('..\..\..\packages\wastorage.0.6.0-preview\build\native\wastorage.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.props'))" />
+    <Error Condition="!Exists('..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\wastorage.redist.0.6.0-preview\build\native\wastorage.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\wastorage.redist.0.6.0-preview\build\native\wastorage.redist.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\wastorage.0.6.0-preview\build\native\wastorage.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\wastorage.0.6.0-preview\build\native\wastorage.targets'))" />
+  </Target>
 </Project>

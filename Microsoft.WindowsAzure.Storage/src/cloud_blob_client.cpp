@@ -38,10 +38,10 @@ namespace azure { namespace storage {
         {
             protocol::list_containers_reader reader(response.body());
 
-            // TODO: Initialize a reasonable capacity for container objects throughout the codebase
-
             std::vector<protocol::cloud_blob_container_list_item> items(reader.move_items());
             std::vector<cloud_blob_container> results;
+            results.reserve(items.size());
+
             for (std::vector<protocol::cloud_blob_container_list_item>::iterator iter = items.begin(); iter != items.end(); ++iter)
             {
                 results.push_back(cloud_blob_container(iter->move_name(), client, iter->move_properties(), iter->move_metadata()));

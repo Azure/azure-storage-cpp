@@ -60,14 +60,14 @@ To install the binaries for the Azure Storage Client Library for C++, type the f
 
 ### C++ REST SDK
 
-The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.3.0. It can be installed through [NuGet](http://www.nuget.org/packages/cpprestsdk/2.3.0) or downloaded directly from [CodePlex](http://casablanca.codeplex.com/releases/view/129408).
+The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.4.0. It can be installed through [NuGet](http://www.nuget.org/packages/cpprestsdk/2.4.0) or downloaded directly from [CodePlex](http://casablanca.codeplex.com/releases/view/146873).
 
 ## Code Samples
 
 How-to topics focused around accomplishing specific tasks are available in the [samples folder](https://github.com/Azure/azure-storage-cpp/tree/master/Microsoft.WindowsAzure.Storage).
 
 ## Getting Started on Linux
-As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://casablanca.codeplex.com/wikipage?title=Setup%20and%20Build%20on%20Linux&referringTitle=Documentation) to compile it. Current version of the library depends on Casablanca version 2.3.0.
+As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://casablanca.codeplex.com/wikipage?title=Setup%20and%20Build%20on%20Linux&referringTitle=Documentation) to compile it. Current version of the library depends on Casablanca version 2.4.0.
 
 Once this is complete, then:
 
@@ -94,20 +94,35 @@ CASABLANCA_DIR=~/Github/Casablanca/casablanca CXX=g++-4.8 cmake .. -DCMAKE_BUILD
 ```
 The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
 
-Once you have built the library, the samples should work equally well for Windows and Linux. You can build the samples as well:
+To build and run unit tests:
+- Install UnitTest++ library:
 ```bash
-cd ../samples
-vi SamplesCommon/samples_common.h – edit this file to include your storage account name and key
-mkdir build.release
-cd build.release
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
-Make
+sudo apt-get install libunittest++-dev
+```
+- Build the test code:
+```bash
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS
+make
+```
+- Run unit tests
+```bash
+cd Binaries
+vi test_configurations.json # modify test config file to include your storage account credentials
+./azurestoragetest
+```
+
+To build sample code:
+```bash
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES
+make
 ```
 To run the samples:
 ```bash
 cd Binaries
-cp ../../BlobsGettingStarted/DataFile.txt .            (this is required to run the blobs sample)
-./samplesblobs            (run the blobs sample)
-./samplestables           (run the tables sample)
-./samplesqueues           (run the queues sample)
+./samplesblobs            # run the blobs sample
+./samplesjson             # run the tables sample with JSON payload
+./samplestables           # run the tables sample
+./samplesqueues           # run the queues sample
 ```
+
+Please note the current build script is only tested on Ubuntu 14.04. Please update the script accordingly for other distributions.

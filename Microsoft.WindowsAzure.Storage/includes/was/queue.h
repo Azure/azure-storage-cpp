@@ -107,6 +107,34 @@ namespace azure { namespace storage {
             : cloud_permissions()
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="queue_permissions"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="queue_permissions" /> on which to base the new instance.</param>
+        queue_permissions(queue_permissions&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="queue_permissions" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="queue_permissions" /> to use to set properties.</param>
+        /// <returns>A <see cref="queue_permissions" /> object with properties set.</returns>
+        queue_permissions& operator=(queue_permissions&& other)
+        {
+            if (this != &other)
+            {
+                cloud_permissions::operator=(other);
+            }
+            return *this;
+        }
+#endif
     };
 
     /// <summary>
@@ -133,28 +161,6 @@ namespace azure { namespace storage {
         {
         }
 
-        /*
-        /// <summary>
-        /// Initializes a new instance of the cloud queue message class with the specified text stream.
-        /// </summary>
-        /// <param name="content">The content of the message as text.</param>
-        cloud_queue_message(const utility::istringstream_t& content)
-            : m_dequeue_count(0)
-        {
-            // TODO: Read content
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the cloud queue message class with the specified text array.
-        /// </summary>
-        /// <param name="content">The content of the message as text.</param>
-        cloud_queue_message(const utility::char_t* content)
-            : m_dequeue_count(0)
-        {
-            // TODO: Copy content
-        }
-        */
-
         /// <summary>
         /// Initializes a new instance of the <see cref="cloud_queue_message"/> class with the specified raw data.
         /// </summary>
@@ -173,6 +179,40 @@ namespace azure { namespace storage {
             : m_id(std::move(id)), m_pop_receipt(std::move(pop_receipt)), m_dequeue_count(0)
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_queue_message"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_queue_message" /> on which to base the new instance.</param>
+        cloud_queue_message(cloud_queue_message&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_queue_message" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_queue_message" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_queue_message" /> object with properties set.</returns>
+        cloud_queue_message& operator=(cloud_queue_message&& other)
+        {
+            if (this != &other)
+            {
+                m_content = std::move(other.m_content);
+                m_id = std::move(other.m_id);
+                m_pop_receipt = std::move(other.m_pop_receipt);
+                m_insertion_time = std::move(other.m_insertion_time);
+                m_expiration_time = std::move(other.m_expiration_time);
+                m_next_visible_time = std::move(other.m_next_visible_time);
+                m_dequeue_count = std::move(other.m_dequeue_count);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Gets the content of the message as text.
@@ -322,6 +362,34 @@ namespace azure { namespace storage {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="queue_request_options"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="queue_request_options" /> on which to base the new instance.</param>
+        queue_request_options(queue_request_options&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="queue_request_options" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="queue_request_options" /> to use to set properties.</param>
+        /// <returns>A <see cref="queue_request_options" /> object with properties set.</returns>
+        queue_request_options& operator=(queue_request_options&& other)
+        {
+            if (this != &other)
+            {
+                request_options::operator=(other);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Applies the default set of request options.
         /// </summary>
@@ -346,6 +414,35 @@ namespace azure { namespace storage {
         queue_result_segment()
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="queue_result_segment"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="queue_result_segment" /> on which to base the new instance.</param>
+        queue_result_segment(queue_result_segment&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="queue_result_segment" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="queue_result_segment" /> to use to set properties.</param>
+        /// <returns>A <see cref="queue_result_segment" /> object with properties set.</returns>
+        queue_result_segment& operator=(queue_result_segment&& other)
+        {
+            if (this != &other)
+            {
+                m_results = std::move(other.m_results);
+                m_continuation_token = std::move(other.m_continuation_token);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Gets an enumerable collection of <see cref="azure::storage::cloud_queue" /> results.
@@ -434,66 +531,34 @@ namespace azure { namespace storage {
             initialize();
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
         /// <summary>
-        /// Returns a result segment containing a collection of queues in the storage account.
+        /// Initializes a new instance of the <see cref="cloud_queue_client"/> class.
         /// </summary>
-        /// <returns>An enumerable collection of <see cref="cloud_queue" /> objects.</returns>
-        std::vector<cloud_queue> list_queues() const
+        /// <param name="other">A reference to a set of <see cref="cloud_queue_client" /> on which to base the new instance.</param>
+        cloud_queue_client(cloud_queue_client&& other)
         {
-            return list_queues_async(utility::string_t(), false, queue_request_options(), operation_context()).get();
+            *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a result segment containing a collection of queues in the storage account.
+        /// Returns a reference to a <see cref="cloud_queue_client" /> object.
         /// </summary>
-        /// <param name="prefix">The queue name prefix.</param>
-        /// <returns>An enumerable collection of <see cref="cloud_queue" /> objects.</returns>
-        std::vector<cloud_queue> list_queues(const utility::string_t& prefix) const
+        /// <param name="other">A reference to a set of <see cref="cloud_queue_client" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_queue_client" /> object with properties set.</returns>
+        cloud_queue_client& operator=(cloud_queue_client&& other)
         {
-            return list_queues_async(prefix, false, queue_request_options(), operation_context()).get();
+            if (this != &other)
+            {
+                cloud_client::operator=(std::move(other));
+                m_default_request_options = std::move(other.m_default_request_options);
+            }
+            return *this;
         }
-
-        /// <summary>
-        /// Returns a result segment containing a collection of queues in the storage account.
-        /// </summary>
-        /// <param name="prefix">The queue name prefix.</param>
-        /// <param name="get_metadata">A enumeration describing which items to include in the listing.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>An enumerable collection of <see cref="cloud_queue" /> objects.</returns>
-        std::vector<cloud_queue> list_queues(const utility::string_t& prefix, bool get_metadata, const queue_request_options& options, operation_context context) const
-        {
-            return list_queues_async(prefix, get_metadata, options, context).get();
-        }
-
-        /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of queue items.
-        /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="cloud_queue" />, that represents the current operation.</returns>
-        pplx::task<std::vector<cloud_queue>> list_queues_async() const
-        {
-            return list_queues_async(utility::string_t(), false, queue_request_options(), operation_context());
-        }
-
-        /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of queue items.
-        /// </summary>
-        /// <param name="prefix">The queue name prefix.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="cloud_queue" />, that represents the current operation.</returns>
-        pplx::task<std::vector<cloud_queue>> list_queues_async(const utility::string_t& prefix) const
-        {
-            return list_queues_async(prefix, false, queue_request_options(), operation_context());
-        }
-
-        /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of queue items.
-        /// </summary>
-        /// <param name="prefix">The queue name prefix.</param>
-        /// <param name="get_metadata">A flag that specifies whether to retrieve queue metadata.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
-        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="cloud_queue" />, that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::vector<cloud_queue>> list_queues_async(const utility::string_t& prefix, bool get_metadata, const queue_request_options& options, operation_context context) const;
+#endif
 
         /// <summary>
         /// Returns a result segment containing a collection of queues in the storage account.
@@ -742,6 +807,38 @@ namespace azure { namespace storage {
         /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the queue for all locations.</param>
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
         WASTORAGE_API cloud_queue(const storage_uri& uri, storage_credentials credentials);
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_queue"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_queue" /> on which to base the new instance.</param>
+        cloud_queue(cloud_queue&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_queue" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_queue" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_queue" /> object with properties set.</returns>
+        cloud_queue& operator=(cloud_queue&& other)
+        {
+            if (this != &other)
+            {
+                m_client = std::move(other.m_client);
+                m_name = std::move(other.m_name);
+                m_uri = std::move(other.m_uri);
+                m_approximate_message_count = std::move(other.m_approximate_message_count);
+                m_metadata = std::move(other.m_metadata);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Creates the queue.

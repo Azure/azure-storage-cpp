@@ -137,8 +137,6 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_block_blob::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
-        // TODO: Consider providing an overload for concurrency::streams::wistream
-
         assert_no_snapshot();
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());

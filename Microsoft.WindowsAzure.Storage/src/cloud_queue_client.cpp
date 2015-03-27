@@ -30,29 +30,6 @@ namespace azure { namespace storage {
         return modified_options;
     }
 
-    pplx::task<std::vector<cloud_queue>> cloud_queue_client::list_queues_async(const utility::string_t& prefix, bool get_metadata, const queue_request_options& options, operation_context context) const
-    {
-        // TODO: Consider having a max_results parameter or request option to limit the total number of items retrieved (consistent with any design changes in other libraries)
-
-        std::shared_ptr<std::vector<cloud_queue>> results = std::make_shared<std::vector<cloud_queue>>();
-        std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
-
-        auto instance = std::make_shared<cloud_queue_client>(*this);
-        return pplx::details::do_while([instance, results, prefix, get_metadata, token, options, context]() mutable -> pplx::task<bool>
-        {
-            return instance->list_queues_segmented_async(prefix, get_metadata, -1, *token, options, context).then([results, token](queue_result_segment result_segment) mutable -> bool
-            {
-                std::vector<azure::storage::cloud_queue> partial_results = result_segment.results();
-                results->insert(results->end(), partial_results.begin(), partial_results.end());
-                *token = result_segment.continuation_token();
-                return !token->empty();
-            });
-        }).then([results] (bool) -> pplx::task<std::vector<cloud_queue>>
-        {
-            return pplx::task_from_result(*results);
-        });
-    }
-
     pplx::task<queue_result_segment> cloud_queue_client::list_queues_segmented_async(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token, const queue_request_options& options, operation_context context) const
     {
         queue_request_options modified_options = get_modified_options(options);

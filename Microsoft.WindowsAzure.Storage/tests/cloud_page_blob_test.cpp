@@ -433,7 +433,7 @@ SUITE(Blob)
         auto same_blob = m_container.get_page_blob_reference(m_blob.name());
         CHECK(same_blob.metadata().empty());
         same_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(2, same_blob.metadata().size());
+        CHECK_EQUAL(2U, same_blob.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), same_blob.metadata()[U("key1")]);
         CHECK_UTF8_EQUAL(U("value2"), same_blob.metadata()[U("key2")]);
     }
@@ -445,14 +445,14 @@ SUITE(Blob)
         m_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto snapshot1 = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(2, snapshot1.metadata().size());
+        CHECK_EQUAL(2U, snapshot1.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), snapshot1.metadata()[U("key1")]);
         CHECK_UTF8_EQUAL(U("value2"), snapshot1.metadata()[U("key2")]);
 
         azure::storage::cloud_page_blob snapshot1_clone(snapshot1.uri(), snapshot1.snapshot_time(), snapshot1.service_client().credentials());
         CHECK(snapshot1_clone.metadata().empty());
         snapshot1_clone.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(2, snapshot1_clone.metadata().size());
+        CHECK_EQUAL(2U, snapshot1_clone.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), snapshot1_clone.metadata()[U("key1")]);
         CHECK_UTF8_EQUAL(U("value2"), snapshot1_clone.metadata()[U("key2")]);
 
@@ -460,14 +460,14 @@ SUITE(Blob)
         snapshot_metadata[U("key3")] = U("value1");
         snapshot_metadata[U("key4")] = U("value2");
         auto snapshot2 = m_blob.create_snapshot(snapshot_metadata, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(2, snapshot1.metadata().size());
+        CHECK_EQUAL(2U, snapshot1.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), snapshot2.metadata()[U("key3")]);
         CHECK_UTF8_EQUAL(U("value2"), snapshot2.metadata()[U("key4")]);
 
         azure::storage::cloud_page_blob snapshot2_clone(snapshot2.uri(), snapshot2.snapshot_time(), snapshot2.service_client().credentials());
         CHECK(snapshot2_clone.metadata().empty());
         snapshot2_clone.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_EQUAL(2, snapshot2_clone.metadata().size());
+        CHECK_EQUAL(2U, snapshot2_clone.metadata().size());
         CHECK_UTF8_EQUAL(U("value1"), snapshot2_clone.metadata()[U("key3")]);
         CHECK_UTF8_EQUAL(U("value2"), snapshot2_clone.metadata()[U("key4")]);
     }
@@ -489,7 +489,7 @@ SUITE(Blob)
         });
 
         CHECK_THROW(m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(std::move(buffer)), 0, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
-        CHECK_EQUAL(2, m_context.request_results().size());
+        CHECK_EQUAL(2U, m_context.request_results().size());
 
         m_context.set_response_received(std::function<void(web::http::http_request &, const web::http::http_response&, azure::storage::operation_context)>());
     }

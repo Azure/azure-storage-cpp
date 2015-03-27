@@ -137,9 +137,6 @@ namespace azure { namespace storage { namespace protocol {
         if (!query.select_columns().empty())
         {
             utility::ostringstream_t select_builder;
-
-            // TODO: Consider calculating the final size of the string and pre-allocating it
-
             select_builder << U("PartitionKey,RowKey,Timestamp");
 
             std::vector<utility::string_t> select_columns = query.select_columns();
@@ -246,7 +243,6 @@ namespace azure { namespace storage { namespace protocol {
     void populate_http_headers(web::http::http_headers& headers, table_operation_type operation_type, table_payload_format payload_format)
     {
         headers.add(web::http::header_names::accept, get_accept_header(payload_format));
-        // TODO: Stop sending the Accept-Charset request header here if possible because UTF-8 appears to be the default anyway
         headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);
 
         if (operation_type == table_operation_type::insert_operation || 
@@ -260,7 +256,6 @@ namespace azure { namespace storage { namespace protocol {
                 headers.add(header_prefer, U("return-no-content"));
             }
 
-            // TODO: Consider sending the Content-Type request header even for empty requests
             headers.add(web::http::header_names::content_type, header_value_content_type_json);
         }
     }
@@ -452,9 +447,7 @@ namespace azure { namespace storage { namespace protocol {
         web::http::http_request request = table_base_request(web::http::methods::POST, uri_builder, timeout, context);
         request.set_response_stream(Concurrency::streams::ostream(response_buffer));
 
-        // TODO: Consider sending the Accept request header
         web::http::http_headers& request_headers = request.headers();
-        // TODO: Stop sending the Accept-Charset request header here if possible because it doesn't apply to a multipart message
         request_headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);
         populate_http_headers(request_headers, batch_boundary_name);
 
@@ -488,10 +481,6 @@ namespace azure { namespace storage { namespace protocol {
 
                 if (!is_query)
                 {
-                    // TODO: Stop sending the MaxDataServiceVersion request header here if possible because it is already sent in the outer request
-                    operation_headers.add(header_max_data_service_version, header_value_data_service_version);
-                    // TODO: Consider sending the Content-ID request header -- operation_headers.add(header_content_id, core::convert_to_string(content_id));
-
                     core::write_boundary(body_text, changeset_boundary_name);
                 }
 

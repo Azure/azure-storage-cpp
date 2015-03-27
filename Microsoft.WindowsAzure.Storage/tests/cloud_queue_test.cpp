@@ -221,7 +221,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -247,7 +247,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -272,7 +272,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -314,7 +314,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -337,7 +337,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -363,7 +363,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -397,7 +397,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -430,7 +430,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(2, context.request_results().size());
+            CHECK_EQUAL(2U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -468,7 +468,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -494,7 +494,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -520,7 +520,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(2, context.request_results().size());
+            CHECK_EQUAL(2U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -558,7 +558,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -584,7 +584,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -661,40 +661,40 @@ SUITE(Queue)
 
         queue1.upload_metadata(options, context);
 
-        CHECK_EQUAL(3, queue1.metadata().size());
+        CHECK_EQUAL(3U, queue1.metadata().size());
         CHECK(queue1.metadata()[U("aaa")].compare(U("111")) == 0);
         CHECK(queue1.metadata()[U("bbb")].compare(U("222")) == 0);
         CHECK(queue1.metadata()[U("ccc")].compare(U("333")) == 0);
 
         queue1.download_attributes(options, context);
 
-        CHECK_EQUAL(3, queue1.metadata().size());
+        CHECK_EQUAL(3U, queue1.metadata().size());
         CHECK(queue1.metadata()[U("aaa")].compare(U("111")) == 0);
         CHECK(queue1.metadata()[U("bbb")].compare(U("222")) == 0);
         CHECK(queue1.metadata()[U("ccc")].compare(U("333")) == 0);
 
         queue2.download_attributes(options, context);
 
-        CHECK_EQUAL(3, queue2.metadata().size());
+        CHECK_EQUAL(3U, queue2.metadata().size());
         CHECK(queue2.metadata()[U("aaa")].compare(U("111")) == 0);
         CHECK(queue2.metadata()[U("bbb")].compare(U("222")) == 0);
         CHECK(queue2.metadata()[U("ccc")].compare(U("333")) == 0);
 
         queue2.metadata().erase(U("bbb"));
 
-        CHECK_EQUAL(2, queue2.metadata().size());
+        CHECK_EQUAL(2U, queue2.metadata().size());
         CHECK(queue2.metadata()[U("aaa")].compare(U("111")) == 0);
         CHECK(queue2.metadata()[U("ccc")].compare(U("333")) == 0);
 
         queue2.upload_metadata(options, context);
 
-        CHECK_EQUAL(2, queue2.metadata().size());
+        CHECK_EQUAL(2U, queue2.metadata().size());
         CHECK(queue2.metadata()[U("aaa")].compare(U("111")) == 0);
         CHECK(queue2.metadata()[U("ccc")].compare(U("333")) == 0);
 
         queue1.download_attributes(options, context);
 
-        CHECK_EQUAL(2, queue1.metadata().size());
+        CHECK_EQUAL(2U, queue1.metadata().size());
         CHECK(queue1.metadata()[U("aaa")].compare(U("111")) == 0);
         CHECK(queue1.metadata()[U("ccc")].compare(U("333")) == 0);
 
@@ -756,7 +756,7 @@ SUITE(Queue)
         CHECK(!context.client_request_id().empty());
         CHECK(context.start_time().is_initialized());
         CHECK(context.end_time().is_initialized());
-        CHECK_EQUAL(1, context.request_results().size());
+        CHECK_EQUAL(1U, context.request_results().size());
         CHECK(context.request_results()[0].is_response_available());
         CHECK(context.request_results()[0].start_time().is_initialized());
         CHECK(context.request_results()[0].end_time().is_initialized());
@@ -798,7 +798,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -821,7 +821,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(2, context.request_results().size());
+            CHECK_EQUAL(2U, context.request_results().size());
             CHECK(context.request_results()[1].is_response_available());
             CHECK(context.request_results()[1].start_time().is_initialized());
             CHECK(context.request_results()[1].end_time().is_initialized());
@@ -844,7 +844,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(3, context.request_results().size());
+            CHECK_EQUAL(3U, context.request_results().size());
             CHECK(context.request_results()[2].is_response_available());
             CHECK(context.request_results()[2].start_time().is_initialized());
             CHECK(context.request_results()[2].end_time().is_initialized());
@@ -890,7 +890,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -934,7 +934,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -975,7 +975,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1006,7 +1006,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1037,7 +1037,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1071,7 +1071,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1102,7 +1102,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1136,7 +1136,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1182,7 +1182,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1213,7 +1213,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1252,7 +1252,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1283,7 +1283,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1307,7 +1307,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1338,7 +1338,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1556,7 +1556,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1586,7 +1586,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1618,7 +1618,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1646,7 +1646,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1672,7 +1672,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1757,7 +1757,7 @@ SUITE(Queue)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());

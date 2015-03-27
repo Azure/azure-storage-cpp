@@ -312,6 +312,40 @@ namespace azure { namespace storage {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="copy_state"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="copy_state" /> on which to base the new instance.</param>
+        copy_state(copy_state&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="copy_state" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="copy_state" /> to use to set properties.</param>
+        /// <returns>A <see cref="copy_state" /> object with properties set.</returns>
+        copy_state& operator=(copy_state&& other)
+        {
+            if (this != &other)
+            {
+                m_copy_id = std::move(other.m_copy_id);
+                m_completion_time = std::move(other.m_completion_time);
+                m_status_description = std::move(other.m_status_description);
+                m_bytes_copied = std::move(other.m_bytes_copied);
+                m_total_bytes = std::move(other.m_total_bytes);
+                m_status = std::move(other.m_status);
+                m_source = std::move(other.m_source);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets the ID of the copy blob operation.
         /// </summary>
@@ -430,6 +464,40 @@ namespace azure { namespace storage {
             : m_sequence_number(0), m_sequence_number_operator(sequence_number_operators::none)
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="access_condition"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="access_condition" /> on which to base the new instance.</param>
+        access_condition(access_condition&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="access_condition" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="access_condition" /> to use to set properties.</param>
+        /// <returns>A <see cref="access_condition" /> object with properties set.</returns>
+        access_condition& operator=(access_condition&& other)
+        {
+            if (this != &other)
+            {
+                m_if_match_etag = std::move(other.m_if_match_etag);
+                m_if_none_match_etag = std::move(other.m_if_none_match_etag);
+                m_if_modified_since_time = std::move(other.m_if_modified_since_time);
+                m_if_not_modified_since_time = std::move(other.m_if_not_modified_since_time);
+                m_lease_id = std::move(other.m_lease_id);
+                m_sequence_number = std::move(other.m_sequence_number);
+                m_sequence_number_operator = std::move(other.m_sequence_number_operator);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Generates an empty access condition.
@@ -806,6 +874,34 @@ namespace azure { namespace storage {
             }
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="lease_break_period"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="lease_break_period" /> on which to base the new instance.</param>
+        lease_break_period(lease_break_period&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="lease_break_period" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="lease_break_period" /> to use to set properties.</param>
+        /// <returns>A <see cref="lease_break_period" /> object with properties set.</returns>
+        lease_break_period& operator=(lease_break_period&& other)
+        {
+            if (this != &other)
+            {
+                m_seconds = std::move(other.m_seconds);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Indicates whether the <see cref="lease_break_period" /> object is valid.
         /// </summary>
@@ -879,6 +975,34 @@ namespace azure { namespace storage {
             }
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="lease_time"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="lease_time" /> on which to base the new instance.</param>
+        lease_time(lease_time&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="lease_time" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="lease_time" /> to use to set properties.</param>
+        /// <returns>A <see cref="lease_time" /> object with properties set.</returns>
+        lease_time& operator=(lease_time&& other)
+        {
+            if (this != &other)
+            {
+                m_seconds = std::move(other.m_seconds);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets the duration of the lease in seconds for a non-infinite lease.
         /// </summary>
@@ -906,6 +1030,35 @@ namespace azure { namespace storage {
             : cloud_permissions(), m_public_access(blob_container_public_access_type::off)
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="blob_container_permissions"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="blob_container_permissions" /> on which to base the new instance.</param>
+        blob_container_permissions(blob_container_permissions&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="blob_container_permissions" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="blob_container_permissions" /> to use to set properties.</param>
+        /// <returns>A <see cref="blob_container_permissions" /> object with properties set.</returns>
+        blob_container_permissions& operator=(blob_container_permissions&& other)
+        {
+            if (this != &other)
+            {
+                cloud_permissions<blob_shared_access_policy>::operator=(std::move(other));
+                m_public_access = std::move(other.m_public_access);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Gets the public access setting for the container.
@@ -951,6 +1104,36 @@ namespace azure { namespace storage {
             : m_blobs(std::move(blobs)), m_directories(std::move(directories)), m_continuation_token(std::move(token))
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="blob_result_segment"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="blob_result_segment" /> on which to base the new instance.</param>
+        blob_result_segment(blob_result_segment&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="blob_result_segment" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="blob_result_segment" /> to use to set properties.</param>
+        /// <returns>A <see cref="blob_result_segment" /> object with properties set.</returns>
+        blob_result_segment& operator=(blob_result_segment&& other)
+        {
+            if (this != &other)
+            {
+                m_blobs = std::move(other.m_blobs);
+                m_directories = std::move(other.m_directories);
+                m_continuation_token = std::move(other.m_continuation_token);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Gets an enumerable collection of <see cref="azure::storage::cloud_blob" /> results.
@@ -1009,10 +1192,9 @@ namespace azure { namespace storage {
         {
         }
 
-        cloud_blob_properties(const cloud_blob_properties& other)
-        {
-            *this = other;
-        }
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="cloud_blob_properties"/> class.
@@ -1023,25 +1205,6 @@ namespace azure { namespace storage {
             *this = std::move(other);
         }
 
-        cloud_blob_properties& operator=(const cloud_blob_properties& other)
-        {
-            m_size = other.m_size;
-            m_etag = other.m_etag;
-            m_last_modified = other.m_last_modified;
-            m_type = other.m_type;
-            m_lease_duration = other.m_lease_duration;
-            m_lease_state = other.m_lease_state;
-            m_lease_status = other.m_lease_status;
-            m_page_blob_sequence_number = other.m_page_blob_sequence_number;
-            m_cache_control = other.m_cache_control;
-            m_content_disposition = other.m_content_disposition;
-            m_content_encoding = other.m_content_encoding;
-            m_content_language = other.m_content_language;
-            m_content_md5 = other.m_content_md5;
-            m_content_type = other.m_content_type;
-            return *this;
-        }
-
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob_properties" /> object.
         /// </summary>
@@ -1049,22 +1212,26 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="cloud_blob_properties" /> object with properties set.</returns>
         cloud_blob_properties& operator=(cloud_blob_properties&& other)
         {
-            m_size = other.m_size;
-            m_etag = std::move(other.m_etag);
-            m_last_modified = other.m_last_modified;
-            m_type = other.m_type;
-            m_lease_duration = other.m_lease_duration;
-            m_lease_state = other.m_lease_state;
-            m_lease_status = other.m_lease_status;
-            m_page_blob_sequence_number = other.m_page_blob_sequence_number;
-            m_cache_control = std::move(other.m_cache_control);
-            m_content_disposition = std::move(other.m_content_disposition);
-            m_content_encoding = std::move(other.m_content_encoding);
-            m_content_language = std::move(other.m_content_language);
-            m_content_md5 = std::move(other.m_content_md5);
-            m_content_type = std::move(other.m_content_type);
+            if (this != &other)
+            {
+                m_cache_control = std::move(other.m_cache_control);
+                m_content_disposition = std::move(other.m_content_disposition);
+                m_content_encoding = std::move(other.m_content_encoding);
+                m_content_language = std::move(other.m_content_language);
+                m_size = std::move(other.m_size);
+                m_content_md5 = std::move(other.m_content_md5);
+                m_content_type = std::move(other.m_content_type);
+                m_etag = std::move(other.m_etag);
+                m_last_modified = std::move(other.m_last_modified);
+                m_type = std::move(other.m_type);
+                m_lease_status = std::move(other.m_lease_status);
+                m_lease_state = std::move(other.m_lease_state);
+                m_lease_duration = std::move(other.m_lease_duration);
+                m_page_blob_sequence_number = std::move(other.m_page_blob_sequence_number);
+            }
             return *this;
         }
+#endif
 
         /// <summary>
         /// Gets the cache-control value stored for the blob.
@@ -1294,6 +1461,38 @@ namespace azure { namespace storage {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_blob_shared_access_headers"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_shared_access_headers" /> on which to base the new instance.</param>
+        cloud_blob_shared_access_headers(cloud_blob_shared_access_headers&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_blob_shared_access_headers" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_shared_access_headers" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_blob_shared_access_headers" /> object with properties set.</returns>
+        cloud_blob_shared_access_headers& operator=(cloud_blob_shared_access_headers&& other)
+        {
+            if (this != &other)
+            {
+                m_cache_control = std::move(other.m_cache_control);
+                m_content_disposition = std::move(other.m_content_disposition);
+                m_content_encoding = std::move(other.m_content_encoding);
+                m_content_language = std::move(other.m_content_language);
+                m_content_type = std::move(other.m_content_type);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets the value of the cache-control header returned with the blob.
         /// </summary>
@@ -1413,6 +1612,41 @@ namespace azure { namespace storage {
             m_parallelism_factor(1)
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="blob_request_options"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="blob_request_options" /> on which to base the new instance.</param>
+        blob_request_options(blob_request_options&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="blob_request_options" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="blob_request_options" /> to use to set properties.</param>
+        /// <returns>A <see cref="blob_request_options" /> object with properties set.</returns>
+        blob_request_options& operator=(blob_request_options&& other)
+        {
+            if (this != &other)
+            {
+                request_options::operator=(std::move(other));
+                m_use_transactional_md5 = std::move(other.m_use_transactional_md5);
+                m_store_blob_content_md5 = std::move(other.m_store_blob_content_md5);
+                m_disable_content_md5_validation = std::move(other.m_disable_content_md5_validation);
+                m_parallelism_factor = std::move(other.m_parallelism_factor);
+                m_single_blob_upload_threshold = std::move(other.m_single_blob_upload_threshold);
+                m_stream_write_size = std::move(other.m_stream_write_size);
+                m_stream_read_size = std::move(other.m_stream_read_size);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Applies the default set of request options.
@@ -1617,8 +1851,6 @@ namespace azure { namespace storage {
             latest
         };
 
-        // TODO: Use std::numeric_limits<size_t>::max() here too?
-
         /// <summary>
         /// Initializes a new instance of the <see cref="block_list_item"/> class.
         /// </summary>
@@ -1637,6 +1869,36 @@ namespace azure { namespace storage {
             : m_id(std::move(id)), m_size(std::numeric_limits<size_t>::max()), m_mode(mode)
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="block_list_item"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="block_list_item" /> on which to base the new instance.</param>
+        block_list_item(block_list_item&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="block_list_item" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="block_list_item" /> to use to set properties.</param>
+        /// <returns>A <see cref="block_list_item" /> object with properties set.</returns>
+        block_list_item& operator=(block_list_item&& other)
+        {
+            if (this != &other)
+            {
+                m_id = std::move(other.m_id);
+                m_size = std::move(other.m_size);
+                m_mode = std::move(other.m_mode);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Gets the name of the block.
@@ -1701,6 +1963,35 @@ namespace azure { namespace storage {
             : m_start_offset(start_offset), m_end_offset(end_offset)
         {
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="page_range"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="page_range" /> on which to base the new instance.</param>
+        page_range(page_range&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="page_range" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="page_range" /> to use to set properties.</param>
+        /// <returns>A <see cref="page_range" /> object with properties set.</returns>
+        page_range& operator=(page_range&& other)
+        {
+            if (this != &other)
+            {
+                m_start_offset = std::move(other.m_start_offset);
+                m_end_offset = std::move(other.m_end_offset);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Returns the content of the page range as a string.
@@ -1837,10 +2128,14 @@ namespace azure { namespace storage {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
         /// <summary>
         /// Initializes a new instance of the <see cref="cloud_blob_container_properties"/> class.
         /// </summary>
-        /// <param name="other">A reference to a <see cref="cloud_blob_container_properties" /> object.</param>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_container_properties" /> on which to base the new instance.</param>
         cloud_blob_container_properties(cloud_blob_container_properties&& other)
         {
             *this = std::move(other);
@@ -1853,13 +2148,17 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="cloud_blob_container_properties" /> object with properties set.</returns>
         cloud_blob_container_properties& operator=(cloud_blob_container_properties&& other)
         {
-            m_etag = std::move(other.m_etag);
-            m_last_modified = other.m_last_modified;
-            m_lease_duration = other.m_lease_duration;
-            m_lease_state = other.m_lease_state;
-            m_lease_status = other.m_lease_status;
+            if (this != &other)
+            {
+                m_etag = std::move(other.m_etag);
+                m_last_modified = std::move(other.m_last_modified);
+                m_lease_status = std::move(other.m_lease_status);
+                m_lease_state = std::move(other.m_lease_state);
+                m_lease_duration = std::move(other.m_lease_duration);
+            }
             return *this;
         }
+#endif
 
         /// <summary>
         /// Gets the ETag value for the container.
@@ -1970,6 +2269,36 @@ namespace azure { namespace storage {
         {
             initialize();
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_blob_client"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_client" /> on which to base the new instance.</param>
+        cloud_blob_client(cloud_blob_client&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_blob_client" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_client" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_blob_client" /> object with properties set.</returns>
+        cloud_blob_client& operator=(cloud_blob_client&& other)
+        {
+            if (this != &other)
+            {
+                cloud_client::operator=(std::move(other));
+                m_default_request_options = std::move(other.m_default_request_options);
+                m_directory_delimiter = std::move(other.m_directory_delimiter);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Sets the authentication scheme to use to sign HTTP requests.
@@ -2318,6 +2647,38 @@ namespace azure { namespace storage {
         /// <param name="metadata">The metadata for the container.</param>
         cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_blob_container"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_container" /> on which to base the new instance.</param>
+        cloud_blob_container(cloud_blob_container&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_blob_container" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_container" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_blob_container" /> object with properties set.</returns>
+        cloud_blob_container& operator=(cloud_blob_container&& other)
+        {
+            if (this != &other)
+            {
+                m_client = std::move(other.m_client);
+                m_name = std::move(other.m_name);
+                m_uri = std::move(other.m_uri);
+                m_metadata = std::move(other.m_metadata);
+                m_properties = std::move(other.m_properties);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Returns a shared access signature for the container.
         /// </summary>
@@ -2384,9 +2745,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets a reference to a virtual blob directory beneath this container.
         /// </summary>
-        /// <param name="name">The name of the virtual blob directory.</param>
+        /// <param name="directory_name">The name of the virtual blob directory.</param>
         /// <returns>A reference to a <see cref="cloud_blob_directory" />.</returns>
-        WASTORAGE_API cloud_blob_directory get_directory_reference(utility::string_t name) const;
+        WASTORAGE_API cloud_blob_directory get_directory_reference(utility::string_t directory_name) const;
 
         /// <summary>
         /// Retrieves the container's attributes.
@@ -3116,6 +3477,36 @@ namespace azure { namespace storage {
         /// <param name="container">The container.</param>
         cloud_blob_directory(utility::string_t name, cloud_blob_container container);
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_blob_directory"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_directory" /> on which to base the new instance.</param>
+        cloud_blob_directory(cloud_blob_directory&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_blob_directory" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_blob_directory" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_blob_directory" /> object with properties set.</returns>
+        cloud_blob_directory& operator=(cloud_blob_directory&& other)
+        {
+            if (this != &other)
+            {
+                m_name = std::move(other.m_name);
+                m_container = std::move(other.m_container);
+                m_uri = std::move(other.m_uri);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets a reference to a blob in this virtual directory.
         /// </summary>
@@ -3315,26 +3706,39 @@ namespace azure { namespace storage {
         /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
         WASTORAGE_API cloud_blob(storage_uri uri, utility::string_t snapshot_time, storage_credentials credentials);
 
-        // TODO: Make constructors that are not called directly by users private
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
+        /// Initializes a new instance of the <see cref="cloud_blob"/> class.
         /// </summary>
-        /// <param name="name">The name of the blob.</param>
-        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
-        /// <param name="container">A reference to the parent container.</param>
-        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container);
+        /// <param name="other">A reference to a set of <see cref="cloud_blob" /> on which to base the new instance.</param>
+        cloud_blob(cloud_blob&& other)
+        {
+            *this = std::move(other);
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
+        /// Returns a reference to a <see cref="cloud_blob" /> object.
         /// </summary>
-        /// <param name="name">The name of the blob.</param>
-        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
-        /// <param name="container">A reference to the parent container.</param>
-        /// <param name="properties">A set of properties for the blob.</param>
-        /// <param name="metadata">User-defined metadata for the blob.</param>
-        /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
-        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state);
+        /// <param name="other">A reference to a set of <see cref="cloud_blob" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_blob" /> object with properties set.</returns>
+        cloud_blob& operator=(cloud_blob&& other)
+        {
+            if (this != &other)
+            {
+                m_properties = std::move(other.m_properties);
+                m_metadata = std::move(other.m_metadata);
+                m_copy_state = std::move(other.m_copy_state);
+                m_name = std::move(other.m_name);
+                m_snapshot_time = std::move(other.m_snapshot_time);
+                m_container = std::move(other.m_container);
+                m_uri = std::move(other.m_uri);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Gets the <see cref="azure::storage::cloud_blob_directory" /> object representing the
@@ -4319,6 +4723,25 @@ namespace azure { namespace storage {
 
     protected:
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
+        /// </summary>
+        /// <param name="name">The name of the blob.</param>
+        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
+        /// <param name="container">A reference to the parent container.</param>
+        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
+        /// </summary>
+        /// <param name="name">The name of the blob.</param>
+        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
+        /// <param name="container">A reference to the parent container.</param>
+        /// <param name="properties">A set of properties for the blob.</param>
+        /// <param name="metadata">User-defined metadata for the blob.</param>
+        /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
+        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, azure::storage::copy_state copy_state);
+
         void assert_no_snapshot() const;
 
         void set_type(blob_type value)
@@ -4339,6 +4762,9 @@ namespace azure { namespace storage {
         utility::string_t m_snapshot_time;
         cloud_blob_container m_container;
         storage_uri m_uri;
+
+        friend class cloud_blob_container;
+        friend class cloud_blob_directory;
     };
 
     /// <summary>
@@ -4389,20 +4815,6 @@ namespace azure { namespace storage {
             set_type(blob_type::block_blob);
         }
 
-        // TODO: Consider making the following constructor private (and similar in other classes) because the user should be using get_blob_reference()
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class.
-        /// </summary>
-        /// <param name="name">The name of the blob.</param>
-        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
-        /// <param name="container">A reference to the parent container.</param>
-        cloud_block_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
-            : cloud_blob(std::move(name), std::move(snapshot_time), std::move(container))
-        {
-            set_type(blob_type::block_blob);
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class.
         /// </summary>
@@ -4412,6 +4824,34 @@ namespace azure { namespace storage {
         {
             set_type(blob_type::block_blob);
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_block_blob"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_block_blob" /> on which to base the new instance.</param>
+        cloud_block_blob(cloud_block_blob&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_block_blob" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_block_blob" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_block_blob" /> object with properties set.</returns>
+        cloud_block_blob& operator=(cloud_block_blob&& other)
+        {
+            if (this != &other)
+            {
+                cloud_blob::operator=(other);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Opens a stream for writing to the block blob.
@@ -4800,6 +5240,23 @@ namespace azure { namespace storage {
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+    private:
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_block_blob" /> class.
+        /// </summary>
+        /// <param name="name">The name of the blob.</param>
+        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
+        /// <param name="container">A reference to the parent container.</param>
+        cloud_block_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
+            : cloud_blob(std::move(name), std::move(snapshot_time), std::move(container))
+        {
+            set_type(blob_type::block_blob);
+        }
+
+        friend class cloud_blob_container;
+        friend class cloud_blob_directory;
     };
 
     /// <summary>
@@ -4853,24 +5310,40 @@ namespace azure { namespace storage {
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class.
         /// </summary>
-        /// <param name="name">The name of the blob.</param>
-        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
-        /// <param name="container">A reference to the parent container.</param>
-        cloud_page_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
-            : cloud_blob(std::move(name), std::move(snapshot_time), std::move(container))
-        {
-            set_type(blob_type::page_blob);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class.
-        /// </summary>
         /// <param name="blob">Reference to the blob.</param>
         cloud_page_blob(const cloud_blob& blob)
             : cloud_blob(blob)
         {
             set_type(blob_type::page_blob);
         }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_page_blob"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_page_blob" /> on which to base the new instance.</param>
+        cloud_page_blob(cloud_page_blob&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_page_blob" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_page_blob" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_page_blob" /> object with properties set.</returns>
+        cloud_page_blob& operator=(cloud_page_blob&& other)
+        {
+            if (this != &other)
+            {
+                cloud_blob::operator=(other);
+            }
+            return *this;
+        }
+#endif
 
         /// <summary>
         /// Opens a stream for writing to an existing page blob.
@@ -5403,6 +5876,23 @@ namespace azure { namespace storage {
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+    private:
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_page_blob" /> class.
+        /// </summary>
+        /// <param name="name">The name of the blob.</param>
+        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
+        /// <param name="container">A reference to the parent container.</param>
+        cloud_page_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
+            : cloud_blob(std::move(name), std::move(snapshot_time), std::move(container))
+        {
+            set_type(blob_type::page_blob);
+        }
+
+        friend class cloud_blob_container;
+        friend class cloud_blob_directory;
     };
 
 }} // namespace azure::storage

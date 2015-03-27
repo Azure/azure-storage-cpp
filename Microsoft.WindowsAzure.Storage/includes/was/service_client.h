@@ -30,6 +30,37 @@ namespace azure { namespace storage {
     {
     public:
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="cloud_client"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_client" /> on which to base the new instance.</param>
+        cloud_client(cloud_client&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="cloud_client" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="cloud_client" /> to use to set properties.</param>
+        /// <returns>A <see cref="cloud_client" /> object with properties set.</returns>
+        cloud_client& operator=(cloud_client&& other)
+        {
+            if (this != &other)
+            {
+                m_base_uri = std::move(other.m_base_uri);
+                m_credentials = std::move(other.m_credentials);
+                m_authentication_scheme = std::move(other.m_authentication_scheme);
+                m_authentication_handler = std::move(other.m_authentication_handler);
+            }
+            return *this;
+        }
+#endif
+
         /// <summary>
         /// Gets the base URI for the service client.
         /// </summary>

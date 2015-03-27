@@ -25,7 +25,11 @@
 #include "targetver.h"
 
 #pragma warning(push)
-#pragma warning(disable: 4635 4638 4251)
+#pragma warning(disable: 4634 4635 4638 4251)
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 
 // This is required to support enough number of arguments in VC11, especially for std::bind
 #define _VARIADIC_MAX 8

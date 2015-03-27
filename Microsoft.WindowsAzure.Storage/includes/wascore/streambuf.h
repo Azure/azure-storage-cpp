@@ -236,7 +236,6 @@ namespace azure { namespace storage { namespace core {
 
         pplx::task<int_type> _putc(char_type ch)
         {
-            // TODO: Consider updating the length and MD5 hash only after writing the data in case writing fails (in a task continuation)
             ++m_total_written;
             m_hash_provider.write(&ch, 1);
 
@@ -245,7 +244,6 @@ namespace azure { namespace storage { namespace core {
 
         pplx::task<size_t> _putn(const char_type* ptr, size_t count)
         {
-            // TODO: Consider updating the length and MD5 hash only after writing the data in case writing fails (in a task continuation)
             m_total_written += count;
             m_hash_provider.write(ptr, count);
 

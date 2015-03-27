@@ -22,6 +22,25 @@
 
 // TODO: Consider making storage_account.h automatically included from blob.h/table.h/queue.h
 
+std::vector<azure::storage::table_entity> execute_table_query(
+    const azure::storage::cloud_table& table,
+    const azure::storage::table_query& query,
+    const azure::storage::table_request_options& options,
+    azure::storage::operation_context context)
+{
+    std::vector<azure::storage::table_entity> results;
+
+    azure::storage::continuation_token token;
+    do
+    {
+        azure::storage::table_query_segment result_segment = table.execute_query_segmented(query, token, options, context);
+        results.insert(results.end(), result_segment.results().begin(), result_segment.results().end());
+        token = result_segment.continuation_token();
+    } while (!token.empty());
+
+    return results;
+}
+
 SUITE(Table)
 {
     TEST_FIXTURE(table_service_test_base, Table_Empty)
@@ -241,7 +260,7 @@ SUITE(Table)
         CHECK(property.property_type() == azure::storage::edm_type::boolean);
         CHECK(!property.is_null());
         CHECK_THROW(property.boolean_value(), std::runtime_error);
-        CHECK_EQUAL(0, property.str().size());
+        CHECK_EQUAL(0U, property.str().size());
     }
 
     TEST_FIXTURE(table_service_test_base, EntityProperty_DateTime)
@@ -903,7 +922,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -929,7 +948,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -963,7 +982,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -986,7 +1005,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1012,7 +1031,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1046,7 +1065,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1079,7 +1098,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(2, context.request_results().size());
+            CHECK_EQUAL(2U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1117,7 +1136,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1143,7 +1162,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1169,7 +1188,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(2, context.request_results().size());
+            CHECK_EQUAL(2U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1207,7 +1226,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1233,7 +1252,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1287,7 +1306,7 @@ SUITE(Table)
         CHECK(!context.client_request_id().empty());
         CHECK(context.start_time().is_initialized());
         CHECK(context.end_time().is_initialized());
-        CHECK_EQUAL(1, context.request_results().size());
+        CHECK_EQUAL(1U, context.request_results().size());
         CHECK(context.request_results()[0].is_response_available());
         CHECK(context.request_results()[0].start_time().is_initialized());
         CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1346,7 +1365,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1375,7 +1394,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(8, result.entity().properties().size());
+            CHECK_EQUAL(8U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
             CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
@@ -1396,7 +1415,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1443,7 +1462,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1479,7 +1498,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1511,7 +1530,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1548,7 +1567,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1610,7 +1629,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1639,7 +1658,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(8, result.entity().properties().size());
+            CHECK_EQUAL(8U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
             CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
@@ -1660,7 +1679,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1714,7 +1733,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1743,7 +1762,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(10, result.entity().properties().size());
+            CHECK_EQUAL(10U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
             CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
@@ -1768,7 +1787,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1822,7 +1841,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1851,7 +1870,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(12, result.entity().properties().size());
+            CHECK_EQUAL(12U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
             CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
@@ -1880,7 +1899,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1914,7 +1933,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -1971,7 +1990,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2033,7 +2052,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2062,7 +2081,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(8, result.entity().properties().size());
+            CHECK_EQUAL(8U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
             CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
@@ -2083,7 +2102,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2137,7 +2156,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2166,7 +2185,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(8, result.entity().properties().size());
+            CHECK_EQUAL(8U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
             CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
             CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
@@ -2187,7 +2206,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2241,7 +2260,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2270,7 +2289,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(8, result.entity().properties().size());
+            CHECK_EQUAL(8U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
             CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
             CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
@@ -2291,7 +2310,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2325,7 +2344,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2382,7 +2401,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2446,7 +2465,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2477,7 +2496,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(8, result.entity().properties().size());
+            CHECK_EQUAL(8U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
             CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
@@ -2498,7 +2517,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2551,7 +2570,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2629,7 +2648,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(10, result.entity().properties().size());
+            CHECK_EQUAL(10U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyA"))->second.property_type() == azure::storage::edm_type::double_floating_point);
             CHECK(result.entity().properties().find(U("PropertyA"))->second.double_value() != result.entity().properties().find(U("PropertyA"))->second.double_value()); // Only NaN is defined to not equal itself
@@ -2725,7 +2744,7 @@ SUITE(Table)
 
             std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -2741,7 +2760,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2764,13 +2783,13 @@ SUITE(Table)
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
-                CHECK_EQUAL(2, results[i].properties().size());
+                CHECK_EQUAL(2U, results[i].properties().size());
                 CHECK_EQUAL(int32_value, results[i].properties()[U("PropertyA")].int32_value());
                 CHECK(string_value.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
             }
@@ -2778,7 +2797,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2815,7 +2834,7 @@ SUITE(Table)
 
             std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -2831,7 +2850,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2854,13 +2873,13 @@ SUITE(Table)
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
-                CHECK_EQUAL(3, results[i].properties().size());
+                CHECK_EQUAL(3U, results[i].properties().size());
                 CHECK_EQUAL(int32_value2, results[i].properties()[U("PropertyA")].int32_value());
                 CHECK(string_value.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
                 CHECK(string_value2.compare(results[i].properties()[U("PropertyC")].string_value()) == 0);
@@ -2869,7 +2888,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2906,7 +2925,7 @@ SUITE(Table)
 
             std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -2922,7 +2941,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2945,13 +2964,13 @@ SUITE(Table)
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
-                CHECK_EQUAL(3, results[i].properties().size());
+                CHECK_EQUAL(3U, results[i].properties().size());
                 CHECK_EQUAL(int32_value3, results[i].properties()[U("PropertyA")].int32_value());
                 CHECK(string_value.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
                 CHECK(string_value3.compare(results[i].properties()[U("PropertyD")].string_value()) == 0);
@@ -2960,7 +2979,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -2996,7 +3015,7 @@ SUITE(Table)
 
             std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -3012,7 +3031,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3035,13 +3054,13 @@ SUITE(Table)
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
-                CHECK_EQUAL(2, results[i].properties().size());
+                CHECK_EQUAL(2U, results[i].properties().size());
                 CHECK(string_value4.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
                 CHECK_EQUAL(int32_value4, results[i].properties()[U("PropertyE")].int32_value());
             }
@@ -3049,7 +3068,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3085,7 +3104,7 @@ SUITE(Table)
 
             std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -3101,7 +3120,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3124,13 +3143,13 @@ SUITE(Table)
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
-                CHECK_EQUAL(3, results[i].properties().size());
+                CHECK_EQUAL(3U, results[i].properties().size());
                 CHECK(string_value4.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
                 CHECK_EQUAL(int32_value5, results[i].properties()[U("PropertyE")].int32_value());
                 CHECK(string_value5.compare(results[i].properties()[U("PropertyF")].string_value()) == 0);
@@ -3139,7 +3158,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3165,7 +3184,7 @@ SUITE(Table)
 
                 std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-                CHECK_EQUAL(1, results.size());
+                CHECK_EQUAL(1U, results.size());
 
                 CHECK(operation.operations()[0].entity().partition_key().compare(results[0].entity().partition_key()) == 0);
                 CHECK(operation.operations()[0].entity().row_key().compare(results[0].entity().row_key()) == 0);
@@ -3178,7 +3197,7 @@ SUITE(Table)
                 CHECK(!context.client_request_id().empty());
                 CHECK(context.start_time().is_initialized());
                 CHECK(context.end_time().is_initialized());
-                CHECK_EQUAL(1, context.request_results().size());
+                CHECK_EQUAL(1U, context.request_results().size());
                 CHECK(context.request_results()[0].is_response_available());
                 CHECK(context.request_results()[0].start_time().is_initialized());
                 CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3208,7 +3227,7 @@ SUITE(Table)
 
             std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-            CHECK_EQUAL(BATCH_SIZE, results.size());
+            CHECK_EQUAL((size_t)BATCH_SIZE, results.size());
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -3224,7 +3243,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3250,7 +3269,7 @@ SUITE(Table)
 
                 std::vector<azure::storage::table_result> results = table.execute_batch(operation, options, context);
 
-                CHECK_EQUAL(1, results.size());
+                CHECK_EQUAL(1U, results.size());
 
                 CHECK(results[0].entity().partition_key().empty());
                 CHECK(results[0].entity().row_key().empty());
@@ -3263,7 +3282,7 @@ SUITE(Table)
                 CHECK(!context.client_request_id().empty());
                 CHECK(context.start_time().is_initialized());
                 CHECK(context.end_time().is_initialized());
-                CHECK_EQUAL(1, context.request_results().size());
+                CHECK_EQUAL(1U, context.request_results().size());
                 CHECK(context.request_results()[0].is_response_available());
                 CHECK(context.request_results()[0].start_time().is_initialized());
                 CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3323,7 +3342,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3361,7 +3380,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -3569,7 +3588,7 @@ SUITE(Table)
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
             CHECK(results.size() > 0);
             CHECK((int)results.size() > take_count);
@@ -3585,7 +3604,7 @@ SUITE(Table)
 
                 azure::storage::table_entity::properties_type properties = entity.properties();
 
-                CHECK_EQUAL(9, properties.size());
+                CHECK_EQUAL(9U, properties.size());
 
                 for (azure::storage::table_entity::properties_type::const_iterator property_it = properties.cbegin(); property_it != properties.cend(); ++property_it)
                 {
@@ -3682,7 +3701,7 @@ SUITE(Table)
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
             CHECK(results.size() > 0);
 
@@ -3697,7 +3716,7 @@ SUITE(Table)
 
                 azure::storage::table_entity::properties_type properties = entity.properties();
 
-                CHECK_EQUAL(9, properties.size());
+                CHECK_EQUAL(9U, properties.size());
 
                 for (azure::storage::table_entity::properties_type::const_iterator property_it = properties.cbegin(); property_it != properties.cend(); ++property_it)
                 {
@@ -3856,7 +3875,7 @@ SUITE(Table)
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
             CHECK(results.size() > 0);
             CHECK((int)results.size() > take_count);
@@ -3872,7 +3891,7 @@ SUITE(Table)
 
                 azure::storage::table_entity::properties_type properties = entity.properties();
 
-                CHECK_EQUAL(9, properties.size());
+                CHECK_EQUAL(9U, properties.size());
 
                 for (azure::storage::table_entity::properties_type::const_iterator property_it = properties.cbegin(); property_it != properties.cend(); ++property_it)
                 {
@@ -3970,7 +3989,7 @@ SUITE(Table)
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
 
-            int segment_count = 0;
+            size_t segment_count = 0;
             azure::storage::table_query_segment query_segment;
             do
             {
@@ -3990,7 +4009,7 @@ SUITE(Table)
 
                     azure::storage::table_entity::properties_type properties = entity.properties();
 
-                    CHECK_EQUAL(9, properties.size());
+                    CHECK_EQUAL(9U, properties.size());
 
                     for (azure::storage::table_entity::properties_type::const_iterator property_it = properties.cbegin(); property_it != properties.cend(); ++property_it)
                     {
@@ -4043,9 +4062,9 @@ SUITE(Table)
         utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
         query.set_filter_string(filter_string);
 
-        std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+        std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-        CHECK_EQUAL(0, results.size());
+        CHECK_EQUAL(0U, results.size());
 
         for (std::vector<azure::storage::table_entity>::const_iterator entity_iterator = results.cbegin(); entity_iterator != results.cend(); ++entity_iterator)
         {
@@ -4055,7 +4074,7 @@ SUITE(Table)
         CHECK(!context.client_request_id().empty());
         CHECK(context.start_time().is_initialized());
         CHECK(context.end_time().is_initialized());
-        CHECK_EQUAL(1, context.request_results().size());
+        CHECK_EQUAL(1U, context.request_results().size());
         CHECK(context.request_results()[0].is_response_available());
         CHECK(context.request_results()[0].start_time().is_initialized());
         CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4088,7 +4107,7 @@ SUITE(Table)
 
         try
         {
-            table.execute_query(query, options, context);
+            execute_table_query(table, query, options, context);
             CHECK(false);
         }
         catch (const azure::storage::storage_exception& e)
@@ -4101,7 +4120,7 @@ SUITE(Table)
         CHECK(!context.client_request_id().empty());
         CHECK(context.start_time().is_initialized());
         CHECK(context.end_time().is_initialized());
-        CHECK_EQUAL(1, context.request_results().size());
+        CHECK_EQUAL(1U, context.request_results().size());
         CHECK(context.request_results()[0].is_response_available());
         CHECK(context.request_results()[0].start_time().is_initialized());
         CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4168,9 +4187,9 @@ SUITE(Table)
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-            CHECK_EQUAL(1, results.size());
+            CHECK_EQUAL(1U, results.size());
 
             for (std::vector<azure::storage::table_entity>::const_iterator entity_iterator = results.cbegin(); entity_iterator != results.cend(); ++entity_iterator)
             {
@@ -4183,7 +4202,7 @@ SUITE(Table)
 
                 azure::storage::table_entity::properties_type properties = entity.properties();
 
-                CHECK_EQUAL(1, properties.size());
+                CHECK_EQUAL(1U, properties.size());
 
                 for (azure::storage::table_entity::properties_type::const_iterator property_it = properties.cbegin(); property_it != properties.cend(); ++property_it)
                 {
@@ -4200,7 +4219,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4245,7 +4264,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4275,7 +4294,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4307,7 +4326,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4335,7 +4354,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4361,7 +4380,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4430,7 +4449,7 @@ SUITE(Table)
             azure::storage::table_result result = table2.execute(retrieve_operation);
 
             CHECK_EQUAL(200, result.http_status_code());
-            CHECK_EQUAL(1, result.entity().properties().size());
+            CHECK_EQUAL(1U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("MyProperty")) != result.entity().properties().cend());
             CHECK_EQUAL(property_value, result.entity().properties().find(U("MyProperty"))->second.int32_value());
 
@@ -4460,7 +4479,7 @@ SUITE(Table)
             azure::storage::table_result result = table2.execute(retrieve_operation);
 
             CHECK_EQUAL(200, result.http_status_code());
-            CHECK_EQUAL(1, result.entity().properties().size());
+            CHECK_EQUAL(1U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("MyProperty")) != result.entity().properties().cend());
             CHECK_EQUAL(property_value, result.entity().properties().find(U("MyProperty"))->second.int32_value());
         }
@@ -4498,7 +4517,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4527,7 +4546,7 @@ SUITE(Table)
             CHECK_EQUAL(200, result.http_status_code());
             CHECK(!result.etag().empty());
 
-            CHECK_EQUAL(1, result.entity().properties().size());
+            CHECK_EQUAL(1U, result.entity().properties().size());
             CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
             CHECK(result.entity().properties().find(U("PropertyA"))->second.property_type() == azure::storage::edm_type::datetime);
             CHECK(result.entity().properties().find(U("PropertyA"))->second.datetime_value() == truncated_value);
@@ -4535,7 +4554,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());
@@ -4558,16 +4577,16 @@ SUITE(Table)
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::equal, truncated_value);
             query.set_filter_string(filter_string);
 
-            std::vector<azure::storage::table_entity> results = table.execute_query(query, options, context);
+            std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
-            CHECK_EQUAL(1, results.size());
+            CHECK_EQUAL(1U, results.size());
 
             CHECK(results[0].partition_key().compare(partition_key) == 0);
             CHECK(results[0].row_key().compare(row_key) == 0);
             CHECK(results[0].timestamp().is_initialized());
-            CHECK(results[0].etag().empty());
+            CHECK(!results[0].etag().empty());
 
-            CHECK_EQUAL(1, results[0].properties().size());
+            CHECK_EQUAL(1U, results[0].properties().size());
             CHECK(results[0].properties().find(U("PropertyA")) != results[0].properties().cend());
             CHECK(results[0].properties().find(U("PropertyA"))->second.property_type() == azure::storage::edm_type::datetime);
             CHECK(results[0].properties().find(U("PropertyA"))->second.datetime_value() == truncated_value);
@@ -4575,7 +4594,7 @@ SUITE(Table)
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
             CHECK(context.end_time().is_initialized());
-            CHECK_EQUAL(1, context.request_results().size());
+            CHECK_EQUAL(1U, context.request_results().size());
             CHECK(context.request_results()[0].is_response_available());
             CHECK(context.request_results()[0].start_time().is_initialized());
             CHECK(context.request_results()[0].end_time().is_initialized());

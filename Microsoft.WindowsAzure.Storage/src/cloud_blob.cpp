@@ -465,7 +465,22 @@ namespace azure { namespace storage {
         {
             std::shared_ptr<core::storage_command<void>> command(weak_command);
 
-            protocol::preprocess_response_void(response, result, context);
+            try
+            {
+                protocol::preprocess_response_void(response, result, context);
+            }
+            catch (...)
+            {
+                // In case any error happens, error information contained in response body might
+                // have been written into the destination stream. So need to reset target to make
+                // sure the destination stream doesn't contain unexpected data since a retry might
+                // be needed.
+                download_info->m_reset_target = true;
+                download_info->m_are_properties_populated = false;
+                command->set_location_mode(core::command_location_mode::primary_or_secondary);
+
+                throw;
+            }
 
             if (!download_info->m_are_properties_populated)
             {

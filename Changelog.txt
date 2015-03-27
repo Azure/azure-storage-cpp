@@ -1,6 +1,20 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v0.6:
+- Changed constructors not intended for public use to private for cloud_blob, cloud_block_blob, cloud_page_blob and cloud_append_blob classes
+- Added move constructors and move assignment operators to many classes for Visual Studio 2012 and 2013
+- User headers in operation context overwrite existing header values
+- Changed table_entity::set_timestamp to a private method as timestamp is read-only
+- Removed following functions:
+  - cloud_queue_client::list_queues
+  - cloud_queue_client::list_queues_async
+  - cloud_table_client::list_tables
+  - cloud_table_client::list_tables_async
+  - cloud_table::execute_query
+  - cloud_table::execute_query_async
+- Upgraded Casablanca dependency to 2.4.0
+
 Changes in v0.5:
 - Default REST API version is 2014-02-14
 - Added parameter sequence_number to the following functions:

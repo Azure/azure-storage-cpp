@@ -1,7 +1,7 @@
 nuget {
     nuspec {
         id = wastorage;
-        version: 0.5.0-preview;
+        version: 0.6.0-preview;
         title: Microsoft Azure Storage Client Library for C++;
         authors: {Microsoft Corporation};
         owners: {Microsoft Corporation};
@@ -17,7 +17,7 @@ nuget {
 
     dependencies {
         packages: {
-            cpprestsdk/2.3.0
+            cpprestsdk/2.4.0.1
         };
     }
 

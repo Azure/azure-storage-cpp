@@ -79,12 +79,18 @@ namespace azure { namespace storage { namespace samples {
                 azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, U("MyPartitionKey")), 
                 azure::storage::query_logical_operator::op_and, 
                 azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("MyRowKey5"))));
-            std::vector<azure::storage::table_entity> entities = table.execute_query(query);
-            for (std::vector<azure::storage::table_entity>::const_iterator it = entities.cbegin(); it != entities.cend(); ++it)
+            azure::storage::continuation_token token;
+            do
             {
-                const azure::storage::table_entity::properties_type& properties = it->properties();
-                ucout << U("PK: ") << it->partition_key() << U(", RK: ") << it->row_key() << U(", Prop: ") << utility::uuid_to_string(properties.at(U("GuidProperty")).guid_value()) << std::endl;
-            }
+                azure::storage::table_query_segment segment = table.execute_query_segmented(query, token);
+                for (std::vector<azure::storage::table_entity>::const_iterator it = segment.results().cbegin(); it != segment.results().cend(); ++it)
+                {
+                    const azure::storage::table_entity::properties_type& properties = it->properties();
+                    ucout << U("PK: ") << it->partition_key() << U(", RK: ") << it->row_key() << U(", Prop: ") << utility::uuid_to_string(properties.at(U("GuidProperty")).guid_value()) << std::endl;
+                }
+
+                token = segment.continuation_token();
+            } while (!token.empty());
 
             // Delete the table entity
             azure::storage::table_operation delete_operation = azure::storage::table_operation::delete_entity(retrieve_result.entity());

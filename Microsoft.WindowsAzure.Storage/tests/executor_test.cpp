@@ -80,7 +80,7 @@ SUITE(Core)
             client_request_id = request.headers().find(U("x-ms-client-request-id"))->second;
             test_key = request.headers().find(U("x-ms-test-key"))->second;
         });
-        context.set_response_received([&service_request_id] (web::http::http_request& request, const web::http::http_response& response, azure::storage::operation_context context) mutable
+        context.set_response_received([&service_request_id] (web::http::http_request&, const web::http::http_response& response, azure::storage::operation_context context) mutable
         {
             service_request_id = response.headers().find(U("x-ms-request-id"))->second;
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -92,7 +92,7 @@ SUITE(Core)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         auto end_time = utility::datetime::utc_now();
         
-        CHECK_EQUAL(1, context.request_results().size());
+        CHECK_EQUAL(1U, context.request_results().size());
         auto result = context.request_results().front();
 
         CHECK(result.is_response_available());

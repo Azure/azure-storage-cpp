@@ -28,27 +28,6 @@ namespace azure { namespace storage {
         return modified_options;
     }
 
-    pplx::task<std::vector<cloud_table>> cloud_table_client::list_tables_async(const utility::string_t& prefix, const table_request_options& options, operation_context context) const
-    {
-        std::shared_ptr<std::vector<cloud_table>> results = std::make_shared<std::vector<cloud_table>>();
-        std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
-
-        auto instance = std::make_shared<cloud_table_client>(*this);
-        return pplx::details::do_while([instance, results, prefix, token, options, context] () mutable -> pplx::task<bool>
-        {
-            return instance->list_tables_segmented_async(prefix, -1, *token, options, context).then([results, token] (table_result_segment result_segment) mutable -> bool
-            {
-                std::vector<azure::storage::cloud_table> partial_results = result_segment.results();
-                results->insert(results->end(), partial_results.begin(), partial_results.end());
-                *token = result_segment.continuation_token();
-                return !token->empty();
-            });
-        }).then([results] (bool) -> pplx::task<std::vector<cloud_table>>
-        {
-            return pplx::task_from_result(*results);
-        });
-    }
-
     pplx::task<table_result_segment> cloud_table_client::list_tables_segmented_async(const utility::string_t& prefix, int max_results, const continuation_token& token, const table_request_options& options, operation_context context) const
     {
         table_request_options modified_options = get_modified_options(options);

@@ -212,27 +212,6 @@ namespace azure { namespace storage {
         return core::executor<std::vector<table_result>>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<std::vector<table_entity>> cloud_table::execute_query_async(const table_query& query, const table_request_options& options, operation_context context) const
-    {
-        std::shared_ptr<std::vector<table_entity>> results = std::make_shared<std::vector<table_entity>>();
-        std::shared_ptr<continuation_token> token = std::make_shared<continuation_token>();
-
-        auto instance = std::make_shared<cloud_table>(*this);
-        return pplx::details::do_while([instance, results, query, token, options, context] () mutable -> pplx::task<bool>
-        {
-            return instance->execute_query_segmented_async(query, *token, options, context).then([results, token] (table_query_segment query_segment) mutable -> bool
-            {
-                std::vector<table_entity> partial_results = query_segment.results();
-                results->insert(results->end(), partial_results.begin(), partial_results.end());
-                *token = query_segment.continuation_token();
-                return !token->empty();
-            });
-        }).then([results] (bool) -> pplx::task<std::vector<table_entity>>
-        {
-            return pplx::task_from_result(*results);
-        });
-    }
-
     pplx::task<table_query_segment> cloud_table::execute_query_segmented_async(const table_query& query, const continuation_token& token, const table_request_options& options, operation_context context) const
     {
         table_request_options modified_options = get_modified_options(options);

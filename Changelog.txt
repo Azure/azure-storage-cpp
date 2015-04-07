@@ -2,11 +2,14 @@ Azure Storage Client Library for C++
 History of Changes
 
 Changes in v0.6:
-- Changed constructors not intended for public use to private for cloud_blob, cloud_block_blob, cloud_page_blob and cloud_append_blob classes
+- Fixed the bug that cloud_blob::download_range_to_stream corrupted downloaded data if retry succeeded after a failed request
+- Fixed the bug that cloud_blob::download_range_to_stream might access the target stream after the call completed and led to access violation under a race condition
+- Changed waiting between retries asynchronous on Linux
+- Changed constructors not intended for public use to private for cloud_blob, cloud_block_blob and cloud_page_blob classes
 - Added move constructors and move assignment operators to many classes for Visual Studio 2012 and 2013
-- User headers in operation context overwrite existing header values
 - Changed table_entity::set_timestamp to a private method as timestamp is read-only
-- Removed following functions:
+- User headers in operation context now overwrite existing header values
+- Removed following listing functions as they don't work well under a large scale. Please use segmented listing functions such as cloud_queue_client::list_queues_segmented instead
   - cloud_queue_client::list_queues
   - cloud_queue_client::list_queues_async
   - cloud_table_client::list_tables

@@ -29,14 +29,11 @@ std::vector<azure::storage::table_entity> execute_table_query(
     azure::storage::operation_context context)
 {
     std::vector<azure::storage::table_entity> results;
-
-    azure::storage::continuation_token token;
-    do
+    azure::storage::table_query_iterator end_of_result;
+    for (azure::storage::table_query_iterator iter = table.execute_query(query, options, context); iter != end_of_result; ++iter)
     {
-        azure::storage::table_query_segment result_segment = table.execute_query_segmented(query, token, options, context);
-        results.insert(results.end(), result_segment.results().begin(), result_segment.results().end());
-        token = result_segment.continuation_token();
-    } while (!token.empty());
+        results.push_back(*iter);
+    }
 
     return results;
 }
@@ -3591,7 +3588,7 @@ SUITE(Table)
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
             CHECK(results.size() > 0);
-            CHECK((int)results.size() > take_count);
+            CHECK_EQUAL(take_count, (int)results.size());
 
             for (std::vector<azure::storage::table_entity>::const_iterator entity_iterator = results.cbegin(); entity_iterator != results.cend(); ++entity_iterator)
             {
@@ -3878,7 +3875,7 @@ SUITE(Table)
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
 
             CHECK(results.size() > 0);
-            CHECK((int)results.size() > take_count);
+            CHECK_EQUAL(take_count, (int)results.size());
 
             for (std::vector<azure::storage::table_entity>::const_iterator entity_iterator = results.cbegin(); entity_iterator != results.cend(); ++entity_iterator)
             {

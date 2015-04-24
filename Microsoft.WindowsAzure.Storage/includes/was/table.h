@@ -17,13 +17,13 @@
 
 #pragma once
 
+#include "common.h"
 #include "service_client.h"
 
 namespace azure { namespace storage {
 
     class cloud_table;
     class table_operation;
-    class table_result_segment;
     class table_entity;
 
     namespace protocol
@@ -227,9 +227,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_permissions"/> class.
+        /// Initializes a new instance of the <see cref="table_permissions"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_permissions" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="table_permissions" /> object.</param>
         table_permissions(table_permissions&& other)
         {
             *this = std::move(other);
@@ -238,7 +238,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="table_permissions" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_permissions" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="table_permissions" /> object to use to set properties.</param>
         /// <returns>A <see cref="table_permissions" /> object with properties set.</returns>
         table_permissions& operator=(table_permissions&& other)
         {
@@ -271,9 +271,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_request_options"/> class.
+        /// Initializes a new instance of the <see cref="table_request_options"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_request_options" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="table_request_options" /> object.</param>
         table_request_options(table_request_options&& other)
         {
             *this = std::move(other);
@@ -282,7 +282,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="table_request_options" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_request_options" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="table_request_options" /> object to use to set properties.</param>
         /// <returns>A <see cref="table_request_options" /> object with properties set.</returns>
         table_request_options& operator=(table_request_options&& other)
         {
@@ -438,9 +438,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class.
+        /// Initializes a new instance of the <see cref="entity_property"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="entity_property" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="entity_property" /> object.</param>
         entity_property(entity_property&& other)
         {
             *this = std::move(other);
@@ -449,7 +449,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="entity_property" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="entity_property" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="entity_property" /> object to use to set properties.</param>
         /// <returns>A <see cref="entity_property" /> object with properties set.</returns>
         entity_property& operator=(entity_property&& other)
         {
@@ -761,9 +761,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_entity"/> class.
+        /// Initializes a new instance of the <see cref="table_entity"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_entity" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="table_entity" /> object.</param>
         table_entity(table_entity&& other)
         {
             *this = std::move(other);
@@ -772,7 +772,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="table_entity" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_entity" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="table_entity" /> object to use to set properties.</param>
         /// <returns>A <see cref="table_entity" /> object with properties set.</returns>
         table_entity& operator=(table_entity&& other)
         {
@@ -907,9 +907,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_operation"/> class.
+        /// Initializes a new instance of the <see cref="table_operation"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_operation" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="table_operation" /> object.</param>
         table_operation(table_operation&& other)
         {
             *this = std::move(other);
@@ -918,7 +918,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="table_operation" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_operation" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="table_operation" /> object to use to set properties.</param>
         /// <returns>A <see cref="table_operation" /> object with properties set.</returns>
         table_operation& operator=(table_operation&& other)
         {
@@ -1058,9 +1058,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_batch_operation"/> class.
+        /// Initializes a new instance of the <see cref="table_batch_operation"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_batch_operation" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="table_batch_operation" /> object.</param>
         table_batch_operation(table_batch_operation&& other)
         {
             *this = std::move(other);
@@ -1069,7 +1069,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="table_batch_operation" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_batch_operation" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="table_batch_operation" /> object to use to set properties.</param>
         /// <returns>A <see cref="table_batch_operation" /> object with properties set.</returns>
         table_batch_operation& operator=(table_batch_operation&& other)
         {
@@ -1267,9 +1267,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_query"/> class.
+        /// Initializes a new instance of the <see cref="table_query"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_query" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="table_query" /> object.</param>
         table_query(table_query&& other)
         {
             *this = std::move(other);
@@ -1278,7 +1278,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="table_query" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_query" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="table_query" /> object to use to set properties.</param>
         /// <returns>A <see cref="table_query" /> object with properties set.</returns>
         table_query& operator=(table_query&& other)
         {
@@ -1520,9 +1520,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_result"/> class.
+        /// Initializes a new instance of the <see cref="table_result"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_result" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="table_result" /> object.</param>
         table_result(table_result&& other)
         {
             *this = std::move(other);
@@ -1531,7 +1531,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="table_result" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_result" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="table_result" /> object to use to set properties.</param>
         /// <returns>A <see cref="table_result" /> object with properties set.</returns>
         table_result& operator=(table_result&& other)
         {
@@ -1606,165 +1606,11 @@ namespace azure { namespace storage {
         utility::string_t m_etag;
     };
 
-    /// <summary>
-    /// Represents a segment of <see cref="azure::storage::cloud_table" /> results. May include a continuation token for 
-    /// retrieving the next page of results.
-    /// </summary>
-    class table_result_segment
-    {
-    public:
+    typedef result_segment<cloud_table> table_result_segment;
+    typedef result_iterator<cloud_table> table_result_iterator;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_result_segment"/> class.
-        /// </summary>
-        table_result_segment()
-        {
-        }
-
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
-        // have implicitly-declared move constructor and move assignment operator.
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="table_result_segment"/> class.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_result_segment" /> on which to base the new instance.</param>
-        table_result_segment(table_result_segment&& other)
-        {
-            *this = std::move(other);
-        }
-
-        /// <summary>
-        /// Returns a reference to a <see cref="table_result_segment" /> object.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_result_segment" /> to use to set properties.</param>
-        /// <returns>A <see cref="table_result_segment" /> object with properties set.</returns>
-        table_result_segment& operator=(table_result_segment&& other)
-        {
-            if (this != &other)
-            {
-                m_results = std::move(other.m_results);
-                m_continuation_token = std::move(other.m_continuation_token);
-            }
-            return *this;
-        }
-#endif
-
-        /// <summary>
-        /// Gets an enumerable collection of <see cref="azure::storage::cloud_table" /> results.
-        /// </summary>
-        /// <returns>An enumerable collection of <see cref="azure::storage::cloud_table" /> results.</returns>
-        const std::vector<azure::storage::cloud_table>& results() const
-        {
-            return m_results;
-        }
-
-        /// <summary>
-        /// Gets the continuation token to use to retrieve the next segment of <see cref="azure::storage::cloud_table" /> results. 
-        /// </summary>
-        /// <returns>An object of type <see cref="continuation_token" />.</returns>
-        const azure::storage::continuation_token& continuation_token() const
-        {
-            return m_continuation_token;
-        }
-
-    private:
-
-        void set_results(std::vector<cloud_table> results)
-        {
-            m_results = std::move(results);
-        }
-
-        void set_continuation_token(azure::storage::continuation_token token)
-        {
-            m_continuation_token = std::move(token);
-        }
-
-        std::vector<azure::storage::cloud_table> m_results;
-        azure::storage::continuation_token m_continuation_token;
-
-        friend class cloud_table_client;
-    };
-
-    /// <summary>
-    /// Represents a segment of <see cref="azure::storage::table_entity" /> results. May include a continuation token for 
-    /// retrieving the next page of results.
-    /// </summary>
-    class table_query_segment
-    {
-    public:
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_query_segment"/> class.
-        /// </summary>
-        table_query_segment()
-        {
-        }
-
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
-        // have implicitly-declared move constructor and move assignment operator.
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="table_query_segment"/> class.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_query_segment" /> on which to base the new instance.</param>
-        table_query_segment(table_query_segment&& other)
-        {
-            *this = std::move(other);
-        }
-
-        /// <summary>
-        /// Returns a reference to a <see cref="table_query_segment" /> object.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_query_segment" /> to use to set properties.</param>
-        /// <returns>A <see cref="table_query_segment" /> object with properties set.</returns>
-        table_query_segment& operator=(table_query_segment&& other)
-        {
-            if (this != &other)
-            {
-                m_results = std::move(other.m_results);
-                m_continuation_token = std::move(other.m_continuation_token);
-            }
-            return *this;
-        }
-#endif
-
-        /// <summary>
-        /// Gets an enumerable collection of <see cref="azure::storage::table_entity" /> results.
-        /// </summary>
-        /// <returns>An enumerable collection of <see cref="azure::storage::table_entity" /> results.</returns>
-        const std::vector<azure::storage::table_entity>& results() const
-        {
-            return m_results;
-        }
-
-        /// <summary>
-        /// Gets the continuation token to use to retrieve the next segment of <see cref="azure::storage::table_entity" /> results. 
-        /// </summary>
-        /// <returns>An object of type <see cref="continuation_token" />.</returns>
-        const azure::storage::continuation_token& continuation_token() const
-        {
-            return m_continuation_token;
-        }
-
-    private:
-
-        void set_results(std::vector<table_entity> results)
-        {
-            m_results = std::move(results);
-        }
-
-        void set_continuation_token(azure::storage::continuation_token token)
-        {
-            m_continuation_token = std::move(token);
-        }
-
-        std::vector<azure::storage::table_entity> m_results;
-        azure::storage::continuation_token m_continuation_token;
-
-        friend class cloud_table;
-    };
+    typedef result_segment<table_entity> table_query_segment;
+    typedef result_iterator<table_entity> table_query_iterator;
 
     /// <summary>
     /// Provides a client-side logical representation of the Windows Azure Table service. 
@@ -1826,9 +1672,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_table_client"/> class.
+        /// Initializes a new instance of the <see cref="cloud_table_client"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_table_client" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_table_client" /> object.</param>
         cloud_table_client(cloud_table_client&& other)
         {
             *this = std::move(other);
@@ -1837,7 +1683,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_table_client" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_table_client" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_table_client" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_table_client" /> object with properties set.</returns>
         cloud_table_client& operator=(cloud_table_client&& other)
         {
@@ -1853,8 +1699,37 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the authentication scheme to use to sign HTTP requests.
         /// </summary>
-        /// <param name="value">The authentication scheme.</param>
+        /// <param name="value">An <see cref="azure::storage::authentication_scheme" /> object that specifies the authentication scheme.</param>
         WASTORAGE_API void set_authentication_scheme(azure::storage::authentication_scheme value) override;
+
+        /// <summary>
+        /// Returns a <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.
+        /// </summary>
+        /// <returns>A <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
+        table_result_iterator list_tables() const
+        {
+            return list_tables(utility::string_t(), 0, table_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables that begin with the specified prefix.
+        /// </summary>
+        /// <returns>A <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
+        table_result_iterator list_tables(const utility::string_t& prefix) const
+        {
+            return list_tables(prefix, 0, table_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables that begin with the specified prefix.
+        /// </summary>
+        /// <param name="prefix">The table name prefix.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
+        WASTORAGE_API table_result_iterator list_tables(const utility::string_t& prefix, utility::size64_t max_results, const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Returns a <see cref="table_result_segment" /> containing an enumerable collection of tables.
@@ -1867,7 +1742,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Returns a <see cref="table_result_segment" /> containing an enumerable collection of tables, retrieved lazily, that begin with the specified prefix.
+        /// Returns a <see cref="table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
@@ -1882,7 +1757,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
-        /// per-operation limit of 5000. If this value is zero the maximum possible number of results will be returned, up to 5000.</param>
+        /// per-operation limit of 1000. If this value is zero the maximum possible number of results will be returned, up to 1000.</param>
         /// <param name="token">A <see cref="azure::storage::continuation_token"/> returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
@@ -1903,7 +1778,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation that returns a <see cref="table_result_segment" /> containing an enumerable collection of tables, retrieved lazily, that begin with the specified prefix.
+        /// Intitiates an asynchronous operation that returns a <see cref="table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
@@ -1918,7 +1793,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the
-        /// per-operation limit of 5000. If this value is zero the maximum possible number of results will be returned, up to 5000.</param>
+        /// per-operation limit of 1000. If this value is zero the maximum possible number of results will be returned, up to 1000.</param>
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
@@ -2102,9 +1977,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_table"/> class.
+        /// Initializes a new instance of the <see cref="cloud_table"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_table" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_table" /> object.</param>
         cloud_table(cloud_table&& other)
         {
             *this = std::move(other);
@@ -2113,7 +1988,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_table" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_table" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_table" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_table" /> object with properties set.</returns>
         cloud_table& operator=(cloud_table&& other)
         {
@@ -2210,6 +2085,25 @@ namespace azure { namespace storage {
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="table_result" />, that represents the current operation.</returns>
         WASTORAGE_API pplx::task<std::vector<table_result>> execute_batch_async(const table_batch_operation& operation, const table_request_options& options, operation_context context) const;
+
+        /// <summary>
+        /// Executes a query on a table.
+        /// </summary>
+        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
+        /// <returns>A <see cref="table_query_iterator" /> that can be used to to lazily enumerate a collection of <see cref="azure::storage::table_entity"/> objects.</returns>
+        table_query_iterator execute_query(const table_query& query) const
+        {
+            return execute_query(query, table_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Executes a query on a table.
+        /// </summary>
+        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
+        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
+        /// <returns>A <see cref="table_query_iterator" /> that can be used to to lazily enumerate a collection of <see cref="azure::storage::table_entity"/> objects.</returns>
+        WASTORAGE_API table_query_iterator execute_query(const table_query& query, const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Executes a query with the specified <see cref="azure::storage::continuation_token"/> to retrieve the next page of results.

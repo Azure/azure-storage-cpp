@@ -119,9 +119,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="storage_uri"/> class.
+        /// Initializes a new instance of the <see cref="storage_uri"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="storage_uri" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="storage_uri" /> object.</param>
         storage_uri(storage_uri&& other)
         {
             *this = std::move(other);
@@ -130,7 +130,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="storage_uri" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="storage_uri" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="storage_uri" /> object to use to set properties.</param>
         /// <returns>A <see cref="storage_uri" /> object with properties set.</returns>
         storage_uri& operator=(storage_uri&& other)
         {
@@ -259,9 +259,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="storage_credentials"/> class.
+        /// Initializes a new instance of the <see cref="storage_credentials"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="storage_credentials" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="storage_credentials" /> object.</param>
         storage_credentials(storage_credentials&& other)
         {
             *this = std::move(other);
@@ -270,7 +270,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="storage_credentials" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="storage_credentials" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="storage_credentials" /> object to use to set properties.</param>
         /// <returns>A <see cref="storage_credentials" /> object with properties set.</returns>
         storage_credentials& operator=(storage_credentials&& other)
         {
@@ -393,9 +393,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="option_with_default"/> class.
+        /// Initializes a new instance of the <see cref="option_with_default"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="option_with_default" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="option_with_default" /> object.</param>
         option_with_default(option_with_default&& other)
         {
             *this = std::move(other);
@@ -404,7 +404,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="option_with_default" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="option_with_default" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="option_with_default" /> object to use to set properties.</param>
         /// <returns>A <see cref="option_with_default" /> object with properties set.</returns>
         option_with_default& operator=(option_with_default&& other)
         {
@@ -497,9 +497,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="storage_extended_error"/> class.
+        /// Initializes a new instance of the <see cref="storage_extended_error"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="storage_extended_error" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="storage_extended_error" /> object.</param>
         storage_extended_error(storage_extended_error&& other)
         {
             *this = std::move(other);
@@ -508,7 +508,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="storage_extended_error" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="storage_extended_error" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="storage_extended_error" /> object  to use to set properties.</param>
         /// <returns>A <see cref="storage_extended_error" /> object with properties set.</returns>
         storage_extended_error& operator=(storage_extended_error&& other)
         {
@@ -613,9 +613,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="request_result"/> class.
+        /// Initializes a new instance of the <see cref="request_result"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="request_result" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="request_result" /> object.</param>
         request_result(request_result&& other)
         {
             *this = std::move(other);
@@ -624,7 +624,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="request_result" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="request_result" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="request_result" /> object to use to set properties.</param>
         /// <returns>A <see cref="request_result" /> object with properties set.</returns>
         request_result& operator=(request_result&& other)
         {
@@ -728,9 +728,9 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the content MD5 hash for the request.
+        /// Gets the content-MD5 hash for the request.
         /// </summary>
-        /// <returns>The content MD5 hash for the request.</returns>
+        /// <returns>A string containing the content-MD5 hash for the request.</returns>
         const utility::string_t& content_md5() const
         {
             return m_content_md5;
@@ -801,7 +801,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="storage_exception"/> class.
         /// </summary>
         /// <param name="message">The error message.</param>
-        /// <param name="inner_exception">The inner exception.</param>
+        /// <param name="inner_exception">A <see cref="std::exception_ptr" /> object containing the inner exception.</param>
         /// <param name="retryable">Indicates whether the request is retryable.</param>
         storage_exception(const std::string& message, std::exception_ptr inner_exception, bool retryable = true)
             : std::runtime_error(message), m_retryable(retryable), m_inner_exception(inner_exception)
@@ -824,7 +824,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="message">The error message.</param>
         /// <param name="result">The request result.</param>
-        /// <param name="inner_exception">The inner exception.</param>
+        /// <param name="inner_exception">A <see cref="std::exception_ptr" /> object containing the inner exception.</param>
         /// <param name="retryable">Indicates whether the request is retryable.</param>
         storage_exception(const std::string& message, request_result result, std::exception_ptr inner_exception, bool retryable = true)
             : std::runtime_error(message), m_result(std::move(result)), m_retryable(retryable), m_inner_exception(inner_exception)
@@ -853,7 +853,7 @@ namespace azure { namespace storage {
         /// Gets the inner exception object that is the cause for the current <see cref="storage_exception"/>.
         /// </summary>
         /// <returns>
-        /// An exception_ptr object. It points to the inner exception that is the cause for the current
+        /// A <see cref="std::exception_ptr" /> object that points to the inner exception associated with the current
         /// <see cref="storage_exception"/>. A null exception_ptr is returned if there is no inner exception
         /// object.
         /// </returns>
@@ -893,9 +893,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="retry_context"/> class.
+        /// Initializes a new instance of the <see cref="retry_context"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="retry_context" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="retry_context" /> object.</param>
         retry_context(retry_context&& other)
         {
             *this = std::move(other);
@@ -904,7 +904,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="retry_context" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="retry_context" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="retry_context" /> object to use to set properties.</param>
         /// <returns>A <see cref="retry_context" /> object with properties set.</returns>
         retry_context& operator=(retry_context&& other)
         {
@@ -940,7 +940,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the target location for the next retry.
         /// </summary>
-        /// <returns>The target location for the next retry.</returns>
+        /// <returns>The <see cref="azure::storage::storage_location"/> for the next retry.</returns>
         storage_location next_location() const
         {
             return m_next_location;
@@ -949,7 +949,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the location mode for subsequent retries.
         /// </summary>
-        /// <returns>The location mode for subsequent retries.</returns>
+        /// <returns>The <see cref="azure::storage::location_mode"/> for subsequent retries.</returns>
         location_mode current_location_mode() const
         {
             return m_current_location_mode;
@@ -994,9 +994,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="retry_info"/> class.
+        /// Initializes a new instance of the <see cref="retry_info"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="retry_info" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="retry_info" /> object.</param>
         retry_info(retry_info&& other)
         {
             *this = std::move(other);
@@ -1005,7 +1005,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="retry_info" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="retry_info" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="retry_info" /> object to use to set properties.</param>
         /// <returns>A <see cref="retry_info" /> object with properties set.</returns>
         retry_info& operator=(retry_info&& other)
         {

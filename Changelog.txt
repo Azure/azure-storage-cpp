@@ -1,6 +1,23 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v1.0:
+- Changed return value type of cloud_blob_client::list_blobs_segmented, cloud_blob_container::list_blobs_segmented and cloud_blob_directory::list_blobs_segmented methods from blob_result_segment to list_blob_item_segment
+- Removed type blob_result_segment
+- Redefined following types using result_segment<typename result_type> template:
+  - queue_result_segment
+  - table_result_segment
+  - table_query_segment
+- Added following functions which retrieve results from service lazily:
+  - cloud_blob_client::list_containers
+  - cloud_blob_client::list_blobs
+  - cloud_blob_container::list_blobs
+  - cloud_blob_directory::list_blobs
+  - cloud_queue_client::list_queues
+  - cloud_table_client::list_tables
+  - cloud_table::execute_query
+- Updated unit test project and unit test guidance to refer to UnitTest++ in GitHub.
+
 Changes in v0.6:
 - Fixed the bug that cloud_blob::download_range_to_stream corrupted downloaded data if retry succeeded after a failed request
 - Fixed the bug that cloud_blob::download_range_to_stream might access the target stream after the call completed and led to access violation under a race condition

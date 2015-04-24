@@ -26,15 +26,11 @@ std::vector < azure::storage::cloud_queue> list_all_queues(
     const azure::storage::queue_request_options& options, azure::storage::operation_context context)
 {
     std::vector<azure::storage::cloud_queue> results;
-
-    int max_results_per_segment = 5000;
-    azure::storage::continuation_token token;
-    do
+    azure::storage::queue_result_iterator end_of_result;
+    for (azure::storage::queue_result_iterator iter = queue_client.list_queues(prefix, get_metadata, 0, options, context); iter != end_of_result; ++iter)
     {
-        azure::storage::queue_result_segment result_segment = queue_client.list_queues_segmented(prefix, get_metadata, max_results_per_segment, token, options, context);
-        results.insert(results.end(), result_segment.results().begin(), result_segment.results().end());
-        token = result_segment.continuation_token();
-    } while (!token.empty());
+        results.push_back(*iter);
+    }
 
     return results;
 }
@@ -91,6 +87,22 @@ SUITE(QueueClient)
         client = azure::storage::cloud_queue_client(base_uri, credentials, default_request_options);
 
         CHECK(client.default_request_options().location_mode() == azure::storage::location_mode::secondary_only);
+    }
+
+    TEST_FIXTURE(queue_service_test_base, QueueClient_MoveConstructor)
+    {
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::queue_request_options default_request_options;
+        default_request_options.set_location_mode(azure::storage::location_mode::secondary_only);
+
+        azure::storage::cloud_queue_client client(base_uri, credentials, default_request_options);
+        azure::storage::cloud_queue_client client2 = std::move(client);
+
+        CHECK(client2.base_uri().primary_uri() == base_uri.primary_uri());
+        CHECK(client2.base_uri().secondary_uri() == base_uri.secondary_uri());
+        CHECK(client2.credentials().is_shared_key());
+        CHECK(client2.default_request_options().location_mode() == azure::storage::location_mode::secondary_only);
     }
 
     TEST_FIXTURE(queue_service_test_base, ListQueues_Normal)
@@ -305,6 +317,28 @@ SUITE(QueueClient)
         for (int i = 0; i < QUEUE_COUNT; ++i)
         {
             CHECK(is_found[i]);
+        }
+    }
+
+    TEST_FIXTURE(queue_service_test_base, ListQueues_SharedKeyLite)
+    {
+        const int QUEUE_COUNT = 5;
+        azure::storage::cloud_queue queues[QUEUE_COUNT];
+        for (int i = 0; i < QUEUE_COUNT; ++i)
+        {
+            azure::storage::cloud_queue queue = get_queue();
+            queues[i] = queue;
+        }
+
+        azure::storage::cloud_queue_client client = get_queue_client();
+        client.set_authentication_scheme(azure::storage::authentication_scheme::shared_key_lite);
+
+        {
+            utility::string_t prefix = object_name_prefix;
+            azure::storage::queue_request_options options;
+            azure::storage::operation_context context;
+            std::vector<azure::storage::cloud_queue> results = list_all_queues(client, prefix, false, options, context);
+            CHECK(results.size() >= QUEUE_COUNT);
         }
 
         for (int i = 0; i < QUEUE_COUNT; ++i)

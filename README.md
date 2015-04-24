@@ -2,8 +2,6 @@
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
-Note that the Azure Storage Client Library for C++ library is a CTP (Community Technology Preview) release.
-
 # Features
 
 - Tables
@@ -54,7 +52,7 @@ cd azure-storage-cpp
 
 To install the binaries for the Azure Storage Client Library for C++, type the following into the [NuGet Package Manager console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console):
 
-`Install-Package wastorage -Pre`
+`Install-Package wastorage`
 
 ## Dependencies
 

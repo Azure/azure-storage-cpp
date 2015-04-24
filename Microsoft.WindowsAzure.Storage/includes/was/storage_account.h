@@ -86,9 +86,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_storage_account"/> class.
+        /// Initializes a new instance of the <see cref="cloud_storage_account"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_storage_account" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_storage_account" /> object.</param>
         cloud_storage_account(cloud_storage_account&& other)
         {
             *this = std::move(other);
@@ -97,7 +97,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_storage_account" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_storage_account" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_storage_account" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_storage_account" /> object with properties set.</returns>
         cloud_storage_account& operator=(cloud_storage_account&& other)
         {

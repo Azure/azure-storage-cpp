@@ -64,7 +64,7 @@ namespace azure { namespace storage { namespace protocol {
             builder.append_query(core::make_query_parameter(uri_query_include, component_metadata, /* do_encoding */ false));
         }
 
-        if (max_results >= 0)
+        if (max_results > 0)
         {
             builder.append_query(core::make_query_parameter(uri_query_max_results, max_results, /* do_encoding */ false));
         }

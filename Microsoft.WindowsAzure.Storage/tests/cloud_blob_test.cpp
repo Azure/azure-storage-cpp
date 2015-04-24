@@ -397,7 +397,7 @@ SUITE(Blob)
             policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
             auto sas_token = m_container.get_shared_access_signature(policy);
 
-            auto blob = m_container.get_block_blob_reference(U("blob") + utility::conversions::print_string(i));
+            auto blob = m_container.get_block_blob_reference(U("blob") + utility::conversions::print_string((int)i));
             blob.properties().set_cache_control(U("no-transform"));
             blob.properties().set_content_disposition(U("attachment"));
             blob.properties().set_content_encoding(U("gzip"));
@@ -420,7 +420,7 @@ SUITE(Blob)
             policy.set_start(utility::datetime::utc_now() - utility::datetime::from_minutes(5));
             policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
 
-            auto blob = m_container.get_block_blob_reference(U("blob") + utility::conversions::print_string(i));
+            auto blob = m_container.get_block_blob_reference(U("blob") + utility::conversions::print_string((int)i));
             blob.properties().set_cache_control(U("no-transform"));
             blob.properties().set_content_disposition(U("attachment"));
             blob.properties().set_content_encoding(U("gzip"));
@@ -580,7 +580,10 @@ SUITE(Blob)
         CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
         CHECK_THROW(copy.start_copy_from_blob(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
         CHECK_EQUAL(web::http::status_codes::PreconditionFailed, m_context.request_results().back().http_status_code());
-        copy.start_copy_from_blob(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(copy.properties().etag()), azure::storage::blob_request_options(), m_context);
-        CHECK(wait_for_copy(copy));
+
+        auto copy2 = m_container.get_block_blob_reference(U("copy2"));
+        copy2.start_copy_from_blob(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK(wait_for_copy(copy2));
+        CHECK_THROW(copy2.start_copy_from_blob(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
     }
 }

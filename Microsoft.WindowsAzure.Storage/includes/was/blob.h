@@ -317,9 +317,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="copy_state"/> class.
+        /// Initializes a new instance of the <see cref="copy_state"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="copy_state" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="copy_state" /> object.</param>
         copy_state(copy_state&& other)
         {
             *this = std::move(other);
@@ -328,7 +328,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="copy_state" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="copy_state" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="copy_state" /> object to use to set properties.</param>
         /// <returns>A <see cref="copy_state" /> object with properties set.</returns>
         copy_state& operator=(copy_state&& other)
         {
@@ -470,19 +470,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="access_condition"/> class.
+        /// Initializes a new instance of the <see cref="access_condition"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="access_condition" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="access_condition" /> object.</param>
         access_condition(access_condition&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="access_condition" /> object.
+        /// Returns a reference to an <see cref="access_condition" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="access_condition" /> to use to set properties.</param>
-        /// <returns>A <see cref="access_condition" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="access_condition" /> object to use to set properties.</param>
+        /// <returns>An <see cref="access_condition" /> object with properties set.</returns>
         access_condition& operator=(access_condition&& other)
         {
             if (this != &other)
@@ -879,9 +879,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="lease_break_period"/> class.
+        /// Initializes a new instance of the <see cref="lease_break_period"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="lease_break_period" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="lease_break_period" /> object.</param>
         lease_break_period(lease_break_period&& other)
         {
             *this = std::move(other);
@@ -890,7 +890,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="lease_break_period" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="lease_break_period" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="lease_break_period" /> object to use to set properties.</param>
         /// <returns>A <see cref="lease_break_period" /> object with properties set.</returns>
         lease_break_period& operator=(lease_break_period&& other)
         {
@@ -980,9 +980,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="lease_time"/> class.
+        /// Initializes a new instance of the <see cref="lease_time"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="lease_time" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="lease_time" /> object.</param>
         lease_time(lease_time&& other)
         {
             *this = std::move(other);
@@ -991,7 +991,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="lease_time" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="lease_time" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="lease_time" /> object to use to set properties.</param>
         /// <returns>A <see cref="lease_time" /> object with properties set.</returns>
         lease_time& operator=(lease_time&& other)
         {
@@ -1036,9 +1036,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="blob_container_permissions"/> class.
+        /// Initializes a new instance of the <see cref="blob_container_permissions"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="blob_container_permissions" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="blob_container_permissions" /> object.</param>
         blob_container_permissions(blob_container_permissions&& other)
         {
             *this = std::move(other);
@@ -1047,7 +1047,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="blob_container_permissions" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="blob_container_permissions" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="blob_container_permissions" /> object to use to set properties.</param>
         /// <returns>A <see cref="blob_container_permissions" /> object with properties set.</returns>
         blob_container_permissions& operator=(blob_container_permissions&& other)
         {
@@ -1083,98 +1083,13 @@ namespace azure { namespace storage {
         blob_container_public_access_type m_public_access;
     };
 
-    /// <summary>
-    /// Represents a segment of <see cref="azure::storage::cloud_blob" /> and <see cref="azure::storage::cloud_blob_directory" /> 
-    /// results, and includes continuation information.
-    /// </summary>
-    class blob_result_segment
-    {
-    public:
-        blob_result_segment()
-        {
-        }
+    class list_blob_item;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="blob_result_segment"/> class.
-        /// </summary>
-        /// <param name="blobs">An enumerable collection of blob results.</param>
-        /// <param name="directories">An enumerable collection of blob directories results.</param>
-        /// <param name="token">The continuation token.</param>
-        blob_result_segment(std::vector<cloud_blob> blobs, std::vector<cloud_blob_directory> directories, azure::storage::continuation_token token)
-            : m_blobs(std::move(blobs)), m_directories(std::move(directories)), m_continuation_token(std::move(token))
-        {
-        }
+    typedef result_segment<list_blob_item> list_blob_item_segment;
+    typedef result_iterator<list_blob_item> list_blob_item_iterator;
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
-        // have implicitly-declared move constructor and move assignment operator.
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="blob_result_segment"/> class.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="blob_result_segment" /> on which to base the new instance.</param>
-        blob_result_segment(blob_result_segment&& other)
-        {
-            *this = std::move(other);
-        }
-
-        /// <summary>
-        /// Returns a reference to a <see cref="blob_result_segment" /> object.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="blob_result_segment" /> to use to set properties.</param>
-        /// <returns>A <see cref="blob_result_segment" /> object with properties set.</returns>
-        blob_result_segment& operator=(blob_result_segment&& other)
-        {
-            if (this != &other)
-            {
-                m_blobs = std::move(other.m_blobs);
-                m_directories = std::move(other.m_directories);
-                m_continuation_token = std::move(other.m_continuation_token);
-            }
-            return *this;
-        }
-#endif
-
-        /// <summary>
-        /// Gets an enumerable collection of <see cref="azure::storage::cloud_blob" /> results.
-        /// </summary>
-        /// <returns>A reference to an enumerable collection of <see cref="azure::storage::cloud_blob" /> results.</returns>
-        const std::vector<cloud_blob>& blobs() const
-        {
-            return m_blobs;
-        }
-
-        /// <summary>
-        /// Gets an enumerable collection of <see cref="azure::storage::cloud_blob_directory" /> results.
-        /// </summary>
-        /// <returns>A reference to an enumerable collection of <see cref="azure::storage::cloud_blob_directory" /> results.</returns>
-        const std::vector<cloud_blob_directory>& directories() const
-        {
-            return m_directories;
-        }
-
-        /// <summary>
-        /// Gets the continuation token to use to retrieve the next segment of <see cref="azure::storage::cloud_blob" /> and 
-        /// <see cref="azure::storage::cloud_blob_directory" /> results.
-        /// </summary>
-        /// <returns>A reference to the <see cref="continuation_token" />.</returns>
-        const azure::storage::continuation_token& continuation_token() const
-        {
-            return m_continuation_token;
-        }
-
-    private:
-
-        std::vector<cloud_blob> m_blobs;
-        std::vector<cloud_blob_directory> m_directories;
-        azure::storage::continuation_token m_continuation_token;
-    };
-
-    /// <summary>
-    /// Represents a segment of <see cref="azure::storage::cloud_blob_container" /> results, and 
-    /// includes continuation and pagination information.
-    /// </summary>
     typedef result_segment<cloud_blob_container> container_result_segment;
+    typedef result_iterator<cloud_blob_container> container_result_iterator;
 
     /// <summary>
     /// Represents the system properties for a blob.
@@ -1197,9 +1112,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_blob_properties"/> class.
+        /// Initializes a new instance of the <see cref="cloud_blob_properties"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_properties" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_properties" /> object.</param>
         cloud_blob_properties(cloud_blob_properties&& other)
         {
             *this = std::move(other);
@@ -1208,7 +1123,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob_properties" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_properties" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_properties" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_blob_properties" /> object with properties set.</returns>
         cloud_blob_properties& operator=(cloud_blob_properties&& other)
         {
@@ -1466,9 +1381,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_blob_shared_access_headers"/> class.
+        /// Initializes a new instance of the <see cref="cloud_blob_shared_access_headers"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_shared_access_headers" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_shared_access_headers" /> object.</param>
         cloud_blob_shared_access_headers(cloud_blob_shared_access_headers&& other)
         {
             *this = std::move(other);
@@ -1477,7 +1392,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob_shared_access_headers" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_shared_access_headers" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_shared_access_headers" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_blob_shared_access_headers" /> object with properties set.</returns>
         cloud_blob_shared_access_headers& operator=(cloud_blob_shared_access_headers&& other)
         {
@@ -1618,9 +1533,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="blob_request_options"/> class.
+        /// Initializes a new instance of the <see cref="blob_request_options"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="blob_request_options" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="blob_request_options" /> object.</param>
         blob_request_options(blob_request_options&& other)
         {
             *this = std::move(other);
@@ -1629,7 +1544,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="blob_request_options" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="blob_request_options" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="blob_request_options" /> object to use to set properties.</param>
         /// <returns>A <see cref="blob_request_options" /> object with properties set.</returns>
         blob_request_options& operator=(blob_request_options&& other)
         {
@@ -1875,9 +1790,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="block_list_item"/> class.
+        /// Initializes a new instance of the <see cref="block_list_item"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="block_list_item" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="block_list_item" /> object.</param>
         block_list_item(block_list_item&& other)
         {
             *this = std::move(other);
@@ -1886,7 +1801,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="block_list_item" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="block_list_item" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="block_list_item" /> object to use to set properties.</param>
         /// <returns>A <see cref="block_list_item" /> object with properties set.</returns>
         block_list_item& operator=(block_list_item&& other)
         {
@@ -1969,9 +1884,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="page_range"/> class.
+        /// Initializes a new instance of the <see cref="page_range"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="page_range" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="page_range" /> object.</param>
         page_range(page_range&& other)
         {
             *this = std::move(other);
@@ -1980,7 +1895,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="page_range" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="page_range" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="page_range" /> object to use to set properties.</param>
         /// <returns>A <see cref="page_range" /> object with properties set.</returns>
         page_range& operator=(page_range&& other)
         {
@@ -2133,9 +2048,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_blob_container_properties"/> class.
+        /// Initializes a new instance of the <see cref="cloud_blob_container_properties"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_container_properties" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_container_properties" /> object.</param>
         cloud_blob_container_properties(cloud_blob_container_properties&& other)
         {
             *this = std::move(other);
@@ -2144,7 +2059,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob_container_properties" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_container_properties" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_container_properties" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_blob_container_properties" /> object with properties set.</returns>
         cloud_blob_container_properties& operator=(cloud_blob_container_properties&& other)
         {
@@ -2275,9 +2190,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_blob_client"/> class.
+        /// Initializes a new instance of the <see cref="cloud_blob_client"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_client" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_client" /> object.</param>
         cloud_blob_client(cloud_blob_client&& other)
         {
             *this = std::move(other);
@@ -2286,7 +2201,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob_client" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_client" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_client" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_blob_client" /> object with properties set.</returns>
         cloud_blob_client& operator=(cloud_blob_client&& other)
         {
@@ -2305,6 +2220,37 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="value">The authentication scheme.</param>
         WASTORAGE_API void set_authentication_scheme(azure::storage::authentication_scheme value) override;
+
+        /// <summary>
+        /// Returns a <see cref="container_result_iterator" /> that can be used to to lazily enumerate a collection of containers.
+        /// </summary>
+        /// <returns>A <see cref="container_result_iterator" /> that can be used to to lazily enumerate a collection of containers.</returns>
+        container_result_iterator list_containers() const
+        {
+            return list_containers(utility::string_t(), container_listing_details::none, 0, blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="container_result_iterator" /> that can be used to to lazily enumerate a collection of containers.
+        /// </summary>
+        /// <param name="prefix">The container name prefix.</param>
+        /// <returns>A <see cref="container_result_iterator" /> that can be used to to lazily enumerate a collection of containers.</returns>
+        container_result_iterator list_containers(const utility::string_t& prefix) const
+        {
+            return list_containers(prefix, container_listing_details::none, 0, blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="container_result_iterator" /> that can be used to to lazily enumerate a collection of containers.
+        /// </summary>
+        /// <param name="prefix">The container name prefix.</param>
+        /// <param name="includes">A <see cref="azure::storage::container_listing_details::values"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="container_result_iterator" /> that can be used to to lazily enumerate a collection of containers.</returns>
+        WASTORAGE_API container_result_iterator list_containers(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Returns a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
@@ -2331,7 +2277,7 @@ namespace azure { namespace storage {
         /// Returns a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="prefix">The container name prefix.</param>
-        /// <param name="listing_details">A value that indicates whether to return container metadata with the listing.</param>
+        /// <param name="includes">A <see cref="azure::storage::container_listing_details::values"/> enumeration describing which items to include in the listing.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned 
         /// in the result segment, up to the per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
@@ -2378,21 +2324,41 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
-        /// Returns a result segment containing a collection of blob items
-        /// in the container.
+        /// Returns a <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items.
+        /// </summary>
+        /// <param name="prefix">The blob name prefix.</param>
+        /// <returns>A <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items.</returns>
+        list_blob_item_iterator list_blobs(const utility::string_t& prefix) const
+        {
+            return list_blobs(prefix, false, blob_listing_details::none, 0, blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items.
+        /// </summary>
+        /// <param name="prefix">The blob name prefix.</param>
+        /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items.</returns>
+        WASTORAGE_API list_blob_item_iterator list_blobs(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const;
+
+        /// <summary>
+        /// Returns a <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement 
-        /// <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, const continuation_token& token) const
+        /// <returns>A <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.</returns>
+        list_blob_item_segment list_blobs_segmented(const utility::string_t& prefix, const continuation_token& token) const
         {
             return list_blobs_segmented_async(prefix, token).get();
         }
 
         /// <summary>
-        /// Returns a result segment containing a collection of blob items
-        /// in the container.
+        /// Returns a <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
@@ -2402,25 +2368,25 @@ namespace azure { namespace storage {
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+        /// <returns>A <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.</returns>
+        list_blob_item_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
         {
             return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items in the container.
+        /// Intitiates an asynchronous operation to return a <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="list_blob_item_segment" /> that represents the current operation.</returns>
+        pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
             return list_blobs_segmented_async(prefix, false, blob_listing_details::none, 0, token, blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items in the container.
+        /// Intitiates an asynchronous operation to return a <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
@@ -2430,8 +2396,8 @@ namespace azure { namespace storage {
         /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="list_blob_item_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Gets the service properties for the Blob service client.
@@ -2603,6 +2569,8 @@ namespace azure { namespace storage {
             m_directory_delimiter = protocol::directory_delimiter;
         }
 
+        static void parse_blob_name_prefix(const utility::string_t& prefix, utility::string_t& container_name, utility::string_t& actual_prefix);
+
         blob_request_options m_default_request_options;
         utility::string_t m_directory_delimiter;
     };
@@ -2652,9 +2620,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_blob_container"/> class.
+        /// Initializes a new instance of the <see cref="cloud_blob_container"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_container" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_container" /> object.</param>
         cloud_blob_container(cloud_blob_container&& other)
         {
             *this = std::move(other);
@@ -2663,7 +2631,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob_container" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_container" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_container" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_blob_container" /> object with properties set.</returns>
         cloud_blob_container& operator=(cloud_blob_container&& other)
         {
@@ -3186,11 +3154,33 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<bool> delete_container_if_exists_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
+        /// Returns a <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the container.
+        /// </summary>
+        /// <returns>A <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the container.</returns>
+        list_blob_item_iterator list_blobs() const
+        {
+            return list_blobs(utility::string_t(), false, blob_listing_details::none, 0, blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the the container.
+        /// </summary>
+        /// <param name="prefix">The blob name prefix.</param>
+        /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the the container.</returns>
+        WASTORAGE_API list_blob_item_iterator list_blobs(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const;
+
+        /// <summary>
         /// Returns a result segment containing a collection of blob items in the container.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const continuation_token& token) const
+        /// <returns>A <see cref="list_blob_item_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
+        list_blob_item_segment list_blobs_segmented(const continuation_token& token) const
         {
             return list_blobs_segmented_async(token).get();
         }
@@ -3201,7 +3191,7 @@ namespace azure { namespace storage {
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <returns>A result segment containing objects that implement <see cref="azure::storage::cloud_blob" /> and <see cref="azure::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, const continuation_token& token) const
+        list_blob_item_segment list_blobs_segmented(const utility::string_t& prefix, const continuation_token& token) const
         {
             return list_blobs_segmented_async(prefix, token).get();
         }
@@ -3217,37 +3207,37 @@ namespace azure { namespace storage {
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+        /// <returns>A <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.</returns>
+        list_blob_item_segment list_blobs_segmented(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
         {
             return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a <see cref="list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const continuation_token& token) const
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="list_blob_item_segment" /> that represents the current operation.</returns>
+        pplx::task<list_blob_item_segment> list_blobs_segmented_async(const continuation_token& token) const
         {
             return list_blobs_segmented_async(utility::string_t(), token);
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a <see cref="list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="list_blob_item_segment" /> that represents the current operation.</returns>
+        pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
             return list_blobs_segmented_async(prefix, false, blob_listing_details::none, 0, token, blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a <see cref="list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
@@ -3258,8 +3248,8 @@ namespace azure { namespace storage {
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="list_blob_item_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Sets permissions for the container.
@@ -3470,21 +3460,14 @@ namespace azure { namespace storage {
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_directory" /> class.
-        /// </summary>
-        /// <param name="name">Name of the virtual directory.</param>
-        /// <param name="container">The container.</param>
-        cloud_blob_directory(utility::string_t name, cloud_blob_container container);
-
 #if defined(_MSC_VER) && _MSC_VER < 1900
         // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_blob_directory"/> class.
+        /// Initializes a new instance of the <see cref="cloud_blob_directory"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_directory" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_directory" /> object.</param>
         cloud_blob_directory(cloud_blob_directory&& other)
         {
             *this = std::move(other);
@@ -3493,7 +3476,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob_directory" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob_directory" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_blob_directory" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_blob_directory" /> object with properties set.</returns>
         cloud_blob_directory& operator=(cloud_blob_directory&& other)
         {
@@ -3567,19 +3550,39 @@ namespace azure { namespace storage {
         WASTORAGE_API cloud_blob_directory get_parent_reference() const;
 
         /// <summary>
+        /// Returns a <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the virtual directory.
+        /// </summary>
+        /// <returns>A <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the virtual directory.</returns>
+        list_blob_item_iterator list_blobs() const
+        {
+            return list_blobs(false, blob_listing_details::none, 0, blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the the virtual directory.
+        /// </summary>
+        /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
+        /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options"/> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the the virtual directory.</returns>
+        WASTORAGE_API list_blob_item_iterator list_blobs(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const;
+
+        /// <summary>
         /// Returns a result segment containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(const continuation_token& token) const
+        /// <returns>A <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.</returns>
+        list_blob_item_segment list_blobs_segmented(const continuation_token& token) const
         {
             return list_blobs_segmented_async(token).get();
         }
 
         /// <summary>
-        /// Returns a result segment containing a collection of blob items
-        /// in the container.
+        /// Returns a <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.
         /// </summary>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
         /// <param name="includes">A <see cref="azure::storage::blob_listing_details::values"/> enumeration describing which items to include in the listing.</param>
@@ -3588,25 +3591,25 @@ namespace azure { namespace storage {
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="blob_result_segment" /> containing blob items, which may implement <see cref="azure::storage::cloud_blob" /> or <see cref="azure::storage::cloud_blob_directory" />.</returns>
-        blob_result_segment list_blobs_segmented(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+        /// <returns>A <see cref="list_blob_item_segment" /> containing a collection of blob items in the container.</returns>
+        list_blob_item_segment list_blobs_segmented(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
         {
             return list_blobs_segmented_async(use_flat_blob_listing, includes, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a <see cref="list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that that represents the current operation.</returns>
-        pplx::task<blob_result_segment> list_blobs_segmented_async(const continuation_token& token) const
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="list_blob_item_segment" /> that that represents the current operation.</returns>
+        pplx::task<list_blob_item_segment> list_blobs_segmented_async(const continuation_token& token) const
         {
             return list_blobs_segmented_async(false, blob_listing_details::none, 0, token, blob_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of blob items
+        /// Intitiates an asynchronous operation to return a <see cref="list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
@@ -3616,8 +3619,8 @@ namespace azure { namespace storage {
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="blob_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<blob_result_segment> list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="list_blob_item_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Gets the Blob service client for the virtual directory.
@@ -3666,9 +3669,20 @@ namespace azure { namespace storage {
 
     private:
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_directory" /> class.
+        /// </summary>
+        /// <param name="name">Name of the virtual directory.</param>
+        /// <param name="container">The container.</param>
+        WASTORAGE_API cloud_blob_directory(utility::string_t name, cloud_blob_container container);
+
         utility::string_t m_name;
         cloud_blob_container m_container;
         storage_uri m_uri;
+
+        friend class cloud_blob_container;
+        friend class cloud_blob;
+        friend class list_blob_item;
     };
 
     /// <summary>
@@ -3711,9 +3725,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_blob"/> class.
+        /// Initializes a new instance of the <see cref="cloud_blob"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_blob" /> object.</param>
         cloud_blob(cloud_blob&& other)
         {
             *this = std::move(other);
@@ -3722,7 +3736,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_blob" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_blob" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_blob" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_blob" /> object with properties set.</returns>
         cloud_blob& operator=(cloud_blob&& other)
         {
@@ -4729,7 +4743,7 @@ namespace azure { namespace storage {
         /// <param name="name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
         /// <param name="container">A reference to the parent container.</param>
-        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container);
+        WASTORAGE_API cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
@@ -4740,7 +4754,7 @@ namespace azure { namespace storage {
         /// <param name="properties">A set of properties for the blob.</param>
         /// <param name="metadata">User-defined metadata for the blob.</param>
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
-        cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, azure::storage::copy_state copy_state);
+        WASTORAGE_API cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, azure::storage::copy_state copy_state);
 
         void assert_no_snapshot() const;
 
@@ -4765,6 +4779,7 @@ namespace azure { namespace storage {
 
         friend class cloud_blob_container;
         friend class cloud_blob_directory;
+        friend class list_blob_item;
     };
 
     /// <summary>
@@ -4830,9 +4845,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_block_blob"/> class.
+        /// Initializes a new instance of the <see cref="cloud_block_blob"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_block_blob" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_block_blob" /> object.</param>
         cloud_block_blob(cloud_block_blob&& other)
         {
             *this = std::move(other);
@@ -4841,7 +4856,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_block_blob" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_block_blob" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_block_blob" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_block_blob" /> object with properties set.</returns>
         cloud_block_blob& operator=(cloud_block_blob&& other)
         {
@@ -5248,7 +5263,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
-        /// <param name="container">A reference to the parent container.</param>
+        /// <param name="container">A <see cref="azure::storage::cloud_blob_container" /> object.</param>
         cloud_block_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container)
             : cloud_blob(std::move(name), std::move(snapshot_time), std::move(container))
         {
@@ -5322,9 +5337,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_page_blob"/> class.
+        /// Initializes a new instance of the <see cref="cloud_page_blob"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_page_blob" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_page_blob" /> object.</param>
         cloud_page_blob(cloud_page_blob&& other)
         {
             *this = std::move(other);
@@ -5333,7 +5348,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_page_blob" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_page_blob" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_page_blob" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_page_blob" /> object with properties set.</returns>
         cloud_page_blob& operator=(cloud_page_blob&& other)
         {
@@ -5893,6 +5908,122 @@ namespace azure { namespace storage {
 
         friend class cloud_blob_container;
         friend class cloud_blob_directory;
+    };
+
+    /// <summary>
+    /// Represents an item that may be returned by a blob listing operation.
+    /// </summary>
+    class list_blob_item
+    {
+    public:
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="list_blob_item" /> class that represents a cloud blob.
+        /// </summary>
+        /// <returns>A <see cref="cloud_blob" /> object.</returns>
+        /// <param name="blob_name">The name of the blob.</param>
+        /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
+        /// <param name="container">A reference to the parent container.</param>
+        /// <param name="properties">A set of properties for the blob.</param>
+        /// <param name="metadata">User-defined metadata for the blob.</param>
+        /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
+        explicit list_blob_item(utility::string_t blob_name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state)
+            : m_is_blob(true), m_name(std::move(blob_name)), m_snapshot_time(std::move(snapshot_time)), m_container(std::move(container)),
+            m_properties(std::move(properties)), m_metadata(std::move(metadata)), m_copy_state(std::move(copy_state))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="list_blob_item" /> class that represents a cloud blob directory.
+        /// </summary>
+        /// <param name="directory_name">Name of the virtual directory.</param>
+        /// <param name="container">The container.</param>
+        explicit list_blob_item(utility::string_t directory_name, cloud_blob_container container)
+            : m_is_blob(false), m_name(std::move(directory_name)), m_container(std::move(container))
+        {
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="list_blob_item"/> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="list_blob_item" /> object.</param>
+        list_blob_item(list_blob_item&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="list_blob_item" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="list_blob_item" /> object to use to set properties.</param>
+        /// <returns>A <see cref="list_blob_item" /> object with properties set.</returns>
+        list_blob_item& operator=(list_blob_item&& other)
+        {
+            if (this != &other)
+            {
+                m_is_blob = other.m_is_blob;
+                m_name = std::move(other.m_name);
+                m_container = std::move(other.m_container);
+                m_snapshot_time = std::move(other.m_snapshot_time);
+                m_properties = std::move(other.m_properties);
+                m_metadata = std::move(other.m_metadata);
+                m_copy_state = std::move(other.m_copy_state);
+            }
+
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="list_blob_item" /> represents a cloud blob or a cloud blob directory.
+        /// </summary>
+        /// <returns><c>true</c> if this <see cref="list_blob_item" /> represents a cloud blob; otherwise, <c>false</c>.</returns>
+        bool is_blob() const
+        {
+            return m_is_blob;
+        }
+
+        /// <summary>
+        /// Returns the item as a <see cref="cloud_blob" /> object, if and only if it represents a cloud blob.
+        /// </summary>
+        /// <returns>A <see cref="cloud_blob" /> object.</returns>
+        cloud_blob as_blob() const
+        {
+            if (!is_blob())
+            {
+                throw std::runtime_error("Cannot access a cloud blob directory as cloud blob ");
+            }
+
+            return cloud_blob(m_name, m_snapshot_time, m_container, m_properties, m_metadata, m_copy_state);
+        }
+
+        /// <summary>
+        /// Returns the item as a <see cref="cloud_blob_directory" /> object, if and only if it represents a cloud blob directory.
+        /// </summary>
+        /// <returns>A <see cref="cloud_blob_directory" /> object.</returns>
+        cloud_blob_directory as_directory() const
+        {
+            if (is_blob())
+            {
+                throw std::runtime_error("Cannot access a cloud blob as cloud blob directory");
+            }
+
+            return cloud_blob_directory(m_name, m_container);
+        }
+
+    private:
+
+        bool m_is_blob;
+        utility::string_t m_name;
+        cloud_blob_container m_container;
+        utility::string_t m_snapshot_time;
+        cloud_blob_properties m_properties;
+        cloud_metadata m_metadata;
+        copy_state m_copy_state;
     };
 
 }} // namespace azure::storage

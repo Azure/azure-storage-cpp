@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeClientLibraryDemo2", "NativeClientLibraryDemo2.vcxproj", "{9999D237-9C22-4B26-8EE8-66686B47A707}"
+Project("{A210F7E6-0DE9-4D39-8B86-5F79C1D8CA7C}") = "NativeClientLibraryDemo2", "NativeClientLibraryDemo2.vcxproj", "{9999D237-9C22-4B26-8EE8-66686B47A707}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

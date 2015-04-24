@@ -367,7 +367,18 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<blob_result_segment> cloud_blob_container::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+    list_blob_item_iterator cloud_blob_container::list_blobs(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const
+    {
+        auto instance = std::make_shared<cloud_blob_container>(*this);
+        return list_blob_item_iterator(
+            [instance, prefix, use_flat_blob_listing, includes, options, context](const continuation_token& token, size_t max_results_per_segment)
+        {
+            return instance->list_blobs_segmented(prefix, use_flat_blob_listing, includes, (int)max_results_per_segment, token, options, context);
+        },
+            max_results, 0);
+    }
+
+    pplx::task<list_blob_item_segment> cloud_blob_container::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -385,38 +396,37 @@ namespace azure { namespace storage {
             delimiter = service_client().directory_delimiter();
         }
 
-        auto command = std::make_shared<core::storage_command<blob_result_segment>>(uri());
+        auto command = std::make_shared<core::storage_command<list_blob_item_segment>>(uri());
         command->set_build_request(std::bind(protocol::list_blobs, prefix, delimiter, includes, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response<blob_result_segment>, blob_result_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-        command->set_postprocess_response([container, delimiter] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<blob_result_segment>
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<list_blob_item_segment>, list_blob_item_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_postprocess_response([container, delimiter] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<list_blob_item_segment>
         {
             protocol::list_blobs_reader reader(response.body());
 
             std::vector<protocol::cloud_blob_list_item> blob_items(reader.move_blob_items());
-            std::vector<cloud_blob> blobs;
-            blobs.reserve(blob_items.size());
-
-            for (std::vector<protocol::cloud_blob_list_item>::iterator iter = blob_items.begin(); iter != blob_items.end(); ++iter)
-            {
-                blobs.push_back(cloud_blob(iter->move_name(), iter->move_snapshot_time(), container, iter->move_properties(), iter->move_metadata(), iter->move_copy_state()));
-            }
-
             std::vector<protocol::cloud_blob_prefix_list_item> blob_prefix_items(reader.move_blob_prefix_items());
-            std::vector<cloud_blob_directory> directories;
-            directories.reserve(blob_prefix_items.size());
+
+            std::vector<list_blob_item> list_blob_items;
+            list_blob_items.reserve(blob_items.size() + blob_prefix_items.size());
+
+            for (auto iter = blob_items.begin(); iter != blob_items.end(); ++iter)
+            {
+                list_blob_items.push_back(list_blob_item(iter->move_name(), iter->move_snapshot_time(), container, iter->move_properties(), iter->move_metadata(), iter->move_copy_state()));
+            }
 
             for (auto iter = blob_prefix_items.begin(); iter != blob_prefix_items.end(); ++iter)
             {
-                directories.push_back(cloud_blob_directory(iter->move_name(), container));
+                list_blob_items.push_back(list_blob_item(iter->move_name(), container));
             }
 
             continuation_token next_token(reader.move_next_marker());
             next_token.set_target_location(result.target_location());
-            return pplx::task_from_result(blob_result_segment(std::move(blobs), std::move(directories), next_token));
+
+            return pplx::task_from_result(list_blob_item_segment(std::move(list_blob_items), std::move(next_token)));
         });
-        return core::executor<blob_result_segment>::execute_async(command, modified_options, context);
+        return core::executor<list_blob_item_segment>::execute_async(command, modified_options, context);
     }
 
     pplx::task<void> cloud_blob_container::upload_permissions_async(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context)

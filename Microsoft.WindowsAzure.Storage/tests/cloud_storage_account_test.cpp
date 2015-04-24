@@ -41,7 +41,7 @@ void check_credentials_equal(const azure::storage::storage_credentials& a, const
     CHECK_UTF8_EQUAL(utility::conversions::to_base64(a.account_key()), utility::conversions::to_base64(b.account_key()));
 }
 
-void check_account_equal(azure::storage::cloud_storage_account a, azure::storage::cloud_storage_account b)
+void check_account_equal(azure::storage::cloud_storage_account& a, azure::storage::cloud_storage_account& b)
 {
     CHECK_UTF8_EQUAL(a.blob_endpoint().primary_uri().to_string(), b.blob_endpoint().primary_uri().to_string());
     CHECK_UTF8_EQUAL(a.blob_endpoint().secondary_uri().to_string(), b.blob_endpoint().secondary_uri().to_string());
@@ -58,7 +58,9 @@ void check_string_roundtrip(const utility::string_t& connection_string)
 {
     auto account = azure::storage::cloud_storage_account::parse(connection_string);
     CHECK_UTF8_EQUAL(connection_string, account.to_string(true));
-    check_account_equal(account, azure::storage::cloud_storage_account::parse(account.to_string(true)));
+
+    auto account2 = azure::storage::cloud_storage_account::parse(account.to_string(true));
+    check_account_equal(account, account2);
 }
 
 SUITE(Core)
@@ -145,6 +147,18 @@ SUITE(Core)
         check_credentials_equal(creds, account2.credentials());
     }
 
+    TEST_FIXTURE(test_base, storage_credentials_move_constructor)
+    {
+        azure::storage::storage_credentials creds(test_account_name, test_account_key);
+        azure::storage::storage_credentials creds2 = std::move(creds);
+
+        CHECK(creds2.sas_token().empty());
+        CHECK_UTF8_EQUAL(test_account_name, creds2.account_name());
+        CHECK_EQUAL(false, creds2.is_anonymous());
+        CHECK_EQUAL(false, creds2.is_sas());
+        CHECK_EQUAL(true, creds2.is_shared_key());
+    }
+
     TEST_FIXTURE(test_base, cloud_storage_account_devstore)
     {
         auto account = azure::storage::cloud_storage_account::development_storage_account();
@@ -200,6 +214,15 @@ SUITE(Core)
         CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().secondary_uri().to_string());
         CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account.queue_endpoint().secondary_uri().to_string());
         CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account.table_endpoint().secondary_uri().to_string());
+
+        azure::storage::storage_credentials creds(test_account_name, test_account_key);
+        azure::storage::cloud_storage_account account2(creds, test_endpoint_suffix, false);
+        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().secondary_uri().to_string());
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_endpoint_suffix_https)
@@ -214,6 +237,15 @@ SUITE(Core)
         CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().secondary_uri().to_string());
         CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account.queue_endpoint().secondary_uri().to_string());
         CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account.table_endpoint().secondary_uri().to_string());
+
+        azure::storage::storage_credentials creds(test_account_name, test_account_key);
+        azure::storage::cloud_storage_account account2(creds, test_endpoint_suffix, true);
+        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().secondary_uri().to_string());
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_string_roundtrip)
@@ -250,13 +282,36 @@ SUITE(Core)
         CHECK_UTF8_EQUAL(account.blob_endpoint().primary_uri().to_string(), blob_client.base_uri().primary_uri().to_string());
         CHECK_UTF8_EQUAL(account.blob_endpoint().secondary_uri().to_string(), blob_client.base_uri().secondary_uri().to_string());
 
+        azure::storage::blob_request_options blob_options;
+        blob_options.set_parallelism_factor(10);
+        blob_options.set_single_blob_upload_threshold_in_bytes(4 * 1024 * 1024);
+        auto blob_client2 = account.create_cloud_blob_client(blob_options);
+        CHECK_UTF8_EQUAL(account.blob_endpoint().primary_uri().to_string(), blob_client2.base_uri().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(account.blob_endpoint().secondary_uri().to_string(), blob_client2.base_uri().secondary_uri().to_string());
+        CHECK_EQUAL(10, blob_client2.default_request_options().parallelism_factor());
+        CHECK_EQUAL(4 * 1024 * 1024, blob_client2.default_request_options().single_blob_upload_threshold_in_bytes());
+
         auto queue_client = account.create_cloud_queue_client();
         CHECK_UTF8_EQUAL(account.queue_endpoint().primary_uri().to_string(), queue_client.base_uri().primary_uri().to_string());
         CHECK_UTF8_EQUAL(account.queue_endpoint().secondary_uri().to_string(), queue_client.base_uri().secondary_uri().to_string());
 
+        azure::storage::queue_request_options queue_options;
+        queue_options.set_location_mode(azure::storage::location_mode::secondary_only);
+        auto queue_client2 = account.create_cloud_queue_client(queue_options);
+        CHECK_UTF8_EQUAL(account.queue_endpoint().primary_uri().to_string(), queue_client2.base_uri().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(account.queue_endpoint().secondary_uri().to_string(), queue_client2.base_uri().secondary_uri().to_string());
+        CHECK(azure::storage::location_mode::secondary_only == queue_client2.default_request_options().location_mode());
+
         auto table_client = account.create_cloud_table_client();
         CHECK_UTF8_EQUAL(account.table_endpoint().primary_uri().to_string(), table_client.base_uri().primary_uri().to_string());
         CHECK_UTF8_EQUAL(account.table_endpoint().secondary_uri().to_string(), table_client.base_uri().secondary_uri().to_string());
+
+        azure::storage::table_request_options table_options;
+        table_options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
+        auto table_client2 = account.create_cloud_table_client(table_options);
+        CHECK_UTF8_EQUAL(account.table_endpoint().primary_uri().to_string(), table_client2.base_uri().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(account.table_endpoint().secondary_uri().to_string(), table_client2.base_uri().secondary_uri().to_string());
+        CHECK(azure::storage::table_payload_format::json_full_metadata == table_client2.default_request_options().payload_format());
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_incorrect_devstore)
@@ -266,11 +321,86 @@ SUITE(Core)
         CHECK_THROW(azure::storage::cloud_storage_account::parse(U("UseDevelopmentStorage=true;BlobEndpoint=http://127.0.0.1:1000/devstoreaccount1")), std::invalid_argument);
     }
 
-    TEST_FIXTURE(test_base, cloud_storage_account_blob_endpoint)
+    TEST_FIXTURE(test_base, cloud_storage_account_endpoints_in_connection_string)
     {
-        auto account = azure::storage::cloud_storage_account::parse(U("DefaultEndpointsProtocol=http;BlobEndpoint=http://customdomain.com/;AccountName=asdf;AccountKey=abc="));
-        CHECK_UTF8_EQUAL(U("http://customdomain.com/"), account.blob_endpoint().primary_uri().to_string());
-        CHECK(account.blob_endpoint().secondary_uri().is_empty());
+        const utility::string_t default_endpoint_suffix(U("core.windows.net"));
+        utility::string_t endpoints[] = {
+            U("http://customdomain.com/"),
+            U("http://customdomain2.com/"),
+            U("http://customdomain3.com/") };
+
+        utility::string_t scheme(U("http"));
+        utility::string_t account_name(U("asdf"));
+        utility::string_t account_key(U("abc="));
+
+        for (int i = 1; i < 8; i++) {
+            utility::ostringstream_t str;
+            str << U("DefaultEndpointsProtocol=") << scheme << ";";
+            if (i & 1) str << U("BlobEndpoint=") << endpoints[0] << ";";
+            if (i & 2) str << U("QueueEndpoint=") << endpoints[1] << ";";
+            if (i & 4) str << U("TableEndpoint=") << endpoints[2] << ";";
+            str << U("AccountName=") << account_name << ";";
+            str << U("AccountKey=") << account_key;
+
+            auto account = azure::storage::cloud_storage_account::parse(str.str());
+            if (i & 1) {
+                CHECK_UTF8_EQUAL(endpoints[0], account.blob_endpoint().primary_uri().to_string());
+                CHECK(account.blob_endpoint().secondary_uri().is_empty());
+            }
+            else {
+                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U(".blob.") + default_endpoint_suffix + U("/"), account.blob_endpoint().primary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U("-secondary.blob.") + default_endpoint_suffix + U("/"), account.blob_endpoint().secondary_uri().to_string());
+            }
+
+            if (i & 2) {
+                CHECK_UTF8_EQUAL(endpoints[1], account.queue_endpoint().primary_uri().to_string());
+                CHECK(account.queue_endpoint().secondary_uri().is_empty());
+            }
+            else {
+                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U(".queue.") + default_endpoint_suffix + U("/"), account.queue_endpoint().primary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U("-secondary.queue.") + default_endpoint_suffix + U("/"), account.queue_endpoint().secondary_uri().to_string());
+            }
+
+            if (i & 4) {
+                CHECK_UTF8_EQUAL(endpoints[2], account.table_endpoint().primary_uri().to_string());
+                CHECK(account.table_endpoint().secondary_uri().is_empty());
+            }
+            else {
+                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U(".table.") + default_endpoint_suffix + U("/"), account.table_endpoint().primary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U("-secondary.table.") + default_endpoint_suffix + U("/"), account.table_endpoint().secondary_uri().to_string());
+            }
+        }
+    }
+
+    TEST_FIXTURE(test_base, cloud_storage_account_endpoints_in_ctor)
+    {
+        const int COUNT = 2;
+        azure::storage::storage_credentials creds(test_account_name, test_account_key);
+        azure::storage::storage_uri blob_uris[] = { azure::storage::storage_uri(U("http://customdomain.com/")), azure::storage::storage_uri() };
+        azure::storage::storage_uri queue_uris[] = { azure::storage::storage_uri(U("http://customdomain2.com/")), azure::storage::storage_uri() };
+        azure::storage::storage_uri table_uris[] = { azure::storage::storage_uri(U("http://customdomain3.com/")), azure::storage::storage_uri() };
+
+        for (int i = 0; i < COUNT; ++i) {
+            for (int j = 0; j < COUNT; ++j) {
+                for (int k = 0; k < COUNT; ++k) {
+                    azure::storage::cloud_storage_account account(creds, blob_uris[i], queue_uris[j], table_uris[k]);
+                    CHECK_UTF8_EQUAL(blob_uris[i].primary_uri().to_string(), account.blob_endpoint().primary_uri().to_string());
+                    CHECK_UTF8_EQUAL(queue_uris[j].primary_uri().to_string(), account.queue_endpoint().primary_uri().to_string());
+                    CHECK_UTF8_EQUAL(table_uris[k].primary_uri().to_string(), account.table_endpoint().primary_uri().to_string());
+
+                    if (i == COUNT - 1 && j == COUNT - 1 && k == COUNT - 1)
+                    {
+                        // all endpoints are empty
+                        CHECK_THROW(azure::storage::cloud_storage_account::parse(account.to_string(true)), std::invalid_argument);
+                    }
+                    else
+                    {
+                        azure::storage::cloud_storage_account account2 = azure::storage::cloud_storage_account::parse(account.to_string(true));
+                        check_account_equal(account, account2);
+                    }
+                }
+            }
+        }
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_devstore_proxy)

@@ -196,7 +196,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t error_code_condition_headers_not_supported(U("ConditionHeadersNotSupported"));
 
     /// <summary>
-    /// Multiple condition headers are not supported.
+    /// Multiple conditional headers are not supported.
     /// </summary>
     const utility::string_t error_code_multiple_condition_headers_not_supported(U("MultipleConditionHeadersNotSupported"));
 
@@ -238,17 +238,17 @@ namespace azure { namespace storage { namespace protocol {
     // This section provides error code strings that are specific to the Blob service.
 
     /// <summary>
-    /// Error code that may be returned when the specified block or blob is invalid.
+    /// The specified block or blob is invalid.
     /// </summary>
     const utility::string_t error_code_invalid_blob_or_block(U("InvalidBlobOrBlock"));
 
     /// <summary>
-    /// Error code that may be returned when a block ID is invalid.
+    /// The block ID is invalid.
     /// </summary>
     const utility::string_t error_code_invalid_block_id(U("InvalidBlockId"));
 
     /// <summary>
-    /// Error code that may be returned when a block list is invalid.
+    /// The block list is invalid.
     /// </summary>
     const utility::string_t error_code_invalid_block_list(U("InvalidBlockList"));
 
@@ -258,7 +258,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t error_code_container_not_found(U("ContainerNotFound"));
 
     /// <summary>
-    /// Error code that may be returned when a blob with the specified address cannot be found.
+    /// The blob with the specified address cannot be found.
     /// </summary>
     const utility::string_t error_code_blob_not_found(U("BlobNotFound"));
 
@@ -278,142 +278,142 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t error_code_container_being_deleted(U("ContainerBeingDeleted"));
 
     /// <summary>
-    /// Error code that may be returned when a client attempts to create a blob that already exists.
+    /// The specified blob already exists.
     /// </summary>
     const utility::string_t error_code_blob_already_exists(U("BlobAlreadyExists"));
 
     /// <summary>
-    /// Error code that may be returned when there is currently no lease on the blob.
+    /// There is currently no lease on the blob.
     /// </summary>
     const utility::string_t error_code_lease_not_present_with_blob_operation(U("LeaseNotPresentWithBlobOperation"));
 
     /// <summary>
-    /// Error code that may be returned when there is currently no lease on the container.
+    /// There is currently no lease on the container.
     /// </summary>
     const utility::string_t error_code_lease_not_present_with_container_operation(U("LeaseNotPresentWithContainerOperation"));
 
     /// <summary>
-    /// Error code that may be returned when a lease ID was specified, but the lease has expired.
+    /// The specified lease has expired.
     /// </summary>
     const utility::string_t error_code_lease_lost(U("LeaseLost"));
 
     /// <summary>
-    /// Error code that may be returned when the lease ID specified did not match the lease ID for the blob.
+    /// The specified lease ID does not match the lease ID for the blob.
     /// </summary>
     const utility::string_t error_code_lease_id_mismatch_with_blob_operation(U("LeaseIdMismatchWithBlobOperation"));
 
     /// <summary>
-    /// Error code that may be returned when the lease ID specified did not match the lease ID for the container.
+    /// The specified lease ID does not match the lease ID for the container.
     /// </summary>
     const utility::string_t error_code_lease_id_mismatch_with_container_operation(U("LeaseIdMismatchWithContainerOperation"));
 
     /// <summary>
-    /// Error code that may be returned when there is currently a lease on the resource and no lease ID was specified in the request.
+    /// There is currently a lease on the resource and no lease ID was specified in the request.
     /// </summary>
     const utility::string_t error_code_lease_id_missing(U("LeaseIdMissing"));
 
     /// <summary>
-    /// Error code that may be returned when there is currently no lease on the resource.
+    /// There is currently no lease on the resource.
     /// </summary>
     const utility::string_t error_code_lease_not_present_with_lease_operation(U("LeaseNotPresentWithLeaseOperation"));
 
     /// <summary>
-    /// Error code that may be returned when the lease ID specified did not match the lease ID.
+    /// The specified lease ID specified does not match the lease operation.
     /// </summary>
     const utility::string_t error_code_lease_id_mismatch_with_lease_operation(U("LeaseIdMismatchWithLeaseOperation"));
 
     /// <summary>
-    /// Error code that may be returned when there is already a lease present.
+    /// There is already a lease present.
     /// </summary>
     const utility::string_t error_code_lease_already_present(U("LeaseAlreadyPresent"));
 
     /// <summary>
-    /// Error code that may be returned when the lease has already been broken and cannot be broken again.
+    /// The lease has already been broken and cannot be broken again.
     /// </summary>
     const utility::string_t error_code_lease_already_broken(U("LeaseAlreadyBroken"));
 
     /// <summary>
-    /// Error code that may be returned when the lease ID matched, but the lease has been broken explicitly and cannot be renewed.
+    /// The lease has been broken explicitly and cannot be renewed.
     /// </summary>
     const utility::string_t error_code_lease_is_broken_and_cannot_be_renewed(U("LeaseIsBrokenAndCannotBeRenewed"));
 
     /// <summary>
-    /// Error code that may be returned when the lease ID matched, but the lease is breaking and cannot be acquired.
+    /// The lease is breaking and cannot be acquired.
     /// </summary>
     const utility::string_t error_code_lease_is_breaking_and_cannot_be_acquired(U("LeaseIsBreakingAndCannotBeAcquired"));
 
     /// <summary>
-    /// Error code that may be returned when the lease ID matched, but the lease is breaking and cannot be changed.
+    /// The lease is breaking and cannot be changed.
     /// </summary>
     const utility::string_t error_code_lease_is_breaking_and_cannot_be_changed(U("LeaseIsBreakingAndCannotBeChanged"));
 
     /// <summary>
-    /// Error code that may be returned when the destination of a copy operation has a lease of fixed duration.
+    /// The destination of a copy operation has a lease of fixed duration.
     /// </summary>
     const utility::string_t error_code_infinite_lease_duration_required(U("InfiniteLeaseDurationRequired"));
 
     /// <summary>
-    /// Error code that may be returned when the operation is not permitted because the blob has snapshots.
+    /// The operation is not permitted because the blob has snapshots.
     /// </summary>
     const utility::string_t error_code_snapshots_present(U("SnapshotsPresent"));
 
     /// <summary>
-    /// Error code that may be returned when the blob type is invalid for this operation.
+    /// The blob type is invalid for this operation.
     /// </summary>
     const utility::string_t error_code_invalid_blob_type(U("InvalidBlobType"));
 
     /// <summary>
-    /// Error code that may be returned when the operation on page blobs uses a version prior to 2009-09-19.
+    /// The operation on page blobs uses a version prior to 2009-09-19.
     /// </summary>
     const utility::string_t error_code_invalid_version_for_page_blob_operation(U("InvalidVersionForPageBlobOperation"));
 
     /// <summary>
-    /// Error code that may be returned when the page range specified is invalid.
+    /// The page range specified is invalid.
     /// </summary>
     const utility::string_t error_code_invalid_page_range(U("InvalidPageRange"));
 
     /// <summary>
-    /// Error code that may be returned when the sequence number condition specified was not met.
+    /// The sequence number condition specified was not met.
     /// </summary>
     const utility::string_t error_code_sequence_number_condition_not_met(U("SequenceNumberConditionNotMet"));
 
     /// <summary>
-    /// Error code that may be returned when the sequence number increment cannot be performed because it would result in overflow of the sequence number.
+    /// The sequence number increment cannot be performed because it would result in overflow of the sequence number.
     /// </summary>
     const utility::string_t error_code_sequence_number_increment_too_large(U("SequenceNumberIncrementTooLarge"));
 
     /// <summary>
-    /// Error code that may be returned when the source condition specified using HTTP conditional header(s) is not met.
+    /// The source condition specified using HTTP conditional header(s) is not met.
     /// </summary>
     const utility::string_t error_code_source_condition_not_met(U("SourceConditionNotMet"));
 
     /// <summary>
-    /// Error code that may be returned when the target condition specified using HTTP conditional header(s) is not met.
+    /// The target condition specified using HTTP conditional header(s) is not met.
     /// </summary>
     const utility::string_t error_code_target_condition_not_met(U("TargetConditionNotMet"));
 
     /// <summary>
-    /// Error code that may be returned when the copy source account and destination account are not the same.
+    ///  The source and destination accounts for the copy operation are not the same.
     /// </summary>
     const utility::string_t error_code_copy_across_accounts_not_supported(U("CopyAcrossAccountsNotSupported"));
 
     /// <summary>
-    /// Error code that may be returned when the source of a copy cannot be accessed.
+    /// The source for the copy operation cannot be accessed.
     /// </summary>
     const utility::string_t error_code_cannot_verify_copy_source(U("CannotVerifyCopySource"));
 
     /// <summary>
-    /// Error code that may be returned when an attempt to modify the destination of a pending copy is made.
+    /// An attempt to modify the destination of a pending copy operation is made.
     /// </summary>
     const utility::string_t error_code_pending_copy_operation(U("PendingCopyOperation"));
 
     /// <summary>
-    /// Error code that may be returned when an Abort Copy operation is called when there is no pending copy.
+    /// An Abort Copy operation is called when there is no pending copy operation.
     /// </summary>
     const utility::string_t error_code_no_pending_copy_operation(U("NoPendingCopyOperation"));
 
     /// <summary>
-    /// Error code that may be returned when the copy ID specified in an Abort Copy operation does not match the current pending copy ID.
+    /// The copy ID specified in an Abort Copy operation does not match the current pending copy operation ID.
     /// </summary>
     const utility::string_t error_code_copy_id_mismatch(U("CopyIdMismatch"));
 
@@ -580,52 +580,52 @@ namespace azure { namespace storage { namespace protocol {
     // This section provides error code strings that are specific to the Queue service.
 
     /// <summary>
-    /// Error code that may be returned when the specified queue was not found.
+    /// The specified queue was not found.
     /// </summary>
     const utility::string_t error_code_queue_not_found(U("QueueNotFound"));
 
     /// <summary>
-    /// Error code that may be returned when the specified queue is disabled.
+    /// The specified queue is disabled.
     /// </summary>
     const utility::string_t error_code_queue_disabled(U("QueueDisabled"));
 
     /// <summary>
-    /// Error code that may be returned when the specified queue already exists.
+    /// The specified queue already exists.
     /// </summary>
     const utility::string_t error_code_queue_already_exists(U("QueueAlreadyExists"));
 
     /// <summary>
-    /// Error code that may be returned when the specified queue is not empty.
+    /// The specified queue is not empty.
     /// </summary>
     const utility::string_t error_code_queue_not_empty(U("QueueNotEmpty"));
 
     /// <summary>
-    /// Error code that may be returned when the specified queue is being deleted.
+    /// The specified queue is being deleted.
     /// </summary>
     const utility::string_t error_code_queue_being_deleted(U("QueueBeingDeleted"));
 
     /// <summary>
-    /// Error code that may be returned when the specified pop receipt does not match.
+    /// The specified pop receipt does not match.
     /// </summary>
     const utility::string_t error_code_pop_receipt_mismatch(U("PopReceiptMismatch"));
 
     /// <summary>
-    /// Error code that may be returned when one or more request parameters are invalid.
+    /// One or more request parameters are invalid.
     /// </summary>
     const utility::string_t error_code_invalid_parameter(U("InvalidParameter"));
 
     /// <summary>
-    /// Error code that may be returned when the specified message was not found.
+    /// The specified message was not found.
     /// </summary>
     const utility::string_t error_code_message_not_found(U("MessageNotFound"));
 
     /// <summary>
-    /// Error code that may be returned when the specified message is too large.
+    /// The specified message is too large.
     /// </summary>
     const utility::string_t error_code_message_too_large(U("MessageTooLarge"));
 
     /// <summary>
-    /// Error code that may be returned when the specified marker is invalid.
+    /// The specified marker is invalid.
     /// </summary>
     const utility::string_t error_code_invalid_marker(U("InvalidMarker"));
 

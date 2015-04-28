@@ -56,20 +56,15 @@ void container_test_base::check_public_access(azure::storage::blob_container_pub
 std::vector<azure::storage::cloud_blob> container_test_base::list_all_blobs(const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options)
 {
     std::vector<azure::storage::cloud_blob> blobs;
-    azure::storage::continuation_token token;
-    
-    do
+    azure::storage::list_blob_item_iterator end_of_result;
+    auto iter = m_container.list_blobs(prefix, true, includes, max_results, options, m_context);
+    for (; iter != end_of_result; ++iter)
     {
-        auto results = m_container.list_blobs_segmented(prefix, true, includes, max_results, token, options, m_context);
-        
-        if (max_results > 0)
+        if (iter->is_blob())
         {
-            CHECK(results.blobs().size() <= static_cast<size_t>(max_results));
+            blobs.push_back(iter->as_blob());
         }
-
-        std::copy(results.blobs().begin(), results.blobs().end(), std::back_inserter(blobs));
-        token = results.continuation_token();
-    } while (!token.empty());
+    }
 
     return blobs;
 }
@@ -207,7 +202,7 @@ SUITE(Blob)
             blobs[blob.name()] = blob;
         }
 
-        auto listing1 = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 2, azure::storage::blob_request_options());
+        auto listing1 = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, azure::storage::blob_request_options());
         for (auto iter = listing1.begin(); iter != listing1.end(); ++iter)
         {
             auto blob = blobs.find(iter->name());

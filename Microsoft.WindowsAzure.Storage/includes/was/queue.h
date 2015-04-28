@@ -113,9 +113,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="queue_permissions"/> class.
+        /// Initializes a new instance of the <see cref="queue_permissions"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="queue_permissions" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="queue_permissions" /> object.</param>
         queue_permissions(queue_permissions&& other)
         {
             *this = std::move(other);
@@ -124,7 +124,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="queue_permissions" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="queue_permissions" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="queue_permissions" /> object to use to set properties.</param>
         /// <returns>A <see cref="queue_permissions" /> object with properties set.</returns>
         queue_permissions& operator=(queue_permissions&& other)
         {
@@ -185,9 +185,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_message"/> class.
+        /// Initializes a new instance of the <see cref="cloud_queue_message"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_queue_message" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_queue_message" /> object.</param>
         cloud_queue_message(cloud_queue_message&& other)
         {
             *this = std::move(other);
@@ -196,7 +196,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_queue_message" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_queue_message" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_queue_message" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_queue_message" /> object with properties set.</returns>
         cloud_queue_message& operator=(cloud_queue_message&& other)
         {
@@ -367,9 +367,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="queue_request_options"/> class.
+        /// Initializes a new instance of the <see cref="queue_request_options"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="queue_request_options" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="queue_request_options" /> object.</param>
         queue_request_options(queue_request_options&& other)
         {
             *this = std::move(other);
@@ -378,7 +378,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="queue_request_options" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="queue_request_options" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="queue_request_options" /> object to use to set properties.</param>
         /// <returns>A <see cref="queue_request_options" /> object with properties set.</returns>
         queue_request_options& operator=(queue_request_options&& other)
         {
@@ -400,85 +400,8 @@ namespace azure { namespace storage {
         }
     };
 
-    /// <summary>
-    /// Represents a segment of <see cref="azure::storage::cloud_queue" /> results 
-    /// and provides a continuation token for retrieving additional results.
-    /// </summary>
-    class queue_result_segment
-    {
-    public:
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::queue_result_segment"/> class.
-        /// </summary>
-        queue_result_segment()
-        {
-        }
-
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
-        // have implicitly-declared move constructor and move assignment operator.
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="queue_result_segment"/> class.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="queue_result_segment" /> on which to base the new instance.</param>
-        queue_result_segment(queue_result_segment&& other)
-        {
-            *this = std::move(other);
-        }
-
-        /// <summary>
-        /// Returns a reference to a <see cref="queue_result_segment" /> object.
-        /// </summary>
-        /// <param name="other">A reference to a set of <see cref="queue_result_segment" /> to use to set properties.</param>
-        /// <returns>A <see cref="queue_result_segment" /> object with properties set.</returns>
-        queue_result_segment& operator=(queue_result_segment&& other)
-        {
-            if (this != &other)
-            {
-                m_results = std::move(other.m_results);
-                m_continuation_token = std::move(other.m_continuation_token);
-            }
-            return *this;
-        }
-#endif
-
-        /// <summary>
-        /// Gets an enumerable collection of <see cref="azure::storage::cloud_queue" /> results.
-        /// </summary>
-        /// <returns>An enumerable collection of results.</returns>
-        const std::vector<azure::storage::cloud_queue>& results() const
-        {
-            return m_results;
-        }
-
-        /// <summary>
-        /// Gets the continuation token used to retrieve the next segment of <see cref="azure::storage::cloud_queue" /> results.
-        /// </summary>
-        /// <returns>The continuation token.</returns>
-        const azure::storage::continuation_token& continuation_token() const
-        {
-            return m_continuation_token;
-        }
-
-    private:
-
-        void set_results(std::vector<cloud_queue> results)
-        {
-            m_results = std::move(results);
-        }
-
-        void set_continuation_token(azure::storage::continuation_token token)
-        {
-            m_continuation_token = std::move(token);
-        }
-
-        std::vector<azure::storage::cloud_queue> m_results;
-        azure::storage::continuation_token m_continuation_token;
-
-        friend class cloud_queue_client;
-    };
+    typedef result_segment<cloud_queue> queue_result_segment;
+    typedef result_iterator<cloud_queue> queue_result_iterator;
 
     /// <summary>
     /// Provides a client-side logical representation of the Windows Azure Queue service. This client is used to configure and execute requests against the Queue service.
@@ -536,9 +459,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_client"/> class.
+        /// Initializes a new instance of the <see cref="cloud_queue_client"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_queue_client" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_queue_client" /> object.</param>
         cloud_queue_client(cloud_queue_client&& other)
         {
             *this = std::move(other);
@@ -547,7 +470,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_queue_client" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_queue_client" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_queue_client" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_queue_client" /> object with properties set.</returns>
         cloud_queue_client& operator=(cloud_queue_client&& other)
         {
@@ -561,13 +484,44 @@ namespace azure { namespace storage {
 #endif
 
         /// <summary>
+        /// Returns a <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.
+        /// </summary>
+        /// <returns>A <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
+        queue_result_iterator list_queues() const
+        {
+            return list_queues(utility::string_t(), false, 0, queue_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues that begin with the specified prefix.
+        /// </summary>
+        /// <param name="prefix">The queue name prefix.</param>
+        /// <returns>A <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
+        queue_result_iterator list_queues(const utility::string_t& prefix) const
+        {
+            return list_queues(prefix, false, 0, queue_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Returns a <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues that begin with the specified prefix.
+        /// </summary>
+        /// <param name="prefix">The queue name prefix.</param>
+        /// <param name="get_metadata">A flag that specifies whether to retrieve queue metadata.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
+        WASTORAGE_API queue_result_iterator list_queues(const utility::string_t& prefix, bool get_metadata, utility::size64_t max_results, const queue_request_options& options, operation_context context) const;
+
+        /// <summary>
         /// Returns a result segment containing a collection of queues in the storage account.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <returns>A result segment containing a collection of queues.</returns>
         queue_result_segment list_queues_segmented(const continuation_token& token) const
         {
-            return list_queues_segmented_async(utility::string_t(), false, -1, token, queue_request_options(), operation_context()).get();
+            return list_queues_segmented_async(utility::string_t(), false, 0, token, queue_request_options(), operation_context()).get();
         }
 
         /// <summary>
@@ -578,7 +532,7 @@ namespace azure { namespace storage {
         /// <returns>A result segment containing a collection of queues.</returns>
         queue_result_segment list_queues_segmented(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_queues_segmented_async(prefix, false, -1, token, queue_request_options(), operation_context()).get();
+            return list_queues_segmented_async(prefix, false, 0, token, queue_request_options(), operation_context()).get();
         }
 
         /// <summary>
@@ -586,7 +540,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <param name="prefix">The queue name prefix.</param>
-        /// <param name="get_metadata">A enumeration describing which items to include in the listing.</param>
+        /// <param name="get_metadata">A flag that specifies whether to retrieve queue metadata.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>         
         /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
@@ -604,7 +558,7 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="queue_result_segment" /> that represents the current operation.</returns>
         pplx::task<queue_result_segment> list_queues_segmented_async(const continuation_token& token) const
         {
-            return list_queues_segmented_async(utility::string_t(), false, -1, token, queue_request_options(), operation_context());
+            return list_queues_segmented_async(utility::string_t(), false, 0, token, queue_request_options(), operation_context());
         }
 
         /// <summary>
@@ -615,7 +569,7 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="queue_result_segment" /> that represents the current operation.</returns>
         pplx::task<queue_result_segment> list_queues_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
-            return list_queues_segmented_async(prefix, false, -1, token, queue_request_options(), operation_context());
+            return list_queues_segmented_async(prefix, false, 0, token, queue_request_options(), operation_context());
         }
 
         /// <summary>
@@ -760,8 +714,6 @@ namespace azure { namespace storage {
             return m_default_request_options;
         }
 
-    protected:
-
         /// <summary>
         /// Sets the authentication scheme to use to sign HTTP requests.
         /// </summary>
@@ -813,9 +765,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue"/> class.
+        /// Initializes a new instance of the <see cref="cloud_queue"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_queue" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_queue" /> object.</param>
         cloud_queue(cloud_queue&& other)
         {
             *this = std::move(other);
@@ -824,7 +776,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_queue" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_queue" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_queue" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_queue" /> object with properties set.</returns>
         cloud_queue& operator=(cloud_queue&& other)
         {
@@ -1592,7 +1544,7 @@ namespace azure { namespace storage {
         cloud_queue_client m_client;
         utility::string_t m_name;
         storage_uri m_uri;
-        std::shared_ptr<int> m_approximate_message_count;        
+        std::shared_ptr<int> m_approximate_message_count;
         std::shared_ptr<cloud_metadata> m_metadata;
 
         friend class cloud_queue_client;

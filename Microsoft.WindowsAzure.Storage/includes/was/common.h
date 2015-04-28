@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <iterator>
 #include <unordered_map>
 
 #include "core.h"
@@ -71,9 +72,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="continuation_token"/> class.
+        /// Initializes a new instance of the <see cref="continuation_token"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="continuation_token" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="continuation_token" /> object.</param>
         continuation_token(continuation_token&& other)
         {
             *this = std::move(other);
@@ -82,7 +83,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="continuation_token" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="continuation_token" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="continuation_token" /> object to use to set properties.</param>
         /// <returns>A <see cref="continuation_token" /> object with properties set.</returns>
         continuation_token& operator=(continuation_token&& other)
         {
@@ -177,9 +178,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="result_segment"/> class.
+        /// Initializes a new instance of the <see cref="result_segment"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="result_segment" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="result_segment" /> object.</param>
         result_segment(result_segment&& other)
         {
             *this = std::move(other);
@@ -188,7 +189,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="result_segment" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="result_segment" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="result_segment" /> object to use to set properties.</param>
         /// <returns>A <see cref="result_segment" /> object with properties set.</returns>
         result_segment& operator=(result_segment&& other)
         {
@@ -226,6 +227,196 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
+    /// Represents a result iterator that could be used to enumerate results in the result set in a lazy way.
+    /// </summary>
+    /// <typeparam name="result_type">The type of the result.</typeparam>
+    template<typename result_type>
+    class result_iterator : public std::iterator<std::input_iterator_tag, result_type>
+    {
+    public:
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="result_iterator{result_type}"/> class.
+        /// </summary>
+        result_iterator() :
+            m_result_generator(nullptr),
+            m_segment_index(0),
+            m_returned_results(0),
+            m_max_results(0),
+            m_max_results_per_segment(0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="result_iterator{result_type}"/> class.
+        /// </summary>
+        /// <param name="result_generator">The result segment generator.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned 
+        /// by the result iterator. If this value is 0, the maximum possible number of results will be returned.</param>
+        /// <param name="max_results_per_segment">A non-negative integer value that indicates the maximum number of results to 
+        /// be returned in one segment. If this value is 0, the maximum possible number of results returned in a segment will be
+        //  determined by individual service.</param>
+        result_iterator(std::function<result_segment<result_type>(const continuation_token &, size_t)> result_generator, utility::size64_t max_results, size_t max_results_per_segment) :
+            m_result_generator(std::move(result_generator)),
+            m_segment_index(0),
+            m_returned_results(0),
+            m_max_results(max_results),
+            m_max_results_per_segment(max_results_per_segment)
+        {
+            fetch_first_segment();
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="result_iterator"/> class.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="result_iterator" /> on which to base the new instance.</param>
+        result_iterator(result_iterator&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to a <see cref="result_iterator" /> object.
+        /// </summary>
+        /// <param name="other">A reference to a set of <see cref="result_iterator" /> to use to set properties.</param>
+        /// <returns>A <see cref="result_iterator" /> object with properties set.</returns>
+        result_iterator& operator=(result_iterator&& other)
+        {
+            if (this != &other)
+            {
+                m_result_generator = std::move(other.m_result_generator);
+                m_result_segment = std::move(other.m_result_segment);
+                m_segment_index = other.m_segment_index;
+                m_returned_results = other.m_returned_results;
+                m_max_results = other.m_max_results;
+                m_max_results_per_segment = other.m_max_results_per_segment;
+            }
+
+            return *this;
+        }
+#endif
+
+        const result_type& operator*() const
+        {
+            if (passed_the_end())
+            {
+                throw std::runtime_error("cannot dereference past-the-end iterator");
+            }
+
+            return m_result_segment.results()[m_segment_index];
+        }
+
+        const result_type* operator->() const
+        {
+            return (std::pointer_traits<const result_type*>::pointer_to(**this));
+        }
+
+        result_iterator& operator++()
+        {
+            // preincrement
+            // - if the iterator has passed the end, do nothing
+            // - if any exception is thrown within the method, do nothing
+            if (!passed_the_end())
+            {
+                if (m_segment_index + 1 == m_result_segment.results().size() && !m_result_segment.continuation_token().empty())
+                {
+                    fetch_next_segment();
+                }
+                else
+                {
+                    m_segment_index++;
+                }
+
+                m_returned_results++;
+            }
+
+            return (*this);
+        }
+
+        result_iterator operator++(int)
+        {
+            // postincrement
+            result_iterator tmp = *this;
+            ++*this;
+            return (tmp);
+        }
+
+        bool operator==(const result_iterator& rhs) const
+        {
+            // test for iterator equality
+            // - comparison of two past-the-end iterators returns true
+            // - comparison of a non-end iterator and a past-the-end iterators returns false
+            // - comparison of two non-end iterators returns false
+            return passed_the_end() && rhs.passed_the_end();
+        }
+
+        bool operator!=(const result_iterator& rhs) const
+        {
+            return (!(*this == rhs));
+        }
+
+    private:
+
+        void fetch_first_segment()
+        {
+            if (nullptr != m_result_generator)
+            {
+                m_result_segment = m_result_generator(continuation_token(), get_remaining_results_num());
+                m_segment_index = 0;
+
+                if (m_result_segment.results().empty())
+                {
+                    // continue if returned result segment is empty
+                    fetch_next_segment();
+                }
+            }
+        }
+
+        void fetch_next_segment()
+        {
+            if (nullptr != m_result_generator && !m_result_segment.continuation_token().empty())
+            {
+                auto tmp_segment = m_result_generator(m_result_segment.continuation_token(), get_remaining_results_num());
+                while (tmp_segment.results().empty() && !tmp_segment.continuation_token().empty())
+                {
+                    tmp_segment = m_result_generator(tmp_segment.continuation_token(), get_remaining_results_num());
+                }
+
+                m_result_segment = std::move(tmp_segment);
+                m_segment_index = 0;
+            }
+        }
+
+        size_t get_remaining_results_num() const
+        {
+            if (m_max_results == 0)
+            {
+                // 0 indicates to return maximum possible number of results
+                return m_max_results_per_segment;
+            }
+
+            return (size_t)std::min(m_max_results - m_returned_results, (utility::size64_t)m_max_results_per_segment);
+        }
+
+        bool passed_the_end() const
+        {
+            return (m_segment_index == m_result_segment.results().size() && m_result_segment.continuation_token().empty()) ||
+                   (m_max_results > 0 && m_returned_results >= m_max_results);
+        }
+
+        std::function<result_segment<result_type>(const continuation_token &, size_t)> m_result_generator;
+        result_segment<result_type> m_result_segment;
+        size_t m_segment_index;
+        utility::size64_t m_returned_results;
+        utility::size64_t m_max_results;
+        size_t m_max_results_per_segment;
+    };
+
+    /// <summary>
     /// Specifies which items to include when setting service properties.
     /// </summary>
     class service_properties_includes
@@ -244,9 +435,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_properties_includes"/> class.
+        /// Initializes a new instance of the <see cref="service_properties_includes"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="service_properties_includes" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="service_properties_includes" /> object.</param>
         service_properties_includes(service_properties_includes&& other)
         {
             *this = std::move(other);
@@ -255,7 +446,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="service_properties_includes" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="service_properties_includes" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="service_properties_includes" /> object to use to set properties.</param>
         /// <returns>A <see cref="service_properties_includes" /> object with properties set.</returns>
         service_properties_includes& operator=(service_properties_includes&& other)
         {
@@ -391,9 +582,9 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="logging_properties"/> class.
+            /// Initializes a new instance of the <see cref="logging_properties"/> class based on an existing instance.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="logging_properties" /> on which to base the new instance.</param>
+            /// <param name="other">An existing <see cref="logging_properties" /> object.</param>
             logging_properties(logging_properties&& other)
             {
                 *this = std::move(other);
@@ -402,7 +593,7 @@ namespace azure { namespace storage {
             /// <summary>
             /// Returns a reference to a <see cref="logging_properties" /> object.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="logging_properties" /> to use to set properties.</param>
+            /// <param name="other">An existing <see cref="logging_properties" /> object to use to set properties.</param>
             /// <returns>A <see cref="logging_properties" /> object with properties set.</returns>
             logging_properties& operator=(logging_properties&& other)
             {
@@ -557,9 +748,9 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="metrics_properties"/> class.
+            /// Initializes a new instance of the <see cref="metrics_properties"/> class based on an existing instance.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="metrics_properties" /> on which to base the new instance.</param>
+            /// <param name="other">An existing <see cref="metrics_properties" /> object.</param>
             metrics_properties(metrics_properties&& other)
             {
                 *this = std::move(other);
@@ -568,7 +759,7 @@ namespace azure { namespace storage {
             /// <summary>
             /// Returns a reference to a <see cref="metrics_properties" /> object.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="metrics_properties" /> to use to set properties.</param>
+            /// <param name="other">An existing <see cref="metrics_properties" /> object to use to set properties.</param>
             /// <returns>A <see cref="metrics_properties" /> object with properties set.</returns>
             metrics_properties& operator=(metrics_properties&& other)
             {
@@ -702,9 +893,9 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="cors_rule"/> class.
+            /// Initializes a new instance of the <see cref="cors_rule"/> class based on an existing instance.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="cors_rule" /> on which to base the new instance.</param>
+            /// <param name="other">An existing <see cref="cors_rule" /> object.</param>
             cors_rule(cors_rule&& other)
             {
                 *this = std::move(other);
@@ -713,7 +904,7 @@ namespace azure { namespace storage {
             /// <summary>
             /// Returns a reference to a <see cref="cors_rule" /> object.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="cors_rule" /> to use to set properties.</param>
+            /// <param name="other">An existing <see cref="cors_rule" /> object to use to set properties.</param>
             /// <returns>A <see cref="cors_rule" /> object with properties set.</returns>
             cors_rule& operator=(cors_rule&& other)
             {
@@ -876,9 +1067,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_properties"/> class.
+        /// Initializes a new instance of the <see cref="service_properties"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="service_properties" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="service_properties" /> object.</param>
         service_properties(service_properties&& other)
         {
             *this = std::move(other);
@@ -887,7 +1078,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="service_properties" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="service_properties" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="service_properties" /> object to use to set properties.</param>
         /// <returns>A <see cref="service_properties" /> object with properties set.</returns>
         service_properties& operator=(service_properties&& other)
         {
@@ -1086,9 +1277,9 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="geo_replication_stats"/> class.
+            /// Initializes a new instance of the <see cref="geo_replication_stats"/> class based on an existing instance.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="geo_replication_stats" /> on which to base the new instance.</param>
+            /// <param name="other">An existing <see cref="geo_replication_stats" /> object.</param>
             geo_replication_stats(geo_replication_stats&& other)
             {
                 *this = std::move(other);
@@ -1097,7 +1288,7 @@ namespace azure { namespace storage {
             /// <summary>
             /// Returns a reference to a <see cref="geo_replication_stats" /> object.
             /// </summary>
-            /// <param name="other">A reference to a set of <see cref="geo_replication_stats" /> to use to set properties.</param>
+            /// <param name="other">An existing <see cref="geo_replication_stats" /> object to use to set properties.</param>
             /// <returns>A <see cref="geo_replication_stats" /> object with properties set.</returns>
             geo_replication_stats& operator=(geo_replication_stats&& other)
             {
@@ -1167,9 +1358,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_stats"/> class.
+        /// Initializes a new instance of the <see cref="service_stats"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="service_stats" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="service_stats" /> object.</param>
         service_stats(service_stats&& other)
         {
             *this = std::move(other);
@@ -1178,7 +1369,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="service_stats" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="service_stats" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="service_stats" /> object to use to set properties.</param>
         /// <returns>A <see cref="service_stats" /> object with properties set.</returns>
         service_stats& operator=(service_stats&& other)
         {
@@ -1403,27 +1594,27 @@ namespace azure { namespace storage {
 
 #ifndef WIN32
         /// <summary>
-        /// Gets the logger object on this op_context.
+        /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The logger object used by this op_context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
         boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger()
         {
             return m_logger;
         }
 
         /// <summary>
-        /// Gets the logger object on this op_context.
+        /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The logger object used by this op_context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
         const boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger() const
         {
             return m_logger;
         }
 
         /// <summary>
-        /// Sets the logger object on this op_context.
+        /// Sets the logger object on this operation context.
         /// </summary>
-        /// <param name="logger">The logger object to use for requests made by this op_context.</param>
+        /// <param name="logger">The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object to use for requests made by this operation context.</param>
         void set_logger(boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger)
         {
             m_logger = std::move(logger);
@@ -1611,27 +1802,27 @@ namespace azure { namespace storage {
 
 #ifndef WIN32
         /// <summary>
-        /// Gets the logger object on this op_context.
+        /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The logger object used by this op_context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
         boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger()
         {
             return m_impl->logger();
         }
 
         /// <summary>
-        /// Gets the logger object on this op_context.
+        /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The logger object used by this op_context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
         const boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger() const
         {
             return m_impl->logger();
         }
 
         /// <summary>
-        /// Sets the logger object on this op_context.
+        /// Sets the logger object on this operation context.
         /// </summary>
-        /// <param name="logger">The logger object to use for requests made by this op_context.</param>
+        /// <param name="logger">The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object to use for requests made by this operation context.</param>
         void set_logger(boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger)
         {
             m_impl->set_logger(std::move(logger));
@@ -1883,9 +2074,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_permissions"/> class.
+        /// Initializes a new instance of the <see cref="cloud_permissions"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_permissions" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="cloud_permissions" /> object.</param>
         cloud_permissions(cloud_permissions&& other)
         {
             *this = std::move(other);
@@ -1894,7 +2085,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="cloud_permissions" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="cloud_permissions" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="cloud_permissions" /> object to use to set properties.</param>
         /// <returns>A <see cref="cloud_permissions" /> object with properties set.</returns>
         cloud_permissions& operator=(cloud_permissions&& other)
         {
@@ -1953,9 +2144,9 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="request_options"/> class.
+        /// Initializes a new instance of the <see cref="request_options"/> class based on an existing instance.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="request_options" /> on which to base the new instance.</param>
+        /// <param name="other">An existing <see cref="request_options" /> object.</param>
         request_options(request_options&& other)
         {
             *this = std::move(other);
@@ -1964,7 +2155,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a reference to a <see cref="request_options" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="request_options" /> to use to set properties.</param>
+        /// <param name="other">An existing <see cref="request_options" /> object to use to set properties.</param>
         /// <returns>A <see cref="request_options" /> object with properties set.</returns>
         request_options& operator=(request_options&& other)
         {

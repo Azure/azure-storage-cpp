@@ -28,6 +28,17 @@ namespace azure { namespace storage {
         return modified_options;
     }
 
+    table_result_iterator cloud_table_client::list_tables(const utility::string_t& prefix, utility::size64_t max_results, const table_request_options& options, operation_context context) const
+    {
+        auto instance = std::make_shared<cloud_table_client>(*this);
+        return table_result_iterator(
+            [instance, prefix, options, context](const continuation_token& token, size_t max_results_per_segment)
+        {
+            return instance->list_tables_segmented(prefix, (int)max_results_per_segment, token, options, context);
+        },
+            max_results, 0);
+    }
+
     pplx::task<table_result_segment> cloud_table_client::list_tables_segmented_async(const utility::string_t& prefix, int max_results, const continuation_token& token, const table_request_options& options, operation_context context) const
     {
         table_request_options modified_options = get_modified_options(options);
@@ -70,10 +81,7 @@ namespace azure { namespace storage {
                 table_results.push_back(std::move(current_table));
             }
 
-            table_result_segment result_segment;
-            result_segment.set_results(table_results);
-            result_segment.set_continuation_token(query_segment.continuation_token());
-
+            table_result_segment result_segment(std::move(table_results), query_segment.continuation_token());
             return result_segment;
         });
     }

@@ -110,6 +110,22 @@ static azure::storage::retry_info create_fake_retry_info(azure::storage::storage
 
 SUITE(Core)
 {
+    TEST_FIXTURE(test_base, retry_policy_default_constructor)
+    {
+        azure::storage::retry_policy null_policy;
+        CHECK(!null_policy.is_valid());
+
+        azure::storage::retry_context dummy_context(0, azure::storage::request_result(), azure::storage::storage_location::primary, azure::storage::location_mode::primary_only);
+        azure::storage::retry_info info = null_policy.evaluate(dummy_context, azure::storage::operation_context());
+        CHECK(!info.should_retry());
+        CHECK(info.target_location() == azure::storage::storage_location::unspecified);
+        CHECK(info.updated_location_mode() == azure::storage::location_mode::unspecified);
+        CHECK(info.retry_interval() == std::chrono::milliseconds());
+
+        azure::storage::retry_policy null_policy2 = null_policy.clone();
+        CHECK(!null_policy2.is_valid());
+    }
+
     TEST_FIXTURE(test_base, retry_info)
     {
         {

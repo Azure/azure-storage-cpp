@@ -22,6 +22,17 @@
 
 namespace azure { namespace storage {
 
+    container_result_iterator cloud_blob_client::list_containers(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const
+    {
+        auto instance = std::make_shared<cloud_blob_client>(*this);
+        return container_result_iterator(
+            [instance, prefix, includes, options, context](const continuation_token& token, size_t max_results_per_segment)
+        {
+            return instance->list_containers_segmented(prefix, includes, (int)max_results_per_segment, token, options, context);
+        },
+            max_results, 0);
+    }
+
     pplx::task<container_result_segment> cloud_blob_client::list_containers_segmented_async(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
         blob_request_options modified_options(options);
@@ -54,24 +65,24 @@ namespace azure { namespace storage {
         return core::executor<container_result_segment>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<blob_result_segment> cloud_blob_client::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+    list_blob_item_iterator cloud_blob_client::list_blobs(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const
+    {
+        utility::string_t container_name;
+        utility::string_t actual_prefix;
+        parse_blob_name_prefix(prefix, container_name, actual_prefix);
+
+        auto container = container_name.empty() ? get_root_container_reference() : get_container_reference(container_name);
+        return container.list_blobs(actual_prefix, use_flat_blob_listing, includes, max_results, options, context);
+    }
+
+    pplx::task<list_blob_item_segment> cloud_blob_client::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
 
         utility::string_t container_name;
         utility::string_t actual_prefix;
-
-        auto first_slash = prefix.find(U('/'));
-        if (first_slash == prefix.npos)
-        {
-            actual_prefix = prefix;
-        }
-        else
-        {
-            container_name = prefix.substr(0, first_slash);
-            actual_prefix = prefix.substr(first_slash + 1);
-        }
+        parse_blob_name_prefix(prefix, container_name, actual_prefix);
 
         auto container = container_name.empty() ? get_root_container_reference() : get_container_reference(container_name);
         return container.list_blobs_segmented_async(actual_prefix, use_flat_blob_listing, includes, max_results, token, modified_options, context);
@@ -140,6 +151,21 @@ namespace azure { namespace storage {
         else
         {
             set_authentication_handler(std::make_shared<protocol::authentication_handler>());
+        }
+    }
+
+    void cloud_blob_client::parse_blob_name_prefix(const utility::string_t& prefix, utility::string_t& container_name, utility::string_t& actual_prefix)
+    {
+        auto first_slash = prefix.find(U('/'));
+        if (first_slash == prefix.npos)
+        {
+            container_name = utility::string_t();
+            actual_prefix = prefix;
+        }
+        else
+        {
+            container_name = prefix.substr(0, first_slash);
+            actual_prefix = prefix.substr(first_slash + 1);
         }
     }
 

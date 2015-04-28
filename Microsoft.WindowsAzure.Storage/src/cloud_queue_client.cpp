@@ -30,6 +30,17 @@ namespace azure { namespace storage {
         return modified_options;
     }
 
+    queue_result_iterator cloud_queue_client::list_queues(const utility::string_t& prefix, bool get_metadata, utility::size64_t max_results, const queue_request_options& options, operation_context context) const
+    {
+        auto instance = std::make_shared<cloud_queue_client>(*this);
+        return queue_result_iterator(
+            [instance, prefix, get_metadata, options, context](const continuation_token& token, size_t max_results_per_segment)
+        {
+            return instance->list_queues_segmented(prefix, get_metadata, (int)max_results_per_segment, token, options, context);
+        },
+            max_results, 0);
+    }
+
     pplx::task<queue_result_segment> cloud_queue_client::list_queues_segmented_async(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token, const queue_request_options& options, operation_context context) const
     {
         queue_request_options modified_options = get_modified_options(options);
@@ -70,10 +81,7 @@ namespace azure { namespace storage {
             azure::storage::continuation_token next_token(std::move(next_marker));
             next_token.set_target_location(result.target_location());
 
-            queue_result_segment result_segment;
-            result_segment.set_results(std::move(results));
-            result_segment.set_continuation_token(std::move(next_token));
-
+            queue_result_segment result_segment(std::move(results), std::move(next_token));
             return pplx::task_from_result(result_segment);
         });
         return core::executor<queue_result_segment>::execute_async(command, modified_options, context);

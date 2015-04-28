@@ -82,7 +82,12 @@ namespace azure { namespace storage {
         }
     }
 
-    pplx::task<blob_result_segment> cloud_blob_directory::list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+    list_blob_item_iterator cloud_blob_directory::list_blobs(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const blob_request_options& options, operation_context context) const
+    {
+        return m_container.list_blobs(m_name, use_flat_blob_listing, includes, max_results, options, context);
+    }
+
+    pplx::task<list_blob_item_segment> cloud_blob_directory::list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
     {
         return m_container.list_blobs_segmented_async(m_name, use_flat_blob_listing, includes, max_results, token, options, context);
     }

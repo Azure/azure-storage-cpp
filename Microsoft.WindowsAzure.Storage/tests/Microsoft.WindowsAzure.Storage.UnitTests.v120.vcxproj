@@ -42,7 +42,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
-    <NuGetPackageImportStamp>228ce23b</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>192ed824</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -91,9 +91,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="blob_test_base.h" />
     <ClInclude Include="check_macros.h" />
     <ClInclude Include="queue_test_base.h" />
@@ -114,6 +111,7 @@
     <ClCompile Include="cloud_block_blob_test.cpp" />
     <ClCompile Include="executor_test.cpp" />
     <ClCompile Include="queue_test_base.cpp" />
+    <ClCompile Include="result_iterator_test.cpp" />
     <ClCompile Include="service_properties_test.cpp" />
     <ClCompile Include="cloud_page_blob_test.cpp" />
     <ClCompile Include="cloud_queue_client_test.cpp" />
@@ -131,6 +129,7 @@
     <ClCompile Include="storage_exception_test.cpp" />
     <ClCompile Include="table_test_base.cpp" />
     <ClCompile Include="test_base.cpp" />
+    <ClCompile Include="unicode_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.WindowsAzure.Storage.v120.vcxproj">
@@ -141,7 +140,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="UnitTest++\UnitTest++.vsnet2005.v120.vcxproj">
+    <ProjectReference Include="UnitTest++\UnitTest++.vsnet2005.vcxproj">
       <Project>{64a4fefe-0461-4e95-8cc1-91ef5f57dbc6}</Project>
     </ProjectReference>
   </ItemGroup>

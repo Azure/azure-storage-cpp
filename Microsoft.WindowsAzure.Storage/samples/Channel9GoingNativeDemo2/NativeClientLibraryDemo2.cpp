@@ -39,8 +39,9 @@ int _tmain(int argc, _TCHAR* argv[])
                     azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, end_row_key))
                     );
 
-                std::vector<azure::storage::table_entity> entities = table.execute_query(query);
-                for (auto it = entities.cbegin(); it != entities.cend(); ++it)
+                azure::storage::table_query_iterator it = table.execute_query(query);
+                azure::storage::table_query_iterator end_of_results;
+                for (; it != end_of_results; ++it)
                 {
                     ucout << U("Entity: ") << it->row_key() << U(" ");
                     ucout << it->properties().at(U("PostId")).int32_value() << U(" ");

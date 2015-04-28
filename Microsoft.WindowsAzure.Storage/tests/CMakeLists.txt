@@ -21,12 +21,14 @@ if(UNIX)
      main.cpp
      queue_test_base.cpp
      read_from_secondary_test.cpp
+     result_iterator_test.cpp
      retry_policy_test.cpp
      service_properties_test.cpp
      stdafx.cpp
      storage_exception_test.cpp
      table_test_base.cpp
      test_base.cpp
+     unicode_test.cpp
     )
 endif()
 

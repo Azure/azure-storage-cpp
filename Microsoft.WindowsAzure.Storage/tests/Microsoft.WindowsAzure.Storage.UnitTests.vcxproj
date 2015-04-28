@@ -91,9 +91,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="blob_test_base.h" />
     <ClInclude Include="check_macros.h" />
     <ClInclude Include="queue_test_base.h" />
@@ -114,6 +111,7 @@
     <ClCompile Include="cloud_block_blob_test.cpp" />
     <ClCompile Include="executor_test.cpp" />
     <ClCompile Include="queue_test_base.cpp" />
+    <ClCompile Include="result_iterator_test.cpp" />
     <ClCompile Include="service_properties_test.cpp" />
     <ClCompile Include="cloud_page_blob_test.cpp" />
     <ClCompile Include="cloud_queue_client_test.cpp" />
@@ -131,6 +129,7 @@
     <ClCompile Include="storage_exception_test.cpp" />
     <ClCompile Include="table_test_base.cpp" />
     <ClCompile Include="test_base.cpp" />
+    <ClCompile Include="unicode_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.WindowsAzure.Storage.vcxproj">
@@ -158,7 +157,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-	<Import Project="..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets" Condition="Exists('..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" />
+    <Import Project="..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets" Condition="Exists('..\..\packages\cpprestsdk.2.4.0.1\build\native\cpprestsdk.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -65,16 +65,17 @@ namespace azure { namespace storage { namespace samples {
             azure::storage::continuation_token token;
             do
             {
-                azure::storage::blob_result_segment result = container.list_blobs_segmented(token);
-                std::vector<azure::storage::cloud_blob> blobs = result.blobs();
-                for (std::vector<azure::storage::cloud_blob>::const_iterator it = blobs.cbegin(); it != blobs.cend(); ++it)
+                azure::storage::list_blob_item_segment result = container.list_blobs_segmented(token);
+                for (auto& item : result.results())
                 {
-                    ucout << U("Blob: ") << it->uri().primary_uri().to_string() << std::endl;
-                }
-                std::vector<azure::storage::cloud_blob_directory> directories = result.directories();
-                for (std::vector<azure::storage::cloud_blob_directory>::const_iterator it = directories.cbegin(); it != directories.cend(); ++it)
-                {
-                    ucout << U("Directory: ") << it->uri().primary_uri().to_string() << std::endl;
+                    if (item.is_blob())
+                    {
+                        ucout << U("Blob: ") << item.as_blob().uri().primary_uri().to_string() << std::endl;
+                    }
+                    else
+                    {
+                        ucout << U("Directory: ") << item.as_directory().uri().primary_uri().to_string() << std::endl;
+                    }
                 }
                 token = result.continuation_token();
             }

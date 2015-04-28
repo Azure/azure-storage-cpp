@@ -26,15 +26,11 @@ std::vector<azure::storage::cloud_table> list_all_tables(
     azure::storage::operation_context context)
 {
     std::vector<azure::storage::cloud_table> results;
-
-    int max_results_per_segment = 1000;
-    azure::storage::continuation_token token;
-    do
+    azure::storage::table_result_iterator end_of_result;
+    for (azure::storage::table_result_iterator iter = table_client.list_tables(prefix, 0, options, context); iter != end_of_result; ++iter)
     {
-        azure::storage::table_result_segment result_segment = table_client.list_tables_segmented(prefix, max_results_per_segment, token, options, context);
-        results.insert(results.end(), result_segment.results().begin(), result_segment.results().end());
-        token = result_segment.continuation_token();
-    } while (!token.empty());
+        results.push_back(*iter);
+    }
 
     return results;
 }
@@ -95,6 +91,22 @@ SUITE(TableClient)
         client = azure::storage::cloud_table_client(base_uri, credentials, default_request_options);
 
         CHECK(client.default_request_options().payload_format() == azure::storage::table_payload_format::json_no_metadata);
+    }
+
+    TEST_FIXTURE(table_service_test_base, TableClient_MoveConstructor)
+    {
+        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::table_request_options default_request_options;
+        default_request_options.set_payload_format(azure::storage::table_payload_format::json_no_metadata);
+
+        azure::storage::cloud_table_client client(base_uri, credentials, default_request_options);
+        azure::storage::cloud_table_client client2 = std::move(client);
+
+        CHECK(client2.base_uri().primary_uri() == base_uri.primary_uri());
+        CHECK(client2.base_uri().secondary_uri() == base_uri.secondary_uri());
+        CHECK(client2.credentials().is_shared_key());
+        CHECK(client2.default_request_options().payload_format() == azure::storage::table_payload_format::json_no_metadata);
     }
 
     TEST_FIXTURE(table_service_test_base, ListTables_Normal)
@@ -243,6 +255,30 @@ SUITE(TableClient)
         {
             CHECK(is_found[i]);
         }
+
+        for (int i = 0; i < TABLE_COUNT; ++i)
+        {
+            tables[i].delete_table();
+        }
+    }
+
+    TEST_FIXTURE(table_service_test_base, ListTabled_SharedKeyLite)
+    {
+        const int TABLE_COUNT = 5;
+        azure::storage::cloud_table tables[TABLE_COUNT];
+        for (int i = 0; i < TABLE_COUNT; ++i)
+        {
+            tables[i] = get_table();
+        }
+
+        azure::storage::cloud_table_client client = get_table_client();
+        client.set_authentication_scheme(azure::storage::authentication_scheme::shared_key_lite);
+
+        utility::string_t prefix = object_name_prefix;
+        azure::storage::table_request_options options;
+        azure::storage::operation_context context;
+        std::vector<azure::storage::cloud_table> results = list_all_tables(client, prefix, options, context);
+        CHECK(results.size() >= TABLE_COUNT);
 
         for (int i = 0; i < TABLE_COUNT; ++i)
         {

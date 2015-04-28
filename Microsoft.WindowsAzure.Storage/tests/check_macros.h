@@ -18,3 +18,27 @@
 #pragma once
 
 #define CHECK_UTF8_EQUAL(expected, actual) CHECK_EQUAL(utility::conversions::to_utf8string(expected), utility::conversions::to_utf8string(actual))
+
+#define CHECK_STORAGE_EXCEPTION(expression, expected_message) \
+    do \
+        { \
+        bool caught_ = false; \
+        std::string returned_message; \
+        try { expression; } \
+        catch (const azure::storage::storage_exception& ex) { \
+            returned_message = ex.what(); \
+            caught_ = true; \
+        } \
+        catch (...) {} \
+        if (!caught_) \
+            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), "storage_exception not thrown"); \
+        else { \
+            try { \
+                UnitTest::CheckEqual(*UnitTest::CurrentTest::Results(), expected_message, returned_message, UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__)); \
+            } \
+            catch (...) { \
+                UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), \
+                    "Unhandled exception in CHECK_STORAGE_EXCEPTION"); \
+            } \
+        } \
+   } while(0)

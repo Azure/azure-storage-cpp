@@ -79,17 +79,22 @@ int list_entire_blob_tree_helper(std::vector<azure::storage::cloud_blob>& blobs,
 
         if (max_results > 0)
         {
-            CHECK((results.blobs().size() + results.directories().size()) <= static_cast<size_t>(max_results));
+            CHECK(results.results().size() <= static_cast<size_t>(max_results));
         }
 
-        std::copy(results.blobs().begin(), results.blobs().end(), std::back_inserter(blobs));
-
-        for (auto iter = results.directories().begin(); iter != results.directories().end(); ++iter)
+        for (auto& item : results.results())
         {
-            int depth = list_entire_blob_tree_helper(blobs, *iter, includes, max_results, options, context);
-            if (depth > max_depth)
+            if (item.is_blob())
             {
-                max_depth = depth;
+                blobs.push_back(std::move(item.as_blob()));
+            }
+            else
+            {
+                int depth = list_entire_blob_tree_helper(blobs, item.as_directory(), includes, max_results, options, context);
+                if (depth > max_depth)
+                {
+                    max_depth = depth;
+                }
             }
         }
 
@@ -111,17 +116,22 @@ std::vector<azure::storage::cloud_blob> list_entire_blob_tree(const azure::stora
 
         if (max_results > 0)
         {
-            CHECK((results.blobs().size() + results.directories().size()) <= static_cast<size_t>(max_results));
+            CHECK(results.results().size() <= static_cast<size_t>(max_results));
         }
 
-        std::copy(results.blobs().begin(), results.blobs().end(), std::back_inserter(blobs));
-
-        for (auto iter = results.directories().begin(); iter != results.directories().end(); ++iter)
+        for (auto& item : results.results())
         {
-            int depth = list_entire_blob_tree_helper(blobs, *iter, includes, max_results, options, context);
-            if (depth > max_depth)
+            if (item.is_blob())
             {
-                max_depth = depth;
+                blobs.push_back(std::move(item.as_blob()));
+            }
+            else
+            {
+                int depth = list_entire_blob_tree_helper(blobs, item.as_directory(), includes, max_results, options, context);
+                if (depth > max_depth)
+                {
+                    max_depth = depth;
+                }
             }
         }
 

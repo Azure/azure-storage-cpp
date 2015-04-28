@@ -212,6 +212,17 @@ namespace azure { namespace storage {
         return core::executor<std::vector<table_result>>::execute_async(command, modified_options, context);
     }
 
+    table_query_iterator cloud_table::execute_query(const table_query& query, const table_request_options& options, operation_context context) const
+    {
+        auto instance = std::make_shared<cloud_table>(*this);
+        return table_query_iterator(
+            [instance, &query, options, context](const continuation_token& token, size_t)
+        {
+            return instance->execute_query_segmented(query, token, options, context);
+        },
+            query.take_count() <= 0 ? 0 : query.take_count(), 0);
+    }
+
     pplx::task<table_query_segment> cloud_table::execute_query_segmented_async(const table_query& query, const continuation_token& token, const table_request_options& options, operation_context context) const
     {
         table_request_options modified_options = get_modified_options(options);
@@ -229,10 +240,7 @@ namespace azure { namespace storage {
 
             return response.extract_json().then([next_token] (const web::json::value& obj) -> table_query_segment
             {
-                table_query_segment query_segment;
-                query_segment.set_results(protocol::table_response_parsers::parse_query_results(obj));
-                query_segment.set_continuation_token(next_token);
-
+                table_query_segment query_segment(protocol::table_response_parsers::parse_query_results(obj), std::move(next_token));
                 return query_segment;
             });
         });

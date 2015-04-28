@@ -1,6 +1,10 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
 
+Breaking Changes in v1.0:
+- Changed return value type of cloud_blob_client::list_blobs_segmented, cloud_blob_container::list_blobs_segmented and cloud_blob_directory::list_blobs_segmented methods from blob_result_segment to list_blob_item_segment
+- Removed type blob_result_segment
+
 Breaking Changes in v0.6:
 - Removed following functions:
   - cloud_queue_client::list_queues

@@ -14,6 +14,8 @@ The Azure Storage Client Library for C++ allows you to build applications agains
     - Insert/Peek Queue Messages
     - Advanced Queue Operations
 
+Please check details on [API reference documents](http://azure.github.io/azure-storage-cpp).
+
 # Getting started
 
 For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes. 

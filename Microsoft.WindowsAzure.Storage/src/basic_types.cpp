@@ -54,7 +54,7 @@ namespace utility {
 
         std::wstring result(reinterpret_cast<wchar_t*>(rpc_string));
 
-        status = RpcStringFree(&rpc_string);
+        status = RpcStringFreeW(&rpc_string);
         if (status != RPC_S_OK)
         {
             throw std::runtime_error(azure::storage::protocol::error_free_uuid);

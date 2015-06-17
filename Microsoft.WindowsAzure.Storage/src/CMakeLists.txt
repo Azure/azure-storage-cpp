@@ -54,7 +54,7 @@ add_library(${AZURESTORAGE_LIBRARY} ${SOURCES})
 
 if(WIN32)
   if (NOT BUILD_SHARED_LIBS)
-    add_definitions(-D_NO_WASTORAGE_API)
+    add_definitions(-D_NO_WASTORAGE_API -D_NO_ASYNCRTIMP)
   endif()
 endif()
 

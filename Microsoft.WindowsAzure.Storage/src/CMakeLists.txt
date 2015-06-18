@@ -56,6 +56,8 @@ if(WIN32)
   if (NOT BUILD_SHARED_LIBS)
     add_definitions(-D_NO_WASTORAGE_API)
   endif()
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /bigobj")
 endif()
 
 target_link_libraries(${AZURESTORAGE_LIBRARIES})

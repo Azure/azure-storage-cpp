@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -88,6 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classazure_1_1storage_1_1cloud__table-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">azure::storage::cloud_table Class Reference</div>  </div>
@@ -252,6 +253,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1450bf938d83689e28e9a2298db95e57"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classazure_1_1storage_1_1storage__uri.html">storage_uri</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__table.html#a1450bf938d83689e28e9a2298db95e57">uri</a> () const </td></tr>
 <tr class="memdesc:a1450bf938d83689e28e9a2298db95e57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the table URI for all locations.  <a href="#a1450bf938d83689e28e9a2298db95e57">More...</a><br /></td></tr>
 <tr class="separator:a1450bf938d83689e28e9a2298db95e57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a535097053af46291e9699b84f8689113"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a535097053af46291e9699b84f8689113"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_table_client</b></td></tr>
+<tr class="separator:a535097053af46291e9699b84f8689113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a table object in the Table service. </p>
@@ -298,7 +305,7 @@ Public Member Functions</h2></td></tr>
 <p>Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__table.html" title="Represents a table object in the Table service. ">azure::storage::cloud_table</a> class using an absolute URI to the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">uri</td><td>A <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">storage_uri</a> object containing the absolute URI to the table for all locations.</td></tr>
+    <tr><td class="paramname">uri</td><td>An <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">azure::storage::storage_uri</a> object containing the absolute URI to the table for all locations.</td></tr>
   </table>
   </dd>
 </dl>
@@ -332,8 +339,8 @@ Public Member Functions</h2></td></tr>
 <p>Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__table.html" title="Represents a table object in the Table service. ">azure::storage::cloud_table</a> class using an absolute URI to the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">uri</td><td>A <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">storage_uri</a> object containing the absolute URI to the table for all locations.</td></tr>
-    <tr><td class="paramname">credentials</td><td>The <a class="el" href="classazure_1_1storage_1_1storage__credentials.html" title="Represents a set of credentials used to authenticate access to a Windows Azure storage account...">storage_credentials</a> to use.</td></tr>
+    <tr><td class="paramname">uri</td><td>An <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">azure::storage::storage_uri</a> object containing the absolute URI to the table for all locations.</td></tr>
+    <tr><td class="paramname">credentials</td><td>The <a class="el" href="classazure_1_1storage_1_1storage__credentials.html" title="Represents a set of credentials used to authenticate access to a Windows Azure storage account...">azure::storage::storage_credentials</a> to use.</td></tr>
   </table>
   </dd>
 </dl>
@@ -401,7 +408,7 @@ Public Member Functions</h2></td></tr>
 <p>Creates a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
@@ -462,7 +469,7 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that creates a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</td></tr>
   </table>
   </dd>
@@ -532,7 +539,7 @@ Public Member Functions</h2></td></tr>
 <p>Creates the table if it does not already exist. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
@@ -594,7 +601,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns a task to create the table if it does not already exist. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</td></tr>
   </table>
   </dd>
@@ -663,7 +670,7 @@ Public Member Functions</h2></td></tr>
 <p>Deletes a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
@@ -724,7 +731,7 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that deletes a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
@@ -794,7 +801,7 @@ Public Member Functions</h2></td></tr>
 <p>Deletes the table if it exists. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
@@ -856,7 +863,7 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that deletes the table if it exists. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</td></tr>
   </table>
   </dd>
@@ -887,7 +894,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the permissions settings for the table. </p>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> object.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> object.</dd></dl>
 
 </div>
 </div>
@@ -931,7 +938,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> object.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> object.</dd></dl>
 
 </div>
 </div>
@@ -957,7 +964,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Intitiates an asynchronous operation that gets the permissions settings for the table. </p>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -993,7 +1000,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1022,11 +1029,11 @@ Public Member Functions</h2></td></tr>
 <p>Executes an operation on a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a> containing the result of the operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a> containing the result of the operation.</dd></dl>
 
 </div>
 </div>
@@ -1071,13 +1078,13 @@ Public Member Functions</h2></td></tr>
 <p>Executes an operation on a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a> containing the result of the operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a> containing the result of the operation.</dd></dl>
 
 </div>
 </div>
@@ -1106,11 +1113,11 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that executes an operation on a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">table_result</a> that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a> that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1147,13 +1154,13 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that executes an operation on a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__operation.html" title="Represents a single table operation. ">azure::storage::table_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">table_result</a> that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a> that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1182,7 +1189,7 @@ Public Member Functions</h2></td></tr>
 <p>Executes a batch operation on a table as an atomic operation. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1231,8 +1238,8 @@ Public Member Functions</h2></td></tr>
 <p>Executes a batch operation on a table as an atomic operation. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
@@ -1266,11 +1273,11 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that executes a batch operation on a table as an atomic operation. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">table_result</a>, that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a>, that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1307,13 +1314,13 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that executes a batch operation on a table as an atomic operation. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">operation</td><td>A <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">operation</td><td>An <a class="el" href="classazure_1_1storage_1_1table__batch__operation.html" title="Represents a batch operation on a table. ">azure::storage::table_batch_operation</a> object that represents the operation to perform.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">table_result</a>, that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1table__result.html" title="Represents the result of a table operation. ">azure::storage::table_result</a>, that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1342,11 +1349,11 @@ Public Member Functions</h2></td></tr>
 <p>Executes a query on a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">query</td><td>A <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
+    <tr><td class="paramname">query</td><td>An <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A table_query_iterator that can be used to to lazily enumerate a collection of <a class="el" href="classazure_1_1storage_1_1table__entity.html" title="Represents an entity in a table. ">azure::storage::table_entity</a> objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::table_query_iterator that can be used to to lazily enumerate a collection of <a class="el" href="classazure_1_1storage_1_1table__entity.html" title="Represents an entity in a table. ">azure::storage::table_entity</a> objects.</dd></dl>
 
 </div>
 </div>
@@ -1383,13 +1390,13 @@ Public Member Functions</h2></td></tr>
 <p>Executes a query on a table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">query</td><td>A <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">query</td><td>An <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A table_query_iterator that can be used to to lazily enumerate a collection of <a class="el" href="classazure_1_1storage_1_1table__entity.html" title="Represents an entity in a table. ">azure::storage::table_entity</a> objects.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::table_query_iterator that can be used to to lazily enumerate a collection of <a class="el" href="classazure_1_1storage_1_1table__entity.html" title="Represents an entity in a table. ">azure::storage::table_entity</a> objects.</dd></dl>
 
 </div>
 </div>
@@ -1428,12 +1435,12 @@ Public Member Functions</h2></td></tr>
 <p>Executes a query with the specified <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> to retrieve the next page of results. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">query</td><td>A <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
-    <tr><td class="paramname">token</td><td>A <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
+    <tr><td class="paramname">query</td><td>An <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
+    <tr><td class="paramname">token</td><td>An <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A azure::storage::table_query_segment object containing the results of the query.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::table_query_segment object containing the results of the query.</dd></dl>
 
 </div>
 </div>
@@ -1484,14 +1491,14 @@ Public Member Functions</h2></td></tr>
 <p>Executes a query with the specified <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> to retrieve the next page of results. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">query</td><td>A <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
-    <tr><td class="paramname">token</td><td>A <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">query</td><td>An <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
+    <tr><td class="paramname">token</td><td>An <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A azure::storage::table_query_segment object containing the results of the query.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::table_query_segment object containing the results of the query.</dd></dl>
 
 </div>
 </div>
@@ -1530,12 +1537,12 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that executes a query with the specified <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> to retrieve the next page of results. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">query</td><td>A <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
-    <tr><td class="paramname">token</td><td>A <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
+    <tr><td class="paramname">query</td><td>An <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
+    <tr><td class="paramname">token</td><td>An <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type table_result_segment that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type azure::storage::table_result_segment that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1578,14 +1585,14 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that executes a query with the specified <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> to retrieve the next page of results. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">query</td><td>A <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
-    <tr><td class="paramname">token</td><td>A <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">query</td><td>An <a class="el" href="classazure_1_1storage_1_1table__query.html" title="Represents a query against a table. ">azure::storage::table_query</a> object.</td></tr>
+    <tr><td class="paramname">token</td><td>An <a class="el" href="classazure_1_1storage_1_1continuation__token.html" title="Represents a continuation token for listing operations. ">azure::storage::continuation_token</a> object.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type table_result_segment that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type azure::storage::table_result_segment that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1650,7 +1657,7 @@ Public Member Functions</h2></td></tr>
 <p>Checks whether the table exists. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </td></tr>
   </table>
   </dd>
@@ -1712,7 +1719,7 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that checks whether the table exists. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</td></tr>
   </table>
   </dd>
@@ -1746,7 +1753,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns a shared access signature for the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">policy</td><td>The <a class="el" href="classazure_1_1storage_1_1table__shared__access__policy.html" title="Represents a shared access policy, which specifies the start time, expiry time, and permissions for a...">table_shared_access_policy</a> for the shared access signature.</td></tr>
+    <tr><td class="paramname">policy</td><td>The <a class="el" href="classazure_1_1storage_1_1table__shared__access__policy.html" title="Represents a shared access policy, which specifies the start time, expiry time, and permissions for a...">azure::storage::table_shared_access_policy</a> for the shared access signature.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1789,7 +1796,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns a shared access signature for the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">policy</td><td>The <a class="el" href="classazure_1_1storage_1_1table__shared__access__policy.html" title="Represents a shared access policy, which specifies the start time, expiry time, and permissions for a...">table_shared_access_policy</a> for the shared access signature.</td></tr>
+    <tr><td class="paramname">policy</td><td>The <a class="el" href="classazure_1_1storage_1_1table__shared__access__policy.html" title="Represents a shared access policy, which specifies the start time, expiry time, and permissions for a...">azure::storage::table_shared_access_policy</a> for the shared access signature.</td></tr>
     <tr><td class="paramname">stored_policy_identifier</td><td>A string identifying a table-level access policy.</td></tr>
   </table>
   </dd>
@@ -1849,8 +1856,12 @@ Public Member Functions</h2></td></tr>
 <p>Returns a shared access signature for the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">policy</td><td>The <a class="el" href="classazure_1_1storage_1_1table__shared__access__policy.html" title="Represents a shared access policy, which specifies the start time, expiry time, and permissions for a...">table_shared_access_policy</a> for the shared access signature.</td></tr>
+    <tr><td class="paramname">policy</td><td>The <a class="el" href="classazure_1_1storage_1_1table__shared__access__policy.html" title="Represents a shared access policy, which specifies the start time, expiry time, and permissions for a...">azure::storage::table_shared_access_policy</a> for the shared access signature.</td></tr>
     <tr><td class="paramname">stored_policy_identifier</td><td>A string identifying a table-level access policy.</td></tr>
+    <tr><td class="paramname">start_partition_key</td><td>A string specifying the start partition key.</td></tr>
+    <tr><td class="paramname">start_row_key</td><td>A string specifying the start row key.</td></tr>
+    <tr><td class="paramname">end_partition_key</td><td>A string specifying the end partition key.</td></tr>
+    <tr><td class="paramname">end_row_key</td><td>A string specifying the end row key.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1935,7 +1946,7 @@ Public Member Functions</h2></td></tr>
 <p>Sets permissions for the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">permissions</td><td>A <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> object.</td></tr>
+    <tr><td class="paramname">permissions</td><td>An <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> object.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1983,7 +1994,7 @@ Public Member Functions</h2></td></tr>
 <p>Sets permissions for the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">permissions</td><td>A <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> object.</td></tr>
+    <tr><td class="paramname">permissions</td><td>An <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> object.</td></tr>
     <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
@@ -2017,7 +2028,7 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that sets permissions for the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">permissions</td><td>A <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> object.</td></tr>
+    <tr><td class="paramname">permissions</td><td>An <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> object.</td></tr>
   </table>
   </dd>
 </dl>
@@ -2058,7 +2069,7 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation that sets permissions for the table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">permissions</td><td>A <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">table_permissions</a> object.</td></tr>
+    <tr><td class="paramname">permissions</td><td>An <a class="el" href="classazure_1_1storage_1_1table__permissions.html" title="Represents the permissions for a table. ">azure::storage::table_permissions</a> object.</td></tr>
     <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1table__request__options.html" title="Represents a set of options that may be specified for a request against the Table service...">azure::storage::table_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
@@ -2090,14 +2101,14 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the table URI for all locations. </p>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">storage_uri</a> object containing the absolute URI to the table for all locations.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">azure::storage::storage_uri</a> object containing the absolute URI to the table for all locations.</dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 14:32:52 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 6 2015 17:00:04 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

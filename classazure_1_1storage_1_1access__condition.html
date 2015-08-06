@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -106,7 +106,7 @@ Public Types</h2></td></tr>
 <a class="el" href="classazure_1_1storage_1_1access__condition.html#a81b49853aef605916c54c8372e1adef0ad91af6958918af87d6a057c1cdf5b225">sequence_number_operators::lt</a>, 
 <a class="el" href="classazure_1_1storage_1_1access__condition.html#a81b49853aef605916c54c8372e1adef0adf22f17124884fc51f1ac69d610096ac">sequence_number_operators::eq</a>
  }</td></tr>
-<tr class="memdesc:a81b49853aef605916c54c8372e1adef0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Describes the set of operators for comparing the blob’s sequence number with the specified value.  <a href="classazure_1_1storage_1_1access__condition.html#a81b49853aef605916c54c8372e1adef0">More...</a><br /></td></tr>
+<tr class="memdesc:a81b49853aef605916c54c8372e1adef0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Describes the set of operators for comparing the blob's sequence number with the specified value.  <a href="classazure_1_1storage_1_1access__condition.html#a81b49853aef605916c54c8372e1adef0">More...</a><br /></td></tr>
 <tr class="separator:a81b49853aef605916c54c8372e1adef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -153,6 +153,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4e9cccfa1f6295f4a56c3951adec640c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a81b49853aef605916c54c8372e1adef0">sequence_number_operators</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a4e9cccfa1f6295f4a56c3951adec640c">sequence_number_operator</a> () const </td></tr>
 <tr class="memdesc:a4e9cccfa1f6295f4a56c3951adec640c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the sequence number comparison operator specified for the access condition.  <a href="#a4e9cccfa1f6295f4a56c3951adec640c">More...</a><br /></td></tr>
 <tr class="separator:a4e9cccfa1f6295f4a56c3951adec640c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2dc485d19a7706ee400f2f5447e98e4"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#aa2dc485d19a7706ee400f2f5447e98e4">max_size</a> () const </td></tr>
+<tr class="memdesc:aa2dc485d19a7706ee400f2f5447e98e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a number that indicates the maximum size in bytes to restrict the blob to when commiting the block.  <a href="#aa2dc485d19a7706ee400f2f5447e98e4">More...</a><br /></td></tr>
+<tr class="separator:aa2dc485d19a7706ee400f2f5447e98e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53d8e58b0bffa83b273111f981d387cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a53d8e58b0bffa83b273111f981d387cb">set_max_size</a> (int64_t value)</td></tr>
+<tr class="memdesc:a53d8e58b0bffa83b273111f981d387cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a number that indicates the maximum size in bytes to restrict the blob to when commiting the block.  <a href="#a53d8e58b0bffa83b273111f981d387cb">More...</a><br /></td></tr>
+<tr class="separator:a53d8e58b0bffa83b273111f981d387cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f804a451386d06a29b0ec24a181f1d7"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a5f804a451386d06a29b0ec24a181f1d7">append_position</a> () const </td></tr>
+<tr class="memdesc:a5f804a451386d06a29b0ec24a181f1d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an append position that the end position of an append blob must be equal to in order for the operation to proceed.  <a href="#a5f804a451386d06a29b0ec24a181f1d7">More...</a><br /></td></tr>
+<tr class="separator:a5f804a451386d06a29b0ec24a181f1d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b231b7cd773d3c7a51d8e0763aa5f0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a3b231b7cd773d3c7a51d8e0763aa5f0b">set_append_position</a> (int64_t value)</td></tr>
+<tr class="memdesc:a3b231b7cd773d3c7a51d8e0763aa5f0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the append position that the end position of an append blob must be equal to in order for the operation to proceed.  <a href="#a3b231b7cd773d3c7a51d8e0763aa5f0b">More...</a><br /></td></tr>
+<tr class="separator:a3b231b7cd773d3c7a51d8e0763aa5f0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a549171e59db5fa8621e0b50a1a004c96"><td class="memItemLeft" align="right" valign="top">const utility::string_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a549171e59db5fa8621e0b50a1a004c96">lease_id</a> () const </td></tr>
 <tr class="memdesc:a549171e59db5fa8621e0b50a1a004c96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a lease ID that must match the lease on a resource.  <a href="#a549171e59db5fa8621e0b50a1a004c96">More...</a><br /></td></tr>
 <tr class="separator:a549171e59db5fa8621e0b50a1a004c96"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,6 +180,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:adb535071c60c0e411d9ba23ec7aad9c9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#adb535071c60c0e411d9ba23ec7aad9c9">generate_empty_condition</a> ()</td></tr>
 <tr class="memdesc:adb535071c60c0e411d9ba23ec7aad9c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an empty access condition.  <a href="#adb535071c60c0e411d9ba23ec7aad9c9">More...</a><br /></td></tr>
 <tr class="separator:adb535071c60c0e411d9ba23ec7aad9c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad27ea80f917b42f32794eacf6879a299"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#ad27ea80f917b42f32794eacf6879a299">generate_if_not_exists_condition</a> ()</td></tr>
+<tr class="memdesc:ad27ea80f917b42f32794eacf6879a299"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an access condition such that an operation will be performed only if the resource does not exist on the service.  <a href="#ad27ea80f917b42f32794eacf6879a299">More...</a><br /></td></tr>
+<tr class="separator:ad27ea80f917b42f32794eacf6879a299"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01c68b20da0d6135251cbdffc07366b7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a01c68b20da0d6135251cbdffc07366b7">generate_if_exists_condition</a> ()</td></tr>
+<tr class="memdesc:a01c68b20da0d6135251cbdffc07366b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an access condition such that an operation will be performed only if the resource exists on the service.  <a href="#a01c68b20da0d6135251cbdffc07366b7">More...</a><br /></td></tr>
+<tr class="separator:a01c68b20da0d6135251cbdffc07366b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a411a051f448c6f6cb8692b20a6de9af8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#a411a051f448c6f6cb8692b20a6de9af8">generate_if_match_condition</a> (utility::string_t etag)</td></tr>
 <tr class="memdesc:a411a051f448c6f6cb8692b20a6de9af8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an access condition such that an operation will be performed only if the resource's ETag value matches the specified ETag value.  <a href="#a411a051f448c6f6cb8692b20a6de9af8">More...</a><br /></td></tr>
 <tr class="separator:a411a051f448c6f6cb8692b20a6de9af8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -192,6 +210,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:afa1615c9d0a22e14fe727745f7cc3170"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#afa1615c9d0a22e14fe727745f7cc3170">generate_lease_condition</a> (utility::string_t <a class="el" href="classazure_1_1storage_1_1access__condition.html#a549171e59db5fa8621e0b50a1a004c96">lease_id</a>)</td></tr>
 <tr class="memdesc:afa1615c9d0a22e14fe727745f7cc3170"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an access condition such that an operation will be performed only if the lease ID on the resource matches the specified lease ID.  <a href="#afa1615c9d0a22e14fe727745f7cc3170">More...</a><br /></td></tr>
 <tr class="separator:afa1615c9d0a22e14fe727745f7cc3170"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1aee3e04c95a1fba9f11ba44260f392"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#af1aee3e04c95a1fba9f11ba44260f392">generate_if_max_size_less_than_or_equal_condition</a> (int64_t <a class="el" href="classazure_1_1storage_1_1access__condition.html#aa2dc485d19a7706ee400f2f5447e98e4">max_size</a>)</td></tr>
+<tr class="memdesc:af1aee3e04c95a1fba9f11ba44260f392"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an access condition such that an operation will be performed only if the size of the blob after committing the block is less than or equal to the specified value.  <a href="#af1aee3e04c95a1fba9f11ba44260f392">More...</a><br /></td></tr>
+<tr class="separator:af1aee3e04c95a1fba9f11ba44260f392"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3419f349c6a340ca99cd0951d3da0a0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1access__condition.html#aa3419f349c6a340ca99cd0951d3da0a0">generate_if_append_position_equal_condition</a> (int64_t <a class="el" href="classazure_1_1storage_1_1access__condition.html#a5f804a451386d06a29b0ec24a181f1d7">append_position</a>)</td></tr>
+<tr class="memdesc:aa3419f349c6a340ca99cd0951d3da0a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an access condition such that an operation will be performed only if the end position of the blob is equal to the specified value.  <a href="#aa3419f349c6a340ca99cd0951d3da0a0">More...</a><br /></td></tr>
+<tr class="separator:aa3419f349c6a340ca99cd0951d3da0a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a set of access conditions to be used for operations against the Blob service. </p>
@@ -214,19 +238,19 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Describes the set of operators for comparing the blob’s sequence number with the specified value. </p>
+<p>Describes the set of operators for comparing the blob's sequence number with the specified value. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a81b49853aef605916c54c8372e1adef0a334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc">
 <p>The blob's sequence number will not be used as an access condition. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a81b49853aef605916c54c8372e1adef0ad9180594744f870aeefb086982e980bb"></a>le&#160;</td><td class="fielddoc">
-<p>If the blob’s sequence number is less than the specified value, the request proceeds. </p>
+<p>If the blob's sequence number is less than the specified value, the request proceeds. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a81b49853aef605916c54c8372e1adef0ad91af6958918af87d6a057c1cdf5b225"></a>lt&#160;</td><td class="fielddoc">
-<p>If the blob’s sequence number is less than or equal to the specified value, the request proceeds. </p>
+<p>If the blob's sequence number is less than or equal to the specified value, the request proceeds. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a81b49853aef605916c54c8372e1adef0adf22f17124884fc51f1ac69d610096ac"></a>eq&#160;</td><td class="fielddoc">
-<p>If the blob’s sequence number is equal to the specified value, the request proceeds. </p>
+<p>If the blob's sequence number is equal to the specified value, the request proceeds. </p>
 </td></tr>
 </table>
 
@@ -259,6 +283,33 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a5f804a451386d06a29b0ec24a181f1d7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t azure::storage::access_condition::append_position </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets an append position that the end position of an append blob must be equal to in order for the operation to proceed. </p>
+<dl class="section return"><dt>Returns</dt><dd>An append position number, or -1 if no append position value is specified.</dd></dl>
+<p>This condition only applies to append blobs.</p>
+
+</div>
+</div>
 <a class="anchor" id="adb535071c60c0e411d9ba23ec7aad9c9"></a>
 <div class="memitem">
 <div class="memproto">
@@ -282,6 +333,66 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Generates an empty access condition. </p>
 <dl class="section return"><dt>Returns</dt><dd>An empty <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa3419f349c6a340ca99cd0951d3da0a0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> azure::storage::access_condition::generate_if_append_position_equal_condition </td>
+          <td>(</td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>append_position</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generates an access condition such that an operation will be performed only if the end position of the blob is equal to the specified value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">append_position</td><td>The value to compare to the current end position of the blob.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the blob-condition-appendpos condition.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a01c68b20da0d6135251cbdffc07366b7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> azure::storage::access_condition::generate_if_exists_condition </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generates an access condition such that an operation will be performed only if the resource exists on the service. </p>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the If-Exists condition.</dd></dl>
+<p>Setting this access condition modifies the request to include the HTTP <em>If-Match</em> conditional header.</p>
 
 </div>
 </div>
@@ -315,6 +426,39 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the If-Match condition.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af1aee3e04c95a1fba9f11ba44260f392"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> azure::storage::access_condition::generate_if_max_size_less_than_or_equal_condition </td>
+          <td>(</td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>max_size</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generates an access condition such that an operation will be performed only if the size of the blob after committing the block is less than or equal to the specified value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">max_size</td><td>The value specifying the maximum length to restrict the blob to when committing the block.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the blob-condition-maxsize condition.</dd></dl>
 
 </div>
 </div>
@@ -382,6 +526,33 @@ Static Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the If-None-Match condition.</dd></dl>
 <p>If <code>"*"</code> is specified as the parameter then this condition requires that the resource does not exist. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad27ea80f917b42f32794eacf6879a299"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> azure::storage::access_condition::generate_if_not_exists_condition </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generates an access condition such that an operation will be performed only if the resource does not exist on the service. </p>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the If-Not-Exists condition.</dd></dl>
+<p>Setting this access condition modifies the request to include the HTTP <em>If-None-Match</em> conditional header.</p>
 
 </div>
 </div>
@@ -706,6 +877,33 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aa2dc485d19a7706ee400f2f5447e98e4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t azure::storage::access_condition::max_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets a number that indicates the maximum size in bytes to restrict the blob to when commiting the block. </p>
+<dl class="section return"><dt>Returns</dt><dd>The maximum size in bytes, or -1 if no maximum size value is specified.</dd></dl>
+<p>This condition only applies to append blobs.</p>
+
+</div>
+</div>
 <a class="anchor" id="ab1abca233a86bf8506bcc306435619fe"></a>
 <div class="memitem">
 <div class="memproto">
@@ -756,6 +954,39 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Gets the sequence number comparison operator specified for the access condition. </p>
 <dl class="section return"><dt>Returns</dt><dd>The sequence number comparison operator specified for the <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a3b231b7cd773d3c7a51d8e0763aa5f0b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void azure::storage::access_condition::set_append_position </td>
+          <td>(</td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the append position that the end position of an append blob must be equal to in order for the operation to proceed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>An append position.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This condition only applies to append blobs.</p>
 
 </div>
 </div>
@@ -1018,10 +1249,43 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a53d8e58b0bffa83b273111f981d387cb"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void azure::storage::access_condition::set_max_size </td>
+          <td>(</td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets a number that indicates the maximum size in bytes to restrict the blob to when commiting the block. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>The maximum size in bytes.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This condition only applies to append blobs.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 14:32:51 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 6 2015 17:00:02 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

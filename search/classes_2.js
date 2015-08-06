@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['cloud_5fappend_5fblob',['cloud_append_blob',['../classazure_1_1storage_1_1cloud__append__blob.html',1,'azure::storage']]],
   ['cloud_5fblob',['cloud_blob',['../classazure_1_1storage_1_1cloud__blob.html',1,'azure::storage']]],
   ['cloud_5fblob_5fclient',['cloud_blob_client',['../classazure_1_1storage_1_1cloud__blob__client.html',1,'azure::storage']]],
   ['cloud_5fblob_5fcontainer',['cloud_blob_container',['../classazure_1_1storage_1_1cloud__blob__container.html',1,'azure::storage']]],

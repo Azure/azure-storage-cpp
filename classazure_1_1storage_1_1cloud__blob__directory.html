@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -88,6 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classazure_1_1storage_1_1cloud__blob__directory-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">azure::storage::cloud_blob_directory Class Reference</div>  </div>
@@ -120,6 +121,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae71f11745cbe30cb63ac24b514facc14"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API <a class="el" href="classazure_1_1storage_1_1cloud__block__blob.html">cloud_block_blob</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#ae71f11745cbe30cb63ac24b514facc14">get_block_blob_reference</a> (utility::string_t blob_name, utility::string_t snapshot_time) const </td></tr>
 <tr class="memdesc:ae71f11745cbe30cb63ac24b514facc14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to a block blob in this virtual directory.  <a href="#ae71f11745cbe30cb63ac24b514facc14">More...</a><br /></td></tr>
 <tr class="separator:ae71f11745cbe30cb63ac24b514facc14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43c1e77642b2a5a7318970e01b3f17fb"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html">cloud_append_blob</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a43c1e77642b2a5a7318970e01b3f17fb">get_append_blob_reference</a> (utility::string_t blob_name) const </td></tr>
+<tr class="memdesc:a43c1e77642b2a5a7318970e01b3f17fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to an append blob in this virtual directory.  <a href="#a43c1e77642b2a5a7318970e01b3f17fb">More...</a><br /></td></tr>
+<tr class="separator:a43c1e77642b2a5a7318970e01b3f17fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a557f98cf45f66f42e544524c07462aef"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html">cloud_append_blob</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a557f98cf45f66f42e544524c07462aef">get_append_blob_reference</a> (utility::string_t blob_name, utility::string_t snapshot_time) const </td></tr>
+<tr class="memdesc:a557f98cf45f66f42e544524c07462aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to an append blob in this virtual directory.  <a href="#a557f98cf45f66f42e544524c07462aef">More...</a><br /></td></tr>
+<tr class="separator:a557f98cf45f66f42e544524c07462aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa3fc9f20a540c351b7f85c02221e5c9"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html">cloud_blob_directory</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#aaa3fc9f20a540c351b7f85c02221e5c9">get_subdirectory_reference</a> (utility::string_t name) const </td></tr>
 <tr class="memdesc:aaa3fc9f20a540c351b7f85c02221e5c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a virtual subdirectory within this virtual directory.  <a href="#aaa3fc9f20a540c351b7f85c02221e5c9">More...</a><br /></td></tr>
 <tr class="separator:aaa3fc9f20a540c351b7f85c02221e5c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,28 +134,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a640197848633aab06bbb27b892f21f81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">azure::storage::cloud_blob_directory</a> object representing the parent directory for the current virtual directory.  <a href="#a640197848633aab06bbb27b892f21f81">More...</a><br /></td></tr>
 <tr class="separator:a640197848633aab06bbb27b892f21f81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01b6d3f9e6e4a17c1e197c2e7206c616"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classazure_1_1storage_1_1result__iterator.html">list_blob_item_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a01b6d3f9e6e4a17c1e197c2e7206c616">list_blobs</a> () const </td></tr>
-<tr class="memdesc:a01b6d3f9e6e4a17c1e197c2e7206c616"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the virtual directory.  <a href="#a01b6d3f9e6e4a17c1e197c2e7206c616">More...</a><br /></td></tr>
+<tr class="memdesc:a01b6d3f9e6e4a17c1e197c2e7206c616"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an azure::storage::list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the virtual directory.  <a href="#a01b6d3f9e6e4a17c1e197c2e7206c616">More...</a><br /></td></tr>
 <tr class="separator:a01b6d3f9e6e4a17c1e197c2e7206c616"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01e3252c8acb7e5583849f08c455f681"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API <a class="el" href="classazure_1_1storage_1_1result__iterator.html">list_blob_item_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a01e3252c8acb7e5583849f08c455f681">list_blobs</a> (bool use_flat_blob_listing, <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">blob_listing_details::values</a> includes, int max_results, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
-<tr class="memdesc:a01e3252c8acb7e5583849f08c455f681"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the the virtual directory.  <a href="#a01e3252c8acb7e5583849f08c455f681">More...</a><br /></td></tr>
+<tr class="memdesc:a01e3252c8acb7e5583849f08c455f681"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an azure::storage::list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the the virtual directory.  <a href="#a01e3252c8acb7e5583849f08c455f681">More...</a><br /></td></tr>
 <tr class="separator:a01e3252c8acb7e5583849f08c455f681"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72b41e7df431d2d6668f8dd21d710dc8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classazure_1_1storage_1_1result__segment.html">list_blob_item_segment</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a72b41e7df431d2d6668f8dd21d710dc8">list_blobs_segmented</a> (const <a class="el" href="classazure_1_1storage_1_1continuation__token.html">continuation_token</a> &amp;token) const </td></tr>
 <tr class="memdesc:a72b41e7df431d2d6668f8dd21d710dc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a result segment containing a collection of blob items in the container.  <a href="#a72b41e7df431d2d6668f8dd21d710dc8">More...</a><br /></td></tr>
 <tr class="separator:a72b41e7df431d2d6668f8dd21d710dc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24bdad2ca26e54b9c655bfc90c5f7199"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classazure_1_1storage_1_1result__segment.html">list_blob_item_segment</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a24bdad2ca26e54b9c655bfc90c5f7199">list_blobs_segmented</a> (bool use_flat_blob_listing, <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">blob_listing_details::values</a> includes, int max_results, const <a class="el" href="classazure_1_1storage_1_1continuation__token.html">continuation_token</a> &amp;token, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
-<tr class="memdesc:a24bdad2ca26e54b9c655bfc90c5f7199"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list_blob_item_segment containing a collection of blob items in the container.  <a href="#a24bdad2ca26e54b9c655bfc90c5f7199">More...</a><br /></td></tr>
+<tr class="memdesc:a24bdad2ca26e54b9c655bfc90c5f7199"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an azure::storage::list_blob_item_segment containing a collection of blob items in the container.  <a href="#a24bdad2ca26e54b9c655bfc90c5f7199">More...</a><br /></td></tr>
 <tr class="separator:a24bdad2ca26e54b9c655bfc90c5f7199"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfc31b65837d3dd30807fc26da79e5a5"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; <a class="el" href="classazure_1_1storage_1_1result__segment.html">list_blob_item_segment</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#acfc31b65837d3dd30807fc26da79e5a5">list_blobs_segmented_async</a> (const <a class="el" href="classazure_1_1storage_1_1continuation__token.html">continuation_token</a> &amp;token) const </td></tr>
-<tr class="memdesc:acfc31b65837d3dd30807fc26da79e5a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to return a list_blob_item_segment containing a collection of blob items in the container.  <a href="#acfc31b65837d3dd30807fc26da79e5a5">More...</a><br /></td></tr>
+<tr class="memdesc:acfc31b65837d3dd30807fc26da79e5a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to return an azure::storage::list_blob_item_segment containing a collection of blob items in the container.  <a href="#acfc31b65837d3dd30807fc26da79e5a5">More...</a><br /></td></tr>
 <tr class="separator:acfc31b65837d3dd30807fc26da79e5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e128e2670a9bf72d72cb40c629f4d47"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; <a class="el" href="classazure_1_1storage_1_1result__segment.html">list_blob_item_segment</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a5e128e2670a9bf72d72cb40c629f4d47">list_blobs_segmented_async</a> (bool use_flat_blob_listing, <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">blob_listing_details::values</a> includes, int max_results, const <a class="el" href="classazure_1_1storage_1_1continuation__token.html">continuation_token</a> &amp;token, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
-<tr class="memdesc:a5e128e2670a9bf72d72cb40c629f4d47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to return a list_blob_item_segment containing a collection of blob items in the container.  <a href="#a5e128e2670a9bf72d72cb40c629f4d47">More...</a><br /></td></tr>
+<tr class="memdesc:a5e128e2670a9bf72d72cb40c629f4d47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to return an azure::storage::list_blob_item_segment containing a collection of blob items in the container.  <a href="#a5e128e2670a9bf72d72cb40c629f4d47">More...</a><br /></td></tr>
 <tr class="separator:a5e128e2670a9bf72d72cb40c629f4d47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae649683f9402755ade5f7132507ea2fa"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classazure_1_1storage_1_1cloud__blob__client.html">cloud_blob_client</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#ae649683f9402755ade5f7132507ea2fa">service_client</a> () const </td></tr>
 <tr class="memdesc:ae649683f9402755ade5f7132507ea2fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the Blob service client for the virtual directory.  <a href="#ae649683f9402755ade5f7132507ea2fa">More...</a><br /></td></tr>
 <tr class="separator:ae649683f9402755ade5f7132507ea2fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a434dd5d59eaddc6e5cffa46a54f0c42f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html">cloud_blob_container</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a434dd5d59eaddc6e5cffa46a54f0c42f">container</a> () const </td></tr>
-<tr class="memdesc:a434dd5d59eaddc6e5cffa46a54f0c42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html" title="Represents a container in the Windows Azure Blob service. ">azure::storage::cloud_blob_container</a> object representing the virtual directory's container.  <a href="#a434dd5d59eaddc6e5cffa46a54f0c42f">More...</a><br /></td></tr>
+<tr class="memdesc:a434dd5d59eaddc6e5cffa46a54f0c42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html" title="Represents a container in the Windows Azure Blob service. ">azure::storage::cloud_blob_container</a> object representing the virtual directory's container.  <a href="#a434dd5d59eaddc6e5cffa46a54f0c42f">More...</a><br /></td></tr>
 <tr class="separator:a434dd5d59eaddc6e5cffa46a54f0c42f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f08c4b7898f15adaf2f382d5140faee"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classazure_1_1storage_1_1storage__uri.html">storage_uri</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a8f08c4b7898f15adaf2f382d5140faee">uri</a> () const </td></tr>
 <tr class="memdesc:a8f08c4b7898f15adaf2f382d5140faee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the virtual directory URI for all locations.  <a href="#a8f08c4b7898f15adaf2f382d5140faee">More...</a><br /></td></tr>
@@ -157,8 +164,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af8f598a2c52b42848f0483da112f0000"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the prefix for the virtual directory.  <a href="#af8f598a2c52b42848f0483da112f0000">More...</a><br /></td></tr>
 <tr class="separator:af8f598a2c52b42848f0483da112f0000"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa83a07f6ad2314e0ae0cabc1afb0760"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#afa83a07f6ad2314e0ae0cabc1afb0760">is_valid</a> () const </td></tr>
-<tr class="memdesc:afa83a07f6ad2314e0ae0cabc1afb0760"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether the <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">cloud_blob_directory</a> object is valid.  <a href="#afa83a07f6ad2314e0ae0cabc1afb0760">More...</a><br /></td></tr>
+<tr class="memdesc:afa83a07f6ad2314e0ae0cabc1afb0760"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether the <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">azure::storage::cloud_blob_directory</a> object is valid.  <a href="#afa83a07f6ad2314e0ae0cabc1afb0760">More...</a><br /></td></tr>
 <tr class="separator:afa83a07f6ad2314e0ae0cabc1afb0760"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:ac766e7ec6d24223ea29898cce403ce9d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac766e7ec6d24223ea29898cce403ce9d"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_blob_container</b></td></tr>
+<tr class="separator:ac766e7ec6d24223ea29898cce403ce9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d9bb1e2fc9b75bdc4be3bdfa64d4f58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d9bb1e2fc9b75bdc4be3bdfa64d4f58"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_blob</b></td></tr>
+<tr class="separator:a1d9bb1e2fc9b75bdc4be3bdfa64d4f58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8550d4d168668fa6d61535f8f05ccf71"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8550d4d168668fa6d61535f8f05ccf71"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>list_blob_item</b></td></tr>
+<tr class="separator:a8550d4d168668fa6d61535f8f05ccf71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a virtual directory of blobs, designated by a delimiter character. </p>
@@ -211,8 +230,69 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Gets a <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html" title="Represents a container in the Windows Azure Blob service. ">azure::storage::cloud_blob_container</a> object representing the virtual directory's container. </p>
+<p>Gets an <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html" title="Represents a container in the Windows Azure Blob service. ">azure::storage::cloud_blob_container</a> object representing the virtual directory's container. </p>
 <dl class="section return"><dt>Returns</dt><dd>The virtual directory's container.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a43c1e77642b2a5a7318970e01b3f17fb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">WASTORAGE_API <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html">cloud_append_blob</a> azure::storage::cloud_blob_directory::get_append_blob_reference </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>blob_name</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets a reference to an append blob in this virtual directory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">blob_name</td><td>The name of the blob.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html" title="Represents a Windows Azure append blob. ">cloud_append_blob</a>.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a557f98cf45f66f42e544524c07462aef"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">WASTORAGE_API <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html">cloud_append_blob</a> azure::storage::cloud_blob_directory::get_append_blob_reference </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>blob_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>snapshot_time</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets a reference to an append blob in this virtual directory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">blob_name</td><td>The name of the blob.</td></tr>
+    <tr><td class="paramname">snapshot_time</td><td>The snapshot timestamp, if the blob is a snapshot.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html" title="Represents a Windows Azure append blob. ">cloud_append_blob</a>.</dd></dl>
 
 </div>
 </div>
@@ -237,7 +317,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">cloud_blob</a>.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to an <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a>.</dd></dl>
 
 </div>
 </div>
@@ -273,7 +353,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">cloud_blob</a>.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to an <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a>.</dd></dl>
 
 </div>
 </div>
@@ -298,7 +378,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__block__blob.html" title="Represents a blob that is uploaded as a set of blocks. ">cloud_block_blob</a>.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to an <a class="el" href="classazure_1_1storage_1_1cloud__block__blob.html" title="Represents a blob that is uploaded as a set of blocks. ">azure::storage::cloud_block_blob</a>.</dd></dl>
 
 </div>
 </div>
@@ -334,7 +414,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__block__blob.html" title="Represents a blob that is uploaded as a set of blocks. ">cloud_block_blob</a>.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to an <a class="el" href="classazure_1_1storage_1_1cloud__block__blob.html" title="Represents a blob that is uploaded as a set of blocks. ">azure::storage::cloud_block_blob</a>.</dd></dl>
 
 </div>
 </div>
@@ -359,7 +439,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html" title="Represents a Windows Azure page blob. ">cloud_page_blob</a>.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to an <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html" title="Represents a Windows Azure page blob. ">azure::storage::cloud_page_blob</a>.</dd></dl>
 
 </div>
 </div>
@@ -395,7 +475,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to a <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html" title="Represents a Windows Azure page blob. ">cloud_page_blob</a>.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to an <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html" title="Represents a Windows Azure page blob. ">azure::storage::cloud_page_blob</a>.</dd></dl>
 
 </div>
 </div>
@@ -438,7 +518,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">azure::storage::cloud_blob_directory</a> object representing the virtual subdirectory.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">azure::storage::cloud_blob_directory</a> object representing the virtual subdirectory.</dd></dl>
 
 </div>
 </div>
@@ -463,8 +543,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Indicates whether the <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">cloud_blob_directory</a> object is valid. </p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">cloud_blob_directory</a> object is valid; otherwise, <code>false</code>.</dd></dl>
+<p>Indicates whether the <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">azure::storage::cloud_blob_directory</a> object is valid. </p>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html" title="Represents a virtual directory of blobs, designated by a delimiter character. ">azure::storage::cloud_blob_directory</a> object is valid; otherwise, <code>false</code>.</dd></dl>
 
 </div>
 </div>
@@ -489,8 +569,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the virtual directory. </p>
-<dl class="section return"><dt>Returns</dt><dd>A list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the virtual directory.</dd></dl>
+<p>Returns an azure::storage::list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the virtual directory. </p>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the virtual directory.</dd></dl>
 
 </div>
 </div>
@@ -536,18 +616,18 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the the virtual directory. </p>
+<p>Returns an azure::storage::list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the the virtual directory. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">use_flat_blob_listing</td><td>Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</td></tr>
-    <tr><td class="paramname">includes</td><td>A <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">azure::storage::blob_listing_details::values</a> enumeration describing which items to include in the listing.</td></tr>
+    <tr><td class="paramname">includes</td><td>An <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">azure::storage::blob_listing_details::values</a> enumeration describing which items to include in the listing.</td></tr>
     <tr><td class="paramname">max_results</td><td>A non-negative integer value that indicates the maximum number of results to be returned. If this value is zero, the maximum possible number of results will be returned.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the the virtual directory.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::list_blob_item_iterator that can be used to to lazily enumerate a collection of blob items in the the virtual directory.</dd></dl>
 
 </div>
 </div>
@@ -580,7 +660,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A list_blob_item_segment containing a collection of blob items in the container.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::list_blob_item_segment containing a collection of blob items in the container.</dd></dl>
 
 </div>
 </div>
@@ -640,19 +720,19 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a list_blob_item_segment containing a collection of blob items in the container. </p>
+<p>Returns an azure::storage::list_blob_item_segment containing a collection of blob items in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">use_flat_blob_listing</td><td>Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</td></tr>
-    <tr><td class="paramname">includes</td><td>A <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">azure::storage::blob_listing_details::values</a> enumeration describing which items to include in the listing.</td></tr>
+    <tr><td class="paramname">includes</td><td>An <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">azure::storage::blob_listing_details::values</a> enumeration describing which items to include in the listing.</td></tr>
     <tr><td class="paramname">max_results</td><td>A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</td></tr>
     <tr><td class="paramname">token</td><td>A continuation token returned by a previous listing operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A list_blob_item_segment containing a collection of blob items in the container.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::list_blob_item_segment containing a collection of blob items in the container.</dd></dl>
 
 </div>
 </div>
@@ -678,14 +758,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to return a list_blob_item_segment containing a collection of blob items in the container. </p>
+<p>Intitiates an asynchronous operation to return an azure::storage::list_blob_item_segment containing a collection of blob items in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">token</td><td>A continuation token returned by a previous listing operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type list_blob_item_segment that that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type azure::storage::list_blob_item_segment that that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -737,19 +817,19 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to return a list_blob_item_segment containing a collection of blob items in the container. </p>
+<p>Intitiates an asynchronous operation to return an azure::storage::list_blob_item_segment containing a collection of blob items in the container. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">use_flat_blob_listing</td><td>Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</td></tr>
-    <tr><td class="paramname">includes</td><td>A <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">azure::storage::blob_listing_details::values</a> enumeration describing which items to include in the listing.</td></tr>
+    <tr><td class="paramname">includes</td><td>An <a class="el" href="structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9">azure::storage::blob_listing_details::values</a> enumeration describing which items to include in the listing.</td></tr>
     <tr><td class="paramname">max_results</td><td>A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</td></tr>
     <tr><td class="paramname">token</td><td>A continuation token returned by a previous listing operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type list_blob_item_segment that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type azure::storage::list_blob_item_segment that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -827,14 +907,14 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the virtual directory URI for all locations. </p>
-<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">storage_uri</a> containing the virtual directory URI for all locations.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">azure::storage::storage_uri</a> containing the virtual directory URI for all locations.</dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 14:32:51 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 6 2015 17:00:03 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

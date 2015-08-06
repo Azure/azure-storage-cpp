@@ -26,10 +26,9 @@ std::vector < azure::storage::cloud_queue> list_all_queues(
     const azure::storage::queue_request_options& options, azure::storage::operation_context context)
 {
     std::vector<azure::storage::cloud_queue> results;
-    azure::storage::queue_result_iterator end_of_result;
-    for (azure::storage::queue_result_iterator iter = queue_client.list_queues(prefix, get_metadata, 0, options, context); iter != end_of_result; ++iter)
+    for (auto&& item : queue_client.list_queues(prefix, get_metadata, 0, options, context))
     {
-        results.push_back(*iter);
+        results.push_back(item);
     }
 
     return results;

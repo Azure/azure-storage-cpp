@@ -59,6 +59,11 @@ namespace azure { namespace storage {
         m_page_blob_sequence_number = parsed_properties.page_blob_sequence_number();
     }
 
+    void cloud_blob_properties::update_append_blob_committed_block_count(const cloud_blob_properties& parsed_properties)
+    {
+        m_append_blob_committed_block_count = parsed_properties.append_blob_committed_block_count();
+    }
+
     void cloud_blob_properties::update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5)
     {
         if ((type() != blob_type::unspecified) && (type() != parsed_properties.type()))

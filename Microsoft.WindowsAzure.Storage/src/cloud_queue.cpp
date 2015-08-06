@@ -395,8 +395,9 @@ namespace azure { namespace storage {
             throw std::logic_error(protocol::error_sas_missing_credentials);
         }
 
+        // since 2015-02-21, canonicalized resource is changed from "/account/name" to "/queue/account/name"
         utility::ostringstream_t resource_str;
-        resource_str << U('/') << service_client().credentials().account_name() << U('/') << name();
+        resource_str << U('/') << protocol::service_queue << U('/') << service_client().credentials().account_name() << U('/') << name();
 
         return protocol::get_queue_sas_token(stored_policy_identifier, policy, resource_str.str(), service_client().credentials());
     }

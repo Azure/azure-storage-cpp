@@ -96,7 +96,27 @@ namespace azure { namespace storage { namespace samples {
             // Delete the blobs
             blob1.delete_blob();
             blob2.delete_blob();
-            blob3.delete_blob();            
+            blob3.delete_blob();
+            
+            // Create an append blob
+            azure::storage::cloud_append_blob append_blob = container.get_append_blob_reference(U("my-append-1"));
+            append_blob.properties().set_content_type(U("text/plain; charset=utf-8"));
+            append_blob.create();
+
+            // Append two blocks
+            concurrency::streams::istream append_input_stream1 = concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(U("some text.")));
+            concurrency::streams::istream append_input_stream2 = concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(U("more text.")));
+            append_blob.append_block(append_input_stream1, utility::string_t());
+            append_blob.append_block(append_input_stream2, utility::string_t());
+            append_input_stream1.close().wait();
+            append_input_stream2.close().wait();
+
+            // Download append blob as text
+            utility::string_t append_text = append_blob.download_text();
+            ucout << U("Append Text: ") << append_text << std::endl;
+            
+            // Delete the blob
+            append_blob.delete_blob();
 
             // Delete the blob container
             // Return value is true if the container did exist and was successfully deleted.

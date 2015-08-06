@@ -1,6 +1,14 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v2.0:
+- Default REST API version is 2015-02-21
+- Added cloud_append_blob class, which supports the new blob type: append blob.
+- Added support of ranged-based for-loop for result_iterator class
+- Changed behavior to stop stripping out query parameters passed in with the resource URI. Some query parameters such as comp, restype, snapshot and api-version will still be removed.
+- Deprecated cloud_blob::start_copy_from_blob and cloud_blob::start_copy_from_blob_async. Use cloud_blob::start_copy instead.
+- Fixed the bug that cloud_table::execute(const table_operation&) method doesn't respect cloud_table_client::default_request_options.
+
 Changes in v1.0:
 - Changed return value type of cloud_blob_client::list_blobs_segmented, cloud_blob_container::list_blobs_segmented and cloud_blob_directory::list_blobs_segmented methods from blob_result_segment to list_blob_item_segment
 - Removed type blob_result_segment

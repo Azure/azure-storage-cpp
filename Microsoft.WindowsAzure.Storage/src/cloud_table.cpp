@@ -108,7 +108,7 @@ namespace azure { namespace storage {
         bool allow_not_found = operation.operation_type() == table_operation_type::retrieve_operation;
 
         std::shared_ptr<core::storage_command<table_result>> command = std::make_shared<core::storage_command<table_result>>(uri);
-        command->set_build_request(std::bind(protocol::execute_operation, operation, options.payload_format(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::execute_operation, operation, modified_options.payload_format(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(operation.operation_type() == azure::storage::table_operation_type::retrieve_operation ? core::command_location_mode::primary_or_secondary : core::command_location_mode::primary_only);
         command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, const request_result& result, operation_context context) -> table_result
@@ -229,7 +229,7 @@ namespace azure { namespace storage {
         storage_uri uri = protocol::generate_table_uri(service_client(), *this, query, token);
 
         std::shared_ptr<core::storage_command<table_query_segment>> command = std::make_shared<core::storage_command<table_query_segment>>(uri);
-        command->set_build_request(std::bind(protocol::execute_query, options.payload_format(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::execute_query, modified_options.payload_format(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<table_query_segment>, table_query_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -257,8 +257,9 @@ namespace azure { namespace storage {
         utility::string_t table_name = name();
         std::transform(table_name.begin(), table_name.end(), table_name.begin(), core::utility_char_tolower);
 
+        // since 2015-02-21, canonicalized resource is changed from "/account/name" to "/table/account/name"
         utility::ostringstream_t resource_str;
-        resource_str << U('/') << service_client().credentials().account_name() << U('/') << table_name;
+        resource_str << U('/') << protocol::service_table << U('/') << service_client().credentials().account_name() << U('/') << table_name;
 
         return protocol::get_table_sas_token(stored_policy_identifier, policy, name(), start_partition_key, start_row_key, end_partition_key, end_row_key, resource_str.str(), service_client().credentials());
     }

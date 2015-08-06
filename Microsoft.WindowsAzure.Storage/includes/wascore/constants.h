@@ -49,6 +49,11 @@ namespace azure { namespace storage { namespace protocol {
     const std::chrono::seconds minimum_fixed_lease_duration(15);
     const std::chrono::seconds maximum_fixed_lease_duration(60);
 
+    // service names
+    const utility::string_t service_blob(U("blob"));
+    const utility::string_t service_table(U("table"));
+    const utility::string_t service_queue(U("queue"));
+
     // uri query parameters
     const utility::string_t uri_query_timeout(U("timeout"));
     const utility::string_t uri_query_resource_type(U("restype"));
@@ -112,6 +117,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t component_block_list(U("blocklist"));
     const utility::string_t component_page_list(U("pagelist"));
     const utility::string_t component_page(U("page"));
+    const utility::string_t component_append_block(U("appendblock"));
     const utility::string_t component_copy(U("copy"));
     const utility::string_t component_acl(U("acl"));
 
@@ -140,6 +146,10 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t ms_header_blob_content_type(U("x-ms-blob-content-type"));
     const utility::string_t ms_header_blob_sequence_number(U("x-ms-blob-sequence-number"));
     const utility::string_t ms_header_sequence_number_action(U("x-ms-sequence-number-action"));
+    const utility::string_t ms_header_blob_condition_maxsize(U("x-ms-blob-condition-maxsize"));
+    const utility::string_t ms_header_blob_condition_appendpos(U("x-ms-blob-condition-appendpos"));
+    const utility::string_t ms_header_blob_append_offset(U("x-ms-blob-append-offset"));
+    const utility::string_t ms_header_blob_committed_block_count(U("x-ms-blob-committed-block-count"));
     const utility::string_t ms_header_copy_id(U("x-ms-copy-id"));
     const utility::string_t ms_header_copy_completion_time(U("x-ms-copy-completion-time"));
     const utility::string_t ms_header_copy_action(U("x-ms-copy-action"));
@@ -178,7 +188,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t ms_header_time_next_visible(U("x-ms-time-next-visible"));
 
     // header values
-    const utility::string_t header_value_storage_version(U("2014-02-14"));
+    const utility::string_t header_value_storage_version(U("2015-02-21"));
     const utility::string_t header_value_true(U("true"));
     const utility::string_t header_value_false(U("false"));
     const utility::string_t header_value_locked(U("locked"));
@@ -205,6 +215,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t header_value_page_write_clear(U("Clear"));
     const utility::string_t header_value_blob_type_block(U("BlockBlob"));
     const utility::string_t header_value_blob_type_page(U("PageBlob"));
+    const utility::string_t header_value_blob_type_append(U("AppendBlob"));
     const utility::string_t header_value_snapshots_include(U("include"));
     const utility::string_t header_value_snapshots_only(U("only"));
     const utility::string_t header_value_sequence_max(U("max"));
@@ -308,9 +319,9 @@ namespace azure { namespace storage { namespace protocol {
 
     // user agent
 #if defined(WIN32)
-    const utility::string_t header_value_user_agent(U("Azure-Storage/1.0.0 (Native; Windows)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.0.0 (Native; Windows)"));
 #else
-    const utility::string_t header_value_user_agent(U("Azure-Storage/1.0.0 (Native)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.0.0 (Native)"));
 #endif
 
 }}} // namespace azure::storage::protocol

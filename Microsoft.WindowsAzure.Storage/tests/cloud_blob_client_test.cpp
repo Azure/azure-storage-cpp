@@ -105,10 +105,9 @@ void blob_service_test_base_with_objects_to_delete::check_blob_list(const std::v
 std::vector<azure::storage::cloud_blob_container> blob_service_test_base::list_all_containers(const utility::string_t& prefix, azure::storage::container_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options)
 {
     std::vector<azure::storage::cloud_blob_container> results;
-    azure::storage::container_result_iterator end_of_result;
-    for (azure::storage::container_result_iterator iter = m_client.list_containers(prefix, includes, max_results, options, m_context); iter != end_of_result; ++iter)
+    for (auto&& item : m_client.list_containers(prefix, includes, max_results, options, m_context))
     {
-        results.push_back(*iter);
+        results.push_back(item);
     }
 
     return results;
@@ -117,28 +116,13 @@ std::vector<azure::storage::cloud_blob_container> blob_service_test_base::list_a
 std::vector<azure::storage::cloud_blob> blob_service_test_base::list_all_blobs_from_client(const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options)
 {
     std::vector<azure::storage::cloud_blob> blobs;
-    azure::storage::continuation_token token;
-
-    do
+    for (auto&& item : m_client.list_blobs(prefix, true, includes, max_results, options, m_context))
     {
-        auto results = m_client.list_blobs_segmented(prefix, true, includes, max_results, token, options, m_context);
-
-        if (max_results > 0)
+        if (item.is_blob())
         {
-            CHECK(results.results().size() <= static_cast<size_t>(max_results));
+            blobs.push_back(std::move(item.as_blob()));
         }
-
-        blobs.reserve(results.results().size());
-        for (auto& item : results.results())
-        {
-            if (item.is_blob())
-            {
-                blobs.push_back(std::move(item.as_blob()));
-            }
-        }
-
-        token = results.continuation_token();
-    } while (!token.empty());
+    }
 
     return blobs;
 }

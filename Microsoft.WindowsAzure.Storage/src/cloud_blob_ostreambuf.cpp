@@ -16,7 +16,9 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
+#include "was/error_code_strings.h"
 #include "wascore/blobstreams.h"
+#include "wascore/logging.h"
 #include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace core {
@@ -255,6 +257,95 @@ namespace azure { namespace storage { namespace core {
         else
         {
             return _sync().then([] (bool)
+            {
+            });
+        }
+    }
+
+    pplx::task<void> basic_cloud_append_blob_ostreambuf::upload_buffer()
+    {
+        auto buffer = prepare_buffer();
+        if (buffer->is_empty())
+        {
+            return pplx::task_from_result();
+        }
+
+        auto offset = m_current_blob_offset;
+        m_current_blob_offset += buffer->size();
+
+        if (m_condition.max_size() != -1 && m_current_blob_offset > m_condition.max_size())
+        {
+            m_currentException = std::make_exception_ptr(std::invalid_argument(protocol::error_invalid_block_size));
+            return pplx::task_from_result();
+        }
+
+        auto this_pointer = std::dynamic_pointer_cast<basic_cloud_append_blob_ostreambuf>(shared_from_this());
+        return m_semaphore.lock_async().then([this_pointer, buffer, offset]()
+        {
+            if (this_pointer->m_currentException == nullptr)
+            {
+                try
+                {
+                    this_pointer->m_condition.set_append_position(offset);
+                    auto previous_results_count = this_pointer->m_context.request_results().size();
+                    this_pointer->m_blob->append_block_async(buffer->stream(), buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context).then([this_pointer, previous_results_count](pplx::task<int64_t> upload_task)
+                    {
+                        std::lock_guard<async_semaphore> guard(this_pointer->m_semaphore, std::adopt_lock);
+                        try
+                        {
+                            upload_task.wait();
+                        }
+                        catch (const azure::storage::storage_exception& ex)
+                        {
+                            if (this_pointer->m_options.absorb_conditional_errors_on_retry()
+                                && ex.result().http_status_code() == web::http::status_codes::PreconditionFailed
+                                && (ex.result().extended_error().code() == protocol::error_code_invalid_append_condition || ex.result().extended_error().code() == protocol::error_invalid_max_blob_size_condition)
+                                && this_pointer->m_context.request_results().size() - previous_results_count > 1)
+                            {
+                                // Pre-condition failure on a retry should be ignored in a single writer scenario since the request
+                                // succeeded in the first attempt.
+                                if (logger::instance().should_log(this_pointer->m_context, client_log_level::log_level_warning))
+                                {
+                                    logger::instance().log(this_pointer->m_context, client_log_level::log_level_warning, protocol::error_precondition_failure_ignored);
+                                }
+                            }
+                            else
+                            {
+                                this_pointer->m_currentException = std::current_exception();
+                            }
+                        }
+                        catch (const std::exception&)
+                        {
+                            this_pointer->m_currentException = std::current_exception();
+                        }
+                    });
+                }
+                catch (...)
+                {
+                    this_pointer->m_semaphore.unlock();
+                }
+            }
+            else
+            {
+                this_pointer->m_semaphore.unlock();
+            }
+        });
+    }
+
+    pplx::task<void> basic_cloud_append_blob_ostreambuf::commit_blob()
+    {
+        if (m_blob_hash_provider.is_enabled())
+        {
+            auto this_pointer = std::dynamic_pointer_cast<basic_cloud_append_blob_ostreambuf>(shared_from_this());
+            return _sync().then([this_pointer](bool) -> pplx::task<void>
+            {
+                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_blob_hash_provider.hash());
+                return this_pointer->m_blob->upload_properties_async(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
+            });
+        }
+        else
+        {
+            return _sync().then([](bool)
             {
             });
         }

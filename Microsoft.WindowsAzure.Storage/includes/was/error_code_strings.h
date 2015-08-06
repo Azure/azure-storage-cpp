@@ -238,6 +238,16 @@ namespace azure { namespace storage { namespace protocol {
     // This section provides error code strings that are specific to the Blob service.
 
     /// <summary>
+    /// The specified append offset is invalid.
+    /// </summary>
+    const utility::string_t error_code_invalid_append_condition(U("AppendPositionConditionNotMet"));
+
+    /// <summary>
+    /// The specified maximum blob size is invalid.
+    /// </summary>
+    const utility::string_t error_invalid_max_blob_size_condition(U("MaxBlobSizeConditionNotMet"));
+
+    /// <summary>
     /// The specified block or blob is invalid.
     /// </summary>
     const utility::string_t error_code_invalid_blob_or_block(U("InvalidBlobOrBlock"));

@@ -68,7 +68,7 @@ SUITE(Table)
         CHECK(table1.uri().primary_uri() == uri.primary_uri());
         CHECK(table1.uri().secondary_uri() == uri.secondary_uri());
 
-        utility::string_t sas_token(U("sv=2012-02-12&tn=people&st=2013-05-15T16%3A20%3A36Z&se=2013-05-15T17%3A20%3A36Z&sp=raud&sig=mysignature"));
+        utility::string_t sas_token(U("se=2013-05-15T17%3A20%3A36Z&sig=mysignature&sp=raud&st=2013-05-15T16%3A20%3A36Z&sv=2012-02-12&tn=people"));
 
         azure::storage::storage_uri sas_uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")));
 
@@ -106,15 +106,7 @@ SUITE(Table)
         azure::storage::storage_uri sas_uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")));
         azure::storage::storage_credentials sas_credentials(sas_token);
 
-        azure::storage::cloud_table table2(sas_uri, sas_credentials);
-
-        CHECK(table2.service_client().base_uri().primary_uri() == expected_primary_uri);
-        CHECK(table2.service_client().base_uri().secondary_uri() == expected_secondary_uri);
-        CHECK(table2.service_client().credentials().is_sas());
-        CHECK(table2.service_client().credentials().sas_token() == sas_token);
-        CHECK(table2.name().compare(U("mytable")) == 0);
-        CHECK(table2.uri().primary_uri() == uri.primary_uri());
-        CHECK(table2.uri().secondary_uri() == uri.secondary_uri());
+        CHECK_THROW(azure::storage::cloud_table(sas_uri, sas_credentials), std::invalid_argument);
 
         azure::storage::storage_credentials invalid_sas_credentials(invalid_sas_token);
 

@@ -40,6 +40,7 @@ if(UNIX)
      cloud_blob_istreambuf.cpp
      cloud_blob_client.cpp
      cloud_blob.cpp
+     cloud_append_blob.cpp
      blob_response_parsers.cpp
      blob_request_factory.cpp
      basic_types.cpp

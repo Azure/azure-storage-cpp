@@ -149,15 +149,11 @@ namespace azure { namespace storage { namespace core {
         primary_or_secondary,
     };
 
-    template<typename T>
-    class executor;
-
-    template<typename T>
-    class storage_command
+    class storage_command_base
     {
     public:
 
-        explicit storage_command(const storage_uri& request_uri)
+        explicit storage_command_base(const storage_uri& request_uri)
             : m_request_uri(request_uri), m_location_mode(command_location_mode::primary_only)
         {
         }
@@ -202,16 +198,6 @@ namespace azure { namespace storage { namespace core {
             m_recover_request = value;
         }
 
-        void set_preprocess_response(std::function<T(const web::http::http_response &, const request_result&, operation_context)> value)
-        {
-            m_preprocess_response = value;
-        }
-
-        void set_postprocess_response(std::function<pplx::task<T>(const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> value)
-        {
-            m_postprocess_response = value;
-        }
-        
         void set_location_mode(command_location_mode value, storage_location lock_location = storage_location::unspecified)
         {
             switch (lock_location)
@@ -242,34 +228,130 @@ namespace azure { namespace storage { namespace core {
 
     private:
 
+        virtual void preprocess_response(const web::http::http_response&, const request_result&, operation_context) = 0;
+        virtual pplx::task<void> postprocess_response(const web::http::http_response&, const request_result&, const ostream_descriptor&, operation_context) = 0;
+
         storage_uri m_request_uri;
         istream_descriptor m_request_body;
         concurrency::streams::ostream m_destination_stream;
         bool m_calculate_response_body_md5;
         command_location_mode m_location_mode;
 
-        std::function<web::http::http_request (web::http::uri_builder, const std::chrono::seconds&, operation_context)> m_build_request;
+        std::function<web::http::http_request(web::http::uri_builder, const std::chrono::seconds&, operation_context)> m_build_request;
         std::function<void(web::http::http_request&, operation_context)> m_sign_request;
         std::function<bool(utility::size64_t, operation_context)> m_recover_request;
-        std::function<T (const web::http::http_response&, const request_result&, operation_context)> m_preprocess_response;
-        std::function<pplx::task<T> (const web::http::http_response&, const request_result&, const ostream_descriptor&, operation_context)> m_postprocess_response;
 
-        friend class executor<T>;
+        friend class executor_impl;
     };
 
     template<typename T>
-    class executor
+    class storage_command : public storage_command_base
     {
     public:
 
-        executor(std::shared_ptr<storage_command<T>> command, const request_options& options, operation_context context)
+        explicit storage_command(const storage_uri& request_uri)
+            : storage_command_base(request_uri)
+        {
+        }
+
+        void set_preprocess_response(std::function<T(const web::http::http_response&, const request_result&, operation_context)> value)
+        {
+            m_preprocess_response = value;
+        }
+
+        void set_postprocess_response(std::function<pplx::task<T>(const web::http::http_response&, const request_result&, const ostream_descriptor&, operation_context)> value)
+        {
+            m_postprocess_response = value;
+        }
+
+        T&& result()
+        {
+            return std::move(m_result);
+        }
+
+    private:
+
+        virtual void preprocess_response(const web::http::http_response& response, const request_result& result, operation_context context)
+        {
+            if (m_preprocess_response != nullptr)
+            {
+                m_result = m_preprocess_response(response, result, context);
+            }
+        }
+
+        virtual pplx::task<void> postprocess_response(const web::http::http_response& response, const request_result& result, const ostream_descriptor& descriptor, operation_context context)
+        {
+            if (m_postprocess_response != nullptr)
+            {
+                return m_postprocess_response(response, result, descriptor, context).then([this](pplx::task<T> task)
+                {
+                    m_result = task.get();
+                });
+            }
+
+            return pplx::task_from_result();
+        }
+
+        std::function<T (const web::http::http_response&, const request_result&, operation_context)> m_preprocess_response;
+        std::function<pplx::task<T> (const web::http::http_response&, const request_result&, const ostream_descriptor&, operation_context)> m_postprocess_response;
+        T m_result;
+    };
+
+    template<>
+    class storage_command<void> : public storage_command_base
+    {
+    public:
+
+        explicit storage_command(const storage_uri& request_uri)
+            : storage_command_base(request_uri)
+        {
+        }
+
+        void set_preprocess_response(std::function<void(const web::http::http_response&, const request_result&, operation_context)> value)
+        {
+            m_preprocess_response = value;
+        }
+
+        void set_postprocess_response(std::function<pplx::task<void>(const web::http::http_response&, const request_result&, const ostream_descriptor&, operation_context)> value)
+        {
+            m_postprocess_response = value;
+        }
+
+    private:
+        virtual void preprocess_response(const web::http::http_response& response, const request_result& result, operation_context context)
+        {
+            if (m_preprocess_response != nullptr)
+            {
+                m_preprocess_response(response, result, context);
+            }
+        }
+
+        virtual pplx::task<void> postprocess_response(const web::http::http_response& response, const request_result& result, const ostream_descriptor& descriptor, operation_context context)
+        {
+            if (m_postprocess_response != nullptr)
+            {
+                return m_postprocess_response(response, result, descriptor, context);
+            }
+
+            return pplx::task_from_result();
+        }
+
+        std::function<void(const web::http::http_response&, const request_result&, operation_context)> m_preprocess_response;
+        std::function<pplx::task<void>(const web::http::http_response&, const request_result&, const ostream_descriptor&, operation_context)> m_postprocess_response;
+    };
+
+    class executor_impl
+    {
+    public:
+
+        executor_impl(std::shared_ptr<storage_command_base> command, const request_options& options, operation_context context)
             : m_command(command), m_request_options(options), m_context(context), m_is_hashing_started(false),
             m_total_downloaded(0), m_retry_count(0), m_current_location(get_first_location(options.location_mode())),
             m_current_location_mode(options.location_mode()), m_retry_policy(options.retry_policy().clone())
         {
         }
 
-        static pplx::task<T> execute_async(std::shared_ptr<storage_command<T>> command, const request_options& options, operation_context context)
+        static pplx::task<void> execute_async(std::shared_ptr<storage_command_base> command, const request_options& options, operation_context context)
         {
             if (!context.start_time().is_initialized())
             {
@@ -279,7 +361,7 @@ namespace azure { namespace storage { namespace core {
             // TODO: Use "it" variable name for iterators in for loops
             // TODO: Reduce usage of auto variable types
 
-            auto instance = std::make_shared<executor<T>>(command, options, context);
+            auto instance = std::make_shared<executor_impl>(command, options, context);
             return pplx::details::do_while([instance]() -> pplx::task<bool>
             {
                 // 0. Begin request 
@@ -388,7 +470,7 @@ namespace azure { namespace storage { namespace core {
                         // This is when the status code will be checked and m_preprocess_response
                         // will throw a storage_exception if it is not expected.
                         instance->m_request_result = request_result(instance->m_start_time, instance->m_current_location, response, false);
-                        instance->m_result = instance->m_command->m_preprocess_response(response, instance->m_request_result, instance->m_context);
+                        instance->m_command->preprocess_response(response, instance->m_request_result, instance->m_context);
 
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                         {
@@ -451,48 +533,36 @@ namespace azure { namespace storage { namespace core {
                         }
                     }
 
-                    // If the command asked for post-processing, it is now time to call m_postprocess_response
-                    if (instance->m_command->m_postprocess_response)
+                    // It is now time to call m_postprocess_response
+                    // Finish the MD5 hash if MD5 was being calculated
+                    instance->m_hash_provider.close();
+                    instance->m_is_hashing_started = false;
+
+                    ostream_descriptor descriptor;
+                    if (instance->m_response_streambuf)
                     {
-                        if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                        utility::size64_t total_downloaded = instance->m_total_downloaded + instance->m_response_streambuf.total_written();
+                        descriptor = ostream_descriptor(total_downloaded, instance->m_hash_provider.hash());
+                    }
+
+                    return instance->m_command->postprocess_response(response, instance->m_request_result, descriptor, instance->m_context).then([instance](pplx::task<void> result_task)
+                    {
+                        try
                         {
-                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Processing response body"));
+                            result_task.get();
                         }
-
-                        // Finish the MD5 hash if MD5 was being calculated
-                        instance->m_hash_provider.close();
-                        instance->m_is_hashing_started = false;
-
-                        ostream_descriptor descriptor;
-                        if (instance->m_response_streambuf)
+                        catch (const storage_exception& e)
                         {
-                            utility::size64_t total_downloaded = instance->m_total_downloaded + instance->m_response_streambuf.total_written();
-                            descriptor = ostream_descriptor(total_downloaded, instance->m_hash_provider.hash());
-                        }
-
-                        return instance->m_command->m_postprocess_response(response, instance->m_request_result, descriptor, instance->m_context).then([instance](pplx::task<T> result_task)
-                        {
-                            try
+                            if (e.result().is_response_available())
                             {
-                                instance->m_result = result_task.get();
-                            }
-                            catch (const storage_exception& e)
-                            {
-                                if (e.result().is_response_available())
-                                {
-                                    instance->m_request_result.set_http_status_code(e.result().http_status_code());
-                                    instance->m_request_result.set_extended_error(e.result().extended_error());
-                                }
-
-                                throw;
+                                instance->m_request_result.set_http_status_code(e.result().http_status_code());
+                                instance->m_request_result.set_extended_error(e.result().extended_error());
                             }
 
-                        });
-                    }
-                    else
-                    {
-                        return pplx::task_from_result();
-                    }
+                            throw;
+                        }
+
+                    });
                 }).then([instance](pplx::task<void> final_task) -> pplx::task<bool>
                 {
                     bool retryable_exception = true;
@@ -582,7 +652,7 @@ namespace azure { namespace storage { namespace core {
                     // Returning false here will cause do_while to exit.
                     return pplx::task_from_result<bool>(false);
                 });
-            }).then([instance](pplx::task<bool> loop_task) -> T
+            }).then([instance](pplx::task<bool> loop_task)
             {
                 instance->m_context.set_end_time(utility::datetime::utc_now());
                 loop_task.wait();
@@ -591,8 +661,6 @@ namespace azure { namespace storage { namespace core {
                 {
                     logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Operation completed successfully"));
                 }
-
-                return instance->m_result;
             });
         }
 
@@ -683,7 +751,7 @@ namespace azure { namespace storage { namespace core {
                 {
                     throw storage_exception(protocol::error_primary_only_command, false);
                 }
-            
+
                 if (logger::instance().should_log(m_context, client_log_level::log_level_verbose))
                 {
                     logger::instance().log(m_context, client_log_level::log_level_verbose, protocol::error_primary_only_command);
@@ -721,7 +789,7 @@ namespace azure { namespace storage { namespace core {
 
             headers.add(name, value);
         }
-        
+
         static std::exception_ptr capture_inner_exception(const std::exception& exception)
         {
             if (nullptr == dynamic_cast<const storage_exception*>(&exception))
@@ -733,7 +801,7 @@ namespace azure { namespace storage { namespace core {
             return nullptr;
         }
 
-        std::shared_ptr<storage_command<T>> m_command;
+        std::shared_ptr<storage_command_base> m_command;
         request_options m_request_options;
         operation_context m_context;
         utility::datetime m_start_time;
@@ -748,39 +816,18 @@ namespace azure { namespace storage { namespace core {
         int m_retry_count;
         storage_location m_current_location;
         location_mode m_current_location_mode;
-        T m_result;
     };
 
-    typedef char void_command_type;
-    const void_command_type VOID_COMMAND_RESULT = 0;
-
-    template<>
-    class storage_command<void> : public storage_command<void_command_type>
+    template<typename T>
+    class executor
     {
     public:
-
-        explicit storage_command(const storage_uri& request_uri)
-            : storage_command<void_command_type>(request_uri)
+        static pplx::task<T> execute_async(std::shared_ptr<storage_command<T>> command, const request_options& options, operation_context context)
         {
-        }
-
-        void set_preprocess_response(std::function<void (const web::http::http_response &, const request_result&, operation_context)> value)
-        {
-            storage_command<void_command_type>::set_preprocess_response([value] (const web::http::http_response& response, const request_result& result, operation_context context) -> void_command_type
+            return executor_impl::execute_async(command, options, context).then([command](pplx::task<void> task) -> T
             {
-                value(response, result, context);
-                return VOID_COMMAND_RESULT;
-            });
-        }
-
-        void set_postprocess_response(std::function<pplx::task<void> (const web::http::http_response &, const request_result&, const ostream_descriptor&, operation_context)> value)
-        {
-            storage_command<void_command_type>::set_postprocess_response([value] (const web::http::http_response& response, const request_result& result, const ostream_descriptor& descriptor, operation_context context) -> pplx::task<void_command_type>
-            {
-                return value(response, result, descriptor, context).then([] () -> void_command_type
-                {
-                    return VOID_COMMAND_RESULT;
-                });
+                task.get();
+                return command->result();
             });
         }
     };
@@ -791,7 +838,7 @@ namespace azure { namespace storage { namespace core {
     public:
         static pplx::task<void> execute_async(std::shared_ptr<storage_command<void>> command, const request_options& options, operation_context context)
         {
-            return executor<void_command_type>::execute_async(command, options, context).then([] (void_command_type) {});
+            return executor_impl::execute_async(command, options, context);
         }
     };
 

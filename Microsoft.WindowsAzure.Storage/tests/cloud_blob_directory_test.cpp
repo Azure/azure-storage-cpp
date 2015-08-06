@@ -60,10 +60,15 @@ void create_blob_tree(const azure::storage::cloud_blob_container& container, con
             azure::storage::cloud_page_blob page_blob(blob);
             page_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), context);
         }
-        else
+        else if (iter->type() == azure::storage::blob_type::block_blob)
         {
             azure::storage::cloud_block_blob block_blob(blob);
             block_blob.upload_block_list(std::vector<azure::storage::block_list_item>(), azure::storage::access_condition(), azure::storage::blob_request_options(), context);
+        }
+        else if (iter->type() == azure::storage::blob_type::append_blob)
+        {
+            azure::storage::cloud_append_blob append_blob(blob);
+            append_blob.create_or_replace(azure::storage::access_condition(), azure::storage::blob_request_options(), context);
         }
     }
 }
@@ -163,6 +168,10 @@ void check_parents(const azure::storage::cloud_blob_container& container, const 
     CHECK(azure::storage::blob_type::page_blob == page_blob.type());
     CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("page_blob"), page_blob.name());
 
+    auto append_blob = dir3.get_append_blob_reference(U("append_blob"));
+    CHECK(azure::storage::blob_type::append_blob == append_blob.type());
+    CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("append_blob"), append_blob.name());
+
     auto blob_parent = blob.get_parent_reference();
     CHECK_UTF8_EQUAL(dir3.prefix(), blob_parent.prefix());
 
@@ -221,6 +230,8 @@ SUITE(Blob)
             blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("blob5")));
             blobs.push_back(container.get_page_blob_reference(U("page_blobs") + delimiter + U("dir1") + delimiter + U("dir2") + delimiter + U("blob6")));
             blobs.push_back(container.get_page_blob_reference(U("page_blobs") + delimiter + U("blob7")));
+            blobs.push_back(container.get_append_blob_reference(U("append_blobs") + delimiter + U("dir1") + delimiter + U("dir3") + delimiter + U("blob8")));
+            blobs.push_back(container.get_append_blob_reference(U("append_blobs") + delimiter + U("blob9")));
 
             create_blob_tree(container, blobs, delimiter, m_context);
 

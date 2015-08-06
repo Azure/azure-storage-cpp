@@ -35,7 +35,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="basic_no_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::basic_no_retry_policy" /> class.
         /// </summary>
         basic_no_retry_policy()
             : basic_retry_policy()
@@ -47,7 +47,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Clones the retry policy.
         /// </summary>
-        /// <returns>A cloned <see cref="retry_policy" />.</returns>
+        /// <returns>A cloned <see cref="azure::storage::retry_policy" />.</returns>
         retry_policy clone() const override
         {
             return retry_policy(std::make_shared<basic_no_retry_policy>());
@@ -62,7 +62,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="no_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::no_retry_policy" /> class.
         /// </summary>
         no_retry_policy()
             : retry_policy(std::make_shared<basic_no_retry_policy>())
@@ -82,7 +82,7 @@ namespace azure { namespace storage {
     protected:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="basic_common_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::basic_common_retry_policy" /> class.
         /// </summary>
         /// <param name="max_attempts">The maximum number of retries to attempt.</param>
         explicit basic_common_retry_policy(int max_attempts)
@@ -114,7 +114,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="basic_linear_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::basic_linear_retry_policy" /> class.
         /// </summary>
         /// <param name="delta_backoff">The delta backoff.</param>
         /// <param name="max_attempts">The maximum number of retries to attempt.</param>
@@ -128,7 +128,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Clones the retry policy.
         /// </summary>
-        /// <returns>A cloned <see cref="retry_policy" />.</returns>
+        /// <returns>A cloned <see cref="azure::storage::retry_policy" />.</returns>
         retry_policy clone() const override
         {
             return retry_policy(std::make_shared<basic_linear_retry_policy>(m_delta_backoff, m_max_attempts));
@@ -147,7 +147,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="linear_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::linear_retry_policy" /> class.
         /// </summary>
         linear_retry_policy()
             : retry_policy(std::make_shared<basic_linear_retry_policy>(protocol::default_retry_interval, default_attempts))
@@ -155,7 +155,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="linear_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::linear_retry_policy" /> class.
         /// </summary>
         /// <param name="delta_backoff">The delta backoff.</param>
         /// <param name="max_attempts">The maximum number of retries to attempt.</param>
@@ -173,7 +173,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="basic_exponential_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::basic_exponential_retry_policy" /> class.
         /// </summary>
         /// <param name="delta_backoff">The delta backoff.</param>
         /// <param name="max_attempts">The maximum number of retries to attempt.</param>
@@ -188,7 +188,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Clones the retry policy.
         /// </summary>
-        /// <returns>A cloned <see cref="retry_policy" />.</returns>
+        /// <returns>A cloned <see cref="azure::storage::retry_policy" />.</returns>
         retry_policy clone() const override
         {
             return retry_policy(std::make_shared<basic_exponential_retry_policy>(m_delta_backoff, m_max_attempts));
@@ -209,7 +209,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="exponential_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::exponential_retry_policy" /> class.
         /// </summary>
         exponential_retry_policy()
             : retry_policy(std::make_shared<basic_exponential_retry_policy>(protocol::default_retry_interval, default_attempts))
@@ -217,7 +217,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="exponential_retry_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::exponential_retry_policy" /> class.
         /// </summary>
         /// <param name="delta_backoff">The delta backoff.</param>
         /// <param name="max_attempts">The maximum number of retries to attempt.</param>

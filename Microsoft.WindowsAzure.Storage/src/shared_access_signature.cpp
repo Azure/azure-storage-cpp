@@ -21,6 +21,7 @@
 #include "was/blob.h"
 #include "was/queue.h"
 #include "was/table.h"
+#include "wascore/logging.h"
 #include "wascore/util.h"
 #include "wascore/resources.h"
 
@@ -39,6 +40,17 @@ namespace azure { namespace storage { namespace protocol {
     utility::string_t convert_datetime_if_initialized(utility::datetime value)
     {
         return value.is_initialized() ? core::truncate_fractional_seconds(value).to_string(utility::datetime::ISO_8601) : utility::string_t();
+    }
+
+    void log_sas_string_to_sign(const utility::string_t& string_to_sign)
+    {
+        operation_context context;
+        if (core::logger::instance().should_log(context, client_log_level::log_level_verbose))
+        {
+            utility::string_t with_dots(string_to_sign);
+            std::replace(with_dots.begin(), with_dots.end(), U('\n'), U('.'));
+            core::logger::instance().log(context, client_log_level::log_level_verbose, U("StringToSign: ") + with_dots);
+        }
     }
 
     web::http::uri_builder get_sas_token_builder(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& signature)
@@ -71,54 +83,47 @@ namespace azure { namespace storage { namespace protocol {
 
     storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource)
     {
-        // Order of the strings in the sas_parameters vector is per MSDN's
-        // definition of Shared Access Signatures.
-        const utility::string_t sas_parameters[] = {
-            protocol::uri_query_sas_version,
-            protocol::uri_query_sas_resource,
-            protocol::uri_query_sas_table_name,
-            protocol::uri_query_sas_start,
-            protocol::uri_query_sas_expiry,
-            protocol::uri_query_sas_permissions,
-            protocol::uri_query_sas_start_partition_key,
-            protocol::uri_query_sas_start_row_key,
-            protocol::uri_query_sas_end_partition_key,
-            protocol::uri_query_sas_end_row_key,
-            protocol::uri_query_sas_identifier,
-            protocol::uri_query_sas_cache_control,
-            protocol::uri_query_sas_content_disposition,
-            protocol::uri_query_sas_content_encoding,
-            protocol::uri_query_sas_content_language,
-            protocol::uri_query_sas_content_type,
-            protocol::uri_query_sas_signature,
-        };
-
-        const int sas_parameters_size = (int) (sizeof(sas_parameters) / sizeof(sas_parameters[0]));
-
+        bool sas_parameter_found = false;
         auto splitted_query = web::http::uri::split_query(uri.query());
-
-        bool params_found = false;
-        web::http::uri_builder builder;
-        for (int i = 0; i < sas_parameters_size; ++i)
+        std::vector<utility::string_t> remove_list;
+        for (auto iter = splitted_query.cbegin(); iter != splitted_query.cend(); ++iter)
         {
-            auto param = splitted_query.find(sas_parameters[i]);
-            if (param != splitted_query.end())
+            utility::string_t query_key = iter->first;
+            std::transform(query_key.begin(), query_key.end(), query_key.begin(), core::utility_char_tolower);
+
+            if (query_key == protocol::uri_query_sas_signature)
             {
-                params_found = true;
-                add_query_if_not_empty(builder, param->first, param->second, /* do_encoding */ false);
+                sas_parameter_found = true;
+            }
+            else if (query_key == protocol::uri_query_resource_type ||
+                query_key == protocol::uri_query_component ||
+                query_key == protocol::uri_query_snapshot ||
+                query_key == protocol::uri_query_sas_api_version)
+            {
+                remove_list.push_back(iter->first);
             }
         }
 
-        if (!params_found)
+        if (!sas_parameter_found)
         {
             return storage_credentials();
         }
 
-        auto signature = splitted_query.find(protocol::uri_query_sas_signature);
+        for (auto remove_param : remove_list)
+        {
+            splitted_query.erase(remove_param);
+        }
+
         auto signed_resource = splitted_query.find(protocol::uri_query_sas_resource);
-        if ((signature == splitted_query.end()) || (require_signed_resource && (signed_resource == splitted_query.end())))
+        if (require_signed_resource && signed_resource == splitted_query.end())
         {
             throw std::invalid_argument(protocol::error_missing_params_for_sas);
+        }
+
+        web::http::uri_builder builder;
+        for (auto iter = splitted_query.cbegin(); iter != splitted_query.cend(); ++iter)
+        {
+            add_query_if_not_empty(builder, iter->first, iter->second, /* do_encoding */ false);
         }
 
         return storage_credentials(builder.query());
@@ -130,6 +135,22 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_blob_sas_string_to_sign(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource, const storage_credentials& credentials)
     {
+        //// StringToSign =      signedpermissions + "\n" +
+        ////                     signedstart + "\n" +
+        ////                     signedexpiry + "\n" +
+        ////                     canonicalizedresource + "\n" +
+        ////                     signedidentifier + "\n" +
+        ////                     signedversion + "\n" +
+        ////                     cachecontrol + "\n" +
+        ////                     contentdisposition + "\n" +
+        ////                     contentencoding + "\n" +
+        ////                     contentlanguage + "\n" +
+        ////                     contenttype
+        ////
+        //// HMAC-SHA256(UTF8.Encode(StringToSign))
+        ////
+        //// Note that the final five headers are invalid for the 2012-02-12 version.
+
         utility::ostringstream_t str;
         get_sas_string_to_sign(str, identifier, policy, resource);
         str << U('\n') << headers.cache_control();
@@ -138,7 +159,10 @@ namespace azure { namespace storage { namespace protocol {
         str << U('\n') << headers.content_language();
         str << U('\n') << headers.content_type();
 
-        return calculate_hmac_sha256_hash(str.str(), credentials);
+        auto string_to_sign = str.str();
+        log_sas_string_to_sign(string_to_sign);
+
+        return calculate_hmac_sha256_hash(string_to_sign, credentials);
     }
 
     utility::string_t get_blob_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials)
@@ -162,10 +186,22 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_queue_sas_string_to_sign(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials)
     {
+        //// StringToSign =      signedpermissions + "\n" +
+        ////                     signedstart + "\n" +
+        ////                     signedexpiry + "\n" +
+        ////                     canonicalizedresource + "\n" +
+        ////                     signedidentifier + "\n" +
+        ////                     signedversion
+        ////
+        //// HMAC-SHA256(UTF8.Encode(StringToSign))
+
         utility::ostringstream_t str;
         get_sas_string_to_sign(str, identifier, policy, resource);
 
-        return calculate_hmac_sha256_hash(str.str(), credentials);
+        auto string_to_sign = str.str();
+        log_sas_string_to_sign(string_to_sign);
+
+        return calculate_hmac_sha256_hash(string_to_sign, credentials);
     }
 
     utility::string_t get_queue_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials)
@@ -182,15 +218,30 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_table_sas_string_to_sign(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials)
     {
+        //// StringToSign =      signedpermissions + "\n" +
+        ////                     signedstart + "\n" +
+        ////                     signedexpiry + "\n" +
+        ////                     canonicalizedresource + "\n" +
+        ////                     signedidentifier + "\n" +
+        ////                     signedversion + "\n" +
+        ////                     startpk + "\n" +
+        ////                     startrk + "\n" +
+        ////                     endpk + "\n" +
+        ////                     endrk
+        ////
+        //// HMAC-SHA256(UTF8.Encode(StringToSign))
+
         utility::ostringstream_t str;
         get_sas_string_to_sign(str, identifier, policy, resource);
-
         str << U('\n') << start_partition_key;
         str << U('\n') << start_row_key;
         str << U('\n') << end_partition_key;
         str << U('\n') << end_row_key;
 
-        return calculate_hmac_sha256_hash(str.str(), credentials);
+        auto string_to_sign = str.str();
+        log_sas_string_to_sign(string_to_sign);
+
+        return calculate_hmac_sha256_hash(string_to_sign, credentials);
     }
 
     utility::string_t get_table_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& table_name, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials)

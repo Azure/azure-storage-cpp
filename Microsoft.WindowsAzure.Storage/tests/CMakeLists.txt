@@ -6,6 +6,7 @@ if(UNIX)
      blob_lease_test.cpp
      blob_streams_test.cpp
      blob_test_base.cpp
+     cloud_append_blob_test.cpp
      cloud_blob_client_test.cpp
      cloud_blob_container_test.cpp
      cloud_blob_directory_test.cpp

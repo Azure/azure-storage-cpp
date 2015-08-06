@@ -1,7 +1,7 @@
 nuget {
     nuspec {
         id = wastorage;
-        version: 1.0.0;
+        version: 2.0.0;
         title: Microsoft Azure Storage Client Library for C++;
         authors: {Microsoft Corporation};
         owners: {Microsoft Corporation};

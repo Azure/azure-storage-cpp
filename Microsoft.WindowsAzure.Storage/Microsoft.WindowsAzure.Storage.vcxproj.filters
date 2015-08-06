@@ -116,6 +116,9 @@
     <ClCompile Include="src\blob_response_parsers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cloud_append_blob.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\cloud_blob.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

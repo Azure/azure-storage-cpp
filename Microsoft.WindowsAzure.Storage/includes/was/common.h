@@ -51,7 +51,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="continuation_token"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::continuation_token" /> class.
         /// </summary>
         continuation_token()
             : m_target_location(storage_location::unspecified)
@@ -59,7 +59,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="continuation_token"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::continuation_token" /> class.
         /// </summary>
         /// <param name="next_marker">The next_marker.</param>
         explicit continuation_token(utility::string_t next_marker)
@@ -72,19 +72,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="continuation_token"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::continuation_token" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="continuation_token" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::continuation_token" /> object.</param>
         continuation_token(continuation_token&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="continuation_token" /> object.
+        /// Returns a reference to an <see cref="azure::storage::continuation_token" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="continuation_token" /> object to use to set properties.</param>
-        /// <returns>A <see cref="continuation_token" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::continuation_token" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::continuation_token" /> object with properties set.</returns>
         continuation_token& operator=(continuation_token&& other)
         {
             if (this != &other)
@@ -157,14 +157,14 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="result_segment{result_type}"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::result_segment{result_type}" /> class.
         /// </summary>
         result_segment()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="result_segment{result_type}"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::result_segment{result_type}" /> class.
         /// </summary>
         /// <param name="results">An enumerable collection of results.</param>
         /// <param name="token">The continuation token.</param>
@@ -178,19 +178,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="result_segment"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::result_segment" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="result_segment" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::result_segment" /> object.</param>
         result_segment(result_segment&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="result_segment" /> object.
+        /// Returns a reference to an <see cref="azure::storage::result_segment" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="result_segment" /> object to use to set properties.</param>
-        /// <returns>A <see cref="result_segment" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::result_segment" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::result_segment" /> object with properties set.</returns>
         result_segment& operator=(result_segment&& other)
         {
             if (this != &other)
@@ -236,7 +236,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="result_iterator{result_type}"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::result_iterator{result_type}" /> class.
         /// </summary>
         result_iterator() :
             m_result_generator(nullptr),
@@ -248,14 +248,14 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="result_iterator{result_type}"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::result_iterator{result_type}" /> class.
         /// </summary>
         /// <param name="result_generator">The result segment generator.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned 
         /// by the result iterator. If this value is 0, the maximum possible number of results will be returned.</param>
         /// <param name="max_results_per_segment">A non-negative integer value that indicates the maximum number of results to 
         /// be returned in one segment. If this value is 0, the maximum possible number of results returned in a segment will be
-        //  determined by individual service.</param>
+        ///  determined by individual service.</param>
         result_iterator(std::function<result_segment<result_type>(const continuation_token &, size_t)> result_generator, utility::size64_t max_results, size_t max_results_per_segment) :
             m_result_generator(std::move(result_generator)),
             m_segment_index(0),
@@ -271,19 +271,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="result_iterator"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::result_iterator" /> class.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="result_iterator" /> on which to base the new instance.</param>
+        /// <param name="other">A reference to a set of <see cref="azure::storage::result_iterator" /> on which to base the new instance.</param>
         result_iterator(result_iterator&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="result_iterator" /> object.
+        /// Returns a reference to an <see cref="azure::storage::result_iterator" /> object.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="result_iterator" /> to use to set properties.</param>
-        /// <returns>A <see cref="result_iterator" /> object with properties set.</returns>
+        /// <param name="other">A reference to a set of <see cref="azure::storage::result_iterator" /> to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::result_iterator" /> object with properties set.</returns>
         result_iterator& operator=(result_iterator&& other)
         {
             if (this != &other)
@@ -417,13 +417,36 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
+    /// begin method that treats a result iterator as a range.
+    /// </summary>
+    /// <typeparam name="result_type">The type of the result.</typeparam>
+    /// <param name="range">An <see cref="azure::storage::result_iterator{result_type}" /> object that represents a range starting from the specified iterator.</param>
+    /// <returns>An <see cref="azure::storage::result_iterator{result_type}" /> object that represents begin of the range.</returns>
+    template<typename result_type>
+    result_iterator<result_type> begin(result_iterator<result_type> range)
+    {
+        return std::move(range);
+    }
+
+    /// <summary>
+    /// end method that treats a result iterator as a range.
+    /// </summary>
+    /// <typeparam name="result_type">The type of the result.</typeparam>
+    /// <returns>An <see cref="azure::storage::result_iterator{result_type}" /> object that represents end of the range.</returns>
+    template<typename result_type>
+    result_iterator<result_type> end(result_iterator<result_type>)
+    {
+        return result_iterator<result_type>();
+    }
+
+    /// <summary>
     /// Specifies which items to include when setting service properties.
     /// </summary>
     class service_properties_includes
     {
     public:
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_properties_includes"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::service_properties_includes" /> class.
         /// </summary>
         service_properties_includes()
             : m_logging(false), m_hour_metrics(false), m_minute_metrics(false), m_cors(false)
@@ -435,19 +458,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_properties_includes"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::service_properties_includes" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="service_properties_includes" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::service_properties_includes" /> object.</param>
         service_properties_includes(service_properties_includes&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="service_properties_includes" /> object.
+        /// Returns a reference to an <see cref="azure::storage::service_properties_includes" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="service_properties_includes" /> object to use to set properties.</param>
-        /// <returns>A <see cref="service_properties_includes" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::service_properties_includes" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::service_properties_includes" /> object with properties set.</returns>
         service_properties_includes& operator=(service_properties_includes&& other)
         {
             if (this != &other)
@@ -462,9 +485,9 @@ namespace azure { namespace storage {
 #endif
 
         /// <summary>
-        /// Gets a <see cref="service_properties_includes" /> object that includes all available service properties.
+        /// Gets an <see cref="azure::storage::service_properties_includes" /> object that includes all available service properties.
         /// </summary>
-        /// <returns>A <see cref="service_properties_includes" /> object with all properties set to <c>true</c>.</returns>
+        /// <returns>An <see cref="azure::storage::service_properties_includes" /> object with all properties set to <c>true</c>.</returns>
         static service_properties_includes all()
         {
             service_properties_includes includes;
@@ -570,7 +593,7 @@ namespace azure { namespace storage {
         public:
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="logging_properties"/> struct.
+            /// Initializes a new instance of the <see cref="azure::storage::service_properties::logging_properties" /> struct.
             /// </summary>
             logging_properties()
                 : m_delete_enabled(false), m_read_enabled(false), m_write_enabled(false), m_retention_enabled(false), m_retention_days(0)
@@ -582,19 +605,19 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="logging_properties"/> class based on an existing instance.
+            /// Initializes a new instance of the <see cref="azure::storage::service_properties::logging_properties" /> class based on an existing instance.
             /// </summary>
-            /// <param name="other">An existing <see cref="logging_properties" /> object.</param>
+            /// <param name="other">An existing <see cref="azure::storage::service_properties::logging_properties" /> object.</param>
             logging_properties(logging_properties&& other)
             {
                 *this = std::move(other);
             }
 
             /// <summary>
-            /// Returns a reference to a <see cref="logging_properties" /> object.
+            /// Returns a reference to an <see cref="azure::storage::service_properties::logging_properties" /> object.
             /// </summary>
-            /// <param name="other">An existing <see cref="logging_properties" /> object to use to set properties.</param>
-            /// <returns>A <see cref="logging_properties" /> object with properties set.</returns>
+            /// <param name="other">An existing <see cref="azure::storage::service_properties::logging_properties" /> object to use to set properties.</param>
+            /// <returns>An <see cref="azure::storage::service_properties::logging_properties" /> object with properties set.</returns>
             logging_properties& operator=(logging_properties&& other)
             {
                 if (this != &other)
@@ -748,19 +771,19 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="metrics_properties"/> class based on an existing instance.
+            /// Initializes a new instance of the <see cref="azure::storage::service_properties::metrics_properties" /> class based on an existing instance.
             /// </summary>
-            /// <param name="other">An existing <see cref="metrics_properties" /> object.</param>
+            /// <param name="other">An existing <see cref="azure::storage::service_properties::metrics_properties" /> object.</param>
             metrics_properties(metrics_properties&& other)
             {
                 *this = std::move(other);
             }
 
             /// <summary>
-            /// Returns a reference to a <see cref="metrics_properties" /> object.
+            /// Returns a reference to an <see cref="azure::storage::service_properties::metrics_properties" /> object.
             /// </summary>
-            /// <param name="other">An existing <see cref="metrics_properties" /> object to use to set properties.</param>
-            /// <returns>A <see cref="metrics_properties" /> object with properties set.</returns>
+            /// <param name="other">An existing <see cref="azure::storage::service_properties::metrics_properties" /> object to use to set properties.</param>
+            /// <returns>An <see cref="azure::storage::service_properties::metrics_properties" /> object with properties set.</returns>
             metrics_properties& operator=(metrics_properties&& other)
             {
                 if (this != &other)
@@ -893,19 +916,19 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="cors_rule"/> class based on an existing instance.
+            /// Initializes a new instance of the <see cref="azure::storage::service_properties::cors_rule" /> class based on an existing instance.
             /// </summary>
-            /// <param name="other">An existing <see cref="cors_rule" /> object.</param>
+            /// <param name="other">An existing <see cref="azure::storage::service_properties::cors_rule" /> object.</param>
             cors_rule(cors_rule&& other)
             {
                 *this = std::move(other);
             }
 
             /// <summary>
-            /// Returns a reference to a <see cref="cors_rule" /> object.
+            /// Returns a reference to an <see cref="azure::storage::service_properties::cors_rule" /> object.
             /// </summary>
-            /// <param name="other">An existing <see cref="cors_rule" /> object to use to set properties.</param>
-            /// <returns>A <see cref="cors_rule" /> object with properties set.</returns>
+            /// <param name="other">An existing <see cref="azure::storage::service_properties::cors_rule" /> object to use to set properties.</param>
+            /// <returns>An <see cref="azure::storage::service_properties::cors_rule" /> object with properties set.</returns>
             cors_rule& operator=(cors_rule&& other)
             {
                 if (this != &other)
@@ -1056,7 +1079,7 @@ namespace azure { namespace storage {
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_properties"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::service_properties" /> class.
         /// </summary>
         service_properties()
         {
@@ -1067,19 +1090,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_properties"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::service_properties" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="service_properties" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::service_properties" /> object.</param>
         service_properties(service_properties&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="service_properties" /> object.
+        /// Returns a reference to an <see cref="azure::storage::service_properties" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="service_properties" /> object to use to set properties.</param>
-        /// <returns>A <see cref="service_properties" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::service_properties" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::service_properties" /> object with properties set.</returns>
         service_properties& operator=(service_properties&& other)
         {
             if (this != &other)
@@ -1265,7 +1288,7 @@ namespace azure { namespace storage {
         public:
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="geo_replication_stats"/> struct.
+            /// Initializes a new instance of the <see cref="azure::storage::service_stats::geo_replication_stats" /> struct.
             /// </summary>
             geo_replication_stats()
                 : m_status(geo_replication_status::unavailable)
@@ -1277,19 +1300,19 @@ namespace azure { namespace storage {
             // have implicitly-declared move constructor and move assignment operator.
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="geo_replication_stats"/> class based on an existing instance.
+            /// Initializes a new instance of the <see cref="azure::storage::service_stats::geo_replication_stats" /> class based on an existing instance.
             /// </summary>
-            /// <param name="other">An existing <see cref="geo_replication_stats" /> object.</param>
+            /// <param name="other">An existing <see cref="azure::storage::service_stats::geo_replication_stats" /> object.</param>
             geo_replication_stats(geo_replication_stats&& other)
             {
                 *this = std::move(other);
             }
 
             /// <summary>
-            /// Returns a reference to a <see cref="geo_replication_stats" /> object.
+            /// Returns a reference to an <see cref="azure::storage::service_stats::geo_replication_stats" /> object.
             /// </summary>
-            /// <param name="other">An existing <see cref="geo_replication_stats" /> object to use to set properties.</param>
-            /// <returns>A <see cref="geo_replication_stats" /> object with properties set.</returns>
+            /// <param name="other">An existing <see cref="azure::storage::service_stats::geo_replication_stats" /> object to use to set properties.</param>
+            /// <returns>An <see cref="azure::storage::service_stats::geo_replication_stats" /> object with properties set.</returns>
             geo_replication_stats& operator=(geo_replication_stats&& other)
             {
                 if (this != &other)
@@ -1347,7 +1370,7 @@ namespace azure { namespace storage {
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_stats"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::service_stats" /> class.
         /// </summary>
         service_stats()
         {
@@ -1358,19 +1381,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="service_stats"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::service_stats" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="service_stats" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::service_stats" /> object.</param>
         service_stats(service_stats&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="service_stats" /> object.
+        /// Returns a reference to an <see cref="azure::storage::service_stats" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="service_stats" /> object to use to set properties.</param>
-        /// <returns>A <see cref="service_stats" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::service_stats" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::service_stats" /> object with properties set.</returns>
         service_stats& operator=(service_stats&& other)
         {
             if (this != &other)
@@ -1500,7 +1523,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the level at which messages are logged.
         /// </summary>
-        /// <returns>A <see cref="client_log_level" /> object indicating the level at which messages are logged.</returns>
+        /// <returns>An <see cref="azure::storage::client_log_level" /> object indicating the level at which messages are logged.</returns>
         client_log_level log_level() const
         {
             return m_log_level;
@@ -1509,7 +1532,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the level at which messages are logged.
         /// </summary>
-        /// <param name="log_level">A <see cref="client_log_level" /> object indicating the level at which messages are to be logged.</param>
+        /// <param name="log_level">An <see cref="azure::storage::client_log_level" /> object indicating the level at which messages are to be logged.</param>
         void set_log_level(client_log_level log_level)
         {
             m_log_level = log_level;
@@ -1536,7 +1559,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the results of the request.
         /// </summary>
-        /// <returns>An enumerable collection of <see cref="request_result" /> objects.</returns>
+        /// <returns>An enumerable collection of <see cref="azure::storage::request_result" /> objects.</returns>
         const std::vector<request_result>& request_results() const
         {
             return m_request_results;
@@ -1545,7 +1568,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Adds a request result to the set of results.
         /// </summary>
-        /// <param name="result">A <see cref="request_result" /> object.</param>
+        /// <param name="result">An <see cref="azure::storage::request_result" /> object.</param>
         void add_request_result(request_result result)
         {
             pplx::extensibility::scoped_critical_section_t l(m_request_results_lock);
@@ -1556,7 +1579,7 @@ namespace azure { namespace storage {
         /// Gets the function to call when sending a request.
         /// </summary>
         /// <returns>A pointer to a function that takes an <see cref="web::http::http_request" /> object 
-        /// and an <see cref="operation_context" /> object.</returns>
+        /// and an <see cref="azure::storage::operation_context" /> object.</returns>
         std::function<void(web::http::http_request &, operation_context)> sending_request() const
         {
             return m_sending_request;
@@ -1566,7 +1589,7 @@ namespace azure { namespace storage {
         /// Sets the function to call when sending a request.
         /// </summary>
         /// <param name="value">A pointer to a function that takes an <see cref="web::http::http_request" /> object 
-        /// and an <see cref="operation_context" /> object.</param>
+        /// and an <see cref="azure::storage::operation_context" /> object.</param>
         void set_sending_request(std::function<void(web::http::http_request &, operation_context)> value)
         {
             m_sending_request = value;
@@ -1576,7 +1599,7 @@ namespace azure { namespace storage {
         /// Gets the function to call when receiving a response from a request.
         /// </summary>
         /// <returns>A pointer to a function that takes an <see cref="web::http::http_request" /> object, 
-        /// an <see cref="web::http::http_response" /> object, and an <see cref="operation_context" /> object.</returns>
+        /// an <see cref="web::http::http_response" /> object, and an <see cref="azure::storage::operation_context" /> object.</returns>
         std::function<void(web::http::http_request &, const web::http::http_response &, operation_context)> response_received() const
         {
             return m_response_received;
@@ -1586,7 +1609,7 @@ namespace azure { namespace storage {
         /// Sets the function to call when receiving a response from a request.
         /// </summary>
         /// <param name="value">A pointer to a function that takes an <see cref="web::http::http_request" /> object,
-        /// an <see cref="web::http::http_response" /> object, and an <see cref="operation_context" /> object.</param>
+        /// an <see cref="web::http::http_response" /> object, and an <see cref="azure::storage::operation_context" /> object.</param>
         void set_response_received(std::function<void(web::http::http_request &, const web::http::http_response &, operation_context)> value)
         {
             m_response_received = value;
@@ -1596,7 +1619,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger{boost::log::trivial::severity_level}" /> object used by this operation context.</returns>
         boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger()
         {
             return m_logger;
@@ -1605,7 +1628,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger{boost::log::trivial::severity_level}" /> object used by this operation context.</returns>
         const boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger() const
         {
             return m_logger;
@@ -1614,7 +1637,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the logger object on this operation context.
         /// </summary>
-        /// <param name="logger">The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object to use for requests made by this operation context.</param>
+        /// <param name="logger">The <see cref="boost::log::sources::severity_logger{boost::log::trivial::severity_level}" /> object to use for requests made by this operation context.</param>
         void set_logger(boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger)
         {
             m_logger = std::move(logger);
@@ -1645,24 +1668,24 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="operation_context"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::operation_context" /> class.
         /// </summary>
         WASTORAGE_API operation_context();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="operation_context"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::operation_context" /> class.
         /// </summary>
-        /// <param name="context">The operation context.</param>
+        /// <param name="context">A reference to an <see cref="azure::storage::operation_context" /> object.</param>
         operation_context(const operation_context& context)
             : m_impl(context.m_impl)
         {
         }
 
         /// <summary>
-        /// Returns a reference to an <see cref="operation_context" /> object.
+        /// Returns a reference to an <see cref="azure::storage::operation_context" /> object.
         /// </summary>
-        /// <param name="context">A reference to an <see cref="operation_context" /> object.</param>
-        /// <returns>An <see cref="operation_context" /> object.</returns>
+        /// <param name="context">A reference to an <see cref="azure::storage::operation_context" /> object.</param>
+        /// <returns>An <see cref="azure::storage::operation_context" /> object.</returns>
         operation_context& operator=(const operation_context& context)
         {
             m_impl = context.m_impl;
@@ -1724,30 +1747,30 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the default logging level to be used for subsequently created instances of the <see cref="azure::storage::operation_context"/> class.
+        /// Gets the default logging level to be used for subsequently created instances of the <see cref="azure::storage::operation_context" /> class.
         /// </summary>
-        /// <returns>A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by default by instances of the <see cref="azure::storage::operation_context"/>.</returns>
+        /// <returns>A value of type <see cref="azure::storage::client_log_level" /> that specifies which events are logged by default by instances of the <see cref="azure::storage::operation_context" />.</returns>
         WASTORAGE_API static client_log_level default_log_level();
 
         /// <summary>
-        /// Sets the default logging level to be used for subsequently created instances of the <see cref="azure::storage::operation_context"/> class.
+        /// Sets the default logging level to be used for subsequently created instances of the <see cref="azure::storage::operation_context" /> class.
         /// </summary>
-        /// <param name="log_level">A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by default by instances of the <see cref="azure::storage::operation_context"/>.</param>
+        /// <param name="log_level">A value of type <see cref="azure::storage::client_log_level" /> that specifies which events are logged by default by instances of the <see cref="azure::storage::operation_context" />.</param>
         WASTORAGE_API static void set_default_log_level(client_log_level log_level);
 
         /// <summary>
-        /// Gets the logging level to be used for an instance of the <see cref="azure::storage::operation_context"/> class.
+        /// Gets the logging level to be used for an instance of the <see cref="azure::storage::operation_context" /> class.
         /// </summary>
-        /// <returns>A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by the <see cref="azure::storage::operation_context"/>.</returns>
+        /// <returns>A value of type <see cref="azure::storage::client_log_level" /> that specifies which events are logged by the <see cref="azure::storage::operation_context" />.</returns>
         client_log_level log_level() const
         {
             return m_impl->log_level();
         }
 
         /// <summary>
-        /// Sets the logging level to be used for an instance of the <see cref="azure::storage::operation_context"/> class.
+        /// Sets the logging level to be used for an instance of the <see cref="azure::storage::operation_context" /> class.
         /// </summary>
-        /// <param name="log_level">A value of type <see cref="azure::storage::client_log_level"/> that specifies which events are logged by the <see cref="azure::storage::operation_context"/>.</param>
+        /// <param name="log_level">A value of type <see cref="azure::storage::client_log_level" /> that specifies which events are logged by the <see cref="azure::storage::operation_context" />.</param>
         void set_log_level(client_log_level log_level)
         {
             m_impl->set_log_level(log_level);
@@ -1756,7 +1779,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets or sets additional headers on the request, for example, for proxy or logging information.
         /// </summary>
-        /// <returns>A <see cref="web::http::http_headers"/> reference containing additional header information.</returns>
+        /// <returns>A <see cref="web::http::http_headers" /> reference containing additional header information.</returns>
         web::http::http_headers& user_headers()
         {
             return m_impl->user_headers();
@@ -1765,7 +1788,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets or sets additional headers on the request, for example, for proxy or logging information.
         /// </summary>
-        /// <returns>A <see cref="web::http::http_headers"/> reference containing additional header information.</returns>
+        /// <returns>A <see cref="web::http::http_headers" /> reference containing additional header information.</returns>
         const web::http::http_headers& user_headers() const
         {
             return m_impl->user_headers();
@@ -1774,7 +1797,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the set of request results that the current operation has created.
         /// </summary>
-        /// <returns>A <see cref="std::vector"/> object that contains <see cref="azure::storage::request_result"/> objects that represent the request results created by the current operation.</returns>
+        /// <returns>A <see cref="std::vector" /> object that contains <see cref="azure::storage::request_result" /> objects that represent the request results created by the current operation.</returns>
         const std::vector<request_result>& request_results() const
         {
             return m_impl->request_results();
@@ -1784,7 +1807,7 @@ namespace azure { namespace storage {
         /// Sets the function to call when sending a request.
         /// </summary>
         /// <param name="value">A pointer to a function that takes an <see cref="web::http::http_request" /> object 
-        /// and an <see cref="operation_context" /> object.</param>
+        /// and an <see cref="azure::storage::operation_context" /> object.</param>
         void set_sending_request(std::function<void(web::http::http_request &, operation_context)> value)
         {
             m_impl->set_sending_request(value);
@@ -1794,7 +1817,7 @@ namespace azure { namespace storage {
         /// Sets the function that is called when a response is received from the server.
         /// </summary>
         /// <param name="value">A pointer to a function that takes an <see cref="web::http::http_request" /> object,
-        /// an <see cref="web::http::http_response" /> object, and an <see cref="operation_context" /> object.</param>
+        /// an <see cref="web::http::http_response" /> object, and an <see cref="azure::storage::operation_context" /> object.</param>
         void set_response_received(std::function<void(web::http::http_request &, const web::http::http_response &, operation_context)> value)
         {
             m_impl->set_response_received(value);
@@ -1804,7 +1827,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger{boost::log::trivial::severity_level}" /> object used by this operation context.</returns>
         boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger()
         {
             return m_impl->logger();
@@ -1813,7 +1836,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the logger object on this operation context.
         /// </summary>
-        /// <returns>The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object used by this operation context.</returns>
+        /// <returns>The <see cref="boost::log::sources::severity_logger{boost::log::trivial::severity_level}" /> object used by this operation context.</returns>
         const boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger() const
         {
             return m_impl->logger();
@@ -1822,7 +1845,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the logger object on this operation context.
         /// </summary>
-        /// <param name="logger">The <see cref="boost::log::sources::severity_logger<boost::log::trivial::severity_level>" /> object to use for requests made by this operation context.</param>
+        /// <param name="logger">The <see cref="boost::log::sources::severity_logger{boost::log::trivial::severity_level}" /> object to use for requests made by this operation context.</param>
         void set_logger(boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger)
         {
             m_impl->set_logger(std::move(logger));
@@ -1903,7 +1926,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the permissions from the given string.
         /// </summary>
-        /// <param name="permissions">The permissions for the shared access policy.</param>
+        /// <param name="value">The permissions for the shared access policy.</param>
         void set_permissions_from_string(const utility::string_t& value)
         {
             m_permission = 0;
@@ -1946,10 +1969,10 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the permissions from the specified permissions.
         /// </summary>
-        /// <param name="permissions">The permissions for the shared access policy.</param>
-        void set_permissions(uint8_t permissions)
+        /// <param name="value">The permissions for the shared access policy.</param>
+        void set_permissions(uint8_t value)
         {
-            m_permission = permissions;
+            m_permission = value;
         }
 
         /// <summary>
@@ -1964,7 +1987,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the start time for the shared access policy.
         /// </summary>
-        /// <param name="start">The start time for the access policy.</param>
+        /// <param name="value">The start time for the access policy.</param>
         void set_start(utility::datetime value)
         {
             m_start = value;
@@ -1982,7 +2005,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the expiry time for the shared access policy.
         /// </summary>
-        /// <param name="expiry">The expiry time for the shared access policy.</param>
+        /// <param name="value">The expiry time for the shared access policy.</param>
         void set_expiry(utility::datetime value)
         {
             m_expiry = value;
@@ -1998,9 +2021,9 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Indicates whether the <see cref="shared_access_policy" /> object is valid.
+        /// Indicates whether the <see cref="azure::storage::shared_access_policy" /> object is valid.
         /// </summary>
-        /// <returns><c>true</c> if the <see cref="shared_access_policy" /> object is valid; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if the <see cref="azure::storage::shared_access_policy" /> object is valid; otherwise, <c>false</c>.</returns>
         bool is_valid() const
         {
             return m_expiry.is_initialized() && (m_permission != none);
@@ -2009,7 +2032,7 @@ namespace azure { namespace storage {
     protected:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_access_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
         /// </summary>
         shared_access_policy()
             : m_permission(none)
@@ -2017,7 +2040,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_access_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
         /// </summary>
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
@@ -2027,7 +2050,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_access_policy"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
         /// </summary>
         /// <param name="start">The start date and time for the shared access policy.</param>
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
@@ -2074,19 +2097,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_permissions"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_permissions" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_permissions" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_permissions" /> object.</param>
         cloud_permissions(cloud_permissions&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_permissions" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_permissions" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_permissions" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_permissions" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_permissions" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_permissions" /> object with properties set.</returns>
         cloud_permissions& operator=(cloud_permissions&& other)
         {
             if (this != &other)
@@ -2144,19 +2167,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="request_options"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::request_options" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="request_options" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::request_options" /> object.</param>
         request_options(request_options&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="request_options" /> object.
+        /// Returns a reference to an <see cref="azure::storage::request_options" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="request_options" /> object to use to set properties.</param>
-        /// <returns>A <see cref="request_options" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::request_options" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::request_options" /> object with properties set.</returns>
         request_options& operator=(request_options&& other)
         {
             if (this != &other)
@@ -2280,14 +2303,14 @@ namespace azure { namespace storage {
     protected:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="request_options"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::request_options" /> class.
         /// </summary>
         WASTORAGE_API request_options();
 
         /// <summary>
         /// Applies the default set of request options.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="request_options" />.</param>
+        /// <param name="other">A reference to a set of <see cref="azure::storage::request_options" />.</param>
         /// <param name="apply_expiry">Specifies that an expiry time be applied to the
         /// request options. This parameter is used internally.</param>
         void apply_defaults(const request_options& other, bool apply_expiry)

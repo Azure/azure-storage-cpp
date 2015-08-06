@@ -1,35 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project
   xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
-  DefaultTargets="Clean;BuildWin32Debug;BuildWin32Release;Buildx64Debug;Buildx64Release">
+  DefaultTargets="Clean;BuildAll">
   
   <ItemGroup>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" />
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" />
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >      
+        <Properties>Configuration=Debug;Platform=Win32</Properties>
+    </StorageSln>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >
+        <Properties>Configuration=Release;Platform=Win32</Properties>
+    </StorageSln>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >
+        <Properties>Configuration=Debug;Platform=x64</Properties>
+    </StorageSln>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >
+        <Properties>Configuration=Release;Platform=x64</Properties>
+    </StorageSln>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
+        <Properties>Configuration=Debug;Platform=Win32</Properties>
+    </StorageSln>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
+        <Properties>Configuration=Release;Platform=Win32</Properties>
+    </StorageSln>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
+        <Properties>Configuration=Debug;Platform=x64</Properties>
+    </StorageSln>
+    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
+        <Properties>Configuration=Release;Platform=x64</Properties>
+    </StorageSln>
   </ItemGroup>
-  
+
   <Target Name="Clean">
     <!-- Clean the solutions -->
-    <Message Importance="high" Text="Cleaning the projects..." ContinueOnError="true" />
+    <Message Importance="high" Text="Cleaning all projects..." ContinueOnError="true" />
     <MSBuild
       Projects="@(StorageSln)"
       Targets="Clean"
-      Properties="Configuration=Debug;Platform=Win32"
       BuildInParallel="true" />
+  </Target>
+
+  <Target Name="BuildAll">
+    <Message Importance="high" Text="Building all versions of the projects..." />
     <MSBuild
       Projects="@(StorageSln)"
-      Targets="Clean"
-      Properties="Configuration=Release;Platform=Win32"
-      BuildInParallel="true" />
-    <MSBuild
-      Projects="@(StorageSln)"
-      Targets="Clean"
-      Properties="Configuration=Debug;Platform=x64"
-      BuildInParallel="true" />
-    <MSBuild
-      Projects="@(StorageSln)"
-      Targets="Clean"
-      Properties="Configuration=Release;Platform=x64"
+      Targets="Build"
       BuildInParallel="true" />
   </Target>
   
@@ -38,7 +52,7 @@
     <MSBuild
       Projects="@(StorageSln)"
       Targets="Build"
-      Properties="Configuration=Release;Platform=Win32"
+      Condition=" '%(Properties)' == 'Configuration=Release;Platform=Win32' "
       BuildInParallel="true" />
   </Target>
 
@@ -47,7 +61,7 @@
     <MSBuild
       Projects="@(StorageSln)"
       Targets="Build"
-      Properties="Configuration=Debug;Platform=Win32"
+      Condition=" '%(Properties)' == 'Configuration=Debug;Platform=Win32' "
       BuildInParallel="true" />
   </Target>
   
@@ -56,7 +70,7 @@
     <MSBuild
       Projects="@(StorageSln)"
       Targets="Build"
-      Properties="Configuration=Release;Platform=x64"
+      Condition=" '%(Properties)' == 'Configuration=Release;Platform=x64' "
       BuildInParallel="true" />
   </Target>
 
@@ -65,7 +79,7 @@
     <MSBuild
       Projects="@(StorageSln)"
       Targets="Build"
-      Properties="Configuration=Debug;Platform=x64"
+      Condition=" '%(Properties)' == 'Configuration=Debug;Platform=x64' "
       BuildInParallel="true" />
   </Target>
 </Project>

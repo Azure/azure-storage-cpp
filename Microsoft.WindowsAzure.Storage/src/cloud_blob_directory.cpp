@@ -64,6 +64,16 @@ namespace azure { namespace storage {
         return cloud_block_blob(m_name + blob_name, std::move(snapshot_time), m_container);
     }
 
+    cloud_append_blob cloud_blob_directory::get_append_blob_reference(utility::string_t blob_name) const
+    {
+        return get_block_blob_reference(std::move(blob_name), utility::string_t());
+    }
+
+    cloud_append_blob cloud_blob_directory::get_append_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
+    {
+        return cloud_append_blob(m_name + blob_name, std::move(snapshot_time), m_container);
+    }
+
     cloud_blob_directory cloud_blob_directory::get_subdirectory_reference(utility::string_t name) const
     {
         return cloud_blob_directory(m_name + name, m_container);

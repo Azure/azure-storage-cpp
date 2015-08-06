@@ -141,7 +141,7 @@ SUITE(Core)
         CHECK_THROW(azure::storage::storage_uri(U("http://www.microsoft.com/test1?parameter=value1"), U("http://127.0.0.1:10000/account/test1?parameter=value2")), std::invalid_argument);
     }
 
-    TEST(storage_exception)
+    TEST_FIXTURE(test_base, storage_exception)
     {
         azure::storage::cloud_blob blob(azure::storage::storage_uri(U("http://www.nonexistenthost.com/test1")));
 

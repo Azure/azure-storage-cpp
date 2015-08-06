@@ -104,6 +104,9 @@
     <ClCompile Include="executor_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cloud_append_blob_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="queue_test_base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

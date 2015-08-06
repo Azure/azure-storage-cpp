@@ -26,10 +26,9 @@ std::vector<azure::storage::cloud_table> list_all_tables(
     azure::storage::operation_context context)
 {
     std::vector<azure::storage::cloud_table> results;
-    azure::storage::table_result_iterator end_of_result;
-    for (azure::storage::table_result_iterator iter = table_client.list_tables(prefix, 0, options, context); iter != end_of_result; ++iter)
+    for (auto&& item : table_client.list_tables(prefix, 0, options, context))
     {
-        results.push_back(*iter);
+        results.push_back(item);
     }
 
     return results;

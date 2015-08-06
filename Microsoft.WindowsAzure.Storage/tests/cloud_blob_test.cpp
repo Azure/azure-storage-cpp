@@ -50,7 +50,8 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
 
     std::vector<uint8_t> buffer;
     buffer.resize(buffer_size);
-    auto md5 = fill_buffer_and_get_md5(buffer, buffer_offset, blob_size == 0 ? buffer_size - buffer_offset : blob_size);
+    size_t target_blob_size = blob_size == 0 ? buffer_size - buffer_offset : blob_size;
+    auto md5 = fill_buffer_and_get_md5(buffer, buffer_offset, target_blob_size);
 
     concurrency::streams::istream stream;
     if (use_seekable_stream)
@@ -90,6 +91,18 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
             page_blob.upload_from_stream(stream, blob_size, 0, azure::storage::access_condition(), options, context);
         }
     }
+    else if (blob.type() == azure::storage::blob_type::append_blob)
+    {
+        azure::storage::cloud_append_blob append_blob(blob);
+        if (blob_size == 0)
+        {
+            append_blob.upload_from_stream(stream, azure::storage::access_condition(), options, context);
+        }
+        else
+        {
+            append_blob.upload_from_stream(stream, blob_size, azure::storage::access_condition(), options, context);
+        }
+    }
 
     CHECK_UTF8_EQUAL(expect_md5_header ? md5 : utility::string_t(), md5_header);
     CHECK_EQUAL(expected_request_count, context.request_results().size());
@@ -99,7 +112,7 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
 
     concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
     blob.download_to_stream(output_buffer.create_ostream(), azure::storage::access_condition(), download_options, context);
-    CHECK_ARRAY_EQUAL(buffer.data() + buffer_offset, output_buffer.collection().data(),(int) (blob_size == 0 ? (buffer_size - buffer_offset) : blob_size));
+    CHECK_ARRAY_EQUAL(buffer.data() + buffer_offset, output_buffer.collection().data(),(int) target_blob_size);
 
     context.set_sending_request(std::function<void(web::http::http_request &, azure::storage::operation_context)>());
     return context;
@@ -526,7 +539,7 @@ SUITE(Blob)
         CHECK_UTF8_EQUAL(U("1"), azure::storage::cloud_block_blob(snapshot1).download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
 
         auto snapshot1_copy = m_container.get_block_blob_reference(m_blob.name() + U("copy"));
-        snapshot1_copy.start_copy_from_blob(defiddler(snapshot1.snapshot_qualified_uri().primary_uri()), azure::storage::access_condition(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        snapshot1_copy.start_copy(defiddler(snapshot1.snapshot_qualified_uri().primary_uri()), azure::storage::access_condition(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK(wait_for_copy(snapshot1_copy));
         CHECK_UTF8_EQUAL(U("1"), snapshot1_copy.download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
 
@@ -572,18 +585,18 @@ SUITE(Blob)
         blob.upload_text(U("1"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto copy = m_container.get_block_blob_reference(U("copy"));
-        CHECK_THROW(copy.start_copy_from_blob(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        CHECK_THROW(copy.start_copy(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
         CHECK_EQUAL(web::http::status_codes::PreconditionFailed, m_context.request_results().back().http_status_code());
-        auto copy_id = copy.start_copy_from_blob(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        auto copy_id = copy.start_copy(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK(wait_for_copy(copy));
         CHECK_THROW(copy.abort_copy(copy_id, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
         CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
-        CHECK_THROW(copy.start_copy_from_blob(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        CHECK_THROW(copy.start_copy(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
         CHECK_EQUAL(web::http::status_codes::PreconditionFailed, m_context.request_results().back().http_status_code());
 
         auto copy2 = m_container.get_block_blob_reference(U("copy2"));
-        copy2.start_copy_from_blob(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        copy2.start_copy(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK(wait_for_copy(copy2));
-        CHECK_THROW(copy2.start_copy_from_blob(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        CHECK_THROW(copy2.start_copy(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(U("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
     }
 }

@@ -169,12 +169,10 @@ namespace azure { namespace storage { namespace core {
         storage_credentials parsed_credentials = protocol::parse_query(uri, require_signed_resource);
         if (parsed_credentials.is_sas())
         {
-            if (credentials.is_shared_key() || (credentials.is_sas() && credentials.sas_token() != parsed_credentials.sas_token()))
+            if (credentials.is_shared_key() || credentials.is_sas())
             {
                 throw std::invalid_argument(protocol::error_multiple_credentials);
             }
-
-            // TODO: Consider if it is OK here to override explicitly given anonymous credentials with the parsed SAS credentials (the .Net Library does not)
 
             // Overwrite the given credentials with the SAS credentials read from the URI
             credentials = parsed_credentials;

@@ -193,7 +193,7 @@ SUITE(Blob)
 
         auto stream = m_blob.open_read(azure::storage::access_condition(), options, m_context);
         stream.read_to_end(output_buffer).wait();
-        stream.close();
+        stream.close().wait();
 
         CHECK_EQUAL(buffer.size(), output_buffer.collection().size());
         CHECK_ARRAY_EQUAL(buffer, output_buffer.collection(), (int)output_buffer.collection().size());
@@ -212,13 +212,13 @@ SUITE(Blob)
         auto stream = m_blob.open_read(azure::storage::access_condition(), options, m_context);
         m_blob.upload_metadata(azure::storage::access_condition(), options, m_context);
         CHECK_THROW(stream.read().wait(), azure::storage::storage_exception);
-        stream.close();
+        stream.close().wait();
 
         auto condition = azure::storage::access_condition::generate_if_match_condition(U("*"));
         stream = m_blob.open_read(condition, options, m_context);
         m_blob.upload_metadata(azure::storage::access_condition(), options, m_context);
         CHECK_THROW(stream.read().wait(), azure::storage::storage_exception);
-        stream.close();
+        stream.close().wait();
     }
 
     TEST_FIXTURE(block_blob_test_base, blob_read_stream_seek)

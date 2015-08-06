@@ -41,7 +41,7 @@ namespace azure { namespace storage { namespace protocol {
     const std::string error_uri_missing_location("The Uri for the target storage location is not specified. Please consider changing the request's location mode.");
     const std::string error_primary_only_command("This operation can only be executed against the primary storage location.");
     const std::string error_secondary_only_command("This operation can only be executed against the secondary storage location.");
-    const std::string error_md5_not_possible("MD5 is not supported for an existing page blobs.");
+    const std::string error_md5_not_possible("MD5 cannot be calculated for an existing page blob or append blob because it would require reading the existing data. Please disable store_blob_content_md5.");
     const std::string error_missing_params_for_sas("Missing mandatory parameters for valid Shared Access Signature.");
     const std::string error_md5_options_mismatch("When uploading a blob in a single request, store_blob_content_md5 must be set to true if use_transactional_md5 is true, because the MD5 calculated for the transaction will be stored in the blob.");
     const std::string error_storage_uri_empty("Primary or secondary location URI must be supplied.");
@@ -82,5 +82,8 @@ namespace azure { namespace storage { namespace protocol {
     const std::string error_empty_metadata_value("The metadata value cannot be empty or consist entirely of whitespace.");
     const std::string error_hash_on_closed_streambuf("Hash is calculated when the streambuf is closed.");
     const std::string error_invalid_settings_form("Settings must be of the form \"name=value\".");
+
+    const std::string error_precondition_failure_ignored("Pre-condition failure on a retry is being ignored since the request should have succeeded in the first attempt.");
+    const std::string error_invalid_block_size("Append block data should not exceed the maximum blob size condition value.");
 
 }}} // namespace azure::storage::protocol

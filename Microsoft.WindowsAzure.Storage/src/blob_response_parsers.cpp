@@ -58,6 +58,10 @@ namespace azure { namespace storage { namespace protocol {
         {
             return blob_type::page_blob;
         }
+        else if (value == header_value_blob_type_append)
+        {
+            return blob_type::append_blob;
+        }
         else
         {
             return blob_type::unspecified;
@@ -97,6 +101,7 @@ namespace azure { namespace storage { namespace protocol {
 
         auto& headers = response.headers();
         properties.m_page_blob_sequence_number = utility::conversions::scan_string<int64_t>(get_header_value(headers, ms_header_blob_sequence_number));
+        properties.m_append_blob_committed_block_count = utility::conversions::scan_string<int>(get_header_value(headers, ms_header_blob_committed_block_count));
         properties.m_cache_control = get_header_value(headers, web::http::header_names::cache_control);
         properties.m_content_disposition = get_header_value(headers, header_content_disposition);
         properties.m_content_encoding = get_header_value(headers, web::http::header_names::content_encoding);

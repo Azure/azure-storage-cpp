@@ -64,7 +64,7 @@ namespace azure { namespace storage {
         }
 
         auto instance = std::make_shared<cloud_table_client>(*this);
-        return table.execute_query_segmented_async(query, token, options, context).then([instance] (table_query_segment query_segment) -> table_result_segment
+        return table.execute_query_segmented_async(query, token, modified_options, context).then([instance] (table_query_segment query_segment) -> table_result_segment
         {
             std::vector<table_entity> query_results = query_segment.results();
 
@@ -102,8 +102,7 @@ namespace azure { namespace storage {
 
     pplx::task<service_stats> cloud_table_client::download_service_stats_async(const table_request_options& options, operation_context context) const
     {
-        table_request_options modified_options(options);
-        modified_options.apply_defaults(default_request_options());
+        table_request_options modified_options = get_modified_options(options);
 
         return download_service_stats_base_async(modified_options, context);
     }

@@ -105,6 +105,17 @@ namespace azure { namespace storage { namespace protocol {
         append(value);
     }
 
+    void canonicalizer_helper::append_content_length_header()
+    {
+        utility::string_t value;
+        m_request.headers().match(web::http::header_names::content_length, value);
+        if (value == U("0"))
+        {
+            value.clear();
+        }
+        append(value);
+    }
+
     void canonicalizer_helper::append_date_header(bool allow_x_ms_date)
     {
         utility::string_t value;
@@ -148,7 +159,7 @@ namespace azure { namespace storage { namespace protocol {
         helper.append(request.method());
         helper.append_header(web::http::header_names::content_encoding);
         helper.append_header(web::http::header_names::content_language);
-        helper.append_header(web::http::header_names::content_length);
+        helper.append_content_length_header();
         helper.append_header(web::http::header_names::content_md5);
         helper.append_header(web::http::header_names::content_type);
         helper.append_date_header(false);

@@ -456,4 +456,57 @@ namespace azure { namespace storage { namespace core {
         }
     };
 
+    class basic_cloud_append_blob_ostreambuf : public basic_cloud_blob_ostreambuf
+    {
+    public:
+        basic_cloud_append_blob_ostreambuf(std::shared_ptr<cloud_append_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
+            : basic_cloud_blob_ostreambuf(condition, options, context),
+            m_blob(blob), m_current_blob_offset(condition.append_position() == -1 ? blob->properties().size() : condition.append_position())
+        {
+            m_semaphore = async_semaphore(1);
+        }
+
+        bool can_seek() const
+        {
+            return false;
+        }
+
+        bool has_size() const
+        {
+            return false;
+        }
+
+        utility::size64_t size() const
+        {
+            return (utility::size64_t)0;
+        }
+
+        pos_type seekpos(pos_type pos, std::ios_base::openmode direction)
+        {
+            UNREFERENCED_PARAMETER(pos);
+            UNREFERENCED_PARAMETER(direction);
+            return (pos_type)traits::eof();
+        }
+
+    protected:
+
+        pplx::task<void> upload_buffer();
+        pplx::task<void> commit_blob();
+
+    private:
+
+        std::shared_ptr<cloud_append_blob> m_blob;
+        int64_t m_current_blob_offset;
+    };
+
+    class cloud_append_blob_ostreambuf : public concurrency::streams::streambuf<basic_cloud_append_blob_ostreambuf::char_type>
+    {
+    public:
+
+        cloud_append_blob_ostreambuf(std::shared_ptr<cloud_append_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
+            : concurrency::streams::streambuf<basic_cloud_append_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_append_blob_ostreambuf>(blob, condition, options, context))
+        {
+        }
+    };
+
 }}} // namespace azure::storage::core

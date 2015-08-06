@@ -36,7 +36,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_storage_account" /> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class.
         /// </summary>
         cloud_storage_account()
             : m_initialized(false), m_is_development_storage_account(false), m_default_endpoints(false)
@@ -47,7 +47,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class using the specified
         /// credentials and service endpoints.
         /// </summary>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         /// <param name="blob_endpoint">The Blob service endpoint.</param>
         /// <param name="queue_endpoint">The Queue service endpoint.</param>
         /// <param name="table_endpoint">The Table service endpoint.</param>
@@ -60,7 +60,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class using the specified
         /// credentials and the default service endpoints.
         /// </summary>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         /// <param name="use_https"><c>true</c> to use HTTPS to connect to storage service endpoints; otherwise, <c>false</c>.</param>
         cloud_storage_account(const storage_credentials& credentials, bool use_https)
             : m_initialized(true), m_is_development_storage_account(false), m_credentials(credentials), m_default_endpoints(true)
@@ -72,7 +72,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class using the specified
         /// credentials and the default service endpoints.
         /// </summary>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         /// <param name="endpoint_suffix">The DNS endpoint suffix for the storage services, e.g., &quot;core.windows.net&quot;.</param>
         /// <param name="use_https"><c>true</c> to use HTTPS to connect to storage service endpoints; otherwise, <c>false</c>.</param>
         cloud_storage_account(const storage_credentials& credentials, const utility::string_t& endpoint_suffix, bool use_https)
@@ -86,19 +86,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_storage_account"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_storage_account" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_storage_account" /> object.</param>
         cloud_storage_account(cloud_storage_account&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_storage_account" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_storage_account" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_storage_account" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_storage_account" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_storage_account" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_storage_account" /> object with properties set.</returns>
         cloud_storage_account& operator=(cloud_storage_account&& other)
         {
             if (this != &other)
@@ -118,11 +118,11 @@ namespace azure { namespace storage {
 #endif
 
         /// <summary>
-        /// Parses a connection string and returns a <see cref="azure::storage::cloud_storage_account" /> created
+        /// Parses a connection string and returns an <see cref="azure::storage::cloud_storage_account" /> created
         /// from the connection string.
         /// </summary>
         /// <param name="connection_string">A valid connection string.</param>
-        /// <returns>A <see cref="azure::storage::cloud_storage_account" /> object constructed from the values provided in the connection string.</returns>
+        /// <returns>An <see cref="azure::storage::cloud_storage_account" /> object constructed from the values provided in the connection string.</returns>
         WASTORAGE_API static cloud_storage_account parse(const utility::string_t& connection_string);
         
         /// <summary>
@@ -178,7 +178,7 @@ namespace azure { namespace storage {
         WASTORAGE_API utility::string_t to_string(bool export_secrets);
 
         /// <summary>
-        /// Gets a <see cref="azure::storage::cloud_storage_account" /> object that references the development storage account.
+        /// Gets an <see cref="azure::storage::cloud_storage_account" /> object that references the development storage account.
         /// </summary>
         /// <returns>A reference to the development storage account.</returns>
         WASTORAGE_API static cloud_storage_account development_storage_account();
@@ -186,7 +186,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the endpoint for the Blob service for all location.
         /// </summary>
-        /// <returns>A <see cref="storage_uri" /> object containing the Blob service endpoint for all locations.</returns>
+        /// <returns>An <see cref="azure::storage::storage_uri" /> object containing the Blob service endpoint for all locations.</returns>
         const storage_uri& blob_endpoint() const
         {
             return m_blob_endpoint;
@@ -195,7 +195,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the endpoint for the Queue service for all location.
         /// </summary>
-        /// <returns>A <see cref="storage_uri" /> object containing the Queue service endpoint for all locations.</returns>
+        /// <returns>An <see cref="azure::storage::storage_uri" /> object containing the Queue service endpoint for all locations.</returns>
         const storage_uri& queue_endpoint() const
         {
             return m_queue_endpoint;
@@ -204,7 +204,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the endpoint for the Table service for all location.
         /// </summary>
-        /// <returns>A <see cref="storage_uri" /> object containing the Table service endpoint for all locations.</returns>
+        /// <returns>An <see cref="azure::storage::storage_uri" /> object containing the Table service endpoint for all locations.</returns>
         const storage_uri& table_endpoint() const
         {
             return m_table_endpoint;

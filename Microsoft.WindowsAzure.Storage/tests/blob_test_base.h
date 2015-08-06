@@ -228,3 +228,21 @@ protected:
 
     azure::storage::cloud_page_blob m_blob;
 };
+
+class append_blob_test_base : public blob_test_base
+{
+public:
+
+    append_blob_test_base()
+    {
+        m_blob = m_container.get_append_blob_reference(U("appendblob"));
+    }
+
+    ~append_blob_test_base()
+    {
+    }
+
+protected:
+
+    azure::storage::cloud_append_blob m_blob;
+};

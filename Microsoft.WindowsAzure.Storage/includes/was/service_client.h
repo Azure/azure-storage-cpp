@@ -35,19 +35,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_client"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_client" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_client" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_client" /> object.</param>
         cloud_client(cloud_client&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_client" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_client" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_client" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_client" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_client" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_client" /> object with properties set.</returns>
         cloud_client& operator=(cloud_client&& other)
         {
             if (this != &other)
@@ -119,7 +119,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Initializes a new instance of the service client class using the specified service endpoint.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the service endpoint for all locations.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the service endpoint for all locations.</param>
         explicit cloud_client(storage_uri base_uri)
             : m_base_uri(std::move(base_uri)), m_authentication_scheme(azure::storage::authentication_scheme::shared_key)
         {
@@ -128,8 +128,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Initializes a new instance of the client class using the specified service endpoint and storage account credentials.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the service endpoint for all locations.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the service endpoint for all locations.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         cloud_client(storage_uri base_uri, azure::storage::storage_credentials credentials)
             : m_base_uri(std::move(base_uri)), m_credentials(std::move(credentials)), m_authentication_scheme(azure::storage::authentication_scheme::shared_key)
         {

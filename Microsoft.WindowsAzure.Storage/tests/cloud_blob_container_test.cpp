@@ -83,6 +83,10 @@ SUITE(Blob)
         CHECK_UTF8_EQUAL(m_container.uri().primary_uri().to_string(), page_blob.container().uri().primary_uri().to_string());
         CHECK_UTF8_EQUAL(m_container.uri().secondary_uri().to_string(), page_blob.container().uri().secondary_uri().to_string());
 
+        auto append_blob = m_container.get_append_blob_reference(U("blob3"));
+        CHECK_UTF8_EQUAL(m_container.uri().primary_uri().to_string(), append_blob.container().uri().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(m_container.uri().secondary_uri().to_string(), append_blob.container().uri().secondary_uri().to_string());
+
         auto directory = m_container.get_directory_reference(U("dir"));
         CHECK_UTF8_EQUAL(m_container.uri().primary_uri().to_string(), directory.container().uri().primary_uri().to_string());
         CHECK_UTF8_EQUAL(m_container.uri().secondary_uri().to_string(), directory.container().uri().secondary_uri().to_string());
@@ -202,6 +206,22 @@ SUITE(Blob)
             blobs[blob.name()] = blob;
         }
 
+        for (int i = 0; i < 3; i++)
+        {
+            auto index = utility::conversions::print_string(i);
+            auto blob = m_container.get_append_blob_reference(U("appendblob") + index);
+            blob.metadata()[U("index")] = index;
+
+            blob.create_or_replace(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+
+            std::vector<uint8_t> buffer;
+            buffer.resize((i + 1) * 8 * 1024);
+            fill_buffer_and_get_md5(buffer);
+            auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(buffer);
+            blob.append_block(stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            blobs[blob.name()] = blob;
+        }
+
         auto listing1 = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, azure::storage::blob_request_options());
         for (auto iter = listing1.begin(); iter != listing1.end(); ++iter)
         {
@@ -223,6 +243,10 @@ SUITE(Blob)
 
             case azure::storage::blob_type::page_blob:
                 CHECK_EQUAL(index * 512, iter->properties().size());
+                break;
+
+            case azure::storage::blob_type::append_blob:
+                CHECK_EQUAL((index + 1) * 8 * 1024, iter->properties().size());
                 break;
 
             default:

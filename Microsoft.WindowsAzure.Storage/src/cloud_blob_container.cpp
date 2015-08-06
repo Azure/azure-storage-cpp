@@ -69,9 +69,11 @@ namespace azure { namespace storage {
             throw std::logic_error(protocol::error_sas_missing_credentials);
         }
 
+        // since 2015-02-21, canonicalized resource is changed from "/account/name" to "/blob/account/name"
         utility::ostringstream_t resource_str;
-        resource_str << U('/') << service_client().credentials().account_name() << U('/') << name();
+        resource_str << U('/') << protocol::service_blob << U('/') << service_client().credentials().account_name() << U('/') << name();
 
+        // Future resource type changes from "c" => "container"
         return protocol::get_blob_sas_token(stored_policy_identifier, policy, cloud_blob_shared_access_headers(), U("c"), resource_str.str(), service_client().credentials());
     }
 
@@ -103,6 +105,16 @@ namespace azure { namespace storage {
     cloud_block_blob cloud_blob_container::get_block_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
     {
         return cloud_block_blob(std::move(blob_name), std::move(snapshot_time), *this);
+    }
+
+    cloud_append_blob cloud_blob_container::get_append_blob_reference(utility::string_t blob_name) const
+    {
+        return get_append_blob_reference(std::move(blob_name), utility::string_t());
+    }
+
+    cloud_append_blob cloud_blob_container::get_append_blob_reference(utility::string_t blob_name, utility::string_t snapshot_time) const
+    {
+        return cloud_append_blob(std::move(blob_name), std::move(snapshot_time), *this);
     }
 
     cloud_blob_directory cloud_blob_container::get_directory_reference(utility::string_t directory_name) const

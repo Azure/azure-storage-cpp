@@ -113,19 +113,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="queue_permissions"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::queue_permissions" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="queue_permissions" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::queue_permissions" /> object.</param>
         queue_permissions(queue_permissions&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="queue_permissions" /> object.
+        /// Returns a reference to an <see cref="azure::storage::queue_permissions" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="queue_permissions" /> object to use to set properties.</param>
-        /// <returns>A <see cref="queue_permissions" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::queue_permissions" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::queue_permissions" /> object with properties set.</returns>
         queue_permissions& operator=(queue_permissions&& other)
         {
             if (this != &other)
@@ -145,7 +145,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_message"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_message" /> class.
         /// </summary>
         cloud_queue_message()
             : m_dequeue_count(0)
@@ -153,7 +153,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_message" /> class, with text content.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_message" /> class, with text content.
         /// </summary>
         /// <param name="content">The content of the message.</param>
         explicit cloud_queue_message(utility::string_t content)
@@ -162,7 +162,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_message"/> class with the specified raw data.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_message" /> class with the specified raw data.
         /// </summary>
         /// <param name="content">The content of the message as raw data.</param>
         explicit cloud_queue_message(const std::vector<uint8_t>& content)
@@ -171,7 +171,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_message"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_message" /> class.
         /// </summary>
         /// <param name="id">The unique ID of the message.</param>
         /// <param name="pop_receipt">The pop receipt token.</param>
@@ -185,19 +185,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_message"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_message" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_queue_message" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_queue_message" /> object.</param>
         cloud_queue_message(cloud_queue_message&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_queue_message" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_queue_message" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_queue_message" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_queue_message" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_queue_message" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_queue_message" /> object with properties set.</returns>
         cloud_queue_message& operator=(cloud_queue_message&& other)
         {
             if (this != &other)
@@ -235,7 +235,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the content of this message.
         /// </summary>
-        /// <param name="content">The new message content.</param>
+        /// <param name="value">The new message content.</param>
         void set_content(utility::string_t value)
         {
             m_content = std::move(value);
@@ -244,7 +244,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the content of this message.
         /// </summary>
-        /// <param name="content">The new message content.</param>
+        /// <param name="value">The new message content.</param>
         void set_content(const std::vector<uint8_t>& value)
         {
             m_content = utility::conversions::to_base64(value);
@@ -367,19 +367,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="queue_request_options"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::queue_request_options" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="queue_request_options" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::queue_request_options" /> object.</param>
         queue_request_options(queue_request_options&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="queue_request_options" /> object.
+        /// Returns a reference to an <see cref="azure::storage::queue_request_options" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="queue_request_options" /> object to use to set properties.</param>
-        /// <returns>A <see cref="queue_request_options" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::queue_request_options" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::queue_request_options" /> object with properties set.</returns>
         queue_request_options& operator=(queue_request_options&& other)
         {
             if (this != &other)
@@ -393,7 +393,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Applies the default set of request options.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="queue_request_options" />.</param>
+        /// <param name="other">A reference to a set of <see cref="azure::storage::queue_request_options" />.</param>
         void apply_defaults(const queue_request_options& other)
         {
             request_options::apply_defaults(other, true);
@@ -421,9 +421,9 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_client"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_client" /> class.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Queue service endpoint for all locations.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the Queue service endpoint for all locations.</param>
         explicit cloud_queue_client(storage_uri base_uri)
             : cloud_client(std::move(base_uri))
         {
@@ -431,10 +431,10 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_client"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_client" /> class.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Queue service endpoint for all locations.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the Queue service endpoint for all locations.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         cloud_queue_client(storage_uri base_uri, azure::storage::storage_credentials credentials)
             : cloud_client(std::move(base_uri), std::move(credentials))
         {
@@ -442,12 +442,12 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_client" /> class using the specified Queue 
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_client" /> class using the specified Queue 
         /// service endpoint and account credentials.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Queue service endpoint for all locations.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
-        /// <param name="default_request_options">The default <see cref="queue_request_options" /> object to use for all requests made with this client object.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the Queue service endpoint for all locations.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
+        /// <param name="default_request_options">The default <see cref="azure::storage::queue_request_options" /> object to use for all requests made with this client object.</param>
         cloud_queue_client(storage_uri base_uri, azure::storage::storage_credentials credentials, queue_request_options default_request_options)
             : cloud_client(std::move(base_uri), std::move(credentials)), m_default_request_options(std::move(default_request_options))
         {
@@ -459,19 +459,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue_client"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue_client" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_queue_client" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_queue_client" /> object.</param>
         cloud_queue_client(cloud_queue_client&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_queue_client" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_queue_client" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_queue_client" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_queue_client" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_queue_client" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_queue_client" /> object with properties set.</returns>
         cloud_queue_client& operator=(cloud_queue_client&& other)
         {
             if (this != &other)
@@ -484,34 +484,34 @@ namespace azure { namespace storage {
 #endif
 
         /// <summary>
-        /// Returns a <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.
+        /// Returns an <see cref="azure::storage::queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.
         /// </summary>
-        /// <returns>A <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
+        /// <returns>An <see cref="azure::storage::queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
         queue_result_iterator list_queues() const
         {
             return list_queues(utility::string_t(), false, 0, queue_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues that begin with the specified prefix.
+        /// Returns an <see cref="azure::storage::queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The queue name prefix.</param>
-        /// <returns>A <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
+        /// <returns>An <see cref="azure::storage::queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
         queue_result_iterator list_queues(const utility::string_t& prefix) const
         {
             return list_queues(prefix, false, 0, queue_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues that begin with the specified prefix.
+        /// Returns an <see cref="azure::storage::queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The queue name prefix.</param>
         /// <param name="get_metadata">A flag that specifies whether to retrieve queue metadata.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
         /// If this value is zero, the maximum possible number of results will be returned.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
+        /// <returns>An <see cref="azure::storage::queue_result_iterator" /> that can be used to to lazily enumerate a collection of queues.</returns>
         WASTORAGE_API queue_result_iterator list_queues(const utility::string_t& prefix, bool get_metadata, utility::size64_t max_results, const queue_request_options& options, operation_context context) const;
 
         /// <summary>
@@ -543,7 +543,7 @@ namespace azure { namespace storage {
         /// <param name="get_metadata">A flag that specifies whether to retrieve queue metadata.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>         
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A result segment containing a collection of queues.</returns>
         queue_result_segment list_queues_segmented(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token, const queue_request_options& options, operation_context context) const
@@ -555,7 +555,7 @@ namespace azure { namespace storage {
         /// Intitiates an asynchronous operation to return a result segment containing a collection of queue items.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="queue_result_segment" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::queue_result_segment" /> that represents the current operation.</returns>
         pplx::task<queue_result_segment> list_queues_segmented_async(const continuation_token& token) const
         {
             return list_queues_segmented_async(utility::string_t(), false, 0, token, queue_request_options(), operation_context());
@@ -566,7 +566,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <param name="prefix">The queue name prefix.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="queue_result_segment" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::queue_result_segment" /> that represents the current operation.</returns>
         pplx::task<queue_result_segment> list_queues_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
             return list_queues_segmented_async(prefix, false, 0, token, queue_request_options(), operation_context());
@@ -580,15 +580,15 @@ namespace azure { namespace storage {
         /// <param name="get_metadata">A flag that specifies whether to retrieve queue metadata.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>         
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="queue_result_segment" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::queue_result_segment" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<queue_result_segment> list_queues_segmented_async(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token, const queue_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Gets the service properties for the Queue service client.
         /// </summary>
-        /// <returns>The <see cref="service_properties" /> for the Queue service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_properties" /> for the Queue service client.</returns>
         service_properties download_service_properties() const
         {
             return download_service_properties_async().get();
@@ -597,9 +597,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the service properties for the Queue service client.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>The <see cref="service_properties" /> for the Queue service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_properties" /> for the Queue service client.</returns>
         service_properties download_service_properties(const queue_request_options& options, operation_context context) const
         {
             return download_service_properties_async(options, context).get();
@@ -608,7 +608,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the properties of the service.
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_properties" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_properties" /> that represents the current operation.</returns>
         pplx::task<service_properties> download_service_properties_async() const
         {
             return download_service_properties_async(queue_request_options(), operation_context());
@@ -617,16 +617,16 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the properties of the service.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_properties" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_properties" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<service_properties> download_service_properties_async(const queue_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Sets the service properties for the Queue service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Queue service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Queue service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
         void upload_service_properties(const service_properties& properties, const service_properties_includes& includes) const
         {
             upload_service_properties_async(properties, includes).wait();
@@ -635,9 +635,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the service properties for the Queue service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Queue service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Queue service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_service_properties(const service_properties& properties, const service_properties_includes& includes, const queue_request_options& options, operation_context context) const
         {
@@ -647,8 +647,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to set the service properties for the Queue service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Queue service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Queue service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes) const
         {
@@ -658,9 +658,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to set the service properties for the Queue service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Queue service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Queue service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes, const queue_request_options& options, operation_context context) const;
@@ -668,7 +668,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the service stats for the Queue service client.
         /// </summary>
-        /// <returns>The <see cref="service_stats" /> for the Queue service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_stats" /> for the Queue service client.</returns>
         service_stats download_service_stats() const
         {
             return download_service_stats_async().get();
@@ -677,9 +677,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the service stats for the Queue service client.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>The <see cref="service_stats" /> for the Queue service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_stats" /> for the Queue service client.</returns>
         service_stats download_service_stats(const queue_request_options& options, operation_context context) const
         {
             return download_service_stats_async(options, context).get();
@@ -688,7 +688,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the stats of the service.
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_stats" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
         pplx::task<service_stats> download_service_stats_async() const
         {
             return download_service_stats_async(queue_request_options(), operation_context());
@@ -697,9 +697,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the stats of the service.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_stats" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<service_stats> download_service_stats_async(const queue_request_options& options, operation_context context) const;
 
         /// <summary>
@@ -740,7 +740,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue" /> class.
         /// </summary>
         cloud_queue()
             : m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
@@ -748,16 +748,16 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue" /> class.
         /// </summary>
-        /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the queue for all locations.</param>
+        /// <param name="uri">An <see cref="azure::storage::storage_uri" /> object containing the absolute URI to the queue for all locations.</param>
         WASTORAGE_API cloud_queue(const storage_uri& uri);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue" /> class.
         /// </summary>
-        /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the queue for all locations.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="uri">An <see cref="azure::storage::storage_uri" /> object containing the absolute URI to the queue for all locations.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         WASTORAGE_API cloud_queue(const storage_uri& uri, storage_credentials credentials);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -765,19 +765,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_queue"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_queue" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_queue" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_queue" /> object.</param>
         cloud_queue(cloud_queue&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_queue" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_queue" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_queue" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_queue" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_queue" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_queue" /> object with properties set.</returns>
         cloud_queue& operator=(cloud_queue&& other)
         {
             if (this != &other)
@@ -803,7 +803,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Creates the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void create(const queue_request_options& options, operation_context context)
         {
@@ -822,7 +822,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to create the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> create_async(const queue_request_options& options, operation_context context);
@@ -838,7 +838,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Creates the queue if it does not already exist.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         bool create_if_not_exists(const queue_request_options & options, operation_context context)
         {
@@ -857,7 +857,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to create the queue if it does not already exist.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> create_if_not_exists_async(const queue_request_options& options, operation_context context);
@@ -873,7 +873,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Deletes the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void delete_queue(const queue_request_options& options, operation_context context)
         {
@@ -892,7 +892,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to delete the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> delete_queue_async(const queue_request_options& options, operation_context context);
@@ -908,7 +908,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Deletes the queue if it exists.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         bool delete_queue_if_exists(const queue_request_options& options, operation_context context)
         {
@@ -927,7 +927,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to delete the queue if it exists.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> delete_queue_if_exists_async(const queue_request_options& options, operation_context context);
@@ -943,7 +943,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Checks for the existence of the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         bool exists(const queue_request_options& options, operation_context context) const
         {
@@ -962,7 +962,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to check for the existence of the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> exists_async(const queue_request_options& options, operation_context context) const;
@@ -982,7 +982,7 @@ namespace azure { namespace storage {
         /// <param name="message">The message to add to the queue.</param>
         /// <param name="time_to_live">The maximum time to allow the message to be in the queue.</param>
         /// <param name="initial_visibility_timeout">The length of time from now during which the message will be invisible.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void add_message(cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, queue_request_options& options, operation_context context)
         {
@@ -1006,7 +1006,7 @@ namespace azure { namespace storage {
         /// <param name="message">The message to add to the queue.</param>
         /// <param name="time_to_live">The maximum time to allow the message to be in the queue.</param>
         /// <param name="initial_visibility_timeout">The length of time from now during which the message will be invisible.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> add_message_async(cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, queue_request_options& options, operation_context context);
@@ -1014,7 +1014,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Retrieves a message from the front of the queue
         /// </summary>
-        /// <returns>A <see cref="cloud_queue_message" /> object.</returns>
+        /// <returns>An <see cref="azure::storage::cloud_queue_message" /> object.</returns>
         cloud_queue_message get_message()
         {
             return get_message_async().get();
@@ -1024,9 +1024,9 @@ namespace azure { namespace storage {
         /// Retrieves a message from the front of the queue
         /// </summary>
         /// <param name="visibility_timeout">The length of time from now during which the message will be invisible.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="cloud_queue_message" /> object.</returns>
+        /// <returns>An <see cref="azure::storage::cloud_queue_message" /> object.</returns>
         cloud_queue_message get_message(std::chrono::seconds visibility_timeout, queue_request_options& options, operation_context context)
         {
             return get_message_async(visibility_timeout, options, context).get();
@@ -1035,7 +1035,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that retrieves a message from the front of the queue
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="cloud_queue_message" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_queue_message" /> that represents the current operation.</returns>
         pplx::task<cloud_queue_message> get_message_async()
         {
             queue_request_options options;
@@ -1046,16 +1046,16 @@ namespace azure { namespace storage {
         /// Intitiates an asynchronous operation that retrieves a message from the front of the queue
         /// </summary>
         /// <param name="visibility_timeout">The length of time from now during which the message will be invisible.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="cloud_queue_message" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_queue_message" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<cloud_queue_message> get_message_async(std::chrono::seconds visibility_timeout, queue_request_options& options, operation_context context);
 
         /// <summary>
         /// Retrieves the specified number of messages from the front of the queue.
         /// </summary>
         /// <param name="message_count">The number of messages to retrieve.</param>
-        /// <returns>An enumerable collection of <see cref="cloud_queue_message" /> objects.</returns>
+        /// <returns>An enumerable collection of <see cref="azure::storage::cloud_queue_message" /> objects.</returns>
         std::vector<cloud_queue_message> get_messages(size_t message_count)
         {
             return get_messages_async(message_count).get();
@@ -1066,9 +1066,9 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="message_count">The number of messages to retrieve.</param>
         /// <param name="visibility_timeout">The length of time from now during which the message will be invisible.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>An enumerable collection of <see cref="cloud_queue_message" /> objects.</returns>
+        /// <returns>An enumerable collection of <see cref="azure::storage::cloud_queue_message" /> objects.</returns>
         std::vector<cloud_queue_message> get_messages(size_t message_count, std::chrono::seconds visibility_timeout, queue_request_options& options, operation_context context)
         {
             return get_messages_async(message_count, visibility_timeout, options, context).get();
@@ -1078,7 +1078,7 @@ namespace azure { namespace storage {
         /// Intitiates an asynchronous operation that retrieves the specified number of messages from the front of the queue.
         /// </summary>
         /// <param name="message_count">The number of messages to retrieve.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="cloud_queue_message" />, that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::cloud_queue_message" />, that represents the current operation.</returns>
         pplx::task<std::vector<cloud_queue_message>> get_messages_async(size_t message_count)
         {
             queue_request_options options;
@@ -1090,15 +1090,15 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="message_count">The number of messages to retrieve.</param>
         /// <param name="visibility_timeout">The length of time from now during which the message will be invisible.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="cloud_queue_message" />, that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::cloud_queue_message" />, that represents the current operation.</returns>
         WASTORAGE_API pplx::task<std::vector<cloud_queue_message>> get_messages_async(size_t message_count, std::chrono::seconds visibility_timeout, queue_request_options& options, operation_context context);
 
         /// <summary>
         /// Peeks a message from the front of the queue
         /// </summary>
-        /// <returns>A <see cref="cloud_queue_message"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::cloud_queue_message" /> object.</returns>
         cloud_queue_message peek_message() const
         {
             return peek_message_async().get();
@@ -1107,9 +1107,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Peeks a message from the front of the queue
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="cloud_queue_message"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::cloud_queue_message" /> object.</returns>
         cloud_queue_message peek_message(const queue_request_options& options, operation_context context) const
         {
             return peek_message_async(options, context).get();
@@ -1118,7 +1118,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that peeks a message from the front of the queue
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="cloud_queue_message" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_queue_message" /> that represents the current operation.</returns>
         pplx::task<cloud_queue_message> peek_message_async() const
         {
             return peek_message_async(queue_request_options(), operation_context());
@@ -1127,9 +1127,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that peeks a message from the front of the queue
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="cloud_queue_message" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_queue_message" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<cloud_queue_message> peek_message_async(const queue_request_options& options, operation_context context) const;
 
         /// <summary>
@@ -1137,7 +1137,7 @@ namespace azure { namespace storage {
         /// message visibility.
         /// </summary>
         /// <param name="message_count">The number of messages to be retrieved.</param>
-        /// <returns>An enumerable collection of <see cref="cloud_queue_message" /> objects.</returns>
+        /// <returns>An enumerable collection of <see cref="azure::storage::cloud_queue_message" /> objects.</returns>
         std::vector<cloud_queue_message> peek_messages(size_t message_count) const
         {
             return peek_messages_async(message_count).get();
@@ -1148,9 +1148,9 @@ namespace azure { namespace storage {
         /// message visibility.
         /// </summary>
         /// <param name="message_count">The number of messages to be retrieved.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>An enumerable collection of <see cref="cloud_queue_message" /> objects.</returns>
+        /// <returns>An enumerable collection of <see cref="azure::storage::cloud_queue_message" /> objects.</returns>
         std::vector<cloud_queue_message> peek_messages(size_t message_count, const queue_request_options& options, operation_context context) const
         {
             return peek_messages_async(message_count, options, context).get();
@@ -1161,7 +1161,7 @@ namespace azure { namespace storage {
         /// message visibility.
         /// </summary>
         /// <param name="message_count">The number of messages to be retrieved.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="cloud_queue_message" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_queue_message" /> that represents the current operation.</returns>
         pplx::task<std::vector<cloud_queue_message>> peek_messages_async(size_t message_count) const
         {
             return peek_messages_async(message_count, queue_request_options(), operation_context());
@@ -1172,9 +1172,9 @@ namespace azure { namespace storage {
         /// message visibility.
         /// </summary>
         /// <param name="message_count">The number of messages to be retrieved.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="cloud_queue_message" />, that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::cloud_queue_message" />, that represents the current operation.</returns>
         WASTORAGE_API pplx::task<std::vector<cloud_queue_message>> peek_messages_async(size_t message_count, const queue_request_options& options, operation_context context) const;
 
         /// <summary>
@@ -1194,7 +1194,7 @@ namespace azure { namespace storage {
         /// <param name="message">The message to update.</param>
         /// <param name="visibility_timeout">The time interval, in seconds, after which the message becomes visible again, unless it has been deleted.</param>
         /// <param name="update_content"><c>true</c> to update the content of the message.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void update_message(cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_content, queue_request_options& options, operation_context context)
         {
@@ -1220,7 +1220,7 @@ namespace azure { namespace storage {
         /// <param name="message">The message to update.</param>
         /// <param name="visibility_timeout">The time interval, in seconds, after which the message becomes visible again, unless it has been deleted.</param>
         /// <param name="update_content"><c>true</c> to update the content of the message.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> update_message_async(cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_content, queue_request_options& options, operation_context context);
@@ -1238,7 +1238,7 @@ namespace azure { namespace storage {
         /// Deletes the given message from the queue.
         /// </summary>
         /// <param name="message">The message to delete.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void delete_message(cloud_queue_message& message, queue_request_options& options, operation_context context)
         {
@@ -1260,7 +1260,7 @@ namespace azure { namespace storage {
         /// Intitiates an asynchronous operation that deletes the given message from the queue.
         /// </summary>
         /// <param name="message">The message to delete.</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> delete_message_async(cloud_queue_message& message, queue_request_options& options, operation_context context);
@@ -1276,7 +1276,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Deletes all the messages in the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void clear(const queue_request_options& options, operation_context context)
         {
@@ -1295,7 +1295,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that deletes all the messages in the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> clear_async(const queue_request_options& options, operation_context context);
@@ -1311,7 +1311,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Retrieves the user-defined metadata for the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void download_attributes(const queue_request_options& options, operation_context context)
         {
@@ -1330,7 +1330,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that retrieves the user-defined metadata for the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> download_attributes_async(const queue_request_options& options, operation_context context);
@@ -1346,7 +1346,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the user-defined metadata for the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_metadata(const queue_request_options& options, operation_context context)
         {
@@ -1365,7 +1365,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that sets the user-defined metadata for the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_metadata_async(const queue_request_options& options, operation_context context);
@@ -1381,7 +1381,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Retrieves the shared access policies for the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         queue_permissions download_permissions(const queue_request_options& options, operation_context context) const
         {
@@ -1391,7 +1391,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that retrieves the shared access policies for the queue.
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="queue_permissions" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::queue_permissions" /> that represents the current operation.</returns>
         pplx::task<queue_permissions> download_permissions_async() const
         {
             return download_permissions_async(queue_request_options(), operation_context());
@@ -1400,9 +1400,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that retrieves the shared access policies for the queue.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="queue_permissions" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::queue_permissions" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<queue_permissions> download_permissions_async(const queue_request_options& options, operation_context context) const;
 
         /// <summary>
@@ -1418,7 +1418,7 @@ namespace azure { namespace storage {
         /// Sets permissions for the queue.
         /// </summary>
         /// <param name="permissions">The access control list to associate with this queue</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_permissions(const queue_permissions& permissions, const queue_request_options& options, operation_context context)
         {
@@ -1439,7 +1439,7 @@ namespace azure { namespace storage {
         /// Intitiates an asynchronous operation that sets permissions for the queue.
         /// </summary>
         /// <param name="permissions">The access control list to associate with this queue</param>
-        /// <param name="options">A <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::queue_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_permissions_async(const queue_permissions& permissions, const queue_request_options& options, operation_context context);
@@ -1465,7 +1465,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the Queue service client that specifies the endpoint for the queue service.
         /// </summary>
-        /// <returns>The <see cref="cloud_queue_client" /> object that specifies the endpoint for the queue service.</returns>
+        /// <returns>The <see cref="azure::storage::cloud_queue_client" /> object that specifies the endpoint for the queue service.</returns>
         const cloud_queue_client& service_client() const 
         { 
             return m_client;
@@ -1483,7 +1483,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the queue URI for all locations.
         /// </summary>
-        /// <returns>A <see cref="storage_uri" /> containing the queue URI for all locations.</returns>
+        /// <returns>An <see cref="azure::storage::storage_uri" /> containing the queue URI for all locations.</returns>
         const storage_uri& uri() const
         {
             return m_uri;

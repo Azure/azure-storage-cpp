@@ -329,6 +329,16 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
+    web::http::http_request append_block(const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_append_block, /* do_encoding */ false));
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        request.headers().add(web::http::header_names::content_md5, content_md5);
+        add_append_condition(request, condition);
+        add_access_condition(request, condition);
+        return request;
+    }
+
     web::http::http_request put_block_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -346,6 +356,16 @@ namespace azure { namespace storage { namespace protocol {
         headers.add(ms_header_blob_type, header_value_blob_type_page);
         headers.add(ms_header_blob_content_length, size);
         headers.add(ms_header_blob_sequence_number, sequence_number);
+        add_properties(request, properties);
+        add_metadata(request, metadata);
+        add_access_condition(request, condition);
+        return request;
+    }
+
+    web::http::http_request put_append_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        request.headers().add(ms_header_blob_type, header_value_blob_type_append);
         add_properties(request, properties);
         add_metadata(request, metadata);
         add_access_condition(request, condition);
@@ -545,6 +565,19 @@ namespace azure { namespace storage { namespace protocol {
         if (!condition.lease_id().empty())
         {
             throw storage_exception(protocol::error_lease_id_on_source, false);
+        }
+    }
+
+    void add_append_condition(web::http::http_request& request, const access_condition& condition)
+    {
+        if (condition.max_size() != -1)
+        {
+            request.headers().add(ms_header_blob_condition_maxsize, condition.max_size());
+        }
+
+        if (condition.append_position() != -1)
+        {
+            request.headers().add(ms_header_blob_condition_appendpos, condition.append_position());
         }
     }
 

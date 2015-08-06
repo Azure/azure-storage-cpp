@@ -111,8 +111,9 @@ namespace azure { namespace storage {
             throw std::logic_error(protocol::error_sas_missing_credentials);
         }
 
+        // since 2015-02-21, canonicalized resource is changed from "/account/container/name" to "/blob/account/container/name"
         utility::ostringstream_t resource_str;
-        resource_str << U('/') << service_client().credentials().account_name() << U('/') << container().name() << U('/') << name();
+        resource_str << U('/') << protocol::service_blob << U('/') << service_client().credentials().account_name() << U('/') << container().name() << U('/') << name();
 
         return protocol::get_blob_sas_token(stored_policy_identifier, policy, headers, U("b"), resource_str.str(), service_client().credentials());
     }
@@ -530,11 +531,11 @@ namespace azure { namespace storage {
         auto instance = std::make_shared<cloud_blob>(*this);
         return concurrency::streams::file_stream<uint8_t>::open_ostream(path).then([instance, condition, options, context] (concurrency::streams::ostream stream) -> pplx::task<void>
         {
-            return instance->download_to_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> download_task) -> pplx::task<void>
+            return instance->download_to_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> upload_task) -> pplx::task<void>
             {
-                return stream.close().then([download_task] ()
+                return stream.close().then([upload_task]()
                 {
-                    download_task.wait();
+                    upload_task.wait();
                 });
             });
         });
@@ -569,7 +570,7 @@ namespace azure { namespace storage {
         return core::executor<bool>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_from_blob_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -592,12 +593,12 @@ namespace azure { namespace storage {
         return core::executor<utility::string_t>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_from_blob_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
     {
         web::http::uri raw_source_uri = source.snapshot_qualified_uri().primary_uri();
         web::http::uri source_uri = service_client().credentials().transform_uri(raw_source_uri);
 
-        return start_copy_from_blob_async(source_uri, source_condition, destination_condition, options, context);
+        return start_copy_async(source_uri, source_condition, destination_condition, options, context);
     }
 
     pplx::task<void> cloud_blob::abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context) const

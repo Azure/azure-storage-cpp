@@ -43,7 +43,12 @@ public:
             return azure::storage::result_segment<int>();
         }
 
-        if (maximum_results == 0 || maximum_results > m_max_results_per_segment)
+        if (m_max_results_per_segment != 0)
+        {
+            CHECK(maximum_results <= m_max_results_per_segment);
+        }
+
+        if (maximum_results == 0)
         {
             // each segment return up to "m_max_results_per_segment" results
             maximum_results = m_max_results_per_segment;
@@ -94,15 +99,12 @@ result_generator_type get_result_generator(test_result_provider& result_provider
 
 void result_iterator_check_result_number(result_generator_type generator, size_t max_results, size_t max_results_per_segment, size_t num_of_results)
 {
-    azure::storage::result_iterator<int> end_of_results;
     azure::storage::result_iterator<int> iter(generator, max_results, max_results_per_segment);
     int count = 0;
-    while (iter != end_of_results)
+    for (auto& item : iter)
     {
         count++;
-        CHECK(*iter == count);
-
-        iter++;
+        CHECK(item == count);
     }
 
     CHECK_EQUAL(num_of_results, (size_t)count);

@@ -78,7 +78,7 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
-    /// Enumeration containing the types of operations that can be performed by a <see cref="azure::storage::table_operation" />.
+    /// Enumeration containing the types of operations that can be performed by an <see cref="azure::storage::table_operation" />.
     /// </summary>
     enum class table_operation_type
     {
@@ -227,19 +227,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_permissions"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::table_permissions" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_permissions" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::table_permissions" /> object.</param>
         table_permissions(table_permissions&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="table_permissions" /> object.
+        /// Returns a reference to an <see cref="azure::storage::table_permissions" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_permissions" /> object to use to set properties.</param>
-        /// <returns>A <see cref="table_permissions" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::table_permissions" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::table_permissions" /> object with properties set.</returns>
         table_permissions& operator=(table_permissions&& other)
         {
             if (this != &other)
@@ -271,19 +271,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_request_options"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::table_request_options" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_request_options" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::table_request_options" /> object.</param>
         table_request_options(table_request_options&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="table_request_options" /> object.
+        /// Returns a reference to an <see cref="azure::storage::table_request_options" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_request_options" /> object to use to set properties.</param>
-        /// <returns>A <see cref="table_request_options" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::table_request_options" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::table_request_options" /> object with properties set.</returns>
         table_request_options& operator=(table_request_options&& other)
         {
             if (this != &other)
@@ -298,7 +298,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Applies the default set of request options.
         /// </summary>
-        /// <param name="other">A reference to a set of <see cref="table_request_options" />.</param>
+        /// <param name="other">A reference to a set of <see cref="azure::storage::table_request_options" />.</param>
         void apply_defaults(const table_request_options& other)
         {
             request_options::apply_defaults(other, true);
@@ -307,18 +307,18 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the <see cref="azure::storage::table_payload_format"/> to use for the request.
+        /// Gets the <see cref="azure::storage::table_payload_format" /> to use for the request.
         /// </summary>
-        /// <returns>A <see cref="azure::storage::table_payload_format"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_payload_format" /> object.</returns>
         azure::storage::table_payload_format payload_format() const
         {
             return m_payload_format;
         }
 
         /// <summary>
-        /// Sets the <see cref="azure::storage::table_payload_format"/> that will be used for the request.
+        /// Sets the <see cref="azure::storage::table_payload_format" /> that will be used for the request.
         /// </summary>
-        /// <param name="payload_format">The <see cref="azure::storage::table_payload_format"/> to use.</param>
+        /// <param name="payload_format">The <see cref="azure::storage::table_payload_format" /> to use.</param>
         void set_payload_format(azure::storage::table_payload_format payload_format)
         {
             m_payload_format = payload_format;
@@ -337,7 +337,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class.
         /// </summary>
         entity_property()
             : m_property_type(edm_type::string), m_is_null(true)
@@ -345,7 +345,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a byte array value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a byte array value.
         /// </summary>
         /// <param name="value">A byte array.</param>
         entity_property(const std::vector<uint8_t>& value)
@@ -355,7 +355,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a boolean value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a boolean value.
         /// </summary>
         /// <param name="value">A boolean value.</param>
         entity_property(bool value)
@@ -365,7 +365,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a date/time value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a date/time value.
         /// </summary>
         /// <param name="value">A datetime value.</param>
         entity_property(utility::datetime value)
@@ -375,7 +375,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a double precision floating-point number value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a double precision floating-point number value.
         /// </summary>
         /// <param name="value">A double value.</param>
         entity_property(double value)
@@ -385,7 +385,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a GUID value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a GUID value.
         /// </summary>
         /// <param name="value">A GUID value.</param>
         entity_property(const utility::uuid& value)
@@ -395,7 +395,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a 32-bit integer value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a 32-bit integer value.
         /// </summary>
         /// <param name="value">A 32-bit integer value.</param>
         entity_property(int32_t value)
@@ -405,7 +405,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a 64-bit integer value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a 64-bit integer value.
         /// </summary>
         /// <param name="value">A 64-bit integer value.</param>
         entity_property(int64_t value)
@@ -415,7 +415,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a string value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a string value.
         /// </summary>
         /// <param name="value">A string value.</param>
         entity_property(utility::string_t value)
@@ -424,7 +424,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class with a string value.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class with a string value.
         /// </summary>
         /// <param name="value">A string value.</param>
         entity_property(const utility::char_t* value)
@@ -438,19 +438,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="entity_property"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::entity_property" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="entity_property" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::entity_property" /> object.</param>
         entity_property(entity_property&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="entity_property" /> object.
+        /// Returns a reference to an <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="entity_property" /> object to use to set properties.</param>
-        /// <returns>A <see cref="entity_property" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::entity_property" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::entity_property" /> object with properties set.</returns>
         entity_property& operator=(entity_property&& other)
         {
             if (this != &other)
@@ -464,18 +464,18 @@ namespace azure { namespace storage {
 #endif
 
         /// <summary>
-        /// Gets the property type of the <see cref="entity_property" /> object.
+        /// Gets the property type of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>An <see cref="edm_type" /> object.</returns>
+        /// <returns>An <see cref="azure::storage::edm_type" /> object.</returns>
         azure::storage::edm_type property_type() const
         {
             return m_property_type;
         }
 
         /// <summary>
-        /// Sets the property type of the <see cref="entity_property" /> object.
+        /// Sets the property type of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <param name="property_type">An <see cref="edm_type" /> object indicating the property type.</param>
+        /// <param name="property_type">An <see cref="azure::storage::edm_type" /> object indicating the property type.</param>
         void set_property_type(azure::storage::edm_type property_type)
         {
             m_property_type = property_type;
@@ -500,79 +500,79 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the byte array value of the <see cref="entity_property"/> object.
+        /// Gets the byte array value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The byte array value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The byte array value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a byte array.
         /// </remarks>
         WASTORAGE_API std::vector<uint8_t> binary_value() const;
 
         /// <summary>
-        /// Gets the boolean value of the <see cref="entity_property"/> object.
+        /// Gets the boolean value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The boolean value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The boolean value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a boolean value.
         /// </remarks>
         WASTORAGE_API bool boolean_value() const;
 
         /// <summary>
-        /// Gets the datetime value of the <see cref="entity_property"/> object.
+        /// Gets the datetime value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The datetime value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The datetime value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a datetime value.
         /// </remarks>
         WASTORAGE_API utility::datetime datetime_value() const;
 
         /// <summary>
-        /// Gets the double-precision floating point value of the <see cref="entity_property"/> object.
+        /// Gets the double-precision floating point value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The double-precision floating point value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The double-precision floating point value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a double-precision floating point value.
         /// </remarks>
         WASTORAGE_API double double_value() const;
 
         /// <summary>
-        /// Gets the GUID value of the <see cref="entity_property"/> object.
+        /// Gets the GUID value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The GUID value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The GUID value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a GUID value.
         /// </remarks>
         WASTORAGE_API utility::uuid guid_value() const;
 
         /// <summary>
-        /// Gets the 32-bit integer value of the <see cref="entity_property"/> object.
+        /// Gets the 32-bit integer value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The 32-bit integer value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The 32-bit integer value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a 32-bit integer value.
         /// </remarks>
         WASTORAGE_API int32_t int32_value() const;
 
         /// <summary>
-        /// Gets the 64-bit integer value of the <see cref="entity_property"/> object.
+        /// Gets the 64-bit integer value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The 64-bit integer value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The 64-bit integer value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a 64-bit integer value.
         /// </remarks>
         WASTORAGE_API int64_t int64_value() const;
 
         /// <summary>
-        /// Gets the string value of the <see cref="entity_property"/> object.
+        /// Gets the string value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
-        /// <returns>The string value of the <see cref="entity_property"/> object.</returns>
+        /// <returns>The string value of the <see cref="azure::storage::entity_property" /> object.</returns>
         /// <remarks>
         /// An exception is thrown if this property is set to a value other than a string value.
         /// </remarks>
         WASTORAGE_API utility::string_t string_value() const;
 
         /// <summary>
-        /// Sets the byte array value of the <see cref="entity_property"/> object.
+        /// Sets the byte array value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The byte array value.</param>
         void set_value(const std::vector<uint8_t>& value)
@@ -581,7 +581,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the boolean value of the <see cref="entity_property"/> object.
+        /// Sets the boolean value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The boolean value.</param>
         void set_value(bool value)
@@ -594,7 +594,7 @@ namespace azure { namespace storage {
         // TODO: Test timezone parsing
 
         /// <summary>
-        /// Sets the datetime value of the <see cref="entity_property"/> object.
+        /// Sets the datetime value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The datetime value.</param>
         void set_value(utility::datetime value)
@@ -605,7 +605,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the double-precision floating point value of the <see cref="entity_property"/> object.
+        /// Sets the double-precision floating point value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The double-precision floating point value.</param>
         void set_value(double value)
@@ -616,7 +616,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the GUID value of the <see cref="entity_property"/> object.
+        /// Sets the GUID value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The GUID point value.</param>
         void set_value(const utility::uuid& value)
@@ -627,7 +627,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the 32-bit integer value of the <see cref="entity_property"/> object.
+        /// Sets the 32-bit integer value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The 32-bit integer value.</param>
         void set_value(int32_t value)
@@ -638,7 +638,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the 64-bit integer value of the <see cref="entity_property"/> object.
+        /// Sets the 64-bit integer value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The 64-bit integer value.</param>
         void set_value(int64_t value)
@@ -649,7 +649,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the string value of the <see cref="entity_property"/> object.
+        /// Sets the string value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The string value.</param>
         void set_value(utility::string_t value)
@@ -660,7 +660,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the string value of the <see cref="entity_property"/> object.
+        /// Sets the string value of the <see cref="azure::storage::entity_property" /> object.
         /// </summary>
         /// <param name="value">The string value.</param>
         void set_value(const utility::char_t * value)
@@ -671,7 +671,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Returns the value of the <see cref="entity_property"/> object as a string.
+        /// Returns the value of the <see cref="azure::storage::entity_property" /> object as a string.
         /// </summary>
         /// <returns>A string containing the property value.</returns>
         const utility::string_t& str() const
@@ -728,14 +728,14 @@ namespace azure { namespace storage {
         typedef std::unordered_map<utility::string_t, azure::storage::entity_property>::value_type property_type;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_entity"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::table_entity" /> class.
         /// </summary>
         table_entity()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_entity"/> class with the specified partition key and row key.
+        /// Initializes a new instance of the <see cref="azure::storage::table_entity" /> class with the specified partition key and row key.
         /// </summary>
         /// <param name="partition_key">The partition key value for the entity.</param>
         /// <param name="row_key">The row key value for the entity.</param>
@@ -745,7 +745,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_entity"/> class with the entity's partition key, row key, ETag (if available/required), and properties.
+        /// Initializes a new instance of the <see cref="azure::storage::table_entity" /> class with the entity's partition key, row key, ETag (if available/required), and properties.
         /// </summary>
         /// <param name="partition_key">The entity's partition key.</param>
         /// <param name="row_key">The entity's row key.</param>
@@ -761,19 +761,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_entity"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::table_entity" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_entity" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::table_entity" /> object.</param>
         table_entity(table_entity&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="table_entity" /> object.
+        /// Returns a reference to an <see cref="azure::storage::table_entity" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_entity" /> object to use to set properties.</param>
-        /// <returns>A <see cref="table_entity" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::table_entity" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::table_entity" /> object with properties set.</returns>
         table_entity& operator=(table_entity&& other)
         {
             if (this != &other)
@@ -907,19 +907,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_operation"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::table_operation" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_operation" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::table_operation" /> object.</param>
         table_operation(table_operation&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="table_operation" /> object.
+        /// Returns a reference to an <see cref="azure::storage::table_operation" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_operation" /> object to use to set properties.</param>
-        /// <returns>A <see cref="table_operation" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::table_operation" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object with properties set.</returns>
         table_operation& operator=(table_operation&& other)
         {
             if (this != &other)
@@ -934,7 +934,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the entity being operated upon.
         /// </summary>
-        /// <returns>A <see cref="table_entity"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_entity" /> object.</returns>
         const table_entity& entity() const
         {
             return m_entity;
@@ -943,7 +943,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the type of operation.
         /// </summary>
-        /// <returns>A <see cref="table_operation_type"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation_type" /> object.</returns>
         table_operation_type operation_type() const
         {
             return m_operation_type;
@@ -953,7 +953,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to delete the specified entity.
         /// </summary>
         /// <param name="entity">The entity to be deleted from the table.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         static const table_operation delete_entity(table_entity entity)
         {
             return table_operation(table_operation_type::delete_operation, std::move(entity));
@@ -963,7 +963,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to insert the specified entity.
         /// </summary>
         /// <param name="entity">The entity to be inserted into the table.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         static const table_operation insert_entity(table_entity entity)
         {
             return table_operation(table_operation_type::insert_operation, std::move(entity));
@@ -974,7 +974,7 @@ namespace azure { namespace storage {
         /// if the entity does exist, then the contents of the specified entity are merged with the existing entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being inserted or merged.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         static const table_operation insert_or_merge_entity(table_entity entity)
         {
             return table_operation(table_operation_type::insert_or_merge_operation, std::move(entity));
@@ -985,7 +985,7 @@ namespace azure { namespace storage {
         /// if the entity does exist, then its contents are replaced with the specified entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being inserted or replaced.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         static const table_operation insert_or_replace_entity(table_entity entity)
         {
             return table_operation(table_operation_type::insert_or_replace_operation, std::move(entity));
@@ -995,7 +995,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to merge the contents of the specified entity with the existing entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being merged.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         static const table_operation merge_entity(table_entity entity)
         {
             return table_operation(table_operation_type::merge_operation, std::move(entity));
@@ -1005,7 +1005,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to replace the contents of the specified entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being replaced.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         static const table_operation replace_entity(table_entity entity)
         {
             return table_operation(table_operation_type::replace_operation, std::move(entity));
@@ -1016,7 +1016,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="partition_key">The partition key of the entity to be replaced.</param>
         /// <param name="row_key">The row key of the entity to be replaced.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         static const table_operation retrieve_entity(utility::string_t partition_key, utility::string_t row_key)
         {
             table_entity entity;
@@ -1047,7 +1047,7 @@ namespace azure { namespace storage {
         typedef std::vector<azure::storage::table_operation> operations_type;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_batch_operation"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::table_batch_operation" /> class.
         /// </summary>
         table_batch_operation()
         {
@@ -1058,19 +1058,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_batch_operation"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::table_batch_operation" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_batch_operation" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::table_batch_operation" /> object.</param>
         table_batch_operation(table_batch_operation&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="table_batch_operation" /> object.
+        /// Returns a reference to an <see cref="azure::storage::table_batch_operation" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_batch_operation" /> object to use to set properties.</param>
-        /// <returns>A <see cref="table_batch_operation" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::table_batch_operation" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::table_batch_operation" /> object with properties set.</returns>
         table_batch_operation& operator=(table_batch_operation&& other)
         {
             if (this != &other)
@@ -1085,7 +1085,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to delete the specified entity.
         /// </summary>
         /// <param name="entity">The entity to be deleted from the table.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         void delete_entity(table_entity entity)
         {
             table_operation operation = table_operation::delete_entity(std::move(entity));
@@ -1096,7 +1096,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to insert the specified entity.
         /// </summary>
         /// <param name="entity">The entity to be inserted into the table.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         void insert_entity(table_entity entity)
         {
             table_operation operation = table_operation::insert_entity(std::move(entity));
@@ -1108,7 +1108,7 @@ namespace azure { namespace storage {
         /// if the entity does exist, then the contents of the specified entity are merged with the existing entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being inserted or merged.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         void insert_or_merge_entity(table_entity entity)
         {
             table_operation operation = table_operation::insert_or_merge_entity(std::move(entity));
@@ -1120,7 +1120,7 @@ namespace azure { namespace storage {
         /// if the entity does exist, then its contents are replaced with the specified entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being inserted or replaced.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         void insert_or_replace_entity(table_entity entity)
         {
             table_operation operation = table_operation::insert_or_replace_entity(std::move(entity));
@@ -1131,7 +1131,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to merge the contents of the specified entity with the existing entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being merged.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         void merge_entity(table_entity entity)
         {
             table_operation operation = table_operation::merge_entity(std::move(entity));
@@ -1142,7 +1142,7 @@ namespace azure { namespace storage {
         /// Creates a new table operation to replace the contents of the specified entity.
         /// </summary>
         /// <param name="entity">The entity whose contents are being replaced.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         void replace_entity(table_entity entity)
         {
             table_operation operation = table_operation::replace_entity(std::move(entity));
@@ -1154,7 +1154,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="partition_key">The partition key of the entity to be replaced.</param>
         /// <param name="row_key">The row key of the entity to be replaced.</param>
-        /// <returns>A <see cref="azure::storage::table_operation"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_operation" /> object.</returns>
         void retrieve_entity(utility::string_t partition_key, utility::string_t row_key)
         {
             table_operation operation = table_operation::retrieve_entity(std::move(partition_key), std::move(row_key));
@@ -1162,20 +1162,20 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets a reference to an <see cref="operations_type"/> object containing an enumerable collection
+        /// Gets a reference to an <see cref="azure::storage::table_batch_operation::operations_type" /> object containing an enumerable collection
         /// of operations comprising a batch operation.
         /// </summary>
-        /// <returns>An <see cref="operations_type"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_batch_operation::operations_type" /> object.</returns>
         operations_type& operations()
         {
             return m_operations;
         }
 
         /// <summary>
-        /// Gets a reference to an <see cref="operations_type"/> object containing an enumerable collection
+        /// Gets a reference to an <see cref="azure::storage::table_batch_operation::operations_type" /> object containing an enumerable collection
         /// of operations comprising a batch operation.
         /// </summary>
-        /// <returns>An <see cref="operations_type"/> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_batch_operation::operations_type" /> object.</returns>
         const operations_type& operations() const
         {
             return m_operations;
@@ -1255,7 +1255,7 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_query"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::table_query" /> class.
         /// </summary>
         table_query()
             : m_take_count(-1)
@@ -1267,19 +1267,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_query"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::table_query" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_query" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::table_query" /> object.</param>
         table_query(table_query&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="table_query" /> object.
+        /// Returns a reference to an <see cref="azure::storage::table_query" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_query" /> object to use to set properties.</param>
-        /// <returns>A <see cref="table_query" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::table_query" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::table_query" /> object with properties set.</returns>
         table_query& operator=(table_query&& other)
         {
             if (this != &other)
@@ -1501,14 +1501,14 @@ namespace azure { namespace storage {
     /// <summary>
     /// Represents the result of a table operation.
     /// </summary>
-    /// <remarks>The <see cref="azure::storage::table_result"/> class encapsulates the HTTP response and any query 
-    /// results returned for a particular <see cref="azure::storage::table_operation"/>.</remarks>
+    /// <remarks>The <see cref="azure::storage::table_result" /> class encapsulates the HTTP response and any query 
+    /// results returned for a particular <see cref="azure::storage::table_operation" />.</remarks>
     class table_result
     {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::table_result"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::table_result" /> class.
         /// </summary>
         table_result()
             : m_http_status_code(0)
@@ -1520,19 +1520,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="table_result"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::table_result" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_result" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::table_result" /> object.</param>
         table_result(table_result&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="table_result" /> object.
+        /// Returns a reference to an <see cref="azure::storage::table_result" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="table_result" /> object to use to set properties.</param>
-        /// <returns>A <see cref="table_result" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::table_result" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::table_result" /> object with properties set.</returns>
         table_result& operator=(table_result&& other)
         {
             if (this != &other)
@@ -1546,25 +1546,25 @@ namespace azure { namespace storage {
 #endif
 
         /// <summary>
-        /// Gets a <see cref="table_entity" /> object returned as part of a <see cref="azure::storage::table_result" /> object.
+        /// Gets an <see cref="azure::storage::table_entity" /> object returned as part of an <see cref="azure::storage::table_result" /> object.
         /// </summary>
-        /// <returns>A <see cref="table_entity" /> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_entity" /> object.</returns>
         const azure::storage::table_entity& entity() const
         {
             return m_entity;
         }
 
         /// <summary>
-        /// Sets a <see cref="table_entity" /> object returned as part of a <see cref="azure::storage::table_result" /> object.
+        /// Sets an <see cref="azure::storage::table_entity" /> object returned as part of an <see cref="azure::storage::table_result" /> object.
         /// </summary>
-        /// <param name="value">A <see cref="table_entity" /> object.</param>
+        /// <param name="value">An <see cref="azure::storage::table_entity" /> object.</param>
         void set_entity(azure::storage::table_entity value)
         {
             m_entity = std::move(value);
         }
 
         /// <summary>
-        /// Gets the HTTP status code for a <see cref="azure::storage::table_result" /> object.
+        /// Gets the HTTP status code for an <see cref="azure::storage::table_result" /> object.
         /// </summary>
         /// <returns>The HTTP status code.</returns>
         int http_status_code() const
@@ -1573,7 +1573,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the HTTP status code for a <see cref="azure::storage::table_result" /> object.
+        /// Sets the HTTP status code for an <see cref="azure::storage::table_result" /> object.
         /// </summary>
         /// <param name="value">The HTTP status code.</param>
         void set_http_status_code(int value)
@@ -1582,7 +1582,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the ETag for a <see cref="azure::storage::table_result" /> object.
+        /// Gets the ETag for an <see cref="azure::storage::table_result" /> object.
         /// </summary>
         /// <returns>The ETag, as a string.</returns>
         const utility::string_t& etag() const
@@ -1591,7 +1591,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the ETag for a <see cref="azure::storage::table_result" /> object.
+        /// Sets the ETag for an <see cref="azure::storage::table_result" /> object.
         /// </summary>
         /// <param name="value">The ETag, as a string.</param>
         void set_etag(utility::string_t value)
@@ -1636,7 +1636,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_table_client" /> class using the specified Table service endpoint
         /// and anonymous credentials.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Table service endpoint for all locations.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the Table service endpoint for all locations.</param>
         explicit cloud_table_client(storage_uri base_uri)
             : cloud_client(std::move(base_uri))
         {
@@ -1647,8 +1647,8 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_table_client" /> class using the specified Table service endpoint
         /// and account credentials.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Table service endpoint for all locations.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the Table service endpoint for all locations.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         cloud_table_client(storage_uri base_uri, storage_credentials credentials)
             : cloud_client(std::move(base_uri), std::move(credentials))
         {
@@ -1659,8 +1659,9 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_table_client" /> class using the specified Table service endpoint
         /// and account credentials.
         /// </summary>
-        /// <param name="base_uri">A <see cref="storage_uri" /> object containing the Table service endpoint for all locations.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="base_uri">An <see cref="azure::storage::storage_uri" /> object containing the Table service endpoint for all locations.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
+        /// <param name="default_request_options">The default <see cref="azure::storage::table_request_options" /> to use.</param>
         cloud_table_client(storage_uri base_uri, storage_credentials credentials, table_request_options default_request_options)
             : cloud_client(std::move(base_uri), std::move(credentials)), m_default_request_options(std::move(default_request_options))
         {
@@ -1672,19 +1673,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_table_client"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_table_client" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_table_client" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_table_client" /> object.</param>
         cloud_table_client(cloud_table_client&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_table_client" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_table_client" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_table_client" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_table_client" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_table_client" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_table_client" /> object with properties set.</returns>
         cloud_table_client& operator=(cloud_table_client&& other)
         {
             if (this != &other)
@@ -1703,107 +1704,107 @@ namespace azure { namespace storage {
         WASTORAGE_API void set_authentication_scheme(azure::storage::authentication_scheme value) override;
 
         /// <summary>
-        /// Returns a <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.
+        /// Returns an <see cref="azure::storage::table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.
         /// </summary>
-        /// <returns>A <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
+        /// <returns>An <see cref="azure::storage::table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
         table_result_iterator list_tables() const
         {
             return list_tables(utility::string_t(), 0, table_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables that begin with the specified prefix.
+        /// Returns an <see cref="azure::storage::table_result_iterator" /> that can be used to to lazily enumerate a collection of tables that begin with the specified prefix.
         /// </summary>
-        /// <returns>A <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
+        /// <returns>An <see cref="azure::storage::table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
         table_result_iterator list_tables(const utility::string_t& prefix) const
         {
             return list_tables(prefix, 0, table_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Returns a <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables that begin with the specified prefix.
+        /// Returns an <see cref="azure::storage::table_result_iterator" /> that can be used to to lazily enumerate a collection of tables that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
         /// If this value is zero, the maximum possible number of results will be returned.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
+        /// <returns>An <see cref="azure::storage::table_result_iterator" /> that can be used to to lazily enumerate a collection of tables.</returns>
         WASTORAGE_API table_result_iterator list_tables(const utility::string_t& prefix, utility::size64_t max_results, const table_request_options& options, operation_context context) const;
 
         /// <summary>
-        /// Returns a <see cref="table_result_segment" /> containing an enumerable collection of tables.
+        /// Returns an <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables.
         /// </summary>
-        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
-        /// <returns>A <see cref="table_result_segment" /> containing an enumerable collection of tables.</returns>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <returns>An <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables.</returns>
         table_result_segment list_tables_segmented(const continuation_token& token) const
         {
             return list_tables_segmented_async(utility::string_t(), 0, token, table_request_options(), operation_context()).get();
         }
 
         /// <summary>
-        /// Returns a <see cref="table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
+        /// Returns an <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
-        /// <returns>A <see cref="table_result_segment" /> containing an enumerable collection of tables.</returns>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <returns>An <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables.</returns>
         table_result_segment list_tables_segmented(const utility::string_t& prefix, const continuation_token& token) const
         {
             return list_tables_segmented_async(prefix, 0, token, table_request_options(), operation_context()).get();
         }
 
         /// <summary>
-        /// Returns a <see cref="table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
+        /// Returns an <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
         /// per-operation limit of 1000. If this value is zero the maximum possible number of results will be returned, up to 1000.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token"/> returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="table_result_segment" /> containing an enumerable collection of tables.</returns>
+        /// <returns>An <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables.</returns>
         table_result_segment list_tables_segmented(const utility::string_t& prefix, int max_results, const continuation_token& token, const table_request_options& options, operation_context context) const
         {
             return list_tables_segmented_async(prefix, max_results, token, options, context).get();
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation that returns a <see cref="table_result_segment" /> containing an enumerable collection of tables.
+        /// Intitiates an asynchronous operation that returns an <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables.
         /// </summary>
-        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_result_segment" /> that represents the current operation.</returns>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_result_segment" /> that represents the current operation.</returns>
         pplx::task<table_result_segment> list_tables_segmented_async(const continuation_token& token) const
         {
             return list_tables_segmented_async(utility::string_t(), 0, token, table_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation that returns a <see cref="table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
+        /// Intitiates an asynchronous operation that returns an <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_result_segment" /> that represents the current operation.</returns>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_result_segment" /> that represents the current operation.</returns>
         pplx::task<table_result_segment> list_tables_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
         {
             return list_tables_segmented_async(prefix, 0, token, table_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation that returns a <see cref="table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
+        /// Intitiates an asynchronous operation that returns an <see cref="azure::storage::table_result_segment" /> containing an enumerable collection of tables that begin with the specified prefix.
         /// </summary>
         /// <param name="prefix">The table name prefix.</param>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the
         /// per-operation limit of 1000. If this value is zero the maximum possible number of results will be returned, up to 1000.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_result_segment" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_result_segment" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<table_result_segment> list_tables_segmented_async(const utility::string_t& prefix, int max_results, const continuation_token& token, const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Gets the service properties for the Table service client.
         /// </summary>
-        /// <returns>The <see cref="service_properties" /> for the Table service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_properties" /> for the Table service client.</returns>
         service_properties download_service_properties() const
         {
             return download_service_properties_async().get();
@@ -1812,9 +1813,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the service properties for the Table service client.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>The <see cref="service_properties" /> for the Table service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_properties" /> for the Table service client.</returns>
         service_properties download_service_properties(const table_request_options& options, operation_context context) const
         {
             return download_service_properties_async(options, context).get();
@@ -1823,7 +1824,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the properties of the service.
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_properties" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_properties" /> that represents the current operation.</returns>
         pplx::task<service_properties> download_service_properties_async() const
         {
             return download_service_properties_async(table_request_options(), operation_context());
@@ -1832,16 +1833,16 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the properties of the service.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_properties" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_properties" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<service_properties> download_service_properties_async(const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Sets the service properties for the Table service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Table service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Table service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
         void upload_service_properties(const service_properties& properties, const service_properties_includes& includes) const
         {
             upload_service_properties_async(properties, includes).wait();
@@ -1850,9 +1851,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the service properties for the Table service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Table service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Table service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_service_properties(const service_properties& properties, const service_properties_includes& includes, const table_request_options& options, operation_context context) const
         {
@@ -1862,8 +1863,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to set the service properties for the Table service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Table service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Table service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes) const
         {
@@ -1873,9 +1874,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to set the service properties for the Table service client.
         /// </summary>
-        /// <param name="properties">The <see cref="service_properties" /> for the Table service client.</param>
-        /// <param name="includes">A <see cref="azure::storage::service_properties_includes"/> enumeration describing which items to include when setting service properties.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Table service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes, const table_request_options& options, operation_context context) const;
@@ -1883,7 +1884,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the service stats for the Table service client.
         /// </summary>
-        /// <returns>The <see cref="service_stats" /> for the Table service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_stats" /> for the Table service client.</returns>
         service_stats download_service_stats() const
         {
             return download_service_stats_async().get();
@@ -1892,9 +1893,9 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the service stats for the Table service client.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>The <see cref="service_stats" /> for the Table service client.</returns>
+        /// <returns>The <see cref="azure::storage::service_stats" /> for the Table service client.</returns>
         service_stats download_service_stats(const table_request_options& options, operation_context context) const
         {
             return download_service_stats_async(options, context).get();
@@ -1903,7 +1904,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the stats of the service.
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_stats" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
         pplx::task<service_stats> download_service_stats_async() const
         {
             return download_service_stats_async(table_request_options(), operation_context());
@@ -1912,22 +1913,22 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to get the stats of the service.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="service_stats" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<service_stats> download_service_stats_async(const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Gets a reference to the specified table.
         /// </summary>
         /// <param name="table_name">The name of the table.</param>
-        /// <returns>A reference to a <see cref="cloud_table" /> object.</returns>
+        /// <returns>A reference to an <see cref="azure::storage::cloud_table" /> object.</returns>
         WASTORAGE_API cloud_table get_table_reference(utility::string_t table_name) const;
 
         /// <summary>
         /// Returns the default set of request options.
         /// </summary>
-        /// <returns>A <see cref="table_request_options" /> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_request_options" /> object.</returns>
         const table_request_options& default_request_options() const
         {
             return m_default_request_options;
@@ -1962,14 +1963,14 @@ namespace azure { namespace storage {
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_table" /> class using an absolute URI to the table.
         /// </summary>
-        /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the table for all locations.</param>
+        /// <param name="uri">An <see cref="azure::storage::storage_uri" /> object containing the absolute URI to the table for all locations.</param>
         WASTORAGE_API cloud_table(const storage_uri& uri);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_table" /> class using an absolute URI to the table.
         /// </summary>
-        /// <param name="uri">A <see cref="storage_uri" /> object containing the absolute URI to the table for all locations.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use.</param>
+        /// <param name="uri">An <see cref="azure::storage::storage_uri" /> object containing the absolute URI to the table for all locations.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         WASTORAGE_API cloud_table(const storage_uri& uri, storage_credentials credentials);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -1977,19 +1978,19 @@ namespace azure { namespace storage {
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="cloud_table"/> class based on an existing instance.
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_table" /> class based on an existing instance.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_table" /> object.</param>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_table" /> object.</param>
         cloud_table(cloud_table&& other)
         {
             *this = std::move(other);
         }
 
         /// <summary>
-        /// Returns a reference to a <see cref="cloud_table" /> object.
+        /// Returns a reference to an <see cref="azure::storage::cloud_table" /> object.
         /// </summary>
-        /// <param name="other">An existing <see cref="cloud_table" /> object to use to set properties.</param>
-        /// <returns>A <see cref="cloud_table" /> object with properties set.</returns>
+        /// <param name="other">An existing <see cref="azure::storage::cloud_table" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::cloud_table" /> object with properties set.</returns>
         cloud_table& operator=(cloud_table&& other)
         {
             if (this != &other)
@@ -2005,8 +2006,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Executes an operation on a table.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_operation"/> object that represents the operation to perform.</param>
-        /// <returns>A <see cref="azure::storage::table_result" /> containing the result of the operation.</returns>
+        /// <param name="operation">An <see cref="azure::storage::table_operation" /> object that represents the operation to perform.</param>
+        /// <returns>An <see cref="azure::storage::table_result" /> containing the result of the operation.</returns>
         table_result execute(const table_operation& operation) const
         {
             return execute_async(operation, table_request_options(), operation_context()).get();
@@ -2015,10 +2016,10 @@ namespace azure { namespace storage {
         /// <summary>
         /// Executes an operation on a table.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_operation"/> object that represents the operation to perform.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="operation">An <see cref="azure::storage::table_operation" /> object that represents the operation to perform.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
-        /// <returns>A <see cref="azure::storage::table_result" /> containing the result of the operation.</returns>
+        /// <returns>An <see cref="azure::storage::table_result" /> containing the result of the operation.</returns>
         table_result execute(const table_operation& operation, const table_request_options& options, operation_context context) const
         {
             return execute_async(operation, options, context).get();
@@ -2027,8 +2028,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that executes an operation on a table.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_operation" /> object that represents the operation to perform.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_result" /> that represents the current operation.</returns>
+        /// <param name="operation">An <see cref="azure::storage::table_operation" /> object that represents the operation to perform.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_result" /> that represents the current operation.</returns>
         pplx::task<table_result> execute_async(const table_operation& operation) const
         {
             return execute_async(operation, table_request_options(), operation_context());
@@ -2037,18 +2038,18 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that executes an operation on a table.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_operation" /> object that represents the operation to perform.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="operation">An <see cref="azure::storage::table_operation" /> object that represents the operation to perform.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_result" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_result" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<table_result> execute_async(const table_operation& operation, const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Executes a batch operation on a table as an atomic operation.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_batch_operation"/> object that represents the operation to perform.</param>
-        /// <returns>An enumerable collection of <see cref="azure::storage::table_result"/> objects that contains the results, in order, 
-        /// of each operation in the <see cref="azure::storage::table_batch_operation"/>.</returns>
+        /// <param name="operation">An <see cref="azure::storage::table_batch_operation" /> object that represents the operation to perform.</param>
+        /// <returns>An enumerable collection of <see cref="azure::storage::table_result" /> objects that contains the results, in order, 
+        /// of each operation in the <see cref="azure::storage::table_batch_operation" />.</returns>
         std::vector<table_result> execute_batch(const table_batch_operation& operation) const
         {
             return execute_batch_async(operation, table_request_options(), operation_context()).get();
@@ -2057,11 +2058,11 @@ namespace azure { namespace storage {
         /// <summary>
         /// Executes a batch operation on a table as an atomic operation.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_batch_operation"/> object that represents the operation to perform.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="operation">An <see cref="azure::storage::table_batch_operation" /> object that represents the operation to perform.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
-        /// <returns>An enumerable collection of <see cref="azure::storage::table_result"/> objects that contains the results, in order, 
-        /// of each operation in the <see cref="azure::storage::table_batch_operation"/>.</returns>
+        /// <returns>An enumerable collection of <see cref="azure::storage::table_result" /> objects that contains the results, in order, 
+        /// of each operation in the <see cref="azure::storage::table_batch_operation" />.</returns>
         std::vector<table_result> execute_batch(const table_batch_operation& operation, const table_request_options& options, operation_context context) const
         {
             return execute_batch_async(operation, options, context).get();
@@ -2070,8 +2071,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that executes a batch operation on a table as an atomic operation.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_batch_operation" /> object that represents the operation to perform.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="table_result" />, that represents the current operation.</returns>
+        /// <param name="operation">An <see cref="azure::storage::table_batch_operation" /> object that represents the operation to perform.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::table_result" />, that represents the current operation.</returns>
         pplx::task<std::vector<table_result>> execute_batch_async(const table_batch_operation& operation) const
         {
             return execute_batch_async(operation, table_request_options(), operation_context());
@@ -2080,17 +2081,17 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that executes a batch operation on a table as an atomic operation.
         /// </summary>
-        /// <param name="operation">A <see cref="azure::storage::table_batch_operation" /> object that represents the operation to perform.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="operation">An <see cref="azure::storage::table_batch_operation" /> object that represents the operation to perform.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="table_result" />, that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::table_result" />, that represents the current operation.</returns>
         WASTORAGE_API pplx::task<std::vector<table_result>> execute_batch_async(const table_batch_operation& operation, const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Executes a query on a table.
         /// </summary>
-        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
-        /// <returns>A <see cref="table_query_iterator" /> that can be used to to lazily enumerate a collection of <see cref="azure::storage::table_entity"/> objects.</returns>
+        /// <param name="query">An <see cref="azure::storage::table_query" /> object.</param>
+        /// <returns>An <see cref="azure::storage::table_query_iterator" /> that can be used to to lazily enumerate a collection of <see cref="azure::storage::table_entity" /> objects.</returns>
         table_query_iterator execute_query(const table_query& query) const
         {
             return execute_query(query, table_request_options(), operation_context());
@@ -2099,55 +2100,55 @@ namespace azure { namespace storage {
         /// <summary>
         /// Executes a query on a table.
         /// </summary>
-        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="query">An <see cref="azure::storage::table_query" /> object.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
-        /// <returns>A <see cref="table_query_iterator" /> that can be used to to lazily enumerate a collection of <see cref="azure::storage::table_entity"/> objects.</returns>
+        /// <returns>An <see cref="azure::storage::table_query_iterator" /> that can be used to to lazily enumerate a collection of <see cref="azure::storage::table_entity" /> objects.</returns>
         WASTORAGE_API table_query_iterator execute_query(const table_query& query, const table_request_options& options, operation_context context) const;
 
         /// <summary>
-        /// Executes a query with the specified <see cref="azure::storage::continuation_token"/> to retrieve the next page of results.
+        /// Executes a query with the specified <see cref="azure::storage::continuation_token" /> to retrieve the next page of results.
         /// </summary>
-        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token"/> object.</param>
-        /// <returns>A <see cref="azure::storage::table_query_segment"/> object containing the results of the query.</returns>
+        /// <param name="query">An <see cref="azure::storage::table_query" /> object.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> object.</param>
+        /// <returns>An <see cref="azure::storage::table_query_segment" /> object containing the results of the query.</returns>
         table_query_segment execute_query_segmented(const table_query& query, const continuation_token& token) const
         {
             return execute_query_segmented_async(query, token, table_request_options(), operation_context()).get();
         }
 
         /// <summary>
-        /// Executes a query with the specified <see cref="azure::storage::continuation_token"/> to retrieve the next page of results.
+        /// Executes a query with the specified <see cref="azure::storage::continuation_token" /> to retrieve the next page of results.
         /// </summary>
-        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token"/> object.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="query">An <see cref="azure::storage::table_query" /> object.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> object.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
-        /// <returns>A <see cref="azure::storage::table_query_segment"/> object containing the results of the query.</returns>
+        /// <returns>An <see cref="azure::storage::table_query_segment" /> object containing the results of the query.</returns>
         table_query_segment execute_query_segmented(const table_query& query, const continuation_token& token, const table_request_options& options, operation_context context) const
         {
             return execute_query_segmented_async(query, token, options, context).get();
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation that executes a query with the specified <see cref="azure::storage::continuation_token"/> to retrieve the next page of results.
+        /// Intitiates an asynchronous operation that executes a query with the specified <see cref="azure::storage::continuation_token" /> to retrieve the next page of results.
         /// </summary>
-        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token"/> object.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_result_segment" /> that represents the current operation.</returns>
+        /// <param name="query">An <see cref="azure::storage::table_query" /> object.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> object.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_result_segment" /> that represents the current operation.</returns>
         pplx::task<table_query_segment> execute_query_segmented_async(const table_query& query, const continuation_token& token) const
         {
             return execute_query_segmented_async(query, token, table_request_options(), operation_context());
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation that executes a query with the specified <see cref="azure::storage::continuation_token"/> to retrieve the next page of results.
+        /// Intitiates an asynchronous operation that executes a query with the specified <see cref="azure::storage::continuation_token" /> to retrieve the next page of results.
         /// </summary>
-        /// <param name="query">A <see cref="azure::storage::table_query"/> object.</param>
-        /// <param name="token">A <see cref="azure::storage::continuation_token"/> object.</param>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="query">An <see cref="azure::storage::table_query" /> object.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> object.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_result_segment" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_result_segment" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<table_query_segment> execute_query_segmented_async(const table_query& query, const continuation_token& token, const table_request_options& options, operation_context context) const;
 
         /// <summary>
@@ -2161,7 +2162,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Creates a table.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
         void create(const table_request_options& options, operation_context context)
         {
@@ -2180,7 +2181,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that creates a table.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> create_async(const table_request_options& options, operation_context context);
@@ -2197,7 +2198,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Creates the table if it does not already exist.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
         /// <returns><c>true</c> if table was created; otherwise, <c>false</c>.</returns>
         bool create_if_not_exists(const table_request_options& options, operation_context context)
@@ -2217,7 +2218,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a task to create the table if it does not already exist.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> create_if_not_exists_async(const table_request_options& options, operation_context context);
@@ -2233,7 +2234,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Deletes a table.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
         void delete_table(const table_request_options& options, operation_context context)
         {
@@ -2252,7 +2253,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that deletes a table.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> delete_table_async(const table_request_options& options, operation_context context);
@@ -2269,7 +2270,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Deletes the table if it exists.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
         /// <returns><c>true</c> if the table was deleted; otherwise, <c>false</c>.</returns>
         bool delete_table_if_exists(const table_request_options& options, operation_context context)
@@ -2289,7 +2290,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that deletes the table if it exists.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> delete_table_if_exists_async(const table_request_options& options, operation_context context);
@@ -2306,7 +2307,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Checks whether the table exists.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation. </param>
         /// <returns><c>true</c> if table exists; otherwise, <c>false</c>.</returns>
         bool exists(const table_request_options& options, operation_context context) const
@@ -2326,7 +2327,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that checks whether the table exists.
         /// </summary>
-        /// <param name="options">A <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation. This object is used to track requests to the storage service, and to provide additional runtime information about the operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<bool> exists_async(const table_request_options& options, operation_context context) const;
@@ -2334,7 +2335,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the permissions settings for the table.
         /// </summary>
-        /// <returns>A <see cref="table_permissions" /> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_permissions" /> object.</returns>
         table_permissions download_permissions() const
         {
             return download_permissions_async().get();
@@ -2345,7 +2346,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="table_permissions" /> object.</returns>
+        /// <returns>An <see cref="azure::storage::table_permissions" /> object.</returns>
         table_permissions download_permissions(const table_request_options& options, operation_context context) const
         {
             return download_permissions_async(options, context).get();
@@ -2354,7 +2355,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that gets the permissions settings for the table.
         /// </summary>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_permissions" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_permissions" /> that represents the current operation.</returns>
         pplx::task<table_permissions> download_permissions_async() const
         {
             return download_permissions_async(table_request_options(), operation_context());
@@ -2365,13 +2366,13 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        /// <returns>A <see cref="pplx::task" /> object of type <see cref="table_permissions" /> that represents the current operation.</returns>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::table_permissions" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<table_permissions> download_permissions_async(const table_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Sets permissions for the table.
         /// </summary>
-        /// <param name="permissions">A <see cref="table_permissions" /> object.</param>
+        /// <param name="permissions">An <see cref="azure::storage::table_permissions" /> object.</param>
         void upload_permissions(const table_permissions& permissions)
         {
             upload_permissions_async(permissions).wait();
@@ -2380,7 +2381,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets permissions for the table.
         /// </summary>
-        /// <param name="permissions">A <see cref="table_permissions" /> object.</param>
+        /// <param name="permissions">An <see cref="azure::storage::table_permissions" /> object.</param>
         /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         void upload_permissions(const table_permissions& permissions, const table_request_options& options, operation_context context)
@@ -2391,7 +2392,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that sets permissions for the table.
         /// </summary>
-        /// <param name="permissions">A <see cref="table_permissions" /> object.</param>
+        /// <param name="permissions">An <see cref="azure::storage::table_permissions" /> object.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_permissions_async(const table_permissions& permissions)
         {
@@ -2401,7 +2402,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation that sets permissions for the table.
         /// </summary>
-        /// <param name="permissions">A <see cref="table_permissions" /> object.</param>
+        /// <param name="permissions">An <see cref="azure::storage::table_permissions" /> object.</param>
         /// <param name="options">An <see cref="azure::storage::table_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -2410,7 +2411,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a shared access signature for the table.
         /// </summary>
-        /// <param name="policy">The <see cref="table_shared_access_policy" /> for the shared access signature.</param>
+        /// <param name="policy">The <see cref="azure::storage::table_shared_access_policy" /> for the shared access signature.</param>
         /// <returns>A string containing a shared access signature.</returns>
         utility::string_t get_shared_access_signature(const table_shared_access_policy& policy) const
         {
@@ -2420,7 +2421,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a shared access signature for the table.
         /// </summary>
-        /// <param name="policy">The <see cref="table_shared_access_policy" /> for the shared access signature.</param>
+        /// <param name="policy">The <see cref="azure::storage::table_shared_access_policy" /> for the shared access signature.</param>
         /// <param name="stored_policy_identifier">A string identifying a table-level access policy.</param>
         /// <returns>A string containing a shared access signature.</returns>
         utility::string_t get_shared_access_signature(const table_shared_access_policy& policy, const utility::string_t& stored_policy_identifier) const
@@ -2431,8 +2432,12 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns a shared access signature for the table.
         /// </summary>
-        /// <param name="policy">The <see cref="table_shared_access_policy" /> for the shared access signature.</param>
+        /// <param name="policy">The <see cref="azure::storage::table_shared_access_policy" /> for the shared access signature.</param>
         /// <param name="stored_policy_identifier">A string identifying a table-level access policy.</param>
+        /// <param name="start_partition_key">A string specifying the start partition key.</param>
+        /// <param name="start_row_key">A string specifying the start row key.</param>
+        /// <param name="end_partition_key">A string specifying the end partition key.</param>
+        /// <param name="end_row_key">A string specifying the end row key.</param>
         /// <returns>A string containing a shared access signature.</returns>
         WASTORAGE_API utility::string_t get_shared_access_signature(const table_shared_access_policy& policy, const utility::string_t& stored_policy_identifier, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key) const;
 
@@ -2457,7 +2462,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the table URI for all locations.
         /// </summary>
-        /// <returns>A <see cref="storage_uri" /> object containing the absolute URI to the table for all locations.</returns>
+        /// <returns>An <see cref="azure::storage::storage_uri" /> object containing the absolute URI to the table for all locations.</returns>
         const storage_uri& uri() const
         {
             return m_uri;

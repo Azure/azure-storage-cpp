@@ -205,7 +205,7 @@ namespace azure { namespace storage {
         {
             return instance->upload_from_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> upload_task) -> pplx::task<void>
             {
-                return stream.close().then([upload_task] ()
+                return stream.close().then([upload_task]()
                 {
                     upload_task.wait();
                 });

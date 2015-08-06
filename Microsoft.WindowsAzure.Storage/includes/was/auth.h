@@ -44,7 +44,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="canonicalizer_helper"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::canonicalizer_helper" /> class.
         /// </summary>
         /// <param name="request">The request to be authenticated.</param>
         /// <param name="account_name">The storage account name.</param>
@@ -83,6 +83,11 @@ namespace azure { namespace storage { namespace protocol {
         /// </summary>
         /// <param name="header_name">The header name.</param>
         void append_header(const utility::string_t& header_name);
+
+        /// <summary>
+        /// Appends Content-Length header to the canonicalization string.
+        /// </summary>
+        void append_content_length_header();
 
         /// <summary>
         /// Appends the Date header to the canonicalization string if it exists on the request. Optionally appends
@@ -140,7 +145,7 @@ namespace azure { namespace storage { namespace protocol {
     protected:
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="canonicalizer"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::canonicalizer" /> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
         explicit canonicalizer(utility::string_t account_name)
@@ -167,7 +172,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_key_blob_queue_canonicalizer"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::shared_key_blob_queue_canonicalizer" /> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
         explicit shared_key_blob_queue_canonicalizer(utility::string_t account_name)
@@ -214,7 +219,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_key_lite_blob_queue_canonicalizer"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::shared_key_lite_blob_queue_canonicalizer" /> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
         explicit shared_key_lite_blob_queue_canonicalizer(utility::string_t account_name)
@@ -261,7 +266,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_key_table_canonicalizer"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::shared_key_table_canonicalizer" /> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
         explicit shared_key_table_canonicalizer(utility::string_t account_name)
@@ -308,7 +313,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_key_lite_table_canonicalizer"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::shared_key_lite_table_canonicalizer" /> class.
         /// </summary>
         /// <param name="account_name">The storage account name.</param>
         explicit shared_key_lite_table_canonicalizer(utility::string_t account_name)
@@ -373,9 +378,9 @@ namespace azure { namespace storage { namespace protocol {
     public:
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="sas_authentication_handler"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::sas_authentication_handler" /> class.
         /// </summary>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use to sign the request.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use to sign the request.</param>
         explicit sas_authentication_handler(storage_credentials credentials)
             : m_credentials(std::move(credentials))
         {
@@ -401,10 +406,10 @@ namespace azure { namespace storage { namespace protocol {
     public:
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="shared_key_authentication_handler"/> class.
+        /// Initializes a new instance of the <see cref="azure::storage::protocol::shared_key_authentication_handler" /> class.
         /// </summary>
         /// <param name="canonicalizer">The canonicalizer to use to sign the request.</param>
-        /// <param name="credentials">The <see cref="storage_credentials" /> to use to sign the request.</param>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use to sign the request.</param>
         shared_key_authentication_handler(std::shared_ptr<canonicalizer> canonicalizer, storage_credentials credentials)
             : m_canonicalizer(canonicalizer), m_credentials(std::move(credentials))
         {

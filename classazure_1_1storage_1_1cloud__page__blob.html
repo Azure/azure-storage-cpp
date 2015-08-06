@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -88,6 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classazure_1_1storage_1_1cloud__page__blob-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">azure::storage::cloud_page_blob Class Reference</div>  </div>
@@ -196,40 +197,40 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a6d35b10ce3e7951c08899500b46ee03b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to write pages to a page blob.  <a href="#a6d35b10ce3e7951c08899500b46ee03b">More...</a><br /></td></tr>
 <tr class="separator:a6d35b10ce3e7951c08899500b46ee03b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ee3982e4ca53b80c367483a82581f59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a0ee3982e4ca53b80c367483a82581f59">upload_from_stream</a> (concurrency::streams::istream source)</td></tr>
-<tr class="memdesc:a0ee3982e4ca53b80c367483a82581f59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob.  <a href="#a0ee3982e4ca53b80c367483a82581f59">More...</a><br /></td></tr>
+<tr class="memdesc:a0ee3982e4ca53b80c367483a82581f59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a0ee3982e4ca53b80c367483a82581f59">More...</a><br /></td></tr>
 <tr class="separator:a0ee3982e4ca53b80c367483a82581f59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad68de8b217d0c3f7344d583580d2ea5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ad68de8b217d0c3f7344d583580d2ea5e">upload_from_stream</a> (concurrency::streams::istream source, int64_t <a class="el" href="classazure_1_1storage_1_1sequence__number.html">sequence_number</a>, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="memdesc:ad68de8b217d0c3f7344d583580d2ea5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob.  <a href="#ad68de8b217d0c3f7344d583580d2ea5e">More...</a><br /></td></tr>
+<tr class="memdesc:ad68de8b217d0c3f7344d583580d2ea5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#ad68de8b217d0c3f7344d583580d2ea5e">More...</a><br /></td></tr>
 <tr class="separator:ad68de8b217d0c3f7344d583580d2ea5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb61502fbe48fc54bfd48618b2299c47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#aeb61502fbe48fc54bfd48618b2299c47">upload_from_stream</a> (concurrency::streams::istream source, utility::size64_t length)</td></tr>
-<tr class="memdesc:aeb61502fbe48fc54bfd48618b2299c47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob.  <a href="#aeb61502fbe48fc54bfd48618b2299c47">More...</a><br /></td></tr>
+<tr class="memdesc:aeb61502fbe48fc54bfd48618b2299c47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#aeb61502fbe48fc54bfd48618b2299c47">More...</a><br /></td></tr>
 <tr class="separator:aeb61502fbe48fc54bfd48618b2299c47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57004e245477cea35d9e71a4f57de29b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a57004e245477cea35d9e71a4f57de29b">upload_from_stream</a> (concurrency::streams::istream source, utility::size64_t length, int64_t <a class="el" href="classazure_1_1storage_1_1sequence__number.html">sequence_number</a>, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="memdesc:a57004e245477cea35d9e71a4f57de29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob.  <a href="#a57004e245477cea35d9e71a4f57de29b">More...</a><br /></td></tr>
+<tr class="memdesc:a57004e245477cea35d9e71a4f57de29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a57004e245477cea35d9e71a4f57de29b">More...</a><br /></td></tr>
 <tr class="separator:a57004e245477cea35d9e71a4f57de29b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab76bcfc57397fbcd25e1055a55470e13"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ab76bcfc57397fbcd25e1055a55470e13">upload_from_stream_async</a> (concurrency::streams::istream source)</td></tr>
-<tr class="memdesc:ab76bcfc57397fbcd25e1055a55470e13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob.  <a href="#ab76bcfc57397fbcd25e1055a55470e13">More...</a><br /></td></tr>
+<tr class="memdesc:ab76bcfc57397fbcd25e1055a55470e13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#ab76bcfc57397fbcd25e1055a55470e13">More...</a><br /></td></tr>
 <tr class="separator:ab76bcfc57397fbcd25e1055a55470e13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ac29333eec5076e97f7012166d30935"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a2ac29333eec5076e97f7012166d30935">upload_from_stream_async</a> (concurrency::streams::istream source, int64_t <a class="el" href="classazure_1_1storage_1_1sequence__number.html">sequence_number</a>, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="memdesc:a2ac29333eec5076e97f7012166d30935"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob.  <a href="#a2ac29333eec5076e97f7012166d30935">More...</a><br /></td></tr>
+<tr class="memdesc:a2ac29333eec5076e97f7012166d30935"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a2ac29333eec5076e97f7012166d30935">More...</a><br /></td></tr>
 <tr class="separator:a2ac29333eec5076e97f7012166d30935"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8debd34ba4e80f4b89b7f7221e3d756e"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a8debd34ba4e80f4b89b7f7221e3d756e">upload_from_stream_async</a> (concurrency::streams::istream source, utility::size64_t length)</td></tr>
-<tr class="memdesc:a8debd34ba4e80f4b89b7f7221e3d756e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob.  <a href="#a8debd34ba4e80f4b89b7f7221e3d756e">More...</a><br /></td></tr>
+<tr class="memdesc:a8debd34ba4e80f4b89b7f7221e3d756e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a8debd34ba4e80f4b89b7f7221e3d756e">More...</a><br /></td></tr>
 <tr class="separator:a8debd34ba4e80f4b89b7f7221e3d756e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e84c74d092d3a78fd678d956af54c18"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a1e84c74d092d3a78fd678d956af54c18">upload_from_stream_async</a> (concurrency::streams::istream source, utility::size64_t length, int64_t <a class="el" href="classazure_1_1storage_1_1sequence__number.html">sequence_number</a>, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="memdesc:a1e84c74d092d3a78fd678d956af54c18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob.  <a href="#a1e84c74d092d3a78fd678d956af54c18">More...</a><br /></td></tr>
+<tr class="memdesc:a1e84c74d092d3a78fd678d956af54c18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a1e84c74d092d3a78fd678d956af54c18">More...</a><br /></td></tr>
 <tr class="separator:a1e84c74d092d3a78fd678d956af54c18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26678d05be3ac0f744ec7094cd54d702"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a26678d05be3ac0f744ec7094cd54d702">upload_from_file</a> (const utility::string_t &amp;path)</td></tr>
-<tr class="memdesc:a26678d05be3ac0f744ec7094cd54d702"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a file to a page blob.  <a href="#a26678d05be3ac0f744ec7094cd54d702">More...</a><br /></td></tr>
+<tr class="memdesc:a26678d05be3ac0f744ec7094cd54d702"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a file to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a26678d05be3ac0f744ec7094cd54d702">More...</a><br /></td></tr>
 <tr class="separator:a26678d05be3ac0f744ec7094cd54d702"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80f1262c7f6845dc271f4308cdd13ac9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a80f1262c7f6845dc271f4308cdd13ac9">upload_from_file</a> (const utility::string_t &amp;path, int64_t <a class="el" href="classazure_1_1storage_1_1sequence__number.html">sequence_number</a>, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="memdesc:a80f1262c7f6845dc271f4308cdd13ac9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a file to a page blob.  <a href="#a80f1262c7f6845dc271f4308cdd13ac9">More...</a><br /></td></tr>
+<tr class="memdesc:a80f1262c7f6845dc271f4308cdd13ac9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads a file to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a80f1262c7f6845dc271f4308cdd13ac9">More...</a><br /></td></tr>
 <tr class="separator:a80f1262c7f6845dc271f4308cdd13ac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7781fc4e8c1ad0587ad5933d41bdd46a"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a7781fc4e8c1ad0587ad5933d41bdd46a">upload_from_file_async</a> (const utility::string_t &amp;path)</td></tr>
-<tr class="memdesc:a7781fc4e8c1ad0587ad5933d41bdd46a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a file to a page blob.  <a href="#a7781fc4e8c1ad0587ad5933d41bdd46a">More...</a><br /></td></tr>
+<tr class="memdesc:a7781fc4e8c1ad0587ad5933d41bdd46a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#a7781fc4e8c1ad0587ad5933d41bdd46a">More...</a><br /></td></tr>
 <tr class="separator:a7781fc4e8c1ad0587ad5933d41bdd46a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe7966f3c2032cd9904a0645b1e3bae5"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#afe7966f3c2032cd9904a0645b1e3bae5">upload_from_file_async</a> (const utility::string_t &amp;path, int64_t <a class="el" href="classazure_1_1storage_1_1sequence__number.html">sequence_number</a>, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="memdesc:afe7966f3c2032cd9904a0645b1e3bae5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a file to a page blob.  <a href="#afe7966f3c2032cd9904a0645b1e3bae5">More...</a><br /></td></tr>
+<tr class="memdesc:afe7966f3c2032cd9904a0645b1e3bae5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten.  <a href="#afe7966f3c2032cd9904a0645b1e3bae5">More...</a><br /></td></tr>
 <tr class="separator:afe7966f3c2032cd9904a0645b1e3bae5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2a74a904eb8649574ce3d926cffb1f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ae2a74a904eb8649574ce3d926cffb1f6">create</a> (utility::size64_t size)</td></tr>
 <tr class="memdesc:ae2a74a904eb8649574ce3d926cffb1f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a page blob.  <a href="#ae2a74a904eb8649574ce3d926cffb1f6">More...</a><br /></td></tr>
@@ -269,7 +270,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac26206c9dcf90d56928ce23386073625"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classazure_1_1storage_1_1cloud__blob"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classazure_1_1storage_1_1cloud__blob')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">azure::storage::cloud_blob</a></td></tr>
 <tr class="memitem:aa93b7f65c75ee69032a12c5deed609a1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#aa93b7f65c75ee69032a12c5deed609a1">cloud_blob</a> ()</td></tr>
-<tr class="memdesc:aa93b7f65c75ee69032a12c5deed609a1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a> class using an absolute URI to the blob.  <a href="#aa93b7f65c75ee69032a12c5deed609a1">More...</a><br /></td></tr>
+<tr class="memdesc:aa93b7f65c75ee69032a12c5deed609a1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a> class.  <a href="#aa93b7f65c75ee69032a12c5deed609a1">More...</a><br /></td></tr>
 <tr class="separator:aa93b7f65c75ee69032a12c5deed609a1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f52cce9cc3c4cbf0edf57f9df137c1b inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a0f52cce9cc3c4cbf0edf57f9df137c1b">cloud_blob</a> (<a class="el" href="classazure_1_1storage_1_1storage__uri.html">storage_uri</a> <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a0552c5a58385f21f3c86ea9b823ca0b1">uri</a>)</td></tr>
 <tr class="memdesc:a0f52cce9cc3c4cbf0edf57f9df137c1b inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a> class using an absolute URI to the blob.  <a href="#a0f52cce9cc3c4cbf0edf57f9df137c1b">More...</a><br /></td></tr>
@@ -499,6 +500,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7211bbd691870afdfc53d712aedd78c1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a7211bbd691870afdfc53d712aedd78c1">start_copy_from_blob_async</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">cloud_blob</a> &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;source_condition, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;destination_condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
 <tr class="memdesc:a7211bbd691870afdfc53d712aedd78c1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.  <a href="#a7211bbd691870afdfc53d712aedd78c1">More...</a><br /></td></tr>
 <tr class="separator:a7211bbd691870afdfc53d712aedd78c1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa4ce1e82f1a11073ec9186d0a5697fe inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#aaa4ce1e82f1a11073ec9186d0a5697fe">start_copy</a> (const web::http::uri &amp;source)</td></tr>
+<tr class="memdesc:aaa4ce1e82f1a11073ec9186d0a5697fe inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins an operation to copy a blob's contents, properties, and metadata to a new blob.  <a href="#aaa4ce1e82f1a11073ec9186d0a5697fe">More...</a><br /></td></tr>
+<tr class="separator:aaa4ce1e82f1a11073ec9186d0a5697fe inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1b64239a2a2980e5a3b65fd97414e57 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#af1b64239a2a2980e5a3b65fd97414e57">start_copy</a> (const web::http::uri &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;source_condition, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;destination_condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:af1b64239a2a2980e5a3b65fd97414e57 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins an operation to copy a blob's contents, properties, and metadata to a new blob.  <a href="#af1b64239a2a2980e5a3b65fd97414e57">More...</a><br /></td></tr>
+<tr class="separator:af1b64239a2a2980e5a3b65fd97414e57 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71060dedd5824f197cf077eb10348857 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a71060dedd5824f197cf077eb10348857">start_copy</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">cloud_blob</a> &amp;source)</td></tr>
+<tr class="memdesc:a71060dedd5824f197cf077eb10348857 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins an operation to copy a blob's contents, properties, and metadata to a new blob.  <a href="#a71060dedd5824f197cf077eb10348857">More...</a><br /></td></tr>
+<tr class="separator:a71060dedd5824f197cf077eb10348857 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b52b391d3365bc9eee6cffd877f2e87 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a0b52b391d3365bc9eee6cffd877f2e87">start_copy</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">cloud_blob</a> &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;source_condition, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;destination_condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:a0b52b391d3365bc9eee6cffd877f2e87 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins an operation to copy a blob's contents, properties, and metadata to a new blob.  <a href="#a0b52b391d3365bc9eee6cffd877f2e87">More...</a><br /></td></tr>
+<tr class="separator:a0b52b391d3365bc9eee6cffd877f2e87 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe0ef7a4db3e53cb3f0af88bfb396076 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#afe0ef7a4db3e53cb3f0af88bfb396076">start_copy_async</a> (const web::http::uri &amp;source)</td></tr>
+<tr class="memdesc:afe0ef7a4db3e53cb3f0af88bfb396076 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.  <a href="#afe0ef7a4db3e53cb3f0af88bfb396076">More...</a><br /></td></tr>
+<tr class="separator:afe0ef7a4db3e53cb3f0af88bfb396076 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ed4d6d079959f88a66a79389fdaac50 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a2ed4d6d079959f88a66a79389fdaac50">start_copy_async</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">cloud_blob</a> &amp;source)</td></tr>
+<tr class="memdesc:a2ed4d6d079959f88a66a79389fdaac50 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.  <a href="#a2ed4d6d079959f88a66a79389fdaac50">More...</a><br /></td></tr>
+<tr class="separator:a2ed4d6d079959f88a66a79389fdaac50 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8f223af504c197f703243864a5e90e7 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#af8f223af504c197f703243864a5e90e7">start_copy_async</a> (const web::http::uri &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;source_condition, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;destination_condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:af8f223af504c197f703243864a5e90e7 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.  <a href="#af8f223af504c197f703243864a5e90e7">More...</a><br /></td></tr>
+<tr class="separator:af8f223af504c197f703243864a5e90e7 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bff5240fe154cd734312b1bbecf6980 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a4bff5240fe154cd734312b1bbecf6980">start_copy_async</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">cloud_blob</a> &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;source_condition, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;destination_condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:a4bff5240fe154cd734312b1bbecf6980 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.  <a href="#a4bff5240fe154cd734312b1bbecf6980">More...</a><br /></td></tr>
+<tr class="separator:a4bff5240fe154cd734312b1bbecf6980 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bd60ac7b8f579254311186123ac4c56 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a1bd60ac7b8f579254311186123ac4c56">abort_copy</a> (const utility::string_t &amp;copy_id) const </td></tr>
 <tr class="memdesc:a1bd60ac7b8f579254311186123ac4c56 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aborts an ongoing blob copy operation.  <a href="#a1bd60ac7b8f579254311186123ac4c56">More...</a><br /></td></tr>
 <tr class="separator:a1bd60ac7b8f579254311186123ac4c56 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -527,7 +552,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a5e64ac047da20e482706334ddc1c1cec inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the <a class="el" href="classazure_1_1storage_1_1cloud__blob__client.html" title="Provides a client-side logical representation of the Windows Azure Blob Service. This client is used ...">azure::storage::cloud_blob_client</a> object that represents the Blob service.  <a href="#a5e64ac047da20e482706334ddc1c1cec">More...</a><br /></td></tr>
 <tr class="separator:a5e64ac047da20e482706334ddc1c1cec inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6d0c06689cabee13539f2dec1c309fb inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html">cloud_blob_container</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#ae6d0c06689cabee13539f2dec1c309fb">container</a> () const </td></tr>
-<tr class="memdesc:ae6d0c06689cabee13539f2dec1c309fb inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html" title="Represents a container in the Windows Azure Blob service. ">azure::storage::cloud_blob_container</a> object representing the blob's container.  <a href="#ae6d0c06689cabee13539f2dec1c309fb">More...</a><br /></td></tr>
+<tr class="memdesc:ae6d0c06689cabee13539f2dec1c309fb inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html" title="Represents a container in the Windows Azure Blob service. ">azure::storage::cloud_blob_container</a> object representing the blob's container.  <a href="#ae6d0c06689cabee13539f2dec1c309fb">More...</a><br /></td></tr>
 <tr class="separator:ae6d0c06689cabee13539f2dec1c309fb inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5837a2fbbf39fa5aa4ac30adde3829ec inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html">cloud_blob_properties</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a5837a2fbbf39fa5aa4ac30adde3829ec">properties</a> ()</td></tr>
 <tr class="memdesc:a5837a2fbbf39fa5aa4ac30adde3829ec inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the blob's system properties.  <a href="#a5837a2fbbf39fa5aa4ac30adde3829ec">More...</a><br /></td></tr>
@@ -560,8 +585,43 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aa717120e37ba465f6188d0e2e6574710 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the type of the blob.  <a href="#aa717120e37ba465f6188d0e2e6574710">More...</a><br /></td></tr>
 <tr class="separator:aa717120e37ba465f6188d0e2e6574710 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a6973fb154ddc4366d5c27075926218 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a8a6973fb154ddc4366d5c27075926218">is_valid</a> () const </td></tr>
-<tr class="memdesc:a8a6973fb154ddc4366d5c27075926218 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">cloud_blob</a> object is valid.  <a href="#a8a6973fb154ddc4366d5c27075926218">More...</a><br /></td></tr>
+<tr class="memdesc:a8a6973fb154ddc4366d5c27075926218 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a> object is valid.  <a href="#a8a6973fb154ddc4366d5c27075926218">More...</a><br /></td></tr>
 <tr class="separator:a8a6973fb154ddc4366d5c27075926218 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:ac766e7ec6d24223ea29898cce403ce9d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac766e7ec6d24223ea29898cce403ce9d"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_blob_container</b></td></tr>
+<tr class="separator:ac766e7ec6d24223ea29898cce403ce9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2517b93046b7233f2522bf09d90ef068"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2517b93046b7233f2522bf09d90ef068"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_blob_directory</b></td></tr>
+<tr class="separator:a2517b93046b7233f2522bf09d90ef068"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_classazure_1_1storage_1_1cloud__blob"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classazure_1_1storage_1_1cloud__blob')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">azure::storage::cloud_blob</a></td></tr>
+<tr class="memitem:ae28fb6662b01261eaed934ab5505e249 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#ae28fb6662b01261eaed934ab5505e249">cloud_blob</a> (utility::string_t <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a376671fe096065bad4ed137b93d26b06">name</a>, utility::string_t <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a68c895693f527a1148fa6abc8672c626">snapshot_time</a>, <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html">cloud_blob_container</a> <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#ae6d0c06689cabee13539f2dec1c309fb">container</a>)</td></tr>
+<tr class="memdesc:ae28fb6662b01261eaed934ab5505e249 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a> class.  <a href="#ae28fb6662b01261eaed934ab5505e249">More...</a><br /></td></tr>
+<tr class="separator:ae28fb6662b01261eaed934ab5505e249 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac811accbbffba7dcd1ef007ee1a2ef54 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#ac811accbbffba7dcd1ef007ee1a2ef54">cloud_blob</a> (utility::string_t <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a376671fe096065bad4ed137b93d26b06">name</a>, utility::string_t <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a68c895693f527a1148fa6abc8672c626">snapshot_time</a>, <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html">cloud_blob_container</a> <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#ae6d0c06689cabee13539f2dec1c309fb">container</a>, <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html">cloud_blob_properties</a> <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a5837a2fbbf39fa5aa4ac30adde3829ec">properties</a>, cloud_metadata <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a06a94b1511f1d7453f1952060cdafcdb">metadata</a>, <a class="el" href="classazure_1_1storage_1_1copy__state.html">azure::storage::copy_state</a> <a class="el" href="classazure_1_1storage_1_1copy__state.html">copy_state</a>)</td></tr>
+<tr class="memdesc:ac811accbbffba7dcd1ef007ee1a2ef54 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a> class.  <a href="#ac811accbbffba7dcd1ef007ee1a2ef54">More...</a><br /></td></tr>
+<tr class="separator:ac811accbbffba7dcd1ef007ee1a2ef54 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02cc9885b6d174c93d24a5bf892df641 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02cc9885b6d174c93d24a5bf892df641"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>assert_no_snapshot</b> () const </td></tr>
+<tr class="separator:a02cc9885b6d174c93d24a5bf892df641 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d0c2a7b8b32c2d9fd783d3560fb9df9 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d0c2a7b8b32c2d9fd783d3560fb9df9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_type</b> (blob_type value)</td></tr>
+<tr class="separator:a0d0c2a7b8b32c2d9fd783d3560fb9df9 inherit pro_methods_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classazure_1_1storage_1_1cloud__blob"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classazure_1_1storage_1_1cloud__blob')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">azure::storage::cloud_blob</a></td></tr>
+<tr class="memitem:a805626c924e1e3e0dbc5cb75d5ab8f58 inherit pro_attribs_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a805626c924e1e3e0dbc5cb75d5ab8f58"></a>
+std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html">cloud_blob_properties</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_properties</b></td></tr>
+<tr class="separator:a805626c924e1e3e0dbc5cb75d5ab8f58 inherit pro_attribs_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50be2b0083f502bc582092c936d91fd0 inherit pro_attribs_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a50be2b0083f502bc582092c936d91fd0"></a>
+std::shared_ptr&lt; cloud_metadata &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_metadata</b></td></tr>
+<tr class="separator:a50be2b0083f502bc582092c936d91fd0 inherit pro_attribs_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65d691afb4746e116fe5d14a9d96af92 inherit pro_attribs_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65d691afb4746e116fe5d14a9d96af92"></a>
+std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1copy__state.html">azure::storage::copy_state</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_copy_state</b></td></tr>
+<tr class="separator:a65d691afb4746e116fe5d14a9d96af92 inherit pro_attribs_classazure_1_1storage_1_1cloud__blob"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents a Windows Azure page blob. </p>
@@ -616,7 +676,7 @@ Public Member Functions</h2></td></tr>
 <p>Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html" title="Represents a Windows Azure page blob. ">azure::storage::cloud_page_blob</a> class using an absolute URI to the blob. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">uri</td><td>A <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">storage_uri</a> object containing the absolute URI to the blob for all locations.</td></tr>
+    <tr><td class="paramname">uri</td><td>An <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">azure::storage::storage_uri</a> object containing the absolute URI to the blob for all locations.</td></tr>
   </table>
   </dd>
 </dl>
@@ -658,8 +718,8 @@ Public Member Functions</h2></td></tr>
 <p>Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html" title="Represents a Windows Azure page blob. ">azure::storage::cloud_page_blob</a> class using an absolute URI to the blob. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">uri</td><td>A <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">storage_uri</a> object containing the absolute URI to the blob for all locations.</td></tr>
-    <tr><td class="paramname">credentials</td><td>The <a class="el" href="classazure_1_1storage_1_1storage__credentials.html" title="Represents a set of credentials used to authenticate access to a Windows Azure storage account...">storage_credentials</a> to use.</td></tr>
+    <tr><td class="paramname">uri</td><td>An <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">azure::storage::storage_uri</a> object containing the absolute URI to the blob for all locations.</td></tr>
+    <tr><td class="paramname">credentials</td><td>The <a class="el" href="classazure_1_1storage_1_1storage__credentials.html" title="Represents a set of credentials used to authenticate access to a Windows Azure storage account...">azure::storage::storage_credentials</a> to use.</td></tr>
   </table>
   </dd>
 </dl>
@@ -707,9 +767,9 @@ Public Member Functions</h2></td></tr>
 <p>Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html" title="Represents a Windows Azure page blob. ">azure::storage::cloud_page_blob</a> class using an absolute URI to the blob. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">uri</td><td>A <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">storage_uri</a> object containing the absolute URI to the blob for all locations.</td></tr>
+    <tr><td class="paramname">uri</td><td>An <a class="el" href="classazure_1_1storage_1_1storage__uri.html" title="Contains the URIs for both the primary and secondary locations of a Windows Azure Storage resource...">azure::storage::storage_uri</a> object containing the absolute URI to the blob for all locations.</td></tr>
     <tr><td class="paramname">snapshot_time</td><td>The snapshot timestamp, if the blob is a snapshot.</td></tr>
-    <tr><td class="paramname">credentials</td><td>The <a class="el" href="classazure_1_1storage_1_1storage__credentials.html" title="Represents a set of credentials used to authenticate access to a Windows Azure storage account...">storage_credentials</a> to use.</td></tr>
+    <tr><td class="paramname">credentials</td><td>The <a class="el" href="classazure_1_1storage_1_1storage__credentials.html" title="Represents a set of credentials used to authenticate access to a Windows Azure storage account...">azure::storage::storage_credentials</a> to use.</td></tr>
   </table>
   </dd>
 </dl>
@@ -848,7 +908,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">start_offset</td><td>The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</td></tr>
     <tr><td class="paramname">length</td><td>The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -948,7 +1008,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">start_offset</td><td>The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</td></tr>
     <tr><td class="paramname">length</td><td>The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1045,7 +1105,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">size</td><td>The maximum size of the page blob, in bytes.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1134,7 +1194,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">size</td><td>The maximum size of the page blob, in bytes.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1211,7 +1271,7 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1320,7 +1380,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">offset</td><td>The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
     <tr><td class="paramname">length</td><td>The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1351,7 +1411,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes. </p>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">page_range</a>, that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">azure::storage::page_range</a>, that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1397,12 +1457,12 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">page_range</a>, that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">azure::storage::page_range</a>, that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1446,7 +1506,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">page_range</a>, that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">azure::storage::page_range</a>, that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1498,12 +1558,12 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">offset</td><td>The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
     <tr><td class="paramname">length</td><td>The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">page_range</a>, that represents the current operation.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">azure::storage::page_range</a>, that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -1575,7 +1635,7 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1673,7 +1733,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">size</td><td>The size of the write operation, in bytes. The size must be a multiple of 512.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1742,7 +1802,7 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1832,7 +1892,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">size</td><td>The size of the write operation, in bytes. The size must be a multiple of 512.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -1922,7 +1982,7 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">size</td><td>The size of the page blob, in bytes.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2004,7 +2064,7 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">size</td><td>The size of the page blob, in bytes.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2094,7 +2154,7 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A value of type <a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">azure::storage::sequence_number</a>, indicating the operation to perform on the sequence number.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2176,7 +2236,7 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A value of type <a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">azure::storage::sequence_number</a>, indicating the operation to perform on the sequence number.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2207,7 +2267,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Uploads a file to a page blob. </p>
+<p>Uploads a file to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>The file providing the blob content.</td></tr>
@@ -2267,13 +2327,13 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Uploads a file to a page blob. </p>
+<p>Uploads a file to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>The file providing the blob content.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2303,7 +2363,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to upload a file to a page blob. </p>
+<p>Intitiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>The file providing the blob content.</td></tr>
@@ -2356,13 +2416,13 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to upload a file to a page blob. </p>
+<p>Intitiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">path</td><td>The file providing the blob content.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2393,7 +2453,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Uploads a stream to a page blob. </p>
+<p>Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
@@ -2453,13 +2513,13 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Uploads a stream to a page blob. </p>
+<p>Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2499,7 +2559,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Uploads a stream to a page blob. </p>
+<p>Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
@@ -2566,14 +2626,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Uploads a stream to a page blob. </p>
+<p>Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
     <tr><td class="paramname">length</td><td>The number of bytes to write from the source stream at its current position.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2603,7 +2663,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to upload a stream to a page blob. </p>
+<p>Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
@@ -2664,13 +2724,13 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to upload a stream to a page blob. </p>
+<p>Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2711,7 +2771,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to upload a stream to a page blob. </p>
+<p>Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
@@ -2771,14 +2831,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Intitiates an asynchronous operation to upload a stream to a page blob. </p>
+<p>Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>The stream providing the blob content.</td></tr>
     <tr><td class="paramname">length</td><td>The number of bytes to write from the source stream at its current position.</td></tr>
     <tr><td class="paramname"><a class="el" href="classazure_1_1storage_1_1sequence__number.html" title="Describes actions that can be performed on a page blob sequence number. ">sequence_number</a></td><td>A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2900,7 +2960,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">start_offset</td><td>The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</td></tr>
     <tr><td class="paramname">content_md5</td><td>An optional hash value that will be used to set the Content-MD5 property on the blob. May be an empty string.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -2949,7 +3009,7 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation to write pages to a page blob. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">page_data</td><td>A stream providing the page data.</td></tr>
+    <tr><td class="paramname">source</td><td>A stream providing the page data.</td></tr>
     <tr><td class="paramname">start_offset</td><td>The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</td></tr>
     <tr><td class="paramname">content_md5</td><td>An optional hash value that will be used to set the Content-MD5 property on the blob. May be an empty string.</td></tr>
   </table>
@@ -3010,11 +3070,11 @@ Public Member Functions</h2></td></tr>
 <p>Intitiates an asynchronous operation to write pages to a page blob. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">page_data</td><td>A stream providing the page data.</td></tr>
+    <tr><td class="paramname">source</td><td>A stream providing the page data.</td></tr>
     <tr><td class="paramname">start_offset</td><td>The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</td></tr>
     <tr><td class="paramname">content_md5</td><td>An optional hash value that will be used to set the Content-MD5 property on the blob. May be an empty string.</td></tr>
     <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
-    <tr><td class="paramname">options</td><td>A <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
     <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
   </table>
   </dd>
@@ -3026,7 +3086,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 14:32:52 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 6 2015 17:00:03 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

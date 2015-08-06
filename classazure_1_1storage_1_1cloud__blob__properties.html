@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -88,6 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classazure_1_1storage_1_1cloud__blob__properties-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">azure::storage::cloud_blob_properties Class Reference</div>  </div>
@@ -100,7 +101,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a8dcfa48b9a4a3c162d7efe00679d3804"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html#a8dcfa48b9a4a3c162d7efe00679d3804">cloud_blob_properties</a> ()</td></tr>
-<tr class="memdesc:a8dcfa48b9a4a3c162d7efe00679d3804"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html" title="Represents the system properties for a blob. ">cloud_blob_properties</a> class.  <a href="#a8dcfa48b9a4a3c162d7efe00679d3804">More...</a><br /></td></tr>
+<tr class="memdesc:a8dcfa48b9a4a3c162d7efe00679d3804"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html" title="Represents the system properties for a blob. ">azure::storage::cloud_blob_properties</a> class.  <a href="#a8dcfa48b9a4a3c162d7efe00679d3804">More...</a><br /></td></tr>
 <tr class="separator:a8dcfa48b9a4a3c162d7efe00679d3804"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75e5cdd68b531fabec3c8eaeaa7650ce"><td class="memItemLeft" align="right" valign="top">const utility::string_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html#a75e5cdd68b531fabec3c8eaeaa7650ce">cache_control</a> () const </td></tr>
 <tr class="memdesc:a75e5cdd68b531fabec3c8eaeaa7650ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the cache-control value stored for the blob.  <a href="#a75e5cdd68b531fabec3c8eaeaa7650ce">More...</a><br /></td></tr>
@@ -162,6 +163,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a45a0faf3aac40d10c6b328fdbacb4ab1"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html#a45a0faf3aac40d10c6b328fdbacb4ab1">page_blob_sequence_number</a> () const </td></tr>
 <tr class="memdesc:a45a0faf3aac40d10c6b328fdbacb4ab1"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the blob is a page blob, gets the blob's current sequence number.  <a href="#a45a0faf3aac40d10c6b328fdbacb4ab1">More...</a><br /></td></tr>
 <tr class="separator:a45a0faf3aac40d10c6b328fdbacb4ab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc9d22493a4bb1cd461900f32394ff9a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html#acc9d22493a4bb1cd461900f32394ff9a">append_blob_committed_block_count</a> () const </td></tr>
+<tr class="memdesc:acc9d22493a4bb1cd461900f32394ff9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the blob is an append blob, gets the number of committed blocks.  <a href="#acc9d22493a4bb1cd461900f32394ff9a">More...</a><br /></td></tr>
+<tr class="separator:acc9d22493a4bb1cd461900f32394ff9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a1d9bb1e2fc9b75bdc4be3bdfa64d4f58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d9bb1e2fc9b75bdc4be3bdfa64d4f58"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_blob</b></td></tr>
+<tr class="separator:a1d9bb1e2fc9b75bdc4be3bdfa64d4f58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10e34cb8a4ada23ee787fdd091593ca6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a10e34cb8a4ada23ee787fdd091593ca6"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_block_blob</b></td></tr>
+<tr class="separator:a10e34cb8a4ada23ee787fdd091593ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3091a0ec372f570b4c3fb7e0cb9cadfd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3091a0ec372f570b4c3fb7e0cb9cadfd"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_page_blob</b></td></tr>
+<tr class="separator:a3091a0ec372f570b4c3fb7e0cb9cadfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06a863c554efdb7912ecda83521d7661"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06a863c554efdb7912ecda83521d7661"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>cloud_append_blob</b></td></tr>
+<tr class="separator:a06a863c554efdb7912ecda83521d7661"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a631925116939f47ebd2bf68595051735"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a631925116939f47ebd2bf68595051735"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>protocol::blob_response_parsers</b></td></tr>
+<tr class="separator:a631925116939f47ebd2bf68595051735"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af72da2eb65ca35c796f9250353284f7b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af72da2eb65ca35c796f9250353284f7b"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>protocol::list_blobs_reader</b></td></tr>
+<tr class="separator:af72da2eb65ca35c796f9250353284f7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents the system properties for a blob. </p>
@@ -187,11 +212,37 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html" title="Represents the system properties for a blob. ">cloud_blob_properties</a> class. </p>
+<p>Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html" title="Represents the system properties for a blob. ">azure::storage::cloud_blob_properties</a> class. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="acc9d22493a4bb1cd461900f32394ff9a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int azure::storage::cloud_blob_properties::append_blob_committed_block_count </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>If the blob is an append blob, gets the number of committed blocks. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of committed blocks</dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a75e5cdd68b531fabec3c8eaeaa7650ce"></a>
 <div class="memitem">
 <div class="memproto">
@@ -422,7 +473,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the blob's lease duration. </p>
-<dl class="section return"><dt>Returns</dt><dd>A azure::storage::lease_duration object that indicates the blob's lease duration.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::lease_duration object that indicates the blob's lease duration.</dd></dl>
 
 </div>
 </div>
@@ -448,7 +499,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the blob's lease state. </p>
-<dl class="section return"><dt>Returns</dt><dd>A azure::storage::lease_state object that indicates the blob's lease state.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::lease_state object that indicates the blob's lease state.</dd></dl>
 
 </div>
 </div>
@@ -474,7 +525,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the blob's lease status. </p>
-<dl class="section return"><dt>Returns</dt><dd>A azure::storage::lease_status object that indicates the blob's lease status.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::lease_status object that indicates the blob's lease status.</dd></dl>
 
 </div>
 </div>
@@ -744,14 +795,14 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the type of the blob. </p>
-<dl class="section return"><dt>Returns</dt><dd>A azure::storage::blob_type object that indicates the type of the blob.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An azure::storage::blob_type object that indicates the type of the blob.</dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 14:32:51 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 6 2015 17:00:03 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

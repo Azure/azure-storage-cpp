@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -125,6 +125,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>abort_copy_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#af9e97ec3e13cf07bacb98476eb6ab98f">azure::storage::cloud_blob</a>
 </li>
+<li>absorb_conditional_errors_on_retry()
+: <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#ad9cf92682f051e0ae8ed9b28c7dc3305">azure::storage::blob_request_options</a>
+</li>
 <li>access_condition()
 : <a class="el" href="classazure_1_1storage_1_1access__condition.html#aadb14b247ba33c0bd38509edc55c2e83">azure::storage::access_condition</a>
 </li>
@@ -139,7 +142,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#ad82ede8f7f2d43a0ad27242291f130b9">azure::storage::cloud_blob_container</a>
 </li>
 <li>acquire_lease_async()
-: <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a0860cb8d9a24ece6a0e1bd22caffbe18">azure::storage::cloud_blob</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a99353727db26b71b8c6b82b4dd83cceb">azure::storage::cloud_blob</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a897729e279077aa43a8f6bb71959ae10">azure::storage::cloud_blob_container</a>
 </li>
 <li>action()
@@ -163,9 +166,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>allowed_origins()
 : <a class="el" href="classazure_1_1storage_1_1service__properties_1_1cors__rule.html#a3b185441d90835a685cb1df6c1ab4261">azure::storage::service_properties::cors_rule</a>
 </li>
+<li>append_blob_committed_block_count()
+: <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html#acc9d22493a4bb1cd461900f32394ff9a">azure::storage::cloud_blob_properties</a>
+</li>
+<li>append_block()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#a49be5032bc5e89877bba6755c64a9ff4">azure::storage::cloud_append_blob</a>
+</li>
+<li>append_block_async()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#a65c9de880a1d8f39f890484f59c4949d">azure::storage::cloud_append_blob</a>
+</li>
+<li>append_from_file()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#a58a9a7fb0d6ba66d25e52dd7a417ea83">azure::storage::cloud_append_blob</a>
+</li>
+<li>append_from_file_async()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#a83576fa3701a19a6dcdc29ee56f0b178">azure::storage::cloud_append_blob</a>
+</li>
+<li>append_from_stream()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#a7f69ec049af3605909d1022c95c70dfa">azure::storage::cloud_append_blob</a>
+</li>
+<li>append_from_stream_async()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#a43382935d83ba8d62e45dc4e93986b20">azure::storage::cloud_append_blob</a>
+</li>
+<li>append_position()
+: <a class="el" href="classazure_1_1storage_1_1access__condition.html#a5f804a451386d06a29b0ec24a181f1d7">azure::storage::access_condition</a>
+</li>
+<li>append_text()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#aa6e12358fa5240ec671ebcca5955e082">azure::storage::cloud_append_blob</a>
+</li>
+<li>append_text_async()
+: <a class="el" href="classazure_1_1storage_1_1cloud__append__blob.html#a17e86891294050a41c03ba6cb1b137f9">azure::storage::cloud_append_blob</a>
+</li>
 <li>apply_defaults()
 : <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a31e9f65272ba33ed3bff05f7eaae86ee">azure::storage::blob_request_options</a>
 , <a class="el" href="classazure_1_1storage_1_1queue__request__options.html#ac61ce49336b042587794a1efd3638e12">azure::storage::queue_request_options</a>
+, <a class="el" href="classazure_1_1storage_1_1request__options.html#a4569b78a90543e2f0772a97416b5c308">azure::storage::request_options</a>
 , <a class="el" href="classazure_1_1storage_1_1table__request__options.html#a98cc72651ea5f87b6c2d7072b6a4df0b">azure::storage::table_request_options</a>
 </li>
 <li>approximate_message_count()
@@ -187,7 +221,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 14:32:53 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 6 2015 17:00:06 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

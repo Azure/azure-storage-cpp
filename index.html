@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">2.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -114,13 +114,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>For general suggestions about Azure, use our <a href="http://feedback.azure.com/forums/34192--general-feedback">Azure feedback forum</a>.</p>
 <h2>Download &amp; Install</h2>
 <h3>Via Git</h3>
-<p>To create a local clone of the source for the Azure Storage Client Library for C++ via <em>git</em>, type:</p>
+<p>To create a local clone of the source for the Azure Storage Client Library for C++ via <code>git</code>, type:</p>
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;git clone https://github.com/Azure/azure-storage-cpp.git</div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;cd azure-storage-cpp</div>
 </div><!-- fragment --><h3>Via NuGet</h3>
 <p>To install the binaries for the Azure Storage Client Library for C++, type the following into the <a href="http://docs.nuget.org/docs/start-here/using-the-package-manager-console">NuGet Package Manager console</a>:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;Install-Package wastorage</div>
-</div><!-- fragment --><h2>Dependencies</h2>
+<p><code>Install-Package wastorage</code></p>
+<h2>Dependencies</h2>
 <h3>C++ REST SDK</h3>
 <p>The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.4.0. It can be installed through <a href="http://www.nuget.org/packages/cpprestsdk/2.4.0">NuGet</a> or downloaded directly from <a href="http://casablanca.codeplex.com/releases/view/146873">CodePlex</a>.</p>
 <h2>Code Samples</h2>
@@ -130,7 +130,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Once this is complete, then:</p>
 <ul>
 <li>Clone the project using git: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;git clone https://github.com/Azure/azure-storage-cpp.git</div>
-</div><!-- fragment --> The project is cloned to a folder called <em>azure-storage-cpp</em>. Always use the master branch, which contains the latest release.</li>
+</div><!-- fragment --> The project is cloned to a folder called <code>azure-storage-cpp</code>. Always use the master branch, which contains the latest release.</li>
 <li>Install additional dependencies: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev</div>
 </div><!-- fragment --></li>
 <li>Build the SDK for Release: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage</div>
@@ -138,8 +138,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;cd build.release</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;CASABLANCA_DIR=&lt;path to Casablanca&gt; CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;make</div>
-</div><!-- fragment --> In the above command, replace &lt;<em>path to Casablanca</em>&gt; to point to your local installation of Casablanca. For example, if the file <em>libcpprest.so</em> exists at location ~/Github/Casablanca/casablanca/Release/build.release/Binaries/libcpprest.so, then your <em>cmake</em> command should be: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;CASABLANCA_DIR=~/Github/Casablanca/casablanca CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release</div>
-</div><!-- fragment --> The library is generated under <em>azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/</em>.</li>
+</div><!-- fragment --> In the above command, replace <code>&lt;path to Casablanca&gt;</code> to point to your local installation of Casablanca. For example, if the file <code>libcpprest.so</code> exists at location <code>~/Github/Casablanca/casablanca/Release/build.release/Binaries/libcpprest.so</code>, then your <code>cmake</code> command should be: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;CASABLANCA_DIR=~/Github/Casablanca/casablanca CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release</div>
+</div><!-- fragment --> The library is generated under <code>azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/</code>.</li>
 </ul>
 <p>To build and run unit tests:</p><ul>
 <li>Install UnitTest++ library: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;sudo apt-get install libunittest++-dev</div>
@@ -163,7 +163,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 14:32:53 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 6 2015 17:00:05 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

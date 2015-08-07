@@ -1,4 +1,4 @@
-﻿# Azure Storage Client Library for C++
+# Azure Storage Client Library for C++ (2.0.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -62,7 +62,12 @@ The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "
 
 ## Code Samples
 
-How-to topics focused around accomplishing specific tasks are available in the [samples folder](https://github.com/Azure/azure-storage-cpp/tree/master/Microsoft.WindowsAzure.Storage).
+To get started with the coding, please visit the following articles:
+- [How to use Blob Storage from C++](https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-blobs/)
+- [How to use Table Storage from C++](https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-tables/)
+- [How to use Queue Storage from C++](https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-queues)
+
+To accomplish specific tasks, please find the code samples at [samples folder](https://github.com/Azure/azure-storage-cpp/tree/master/Microsoft.WindowsAzure.Storage).
 
 ## Getting Started on Linux
 As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://casablanca.codeplex.com/wikipage?title=Setup%20and%20Build%20on%20Linux&referringTitle=Documentation) to compile it. Current version of the library depends on Casablanca version 2.4.0.
@@ -124,3 +129,8 @@ cd Binaries
 ```
 
 Please note the current build script is only tested on Ubuntu 14.04. Please update the script accordingly for other distributions.
+
+
+# Learn More
+- [Microsoft Azure Storage Client Library for C++ v2.0.0](https://github.com/Azure/azure-storage-cpp/tree/master/documentation/Microsoft Azure Storage Client lib for CCP 2.0.0.md)
+- [Microsoft Azure Storage Client Library for C++ v1.0.0 (General Availability)](http://blogs.msdn.com/b/windowsazurestorage/archive/2015/04/29/microsoft-azure-storage-client-library-for-c-v1-0-0-general-availability.aspx)

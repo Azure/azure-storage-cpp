@@ -132,5 +132,5 @@ Please note the current build script is only tested on Ubuntu 14.04. Please upda
 
 
 # Learn More
-- [Microsoft Azure Storage Client Library for C++ v2.0.0](https://github.com/Azure/azure-storage-cpp/tree/master/documentation/Microsoft Azure Storage Client lib for CCP 2.0.0.md)
+- [Microsoft Azure Storage Client Library for C++ v2.0.0](https://github.com/Azure/azure-storage-cpp/blob/master/documentation/Microsoft%20Azure%20Storage%20Client%20Library%20for%20C%2B%2B%202.0.0.md)
 - [Microsoft Azure Storage Client Library for C++ v1.0.0 (General Availability)](http://blogs.msdn.com/b/windowsazurestorage/archive/2015/04/29/microsoft-azure-storage-client-library-for-c-v1-0-0-general-availability.aspx)

@@ -48,7 +48,6 @@ The following sample code shows the use of Append Blob.
 	            append_blob.delete_blob();
 	
 	            // Delete the blob container
-	            // Return value is true if the container did exist and was successfully deleted
 	            container.delete_container_if_exists();
 	        }
 	        catch (const azure::storage::storage_exception& e)
@@ -96,7 +95,7 @@ With version 2.0.0, you can also use a range-based for-loop to list blobs.
 	         }
 	         else
 	         {
-	             process_directory(item.as_blob_directory());
+	             process_directory(item.as_directory());
 	         }
 	     }
 
@@ -106,31 +105,109 @@ For more details about listing APIs of the C++ client library, visit [Efficientl
 
 With versions earlier than 2.0.0, the C++ client library will *keep* only the following parameters and ignore the others when handling the Azure Storage resource URI:
 
-	sas_version
-	sas_resource
-	sas_table_name
-	sas_start
-	sas_expiry
-	sas_permissions
-	sas_start_partition_key
-	sas_start_row_key
-	sas_end_partition_key
-	sas_end_row_key
-	sas_identifier
-	sas_cache_control
-	sas_content_disposition
-	sas_content_encoding
-	sas_content_language
-	sas_content_type
-	sas_signature
-	sas_api_version
+<table>
+<tr>
+    <td><b>Field Name</b></td>
+    <td><b>Query Parameter</b></td>
+</tr>
+<tr>
+    <td>signedversion</td>
+    <td>sv</td>
+</tr>
+<tr>
+    <td>signedresource</td>
+    <td>sr</td>
+</tr>
+<tr>
+    <td>tablename</td>
+    <td>tn</td>
+</tr>
+<tr>
+    <td>signedstart</td>
+    <td>st</td>
+</tr>
+<tr>
+    <td>signedexpiry</td>
+    <td>se</td>
+</tr>
+<tr>
+    <td>signedpermissions</td>
+    <td>sp</td>
+</tr>
+<tr>
+    <td>startpk</td>
+    <td>spk</td>
+</tr>
+<tr>
+    <td>startrk</td>
+    <td>srk</td>
+</tr>
+<tr>
+    <td>endpk</td>
+    <td>epk</td>
+</tr>
+<tr>
+    <td>endrk</td>
+    <td>erk</td>
+</tr>
+<tr>
+    <td>signedidentifier</td>
+    <td>si</td>
+</tr>
+<tr>
+    <td>Cache-Control</td>
+    <td>rscc</td>
+</tr>
+<tr>
+    <td>Content-Disposition</td>
+    <td>rscd</td>
+</tr>
+<tr>
+    <td>Content-Encoding</td>
+    <td>rsce</td>
+</tr>
+<tr>
+    <td>Content-Language</td>
+    <td>rscl</td>
+</tr>
+<tr>
+    <td>Content-Type</td>
+    <td>rsct</td>
+</tr>
+<tr>
+    <td>signature</td>
+    <td>sig</td>
+</tr>
+<tr>
+    <td>api-version</td>
+    <td>api-version</td>
+</tr>
+</table>
 
 With version 2.0.0, the C++ client library will ignore only the following parameters:
 
-	resource_type
-	component
-	snapshot
-	sas_api_version
+<table>
+<tr>
+    <td><b>Field Name</b></td>
+    <td><b>Query Parameter</b></td>
+</tr>
+<tr>
+    <td>resoucetype</td>
+    <td>restype</td>
+</tr>
+<tr>
+    <td>component</td>
+    <td>comp</td>
+</tr>
+<tr>
+    <td>snapshot</td>
+    <td>snapshot</td>
+</tr>
+<tr>
+    <td>api-version</td>
+    <td>api-version</td>
+</tr>
+</table>
 
 As a result of this change, you can write code like this:
 

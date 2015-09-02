@@ -185,10 +185,12 @@ SUITE(Blob)
         check_page_ranges_equal(pages);
 
         options.set_use_transactional_md5(true);
-        fill_buffer_and_get_md5(buffer);
-        auto stream = concurrency::streams::bytestream::open_istream(buffer);
-        CHECK_THROW(m_blob.upload_pages(stream, 0, dummy_md5, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
-        CHECK_UTF8_EQUAL(dummy_md5, md5_header);
+        {
+            fill_buffer_and_get_md5(buffer);
+            auto stream = concurrency::streams::bytestream::open_istream(buffer);
+            CHECK_THROW(m_blob.upload_pages(stream, 0, dummy_md5, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
+            CHECK_UTF8_EQUAL(dummy_md5, md5_header);
+        }
 
         // trying upload page ranges bigger than max_block_size
         {

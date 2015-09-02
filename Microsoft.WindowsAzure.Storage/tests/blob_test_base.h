@@ -70,7 +70,7 @@ public:
         m_content_md5 = fill_buffer_and_get_md5(buffer);
 
         auto stream = concurrency::streams::file_stream<uint8_t>::open_ostream(m_path).get();
-        stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
         stream.close().wait();
     }
 

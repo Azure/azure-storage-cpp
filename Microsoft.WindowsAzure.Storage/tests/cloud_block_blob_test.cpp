@@ -175,7 +175,7 @@ SUITE(Blob)
             fill_buffer_and_get_md5(buffer);
 
             concurrency::streams::producer_consumer_buffer<uint8_t> pcbuffer;
-            pcbuffer.putn(buffer.data(), azure::storage::protocol::max_block_size * 2);
+            pcbuffer.putn_nocopy(buffer.data(), azure::storage::protocol::max_block_size * 2);
             pcbuffer.close(std::ios_base::out);
 
             // non-seekable stream

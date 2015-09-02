@@ -1,6 +1,13 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v2.1:
+- Upgraded Casablanca dependency to 2.6.0
+- Added support for Visual Studio 2015, dropped support for Visual Studio 2012
+- Separated Nuget packages to wastorage.v120 and wastorage.v140. For backwards compatibility, wastorage became umbrella package which has both packages as dependencies.
+- Retired CoApp autopkg. Nuget.exe and nuspec files are used to generate Nuget packages.
+- Fixed an issue that MSBuild must run twice to first download Nuget packages then compile.
+
 Changes in v2.0:
 - Default REST API version is 2015-02-21
 - Added cloud_append_blob class, which supports the new blob type: append blob.

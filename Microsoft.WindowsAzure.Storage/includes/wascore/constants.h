@@ -319,9 +319,9 @@ namespace azure { namespace storage { namespace protocol {
 
     // user agent
 #if defined(WIN32)
-    const utility::string_t header_value_user_agent(U("Azure-Storage/2.0.0 (Native; Windows)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.1.0 (Native; Windows)"));
 #else
-    const utility::string_t header_value_user_agent(U("Azure-Storage/2.0.0 (Native)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.1.0 (Native)"));
 #endif
 
 }}} // namespace azure::storage::protocol

@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (2.0.0)
+# Azure Storage Client Library for C++ (2.1.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -54,11 +54,14 @@ To install the binaries for the Azure Storage Client Library for C++, type the f
 
 `Install-Package wastorage`
 
+#### Visual Studio Version
+Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visual Studio 2013 and Visual Studio 2015. In case you have the need to use Visual Studio 2012, please get [version 2.0.0](http://www.nuget.org/packages/wastorage/2.0.0).
+
 ## Dependencies
 
 ### C++ REST SDK
 
-The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.4.0. It can be installed through [NuGet](http://www.nuget.org/packages/cpprestsdk/2.4.0) or downloaded directly from [CodePlex](http://casablanca.codeplex.com/releases/view/146873).
+The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.6.0. It can be installed through [NuGet](http://www.nuget.org/packages/cpprestsdk/2.6.0) or downloaded directly from [CodePlex](http://casablanca.codeplex.com/releases/view/612765).
 
 ## Code Samples
 
@@ -70,7 +73,7 @@ To get started with the coding, please visit the following articles:
 To accomplish specific tasks, please find the code samples at [samples folder](https://github.com/Azure/azure-storage-cpp/tree/master/Microsoft.WindowsAzure.Storage).
 
 ## Getting Started on Linux
-As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://casablanca.codeplex.com/wikipage?title=Setup%20and%20Build%20on%20Linux&referringTitle=Documentation) to compile it. Current version of the library depends on Casablanca version 2.4.0.
+As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://casablanca.codeplex.com/wikipage?title=Setup%20and%20Build%20on%20Linux&referringTitle=Documentation) to compile it. Current version of the library depends on Casablanca version 2.6.0.
 
 Once this is complete, then:
 

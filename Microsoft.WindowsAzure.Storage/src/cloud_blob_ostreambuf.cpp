@@ -117,7 +117,7 @@ namespace azure { namespace storage { namespace core {
             }
 
             // The streambuf is waited because it is a memory buffer, so does not involve async I/O
-            m_buffer.putn(ptr, write_size).wait();
+            m_buffer.putn_nocopy(ptr, write_size).wait();
             if (m_buffer_size == m_buffer.size())
             {
                 upload_task = upload_buffer();

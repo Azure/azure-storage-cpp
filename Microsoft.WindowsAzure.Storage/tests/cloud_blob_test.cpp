@@ -62,7 +62,7 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
     else
     {
         concurrency::streams::producer_consumer_buffer<uint8_t> pcbuffer;
-        pcbuffer.putn(buffer.data() + buffer_offset, buffer_size - buffer_offset);
+        pcbuffer.putn_nocopy(buffer.data() + buffer_offset, buffer_size - buffer_offset);
         pcbuffer.close(std::ios_base::out);
         stream = pcbuffer.create_istream();
     }

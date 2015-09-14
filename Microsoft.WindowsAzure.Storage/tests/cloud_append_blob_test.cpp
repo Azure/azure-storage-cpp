@@ -340,7 +340,7 @@ SUITE(Blob)
             // create a temporary test file
             utility::string_t tmp_file_path = get_random_container_name(8);
             auto stream = concurrency::streams::file_stream<uint8_t>::open_ostream(tmp_file_path).get();
-            stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+            stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
             stream.close().wait();
 
             // append from file

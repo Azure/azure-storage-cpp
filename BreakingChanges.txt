@@ -1,6 +1,12 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
 
+Breaking Changes in v2.1:
+- Upgraded Casablanca dependency to 2.6.0
+- Added support for Visual Studio 2015, dropped support for Visual Studio 2012
+- Separated Nuget packages to wastorage.v120 and wastorage.v140. For backwards compatibility, wastorage became umbrella package which has both packages as dependencies.
+- Retired CoApp autopkg. Nuget.exe and nuspec files are used to generate Nuget packages.
+
 Breaking Changes in v2.0:
 - Changed behavior to stop stripping out query parameters passed in with the resource URI. Some query parameters such as comp, restype, snapshot and api-version will still be removed.
 - Deprecated cloud_blob::start_copy_from_blob and cloud_blob::start_copy_from_blob_async. Use cloud_blob::start_copy instead.

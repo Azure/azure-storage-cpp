@@ -13,10 +13,10 @@ macro (buildsample SAMPLE_NAME SAMPLE_SOURCES)
 
   if("${SAMPLE_NAME}" MATCHES "${AZURESTORAGESAMPLES_COMMON}")
     add_library(${SAMPLE_NAME} ${SAMPLE_SOURCES})
-  	target_link_libraries(${AZURESTORAGESAMPLES_LIBRARIES})
+    target_link_libraries(${AZURESTORAGESAMPLES_LIBRARIES})
   else()
     add_executable(${SAMPLE_NAME} ${SAMPLE_SOURCES})
-  	target_link_libraries(${SAMPLE_NAME} ${AZURESTORAGESAMPLES_LIBRARIES})
+    target_link_libraries(${SAMPLE_NAME} ${AZURESTORAGESAMPLES_LIBRARIES})
   endif()
 
   # Portions specific to cpprest binary versioning.

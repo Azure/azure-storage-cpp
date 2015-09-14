@@ -1,85 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project
   xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
-  DefaultTargets="Clean;BuildAll">
+  DefaultTargets="Build">
   
   <ItemGroup>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >      
+    <Solution Include="build.sln" >      
         <Properties>Configuration=Debug;Platform=Win32</Properties>
-    </StorageSln>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >
+    </Solution>
+    <Solution Include="build.sln" >
         <Properties>Configuration=Release;Platform=Win32</Properties>
-    </StorageSln>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >
+    </Solution>
+    <Solution Include="build.sln" >
         <Properties>Configuration=Debug;Platform=x64</Properties>
-    </StorageSln>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.vcxproj" >
+    </Solution>
+    <Solution Include="build.sln" >
         <Properties>Configuration=Release;Platform=x64</Properties>
-    </StorageSln>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
-        <Properties>Configuration=Debug;Platform=Win32</Properties>
-    </StorageSln>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
-        <Properties>Configuration=Release;Platform=Win32</Properties>
-    </StorageSln>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
-        <Properties>Configuration=Debug;Platform=x64</Properties>
-    </StorageSln>
-    <StorageSln Include=".\Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" >
-        <Properties>Configuration=Release;Platform=x64</Properties>
-    </StorageSln>
+    </Solution>
   </ItemGroup>
 
+  <Target Name="RestorePackages">
+    <Exec Command="&quot;tools\NuGet.exe&quot; restore &quot;%(Solution.Identity)&quot;" />
+  </Target>
+  
   <Target Name="Clean">
     <!-- Clean the solutions -->
     <Message Importance="high" Text="Cleaning all projects..." ContinueOnError="true" />
     <MSBuild
-      Projects="@(StorageSln)"
+      Projects="@(Solution)"
       Targets="Clean"
       BuildInParallel="true" />
   </Target>
 
-  <Target Name="BuildAll">
+  <Target Name="Build" DependsOnTargets="RestorePackages;Clean">
     <Message Importance="high" Text="Building all versions of the projects..." />
     <MSBuild
-      Projects="@(StorageSln)"
+      Projects="@(Solution)"
       Targets="Build"
-      BuildInParallel="true" />
-  </Target>
-  
-  <Target Name="BuildWin32Release">
-    <Message Importance="high" Text="Building Win32 release version of the projects..." />
-    <MSBuild
-      Projects="@(StorageSln)"
-      Targets="Build"
-      Condition=" '%(Properties)' == 'Configuration=Release;Platform=Win32' "
-      BuildInParallel="true" />
-  </Target>
-
-  <Target Name="BuildWin32Debug">
-    <Message Importance="high" Text="Building Win32 debug version the projects..." />
-    <MSBuild
-      Projects="@(StorageSln)"
-      Targets="Build"
-      Condition=" '%(Properties)' == 'Configuration=Debug;Platform=Win32' "
-      BuildInParallel="true" />
-  </Target>
-  
-  <Target Name="Buildx64Release">
-    <Message Importance="high" Text="Building x64 release version of the projects..." />
-    <MSBuild
-      Projects="@(StorageSln)"
-      Targets="Build"
-      Condition=" '%(Properties)' == 'Configuration=Release;Platform=x64' "
-      BuildInParallel="true" />
-  </Target>
-
-  <Target Name="Buildx64Debug">
-    <Message Importance="high" Text="Building x64 debug version the projects..." />
-    <MSBuild
-      Projects="@(StorageSln)"
-      Targets="Build"
-      Condition=" '%(Properties)' == 'Configuration=Debug;Platform=x64' "
       BuildInParallel="true" />
   </Target>
 </Project>

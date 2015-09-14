@@ -354,7 +354,7 @@ SUITE(Blob)
 
         buffer.resize(1024);
         fill_buffer_and_get_md5(buffer);
-        stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
 
         std::copy(buffer.begin(), buffer.end(), final_blob_contents.begin());
 
@@ -362,12 +362,12 @@ SUITE(Blob)
         attempts++;
 
         fill_buffer_and_get_md5(buffer);
-        stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
 
         std::copy(buffer.begin(), buffer.end(), final_blob_contents.begin() + 5 * 1024);
 
         fill_buffer_and_get_md5(buffer);
-        stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
 
         std::copy(buffer.begin(), buffer.end(), final_blob_contents.begin() + 6 * 1024);
 
@@ -375,7 +375,7 @@ SUITE(Blob)
         attempts++;
 
         fill_buffer_and_get_md5(buffer);
-        stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
 
         std::copy(buffer.begin(), buffer.end(), final_blob_contents.begin() + 512);
 
@@ -407,7 +407,7 @@ SUITE(Blob)
         options.set_store_blob_content_md5(false);
         auto stream = m_blob.open_write(azure::storage::access_condition(), options, m_context);
         stream.seek(512);
-        stream.streambuf().putn(buffer.data(), 512).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), 512).wait();
         stream.close().wait();
 
         concurrency::streams::container_buffer<std::vector<uint8_t>> downloaded_blob;
@@ -606,7 +606,7 @@ SUITE(Blob)
         std::vector<uint8_t> buffer;
         buffer.resize(512);
 
-        stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
         stream.close().wait();
     }
 
@@ -625,7 +625,7 @@ SUITE(Blob)
         std::vector<uint8_t> buffer;
         buffer.resize(512);
 
-        stream.streambuf().putn(buffer.data(), buffer.size()).wait();
+        stream.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
         stream.close().wait();
     }
 

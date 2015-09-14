@@ -247,7 +247,7 @@ namespace azure { namespace storage { namespace core {
             m_total_written += count;
             m_hash_provider.write(ptr, count);
 
-            return m_inner_streambuf.putn(ptr, count);
+            return m_inner_streambuf.putn_nocopy(ptr, count);
         }
 
         utility::string_t hash() const

@@ -101,7 +101,7 @@ namespace azure { namespace storage { namespace samples {
             // Create an append blob
             azure::storage::cloud_append_blob append_blob = container.get_append_blob_reference(U("my-append-1"));
             append_blob.properties().set_content_type(U("text/plain; charset=utf-8"));
-            append_blob.create();
+            append_blob.create_or_replace();
 
             // Append two blocks
             concurrency::streams::istream append_input_stream1 = concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(U("some text.")));

@@ -439,7 +439,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& operation, table_payload_format payload_format, bool is_query, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         utility::string_t batch_boundary_name = core::generate_boundary_name(U("batch"));
         utility::string_t changeset_boundary_name = core::generate_boundary_name(U("changeset"));
@@ -451,7 +451,7 @@ namespace azure { namespace storage { namespace protocol {
         request_headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);
         populate_http_headers(request_headers, batch_boundary_name);
 
-        table_batch_operation::operations_type operations = operation.operations();
+        table_batch_operation::operations_type operations = batch_operation.operations();
 
         web::http::uri base_uri = table.service_client().base_uri().primary_uri();
         utility::string_t body_text;

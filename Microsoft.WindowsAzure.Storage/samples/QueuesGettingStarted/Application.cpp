@@ -23,12 +23,34 @@
 
 namespace azure { namespace storage { namespace samples {
 
+    utility::string_t get_connection_string()
+    {
+        // Load configuration
+        utility::ifstream_t config_file;
+        config_file.open("test_configurations.json");
+
+        web::json::value config;
+        config_file >> config;
+
+        auto target_name = config[U("target")].as_string();
+        web::json::value& tenants = config[U("tenants")];
+
+        for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
+        {
+            const web::json::value& name_obj = it->at(U("name"));
+            if (name_obj.as_string() == target_name)
+            {
+                return it->at(U("connection_string")).as_string();
+            }
+        }
+    }
+
     void queues_getting_started_sample()
     {
         try
         {
             // Initialize storage account
-            azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);
+	    azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(get_connection_string());
 
             // Create a queue
             azure::storage::cloud_queue_client queue_client = storage_account.create_cloud_queue_client();

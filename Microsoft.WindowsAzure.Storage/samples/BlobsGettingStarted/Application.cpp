@@ -30,12 +30,36 @@ namespace azure { namespace storage { namespace samples {
         return utility::string_t(data.cbegin(), data.cend());
     }
 
+    utility::string_t get_connection_string()
+    {
+        // Load configuration
+        utility::ifstream_t config_file;
+        config_file.open("test_configurations.json");
+
+        web::json::value config;
+        config_file >> config;
+
+        auto target_name = config[U("target")].as_string();
+        web::json::value& tenants = config[U("tenants")];
+
+        for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
+        {
+            const web::json::value& name_obj = it->at(U("name"));
+            if (name_obj.as_string() == target_name)
+            {
+                return it->at(U("connection_string")).as_string();
+            }
+        }
+    }
+
     void blobs_getting_started_sample()
     {
         try
         {
-            // Initialize storage account
-            azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);
+	    
+	    
+            // Initialize storage account, get connection string from test_configurations.json
+            azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(get_connection_string());
 
             // Create a blob container
             azure::storage::cloud_blob_client blob_client = storage_account.create_cloud_blob_client();

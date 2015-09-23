@@ -6,11 +6,33 @@
 #include "was/table.h"
 #include "was/queue.h"
 
+utility::string_t get_connection_string()
+{
+    // Load configuration
+    utility::ifstream_t config_file;
+    config_file.open("test_configurations.json");
+
+    web::json::value config;
+    config_file >> config;
+
+    auto target_name = config[U("target")].as_string();
+    web::json::value& tenants = config[U("tenants")];
+
+    for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
+    {
+        const web::json::value& name_obj = it->at(U("name"));
+        if (name_obj.as_string() == target_name)
+        {
+            return it->at(U("connection_string")).as_string();
+        }
+    }
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     try
     {
-        azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(U("DefaultEndpointsProtocol=https;AccountName=ACCOUNT_NAME;AccountKey=ACCOUNT_KEY"));
+        azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(U(get_connection_string()));
 
         azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();
         azure::storage::cloud_table table = table_client.get_table_reference(U("blogposts"));

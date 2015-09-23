@@ -107,7 +107,7 @@ sudo apt-get install libunittest++-dev
 ```
 - Build the test code:
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=1
 make
 ```
 - Run unit tests
@@ -119,7 +119,7 @@ vi test_configurations.json # modify test config file to include your storage ac
 
 To build sample code:
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=1
 make
 ```
 To run the samples:

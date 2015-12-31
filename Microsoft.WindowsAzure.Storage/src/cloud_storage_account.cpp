@@ -394,4 +394,14 @@ namespace azure { namespace storage {
         return result.str();
     }
 
+    utility::string_t cloud_storage_account::get_shared_access_signature(const account_shared_access_policy& policy) const
+    {
+        if (!credentials().is_shared_key())
+        {
+            throw std::logic_error(protocol::error_sas_missing_credentials);
+        }
+
+        return protocol::get_account_sas_token(utility::string_t(), policy, credentials());
+    }
+
 }} // namespace azure::storage

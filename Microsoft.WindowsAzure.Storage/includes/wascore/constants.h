@@ -87,6 +87,10 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t uri_query_sas_content_language(U("rscl"));
     const utility::string_t uri_query_sas_content_disposition(U("rscd"));
     const utility::string_t uri_query_sas_api_version(U("api-version"));
+    const utility::string_t uri_query_sas_services(U("ss"));
+    const utility::string_t uri_query_sas_resource_types(U("srt"));
+    const utility::string_t uri_query_sas_ip(U("sip"));
+    const utility::string_t uri_query_sas_protocol(U("spr"));
 
     // table query parameters
     const utility::string_t table_query_next_partition_key(U("NextPartitionKey"));
@@ -188,7 +192,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t ms_header_time_next_visible(U("x-ms-time-next-visible"));
 
     // header values
-    const utility::string_t header_value_storage_version(U("2015-02-21"));
+    const utility::string_t header_value_storage_version(U("2015-04-05"));
     const utility::string_t header_value_true(U("true"));
     const utility::string_t header_value_false(U("false"));
     const utility::string_t header_value_locked(U("locked"));
@@ -319,9 +323,13 @@ namespace azure { namespace storage { namespace protocol {
 
     // user agent
 #if defined(WIN32)
-    const utility::string_t header_value_user_agent(U("Azure-Storage/2.1.0 (Native; Windows)"));
+#if defined(_MSC_VER)
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.2.0 (Native; Windows; MSC_VER ") + utility::conversions::to_string_t(std::to_string(_MSC_VER)) + U(")"));
 #else
-    const utility::string_t header_value_user_agent(U("Azure-Storage/2.1.0 (Native)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.2.0 (Native; Windows)"));
+#endif
+#else
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.2.0 (Native)"));
 #endif
 
 }}} // namespace azure::storage::protocol

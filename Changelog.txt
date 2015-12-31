@@ -1,6 +1,15 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v2.2:
+- Default REST API version is 2015-04-05
+- Supported account SAS
+- Supported IP ACL and HTTP protocol in account/service SAS
+- Introduced add permission for blob SAS
+- Upgraded Casablanca dependency to 2.7.0
+- Added Microsoft Visual C++ compiler version to user agent string if MSVC is used to compile.
+- Fixed a bug that cloud_block_blob::upload_block_list_async method doesn't respect use_transactional_md5 field
+
 Changes in v2.1:
 - Upgraded Casablanca dependency to 2.6.0
 - Added support for Visual Studio 2015, dropped support for Visual Studio 2012

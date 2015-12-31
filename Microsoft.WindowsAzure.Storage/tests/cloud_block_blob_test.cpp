@@ -521,6 +521,43 @@ SUITE(Blob)
         CHECK_UTF8_EQUAL(U("value2"), same_blob.metadata()[U("key2")]);
     }
 
+    TEST_FIXTURE(block_blob_test_base, block_blob_block_list_use_transactional_md5)
+    {
+        m_blob.properties().set_content_type(U("text/plain; charset=utf-8"));
+
+        utility::string_t md5_header;
+        m_context.set_sending_request([&md5_header](web::http::http_request& request, azure::storage::operation_context)
+        {
+            if (!request.headers().match(web::http::header_names::content_md5, md5_header))
+            {
+                md5_header.clear();
+            }
+        });
+
+        std::vector<azure::storage::block_list_item> blocks;
+        for (uint16_t i = 0; i < 10; i++)
+        {
+            auto id = get_block_id(i);
+            auto utf8_body = utility::conversions::to_utf8string(utility::conversions::print_string(i));
+            auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
+            m_blob.upload_block(id, stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            blocks.push_back(azure::storage::block_list_item(id));
+        }
+
+        azure::storage::blob_request_options options;
+        options.set_use_transactional_md5(false);
+        m_blob.upload_block_list(blocks, azure::storage::access_condition(), options, m_context);
+        CHECK_UTF8_EQUAL(utility::string_t(), md5_header);
+        CHECK_UTF8_EQUAL(U("0123456789"), m_blob.download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
+
+        options.set_use_transactional_md5(true);
+        m_blob.upload_block_list(blocks, azure::storage::access_condition(), options, m_context);
+        CHECK_UTF8_EQUAL(m_context.request_results().back().content_md5(), md5_header);
+        CHECK_UTF8_EQUAL(U("0123456789"), m_blob.download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
+
+        m_context.set_sending_request(std::function<void(web::http::http_request &, azure::storage::operation_context)>());
+    }
+
     TEST_FIXTURE(block_blob_test_base, block_blob_put_blob_with_metadata)
     {
         m_blob.metadata()[U("key1")] = U("value1");

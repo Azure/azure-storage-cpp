@@ -259,10 +259,11 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        request.headers().add(web::http::header_names::content_md5, content_md5);
         add_properties(request, properties);
         add_metadata(request, metadata);
         add_access_condition(request, condition);

@@ -3,7 +3,7 @@ var searchData=
   ['page_5fblob_5fsequence_5fnumber',['page_blob_sequence_number',['../classazure_1_1storage_1_1cloud__blob__properties.html#a45a0faf3aac40d10c6b328fdbacb4ab1',1,'azure::storage::cloud_blob_properties']]],
   ['page_5frange',['page_range',['../classazure_1_1storage_1_1page__range.html#a883f636501a371e831d712f1531a92e0',1,'azure::storage::page_range']]],
   ['parallelism_5ffactor',['parallelism_factor',['../classazure_1_1storage_1_1blob__request__options.html#afd2ee25ba6889827155e1feaf468f8e5',1,'azure::storage::blob_request_options']]],
-  ['parse',['parse',['../classazure_1_1storage_1_1cloud__storage__account.html#ab34b15fe3390a9bea06cfc896b46bc8e',1,'azure::storage::cloud_storage_account']]],
+  ['parse',['parse',['../classazure_1_1storage_1_1cloud__storage__account.html#ab34b15fe3390a9bea06cfc896b46bc8e',1,'azure::storage::cloud_storage_account::parse()'],['../classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a5e01180ff52d892737a89e8d73b1acdb',1,'azure::storage::core::xml::xml_reader::parse()']]],
   ['partition_5fkey',['partition_key',['../classazure_1_1storage_1_1table__entity.html#ab6e7e5c501516052f89645a8ce918d7b',1,'azure::storage::table_entity']]],
   ['path',['path',['../classazure_1_1storage_1_1storage__uri.html#af7cdf01efd296f1d372b875a385b08fe',1,'azure::storage::storage_uri']]],
   ['payload_5fformat',['payload_format',['../classazure_1_1storage_1_1table__request__options.html#a0738da224665e0350d646e9c76a5f0bd',1,'azure::storage::table_request_options']]],
@@ -19,5 +19,7 @@ var searchData=
   ['primary_5furi',['primary_uri',['../classazure_1_1storage_1_1storage__uri.html#a8b1e925bc4ea079515e911c417b342c1',1,'azure::storage::storage_uri']]],
   ['properties',['properties',['../classazure_1_1storage_1_1cloud__blob__container.html#a4848428ee75c41d377a09ee081c709ac',1,'azure::storage::cloud_blob_container::properties()'],['../classazure_1_1storage_1_1cloud__blob.html#a5837a2fbbf39fa5aa4ac30adde3829ec',1,'azure::storage::cloud_blob::properties()'],['../classazure_1_1storage_1_1cloud__blob.html#afd6a3a9e838f4a86ad6fc651275a2643',1,'azure::storage::cloud_blob::properties() const '],['../classazure_1_1storage_1_1table__entity.html#aef361f0b33c7d64f0fb30e349d3c0ec4',1,'azure::storage::table_entity::properties()'],['../classazure_1_1storage_1_1table__entity.html#a36695657eed0031f3a78624113232ab0',1,'azure::storage::table_entity::properties() const ']]],
   ['property_5ftype',['property_type',['../classazure_1_1storage_1_1entity__property.html#a264f3d6a9e8e967696a52859a8c75f0e',1,'azure::storage::entity_property']]],
+  ['protocol',['protocol',['../classazure_1_1storage_1_1shared__access__policy.html#a5438fc4359fccabbf47981c462aead27',1,'azure::storage::shared_access_policy']]],
+  ['protocols_5fto_5fstring',['protocols_to_string',['../classazure_1_1storage_1_1shared__access__policy.html#afc09a4d98aa88dd87cff7f5efa806113',1,'azure::storage::shared_access_policy']]],
   ['public_5faccess',['public_access',['../classazure_1_1storage_1_1blob__container__permissions.html#a9e340ab48d66bff2ba0d65d1ca380fb7',1,'azure::storage::blob_container_permissions']]]
 ];

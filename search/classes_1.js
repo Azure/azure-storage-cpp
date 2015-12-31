@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['blob_5fcontainer_5fpermissions',['blob_container_permissions',['../classazure_1_1storage_1_1blob__container__permissions.html',1,'azure::storage']]],
-  ['blob_5flisting_5fdetails',['blob_listing_details',['../structazure_1_1storage_1_1blob__listing__details.html',1,'azure::storage']]],
-  ['blob_5frequest_5foptions',['blob_request_options',['../classazure_1_1storage_1_1blob__request__options.html',1,'azure::storage']]],
-  ['blob_5fshared_5faccess_5fpolicy',['blob_shared_access_policy',['../classazure_1_1storage_1_1blob__shared__access__policy.html',1,'azure::storage']]],
-  ['block_5flist_5fitem',['block_list_item',['../classazure_1_1storage_1_1block__list__item.html',1,'azure::storage']]]
+  ['access_5fcondition',['access_condition',['../classazure_1_1storage_1_1access__condition.html',1,'azure::storage']]],
+  ['account_5fshared_5faccess_5fpolicy',['account_shared_access_policy',['../classazure_1_1storage_1_1account__shared__access__policy.html',1,'azure::storage']]],
+  ['async_5fsemaphore',['async_semaphore',['../classazure_1_1storage_1_1core_1_1async__semaphore.html',1,'azure::storage::core']]]
 ];

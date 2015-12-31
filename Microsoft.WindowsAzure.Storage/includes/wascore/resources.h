@@ -86,4 +86,6 @@ namespace azure { namespace storage { namespace protocol {
     const std::string error_precondition_failure_ignored("Pre-condition failure on a retry is being ignored since the request should have succeeded in the first attempt.");
     const std::string error_invalid_block_size("Append block data should not exceed the maximum blob size condition value.");
 
+    const std::string error_invalid_ip_address("Error when parsing IP address: IP address is invalid.");
+    const std::string error_ip_must_be_ipv4_in_sas("When specifying an IP Address in a SAS token, it must be an IPv4 address.");
 }}} // namespace azure::storage::protocol

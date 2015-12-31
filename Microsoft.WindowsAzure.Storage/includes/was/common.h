@@ -27,6 +27,7 @@
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/sources/severity_logger.hpp>
+#include <boost/asio/ip/address.hpp>
 #endif
 
 namespace azure { namespace storage {
@@ -1872,6 +1873,177 @@ namespace azure { namespace storage {
     public:
 
         /// <summary>
+        /// Specifies the set of possible signed protocols for a shared access account policy.
+        /// </summary>
+        enum protocols
+        {
+            /// <summary>
+            /// Permission to use SAS only through https granted.
+            /// </summary>
+            https_only = 0x1,
+
+            /// <summary>
+            /// Permission to use SAS through https or http granted. Equivalent to not specifying any permission at all.
+            /// </summary>
+            https_or_http = 0x2
+        };
+
+        /// <summary>
+        /// Get a canonical string representation of the protocols for a shared access policy.
+        /// </summary>
+        utility::string_t protocols_to_string() const
+        {
+            if (m_protocol == https_only)
+            {
+                return U("https");
+            }
+            else
+            {
+                return U("https,http");
+            }
+        }
+
+        /// <summary>
+        /// Specifies either a single IP Address or a single range of IP Addresses (a minimum and a maximum, inclusive.)
+        /// </summary>
+        class ip_address_or_range
+        {
+        public:
+
+            /// <summary>
+            /// Initializes a default new instance of the <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> class.
+            /// </summary>
+            ip_address_or_range()
+            : m_single_address(true)
+            {}
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> class using the a single ip address.
+            /// </summary>
+            /// <param name="address">The single IP address to use.</param>
+            ip_address_or_range(utility::string_t address)
+            : m_address(std::move(address)), m_single_address(true)
+            {
+                try_parse(m_address);
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> class using
+            /// a range of ip address specified by a minimum ip address and a maximum ip address.
+            /// </summary>
+            /// <param name="minimum_address">The minimum IP address of a range to use.</param>
+            /// <param name="maximum_address">The maximum IP address of a range to use.</param>
+            ip_address_or_range(utility::string_t minimum_address, utility::string_t maximum_address)
+            : m_minimum_address(std::move(minimum_address)), m_maximum_address(std::move(maximum_address)), m_single_address(false)
+            {
+                validate_range();
+            }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+            // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+            // have implicitly-declared move constructor and move assignment operator.
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> class based on an existing instance.
+            /// </summary>
+            /// <param name="other">An existing <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> object.</param>
+            ip_address_or_range(ip_address_or_range&& other)
+            {
+                *this = std::move(other);
+            }
+
+            /// <summary>
+            /// Returns a reference to an <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> object.
+            /// </summary>
+            /// <param name="other">An existing <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> object to use to set properties.</param>
+            /// <returns>An <see cref="azure::storage::shared_access_policy::ip_address_or_range" /> object with properties set.</returns>
+            ip_address_or_range& operator=(ip_address_or_range&& other)
+            {
+                if (this != &other)
+                {
+                    m_address = std::move(other.m_address);
+                    m_minimum_address = std::move(other.m_minimum_address);
+                    m_maximum_address = std::move(other.m_maximum_address);
+                    m_single_address = std::move(other.m_single_address);
+                }
+                return *this;
+            }
+#endif
+
+            /// <summary>
+            /// Gets the IP Address.
+            /// Returns empty string if this object represents a range of IP addresses.
+            /// </summary>
+            /// <returns>The IP Address.</returns>
+            const utility::string_t &address() const
+            {
+                return m_address;
+            }
+
+            /// <summary>
+            /// Gets the minimum IP Address for the range, inclusive.
+            /// Returns empty string if this object represents a single IP address.
+            /// </summary>
+            /// <returns>The minimum IP Address.</returns>
+            const utility::string_t &minimum_address() const
+            {
+                return m_minimum_address;
+            }
+
+            /// <summary>
+            /// Gets the maximum IP Address for the range, inclusive.
+            /// Returns empty string if this object represents a single IP address.
+            /// </summary>
+            /// <returns>The maximum IP Address.</returns>
+            const utility::string_t &maximum_address() const
+            {
+                return m_maximum_address;
+            }
+
+            /// <summary>
+            /// True if this object represents a single IP Address, false if it represents a range.
+            /// </summary>
+            bool is_single_address() const
+            {
+                return m_single_address;
+            }
+            
+            /// <summary>
+            /// Get a canonical string representation of the ip address or range for a shared access policy.
+            /// </summary>
+            utility::string_t to_string() const
+            {
+                if (m_single_address)
+                {
+                    return m_address;
+                }
+                else
+                {
+                    return m_minimum_address + U("-") + m_maximum_address;
+                }
+            }
+
+        private:
+
+            utility::string_t m_address;
+            utility::string_t m_minimum_address;
+            utility::string_t m_maximum_address;
+            bool m_single_address;
+#ifdef WIN32
+            struct ip_address
+            {
+                bool ipv4;
+                unsigned long addr;
+                unsigned short addr6[8];
+            };
+#else
+            using ip_address = boost::asio::ip::address;
+#endif
+            WASTORAGE_API static ip_address try_parse(const utility::string_t &address);
+            WASTORAGE_API void validate_range();
+        };
+
+        /// <summary>
         /// Get a canonical string representation of the permissions for a shared access policy.
         /// </summary>
         /// <remarks>
@@ -1889,14 +2061,19 @@ namespace azure { namespace storage {
                     permissions.push_back(U('r'));
                 }
 
-                if (m_permission & write)
-                {
-                    permissions.push_back(U('w'));
-                }
-
                 if (m_permission & add)
                 {
                     permissions.push_back(U('a'));
+                }
+                
+                if (m_permission & create)
+                {
+                    permissions.push_back(U('c'));
+                }
+
+                if (m_permission & write)
+                {
+                    permissions.push_back(U('w'));
                 }
 
                 if (m_permission & update)
@@ -1961,6 +2138,10 @@ namespace azure { namespace storage {
 
                 case U('p'):
                     m_permission |= process;
+                    break;
+
+                case U('c'):
+                    m_permission |= create;
                     break;
                 }
             }
@@ -2029,13 +2210,49 @@ namespace azure { namespace storage {
             return m_expiry.is_initialized() && (m_permission != none);
         }
 
+        /// <summary>
+        /// Sets the allowed protocols for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <param name="value">The allowed protocols for the shared access policy.</param>
+        void set_protocol(protocols value)
+        {
+            m_protocol = value;
+        }
+
+        /// <summary>
+        /// Gets the allowed protocols for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <returns>The allowed protocols for the shared access policy.</returns>
+        protocols protocol() const
+        {
+            return m_protocol;
+        }
+
+        /// <summary>
+        /// Sets the allowed IP address or IP address range for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <param name="value">The allowed IP address or IP address range for the shared access policy.</param>
+        void set_address_or_range(ip_address_or_range value)
+        {
+            m_ip_address_or_range = std::move(value);
+        }
+
+        /// <summary>
+        /// Gets the allowed IP address or IP address range for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <returns>The allowed IP address or IP address range for the shared access policy.</returns>
+        const ip_address_or_range &address_or_range() const
+        {
+            return m_ip_address_or_range;
+        }
+
     protected:
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
         /// </summary>
         shared_access_policy()
-            : m_permission(none)
+            : m_permission(none), m_protocol(protocols::https_or_http)
         {
         }
 
@@ -2045,7 +2262,7 @@ namespace azure { namespace storage {
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
         shared_access_policy(utility::datetime expiry, uint8_t permission)
-            : m_permission(permission), m_expiry(expiry)
+            : m_permission(permission), m_expiry(expiry), m_protocol(protocols::https_or_http)
         {
         }
 
@@ -2056,7 +2273,34 @@ namespace azure { namespace storage {
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
         shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission)
-            : m_permission(permission), m_start(start), m_expiry(expiry)
+            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocols::https_or_http)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
+        /// </summary>
+        /// <param name="start">The start date and time for the shared access policy.</param>
+        /// <param name="expiry">The expiration date and time for the shared access policy.</param>
+        /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
+        /// <param name="protocol">The allowed protocols for a shared access signature associated with this shared access policy.</param>
+        /// <param name="address">The allowed IP address for a shared access signature associated with this shared access policy.</param>
+        shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t address)
+            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(address)))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
+        /// </summary>
+        /// <param name="start">The start date and time for the shared access policy.</param>
+        /// <param name="expiry">The expiration date and time for the shared access policy.</param>
+        /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
+        /// <param name="protocol">The allowed protocols for the shared access policy.</param>
+        /// <param name="minimum_address">The minimum allowed address for an IP range for the shared access policy.</param>
+        /// <param name="maximum_address">The maximum allowed address for an IP range for the shared access policy.</param>
+        shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t minimum_address, utility::string_t maximum_address)
+            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(minimum_address), std::move(maximum_address)))
         {
         }
 
@@ -2064,11 +2308,13 @@ namespace azure { namespace storage {
 
         enum permissions
         {
-            none = 0, read = 1, write = 2, del = 4, list = 8, add = 0x10, update = 0x20, process = 0x40
+            none = 0, read = 1, write = 2, del = 4, list = 8, add = 0x10, update = 0x20, process = 0x40, create = 0x80
         };
 
         utility::datetime m_start;
         utility::datetime m_expiry;
+        protocols m_protocol;
+        ip_address_or_range m_ip_address_or_range;
         uint8_t m_permission;
     };
 

@@ -48,21 +48,23 @@ namespace azure { namespace storage {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
+        bool needs_md5 = modified_options.use_transactional_md5();
+
         protocol::block_list_writer writer;
         concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(writer.write(block_list)));
 
         auto properties = m_properties;
         
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::put_block_list, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
         });
-        return core::istream_descriptor::create(stream).then([command, context, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(stream, needs_md5).then([command, properties, this, context, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<void>
         {
+            command->set_build_request(std::bind(protocol::put_block_list, *properties, metadata(), request_body.content_md5(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });

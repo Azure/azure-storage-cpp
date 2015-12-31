@@ -368,7 +368,11 @@ namespace azure { namespace storage {  namespace core {
 #endif
     }
 
+#ifdef WIN32
     class delay_event
+#else
+    class delay_event : public std::enable_shared_from_this<delay_event>
+#endif
     {
     public:
 #ifdef WIN32
@@ -394,7 +398,7 @@ namespace azure { namespace storage {  namespace core {
 
         void start()
         {
-            m_timer.async_wait(std::bind(&delay_event::timer_fired, this, std::placeholders::_1));
+            m_timer.async_wait(std::bind(&delay_event::timer_fired, shared_from_this(), std::placeholders::_1));
         }
 #endif
         pplx::task<void> create_task()
@@ -425,13 +429,22 @@ namespace azure { namespace storage {  namespace core {
 
     pplx::task<void> complete_after(std::chrono::milliseconds timeout)
     {
+#ifdef WIN32
         delay_event* event = new delay_event(timeout);
+#else
+        auto event = std::make_shared<delay_event>(timeout);
+#endif
         event->start();
 
+#ifdef WIN32
         return event->create_task().then([event]()
         {
             delete event;
         });
+#else
+        return event->create_task();
+#endif
+
     }
 
 }}} // namespace azure::storage::core

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "core.h"
+#include "common.h"
 
 namespace azure { namespace storage {
 
@@ -27,6 +28,7 @@ namespace azure { namespace storage {
     class blob_request_options;
     class queue_request_options;
     class table_request_options;
+    class account_shared_access_policy;
 
     /// <summary>
     /// Represents a Windows Azure storage account.
@@ -228,6 +230,13 @@ namespace azure { namespace storage {
             return m_initialized;
         }
 
+        /// <summary>
+        /// Returns a shared access signature for the account.
+        /// </summary>
+        /// <param name="policy">The access policy for the shared access signature.</param>
+        /// <returns>A string containing a shared access signature.</returns>
+        WASTORAGE_API utility::string_t get_shared_access_signature(const account_shared_access_policy& policy) const;
+
     private:
 
         WASTORAGE_API void initialize_default_endpoints(bool use_https);
@@ -247,4 +256,277 @@ namespace azure { namespace storage {
         std::map<utility::string_t, utility::string_t> m_settings;
     };
 
+    /// <summary>
+    /// Represents a shared access policy for an account, which specifies the start time, expiry time,
+    /// permissions, singed service, signed resource type, signed protocol, and signed IP addresses for a shared access signature.
+    /// </summary>
+    class account_shared_access_policy : public shared_access_policy
+    {
+    public:
+
+        /// <summary>
+        /// An enumeration describing permissions that may be used for a shared access signature.
+        /// </summary>
+        enum permissions
+        {
+            /// <summary>
+            /// No shared access granted.
+            /// </summary>
+            none = 0,
+
+            /// <summary>
+            /// Permission to read resources and list queues and tables granted.
+            /// </summary>
+            read = 1,
+
+            /// <summary>
+            /// Permission to write resources granted.
+            /// </summary>
+            write = 2,
+
+            /// <summary>
+            /// Permission to delete resources granted.
+            /// </summary>
+            del = 4,
+
+            /// <summary>
+            /// Permission to list blob containers, blobs, shares, directories, and files granted.
+            /// </summary>
+            list = 8,
+
+            /// <summary>
+            /// Permission to add messages, table entities, blobs, and files granted.
+            /// </summary>
+            add = 0x10,
+
+            /// <summary>
+            /// Permissions to update messages and table entities granted.
+            /// </summary>
+            update = 0x20,
+
+            /// <summary>
+            /// Permission to get and delete messages granted.
+            /// </summary>
+            process = 0x40,
+
+            /// <summary>
+            /// Permission to create containers, blobs, shares, directories, and files granted.
+            /// </summary>
+            create = 0x80
+        };
+
+        /// <summary>
+        /// Specifies the set of possible signed services for a shared access account policy.
+        /// </summary>
+        enum service_types
+        {
+            /// <summary>
+            /// Permission to access blob resources granted.
+            /// </summary>
+            blob = 0x1,
+
+            /// <summary>
+            /// Permission to access queue resources granted.
+            /// </summary>
+            queue = 0x2,
+
+            /// <summary>
+            /// Permission to access table resources granted.
+            /// </summary>
+            table = 0x4,
+
+            /// <summary>
+            /// Permission to access file resources granted.
+            /// </summary>
+            file = 0x8
+        };
+
+        /// <summary>
+        /// Get a canonical string representation of the services for a shared access policy.
+        /// </summary>
+        utility::string_t service_types_to_string() const
+        {
+            utility::string_t services;
+            if (m_service_type & blob)
+            {
+                services.push_back(U('b'));
+            }
+
+            if (m_service_type & queue)
+            {
+                services.push_back(U('q'));
+            }
+
+            if (m_service_type & table)
+            {
+                services.push_back(U('t'));
+            }
+
+            if (m_service_type & file)
+            {
+                services.push_back(U('f'));
+            }
+
+            return services;
+        }
+
+        /// <summary>
+        /// Specifies the set of possible signed resource types for a shared access account policy.
+        /// </summary>
+        enum resource_types
+        {
+            /// <summary>
+            /// Permission to access service level APIs granted.
+            /// </summary>
+            service = 0x1,
+
+            /// <summary>
+            /// Permission to access container level APIs (Blob Containers, Tables, Queues, File Shares) granted.
+            /// </summary>
+            container = 0x2,
+
+            /// <summary>
+            /// Permission to access object level APIs (Blobs, Table Entities, Queue Messages, Files) granted
+            /// </summary>
+            object = 0x4
+        };
+
+        /// <summary>
+        /// Get a canonical string representation of the resource types for a shared access policy.
+        /// </summary>
+        utility::string_t resource_types_to_string() const
+        {
+            utility::string_t resource_types;
+            if (m_resource_type & service)
+            {
+                resource_types.push_back(U('s'));
+            }
+
+            if (m_resource_type & container)
+            {
+                resource_types.push_back(U('c'));
+            }
+
+            if (m_resource_type & object)
+            {
+                resource_types.push_back(U('o'));
+            }
+
+            return resource_types;
+        }
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_shared_access_policy" /> class.
+        /// </summary>
+        account_shared_access_policy()
+            : shared_access_policy()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_shared_access_policy" /> class.
+        /// </summary>
+        /// <param name="service">The services (blob, file, queue, table) for the shared access policy.</param>
+        /// <param name="resource">The resource type for the shared access policy.</param>
+        account_shared_access_policy(service_types service, resource_types resource)
+            : shared_access_policy(), m_service_type(service), m_resource_type(resource)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_shared_access_policy" /> class.
+        /// </summary>
+        /// <param name="expiry">The expiration date and time of the policy.</param>
+        /// <param name="permission">A mask containing the permissions of the policy</param>
+        /// <param name="service">The services (blob, file, queue, table) for the shared access policy.</param>
+        /// <param name="resource">The resource type for the shared access policy.</param>
+        account_shared_access_policy(utility::datetime expiry, uint8_t permission, service_types service, resource_types resource)
+            : shared_access_policy(expiry, permission), m_service_type(service), m_resource_type(resource)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_shared_access_policy" /> class.
+        /// </summary>
+        /// <param name="start">The start date and time of the policy.</param>
+        /// <param name="expiry">The expiration date and time of the policy.</param>
+        /// <param name="permission">A mask containing the permissions of the policy</param>
+        /// <param name="service">The services (blob, file, queue, table) for the shared access policy.</param>
+        /// <param name="resource">The resource type for the shared access policy.</param>
+        account_shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, service_types service, resource_types resource)
+            : shared_access_policy(start, expiry, permission), m_service_type(service), m_resource_type(resource)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_shared_access_policy" /> class.
+        /// </summary>
+        /// <param name="start">The start date and time of the policy.</param>
+        /// <param name="expiry">The expiration date and time of the policy.</param>
+        /// <param name="permission">A mask containing the permissions of the policy</param>
+        /// <param name="protocol">The allowed protocols for the shared access policy.</param>
+        /// <param name="address">The allowed IP address for a shared access signature associated with this shared access policy.</param>
+        /// <param name="service">The services (blob, file, queue, table) for the shared access policy.</param>
+        /// <param name="resource">The resource type for the shared access policy.</param>
+        account_shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t address, service_types service, resource_types resource)
+            : shared_access_policy(start, expiry, permission, protocol, std::move(address)), m_service_type(service), m_resource_type(resource)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_shared_access_policy" /> class.
+        /// </summary>
+        /// <param name="start">The start date and time of the policy.</param>
+        /// <param name="expiry">The expiration date and time of the policy.</param>
+        /// <param name="permission">A mask containing the permissions of the policy</param>
+        /// <param name="protocol">The allowed protocols for the shared access policy.</param>
+        /// <param name="minimum_address">The minimum allowed address for an IP range for the shared access policy.</param>
+        /// <param name="maximum_address">The maximum allowed address for an IP range for the shared access policy.</param>
+        /// <param name="service">The services (blob, file, queue, table) for the shared access policy.</param>
+        /// <param name="resource">The resource type for the shared access policy.</param>
+        account_shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t minimum_address, utility::string_t maximum_address, service_types service, resource_types resource)
+            : shared_access_policy(start, expiry, permission, protocol, std::move(minimum_address), std::move(maximum_address)), m_service_type(service), m_resource_type(resource)
+        {
+        }
+
+        /// <summary>
+        /// Sets the services (blob, file, queue, table) for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <param name="value">The services for the shared access policy.</param>
+        void set_service_type(service_types value)
+        {
+            m_service_type = value;
+        }
+        
+        /// <summary>
+        /// Gets the services (blob, file, queue, table) for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <returns>The services for the shared access policy.</returns>
+        service_types service_type()
+        {
+            return m_service_type;
+        }
+
+        /// <summary>
+        /// Sets the resource type for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <param name="value">The resource type for the shared access policy.</param>
+        void set_resource_type(resource_types value)
+        {
+            m_resource_type = value;
+        }
+
+        /// <summary>
+        /// Gets the resource type for a shared access signature associated with this shared access policy.
+        /// </summary>
+        /// <returns>The resource type for the shared access policy.</returns>
+        resource_types resource_type()
+        {
+            return m_resource_type;
+        }
+
+    private:
+        service_types m_service_type;
+        resource_types m_resource_type;
+    };
 }} // namespace azure::storage

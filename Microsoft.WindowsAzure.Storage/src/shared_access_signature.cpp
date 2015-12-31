@@ -21,6 +21,7 @@
 #include "was/blob.h"
 #include "was/queue.h"
 #include "was/table.h"
+#include "was/storage_account.h"
 #include "wascore/logging.h"
 #include "wascore/util.h"
 #include "wascore/resources.h"
@@ -60,6 +61,8 @@ namespace azure { namespace storage { namespace protocol {
         add_query_if_not_empty(builder, uri_query_sas_version, header_value_storage_version, /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_identifier, identifier, /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_signature, signature, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_ip, policy.address_or_range().to_string(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_protocol, policy.protocols_to_string(), /* do_encoding */ true);
 
         if (policy.is_valid())
         {
@@ -78,6 +81,8 @@ namespace azure { namespace storage { namespace protocol {
         str << convert_datetime_if_initialized(policy.expiry()) << U('\n');
         str << resource << U('\n');
         str << identifier << U('\n');
+        str << policy.address_or_range().to_string() << U('\n');
+        str << policy.protocols_to_string() << U('\n');
         str << header_value_storage_version;
     }
 
@@ -140,6 +145,8 @@ namespace azure { namespace storage { namespace protocol {
         ////                     signedexpiry + "\n" +
         ////                     canonicalizedresource + "\n" +
         ////                     signedidentifier + "\n" +
+        ////                     signedIP + "\n" +
+        ////                     signedProtocol + "\n" +
         ////                     signedversion + "\n" +
         ////                     cachecontrol + "\n" +
         ////                     contentdisposition + "\n" +
@@ -191,6 +198,8 @@ namespace azure { namespace storage { namespace protocol {
         ////                     signedexpiry + "\n" +
         ////                     canonicalizedresource + "\n" +
         ////                     signedidentifier + "\n" +
+        ////                     signedIP + "\n" +
+        ////                     signedProtocol + "\n" +
         ////                     signedversion
         ////
         //// HMAC-SHA256(UTF8.Encode(StringToSign))
@@ -223,6 +232,8 @@ namespace azure { namespace storage { namespace protocol {
         ////                     signedexpiry + "\n" +
         ////                     canonicalizedresource + "\n" +
         ////                     signedidentifier + "\n" +
+        ////                     signedIP + "\n" +
+        ////                     signedProtocol + "\n" +
         ////                     signedversion + "\n" +
         ////                     startpk + "\n" +
         ////                     startrk + "\n" +
@@ -255,6 +266,68 @@ namespace azure { namespace storage { namespace protocol {
         add_query_if_not_empty(builder, uri_query_sas_end_partition_key, end_partition_key, /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_end_row_key, end_row_key, /* do_encoding */ true);
 
+        return builder.query();
+    }
+
+#pragma endregion
+
+#pragma region Account SAS Helpers
+
+    utility::string_t get_account_sas_string_to_sign(const utility::string_t& identifier, const account_shared_access_policy& policy, const storage_credentials& credentials)
+    {
+        UNREFERENCED_PARAMETER(identifier);
+
+        //// StringToSign =      accountname +"\n"
+        ////                     signedpermissions + "\n" +
+        ////                     signedservice + "\n" +
+        ////                     signedresourcetype + "\n" +
+        ////                     signedstart + "\n" +
+        ////                     signedexpiry + "\n" +
+        ////                     signedIP + "\n" +
+        ////                     signedProtocol + "\n" +
+        ////                     signedversion + "\n"
+        ////
+        //// HMAC-SHA256(UTF8.Encode(StringToSign))
+
+        utility::ostringstream_t str;
+        str << credentials.account_name() << U('\n');
+        str << policy.permissions_to_string() << U('\n');
+        str << policy.service_types_to_string() << U('\n');
+        str << policy.resource_types_to_string() << U('\n');
+        str << convert_datetime_if_initialized(policy.start()) << U('\n');
+        str << convert_datetime_if_initialized(policy.expiry()) << U('\n');
+        str << policy.address_or_range().to_string() << U('\n');
+        str << policy.protocols_to_string() << U('\n');
+        str << header_value_storage_version << U('\n');
+
+        auto string_to_sign = str.str();
+        log_sas_string_to_sign(string_to_sign);
+
+        return calculate_hmac_sha256_hash(string_to_sign, credentials);
+    }
+
+    utility::string_t get_account_sas_token(const utility::string_t& identifier, const account_shared_access_policy& policy, const storage_credentials& credentials)
+    {
+        UNREFERENCED_PARAMETER(identifier);
+
+        auto signature = get_account_sas_string_to_sign(identifier, policy, credentials);
+        
+        web::http::uri_builder builder;
+
+        add_query_if_not_empty(builder, uri_query_sas_version, header_value_storage_version, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_signature, signature, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_services, policy.service_types_to_string(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_resource_types, policy.resource_types_to_string(), /* do_encoding */ true);
+
+        if (policy.is_valid())
+        {
+            add_query_if_not_empty(builder, uri_query_sas_start, convert_datetime_if_initialized(policy.start()), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_expiry, convert_datetime_if_initialized(policy.expiry()), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_permissions, policy.permissions_to_string(), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_ip, policy.address_or_range().to_string(), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_protocol, policy.protocols_to_string(), /* do_encoding */ true);
+        }
+        
         return builder.query();
     }
 

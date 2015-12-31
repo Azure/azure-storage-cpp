@@ -1,6 +1,10 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
 
+Breaking Changes in v2.2:
+- Upgraded Casablanca dependency to 2.7.0
+- Added Microsoft Visual C++ compiler version to user agent string if MSVC is used to compile.
+
 Breaking Changes in v2.1:
 - Upgraded Casablanca dependency to 2.6.0
 - Added support for Visual Studio 2015, dropped support for Visual Studio 2012

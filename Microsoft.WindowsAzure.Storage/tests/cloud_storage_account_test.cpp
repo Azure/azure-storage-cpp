@@ -63,6 +63,277 @@ void check_string_roundtrip(const utility::string_t& connection_string)
     check_account_equal(account, account2);
 }
 
+void check_account_sas_permission_blob(azure::storage::cloud_storage_account account, azure::storage::account_shared_access_policy policy)
+{
+    if ((policy.service_type() & azure::storage::account_shared_access_policy::service_types::blob) != azure::storage::account_shared_access_policy::service_types::blob)
+    {
+        return;
+    }
+
+    auto sas_token = account.get_shared_access_signature(policy);
+    azure::storage::storage_credentials sas_cred(sas_token);
+    azure::storage::cloud_blob_client sas_blob_client(account.blob_endpoint(), sas_cred);
+    auto blob_client = account.create_cloud_blob_client();
+
+    auto container_name = U("c") + test_base::get_random_string();
+    auto container = blob_client.get_container_reference(container_name);
+    auto sas_container = sas_blob_client.get_container_reference(container_name);
+    auto blob_name = U("b") + test_base::get_random_string();
+    auto blob = container.get_page_blob_reference(blob_name);
+    auto sas_blob = sas_container.get_page_blob_reference(blob_name);
+
+    auto permission = policy.permission();
+    if ((((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
+        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write))
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
+    {
+        sas_container.create();
+    }
+    else
+    {
+        CHECK_THROW(sas_container.create(), azure::storage::storage_exception);
+        container.create();
+    }
+    CHECK(container.exists());
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::list) == azure::storage::account_shared_access_policy::permissions::list)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::service) == azure::storage::account_shared_access_policy::resource_types::service))
+    {
+        CHECK_UTF8_EQUAL(container_name, sas_blob_client.list_containers(container_name)->name());
+    }
+    else
+    {
+        CHECK_THROW(sas_blob_client.list_containers(container_name), azure::storage::storage_exception);
+    }
+
+    size_t text_size = 512;
+    if ((((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
+        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write))
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_blob.create(text_size);
+    }
+    else
+    {
+        CHECK_THROW(sas_blob.create(text_size), azure::storage::storage_exception);
+        blob.create(text_size);
+    }
+    CHECK(blob.exists());
+
+    utility::string_t text = test_base::get_random_string(text_size);
+    auto utf8_body = utility::conversions::to_utf8string(text);
+    if (((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_blob.upload_pages(concurrency::streams::bytestream::open_istream(utf8_body), 0, utility::string_t());
+    }
+    else
+    {
+        CHECK_THROW(sas_blob.upload_pages(concurrency::streams::bytestream::open_istream(utf8_body), 0, utility::string_t()), azure::storage::storage_exception);
+        blob.upload_pages(concurrency::streams::bytestream::open_istream(utf8_body), 0, utility::string_t());
+    }
+
+    concurrency::streams::container_buffer<std::vector<uint8_t>> buffer;
+    if (((permission & azure::storage::account_shared_access_policy::permissions::read) == azure::storage::account_shared_access_policy::permissions::read)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_blob.download_to_stream(buffer.create_ostream());
+        std::string actual(reinterpret_cast<char*>(buffer.collection().data()), static_cast<unsigned int>(buffer.size()));
+        CHECK_UTF8_EQUAL(text, actual);
+    }
+    else
+    {
+        CHECK_THROW(sas_blob.download_to_stream(buffer.create_ostream()), azure::storage::storage_exception);
+    }
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::del) == azure::storage::account_shared_access_policy::permissions::del)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_blob.delete_blob();
+    }
+    else
+    {
+        CHECK_THROW(sas_blob.delete_blob(), azure::storage::storage_exception);
+        blob.delete_blob();
+    }
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::del) == azure::storage::account_shared_access_policy::permissions::del)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
+    {
+        sas_container.delete_container();
+    }
+    else
+    {
+        CHECK_THROW(sas_container.delete_container(), azure::storage::storage_exception);
+        container.delete_container();
+    }
+}
+
+void check_account_sas_permission_queue(azure::storage::cloud_storage_account account, azure::storage::account_shared_access_policy policy)
+{
+    if ((policy.service_type() & azure::storage::account_shared_access_policy::service_types::queue) != azure::storage::account_shared_access_policy::service_types::queue)
+    {
+        return;
+    }
+
+    auto sas_token = account.get_shared_access_signature(policy);
+    azure::storage::storage_credentials sas_cred(sas_token);
+    azure::storage::cloud_queue_client sas_queue_client(account.queue_endpoint(), sas_cred);
+    auto queue_client = account.create_cloud_queue_client();
+
+    auto queue_name = U("q") + test_base::get_random_string();
+    auto queue = queue_client.get_queue_reference(queue_name);
+    auto sas_queue = sas_queue_client.get_queue_reference(queue_name);
+
+    auto permission = policy.permission();
+    if (((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
+        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
+    {
+        sas_queue.create();
+    }
+    else
+    {
+        CHECK_THROW(sas_queue.create(), azure::storage::storage_exception);
+        queue.create();
+    }
+    CHECK(queue.exists());
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::list) == azure::storage::account_shared_access_policy::permissions::list)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::service) == azure::storage::account_shared_access_policy::resource_types::service))
+    {
+        CHECK_UTF8_EQUAL(queue_name, sas_queue_client.list_queues(queue_name)->name());
+    }
+    else
+    {
+        CHECK_THROW(sas_queue_client.list_queues(queue_name), azure::storage::storage_exception);
+    }
+
+    utility::string_t text(U("hello, world"));
+    azure::storage::cloud_queue_message message(text);
+    if (((permission & azure::storage::account_shared_access_policy::permissions::add) == azure::storage::account_shared_access_policy::permissions::add)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_queue.add_message(message);
+    }
+    else
+    {
+        CHECK_THROW(sas_queue.add_message(message), azure::storage::storage_exception);
+        queue.add_message(message);
+    }
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::process) == azure::storage::account_shared_access_policy::permissions::process)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        CHECK_UTF8_EQUAL(text, sas_queue.get_message().content_as_string());
+    }
+    else
+    {
+        CHECK_THROW(sas_queue.get_message(), azure::storage::storage_exception);
+    }
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::del) == azure::storage::account_shared_access_policy::permissions::del)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_queue.clear();
+    }
+    else
+    {
+        CHECK_THROW(sas_queue.clear(), azure::storage::storage_exception);
+        queue.clear();
+    }
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::del) == azure::storage::account_shared_access_policy::permissions::del)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
+    {
+        sas_queue.delete_queue();
+    }
+    else
+    {
+        CHECK_THROW(sas_queue.delete_queue(), azure::storage::storage_exception);
+        queue.delete_queue();
+    }
+}
+
+void check_account_sas_permission_table(azure::storage::cloud_storage_account account, azure::storage::account_shared_access_policy policy)
+{
+    if ((policy.service_type() & azure::storage::account_shared_access_policy::service_types::table) != azure::storage::account_shared_access_policy::service_types::table)
+    {
+        return;
+    }
+
+    auto sas_token = account.get_shared_access_signature(policy);
+    azure::storage::storage_credentials sas_cred(sas_token);
+    azure::storage::cloud_table_client sas_table_client(account.table_endpoint(), sas_cred);
+    auto table_client = account.create_cloud_table_client();
+
+    auto table_name = U("t") + test_base::get_random_string();
+    auto table = table_client.get_table_reference(table_name);
+    auto sas_table = sas_table_client.get_table_reference(table_name);
+
+    auto permission = policy.permission();
+    if (((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
+        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
+    {
+        sas_table.create();
+    }
+    else
+    {
+        CHECK_THROW(sas_table.create(), azure::storage::storage_exception);
+        table.create();
+    }
+    CHECK(table.exists());
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::list) == azure::storage::account_shared_access_policy::permissions::list)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
+    {
+        CHECK_UTF8_EQUAL(table_name, sas_table_client.list_tables(table_name)->name());
+    }
+    else
+    {
+        CHECK_THROW(sas_table_client.list_tables(table_name), azure::storage::storage_exception);
+    }
+
+    auto op = azure::storage::table_operation::insert_entity(azure::storage::table_entity(U("pk"), U("rk")));
+    if (((permission & azure::storage::account_shared_access_policy::permissions::add) == azure::storage::account_shared_access_policy::permissions::add)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_table.execute(op);
+    }
+    else
+    {
+        CHECK_THROW(sas_table.execute(op), azure::storage::storage_exception);
+        table.execute(op);
+    }
+
+    azure::storage::table_query q;
+    q.set_filter_string(azure::storage::table_query::combine_filter_conditions(azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, U("pk")),
+        azure::storage::query_logical_operator::op_and,
+        azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::equal, U("rk"))));
+    if (((permission & azure::storage::account_shared_access_policy::permissions::read) == azure::storage::account_shared_access_policy::permissions::read)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
+    {
+        sas_table.execute_query(q);
+    }
+    else
+    {
+        CHECK_THROW(sas_table.execute_query(q), azure::storage::storage_exception);
+        table.execute_query(q);
+    }
+
+    if (((permission & azure::storage::account_shared_access_policy::permissions::del) == azure::storage::account_shared_access_policy::permissions::del)
+        && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
+    {
+        sas_table.delete_table();
+    }
+    else
+    {
+        CHECK_THROW(sas_table.delete_table(), azure::storage::storage_exception);
+        table.delete_table();
+    }
+}
+
 SUITE(Core)
 {
     TEST_FIXTURE(test_base, storage_credentials_anonymous)
@@ -412,5 +683,160 @@ SUITE(Core)
         CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10000/devstoreaccount1-secondary"), account.blob_endpoint().secondary_uri().to_string());
         CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10001/devstoreaccount1-secondary"), account.queue_endpoint().secondary_uri().to_string());
         CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10002/devstoreaccount1-secondary"), account.table_endpoint().secondary_uri().to_string());
+    }
+
+    TEST_FIXTURE(test_base, account_sas_permission)
+    {
+        auto account = test_config::instance().account();
+
+        azure::storage::account_shared_access_policy policy;
+        policy.set_start(utility::datetime::utc_now());
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
+        policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
+        policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
+
+        for (int i = 1; i < 0x100; i++)
+        {
+            policy.set_permissions((uint8_t)i);
+            check_account_sas_permission_blob(account, policy);
+            //Currently account SAS is supported only for the Blob and File services. It will be supported for the Table and Queue services in the near future.
+            //check_account_sas_permission_queue(account, policy);
+            //check_account_sas_permission_table(account, policy);
+        }
+    }
+
+    TEST_FIXTURE(test_base, account_sas_service_types)
+    {
+        auto account = test_config::instance().account();
+
+        azure::storage::account_shared_access_policy policy;
+        policy.set_start(utility::datetime::utc_now());
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
+        policy.set_permissions(0xFF);
+        policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
+
+        for (int i = 1; i < 0x10; i++)
+        {
+            policy.set_service_type((azure::storage::account_shared_access_policy::service_types)i);
+            check_account_sas_permission_blob(account, policy);
+            //Currently account SAS is supported only for the Blob and File services. It will be supported for the Table and Queue services in the near future.
+            //check_account_sas_permission_queue(account, policy);
+            //check_account_sas_permission_table(account, policy);
+        }
+    }
+
+    TEST_FIXTURE(test_base, account_sas_resource_types)
+    {
+        auto account = test_config::instance().account();
+
+        azure::storage::account_shared_access_policy policy;
+        policy.set_start(utility::datetime::utc_now());
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
+        policy.set_permissions(0xFF);
+        policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
+        
+        for (int i = 1; i < 0x8; i++)
+        {
+            policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)i);
+            check_account_sas_permission_blob(account, policy);
+            //Currently account SAS is supported only for the Blob and File services. It will be supported for the Table and Queue services in the near future.
+            //check_account_sas_permission_queue(account, policy);
+            //check_account_sas_permission_table(account, policy);
+        }
+    }
+
+    TEST_FIXTURE(test_base, account_sas_expiry)
+    {
+        auto account = test_config::instance().account();
+
+        azure::storage::account_shared_access_policy policy;
+        policy.set_start(utility::datetime::utc_now());
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_seconds(10));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
+        policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
+        policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
+        policy.set_permissions(0xFF);
+
+        auto sas_token = account.get_shared_access_signature(policy);
+        azure::storage::storage_credentials sas_cred(sas_token);
+        azure::storage::cloud_blob_client sas_blob_client(account.blob_endpoint(), sas_cred);
+        sas_blob_client.list_containers(U("prefix"));
+
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        CHECK_THROW(sas_blob_client.list_containers(U("prefix")), azure::storage::storage_exception);
+    }
+
+    TEST_FIXTURE(test_base, account_sas_protocol)
+    {
+        auto account = test_config::instance().account();
+        auto blob_host = account.blob_endpoint().primary_uri().host();
+        web::uri_builder blob_endpoint;
+        blob_endpoint.set_scheme(U("http"));
+        blob_endpoint.set_host(blob_host);
+        
+        azure::storage::account_shared_access_policy policy;
+        policy.set_start(utility::datetime::utc_now());
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_seconds(60));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
+        policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
+        policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
+        policy.set_permissions(0xFF);
+
+        auto sas_token = account.get_shared_access_signature(policy);
+        azure::storage::storage_credentials sas_cred(sas_token);
+        azure::storage::cloud_blob_client sas_blob_client(blob_endpoint.to_uri(), sas_cred);
+        sas_blob_client.list_containers(U("prefix"));
+
+        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_only);
+        auto sas_token_https = account.get_shared_access_signature(policy);
+        azure::storage::storage_credentials sas_cred_https(sas_token_https);
+        azure::storage::cloud_blob_client sas_blob_client_https(blob_endpoint.to_uri(), sas_cred_https);
+        CHECK_THROW(sas_blob_client_https.list_containers(U("prefix")), azure::storage::storage_exception);
+    }
+
+    TEST_FIXTURE(test_base, account_sas_address)
+    {
+        auto account = test_config::instance().account();
+
+        azure::storage::account_shared_access_policy policy;
+        policy.set_start(utility::datetime::utc_now());
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_seconds(60));
+        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
+        policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
+        policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
+        policy.set_permissions(0xFF);
+
+        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("256.256.255.255"))), std::invalid_argument);
+        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("::1"))), std::invalid_argument);
+        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("ipv4.fiddler"))), std::invalid_argument);
+        
+        utility::string_t min_addr(U("0.0.0.0"));
+        utility::string_t max_addr(U("255.0.0.0"));
+        utility::string_t expected_range = min_addr + U("-") + max_addr;
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(min_addr, max_addr));
+        CHECK_UTF8_EQUAL(expected_range, policy.address_or_range().to_string());
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(max_addr, min_addr));
+        CHECK_UTF8_EQUAL(expected_range, policy.address_or_range().to_string());
+
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("255.255.255.255")));
+        auto sas_token = account.get_shared_access_signature(policy);
+        azure::storage::storage_credentials sas_cred(sas_token);
+        azure::storage::cloud_blob_client sas_blob_client(account.blob_endpoint(), sas_cred);
+        azure::storage::operation_context op;
+        CHECK_THROW(sas_blob_client.list_containers(U("prefix"), azure::storage::container_listing_details::none, 0, azure::storage::blob_request_options(), op), azure::storage::storage_exception);
+        auto error_details = op.request_results().back().extended_error().details();
+        auto source_ip = error_details[U("SourceIP")];
+
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(source_ip));
+        sas_token = account.get_shared_access_signature(policy);
+        azure::storage::cloud_blob_client(account.blob_endpoint(), azure::storage::storage_credentials(sas_token)).list_containers(U("prefix"));
     }
 }

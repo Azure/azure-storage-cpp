@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (2.1.0)
+# Azure Storage Client Library for C++ (2.2.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -61,7 +61,7 @@ Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visua
 
 ### C++ REST SDK
 
-The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.6.0. It can be installed through [NuGet](http://www.nuget.org/packages/cpprestsdk/2.6.0) or downloaded directly from [CodePlex](http://casablanca.codeplex.com/releases/view/612765).
+The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.7.0. It can be installed through [NuGet](http://www.nuget.org/packages/cpprestsdk/2.7.0) or downloaded directly from [GitHub](https://github.com/Microsoft/cpprestsdk/releases/tag/v2.7.0).
 
 ## Code Samples
 
@@ -73,7 +73,7 @@ To get started with the coding, please visit the following articles:
 To accomplish specific tasks, please find the code samples at [samples folder](https://github.com/Azure/azure-storage-cpp/tree/master/Microsoft.WindowsAzure.Storage).
 
 ## Getting Started on Linux
-As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://casablanca.codeplex.com/wikipage?title=Setup%20and%20Build%20on%20Linux&referringTitle=Documentation) to compile it. Current version of the library depends on Casablanca version 2.6.0.
+As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux) to compile it. Current version of the library depends on Casablanca version 2.7.0.
 
 Once this is complete, then:
 
@@ -94,9 +94,9 @@ cd build.release
 CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
-In the above command, replace `<path to Casablanca>` to point to your local installation of Casablanca. For example, if the file `libcpprest.so` exists at location `~/Github/Casablanca/casablanca/Release/build.release/Binaries/libcpprest.so`, then your `cmake` command should be:
+In the above command, replace `<path to Casablanca>` to point to your local installation of Casablanca. For example, if the file `libcpprest.so` exists at location `~/Github/Casablanca/cpprestsdk/Release/build.release/Binaries/libcpprest.so`, then your `cmake` command should be:
 ```bash
-CASABLANCA_DIR=~/Github/Casablanca/casablanca CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
 
@@ -107,7 +107,7 @@ sudo apt-get install libunittest++-dev
 ```
 - Build the test code:
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 make
 ```
 - Run unit tests
@@ -119,7 +119,7 @@ vi test_configurations.json # modify test config file to include your storage ac
 
 To build sample code:
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
 To run the samples:

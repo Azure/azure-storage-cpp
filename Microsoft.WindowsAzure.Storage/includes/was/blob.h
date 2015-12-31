@@ -127,6 +127,16 @@ namespace azure { namespace storage {
             /// Permission granted to list the blobs in a container.
             /// </summary>
             list = 8,
+
+            /// <summary>
+            /// Permission to add a block to an append blob granted.
+            /// </summary>
+            add = 0x10,
+
+            /// <summary>
+            /// Permission to write a new blob, snapshot a blob, or copy a blob to a new blob granted.
+            /// </summary>
+            create = 0x80
         };
 
         /// <summary>

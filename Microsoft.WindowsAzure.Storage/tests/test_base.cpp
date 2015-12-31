@@ -118,13 +118,12 @@ utility::string_t test_base::get_random_string(const std::vector<utility::char_t
     return result;
 }
 
-utility::string_t test_base::get_random_string()
+utility::string_t test_base::get_random_string(size_t size)
 {
     initialize_random();
-    const int SIZE = 10;
     utility::string_t result;
-    result.reserve(SIZE);
-    for (int i = 0; i < SIZE; ++i)
+    result.reserve(size);
+    for (size_t i = 0; i < size; ++i)
     {
         result.push_back((utility::char_t) (U('0') + rand() % 10));
     }

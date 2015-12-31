@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['maximum',['maximum',['../classazure_1_1storage_1_1sequence__number.html#ab83b97dcec038c5610df17eb3635c669a65b0e2883c997f2bea5dd11c923b94cf',1,'azure::storage::sequence_number']]],
-  ['metadata',['metadata',['../structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9a1375bd4cf9b921211017e784673a8d2e',1,'azure::storage::blob_listing_details::metadata()'],['../structazure_1_1storage_1_1container__listing__details.html#a0f5198f2b6837897e40e96e07624f9e4a3a3de4ab22133b3482833b79a737f2a7',1,'azure::storage::container_listing_details::metadata()']]]
+  ['https_5fonly',['https_only',['../classazure_1_1storage_1_1shared__access__policy.html#a3d1e6328073292afb65cb557f81fa474ab7499082c5724f00e00d598017e59669',1,'azure::storage::shared_access_policy']]],
+  ['https_5for_5fhttp',['https_or_http',['../classazure_1_1storage_1_1shared__access__policy.html#a3d1e6328073292afb65cb557f81fa474af886f09fab5fc6890c53b8a3dc0cf131',1,'azure::storage::shared_access_policy']]]
 ];

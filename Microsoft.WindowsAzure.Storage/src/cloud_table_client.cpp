@@ -46,7 +46,7 @@ namespace azure { namespace storage {
         // This operation is processed internally and it does not need metadata because all property types are known
         modified_options.set_payload_format(table_payload_format::json_no_metadata);
 
-        cloud_table table = get_table_reference(U("Tables"));
+        cloud_table table = get_table_reference(_XPLATSTR("Tables"));
         table_query query;
 
         if (max_results > 0)
@@ -57,9 +57,9 @@ namespace azure { namespace storage {
         if (!prefix.empty())
         {
             utility::string_t filter_string = table_query::combine_filter_conditions(
-                table_query::generate_filter_condition(U("TableName"), query_comparison_operator::greater_than_or_equal, prefix), 
+                table_query::generate_filter_condition(_XPLATSTR("TableName"), query_comparison_operator::greater_than_or_equal, prefix), 
                 query_logical_operator::op_and, 
-                table_query::generate_filter_condition(U("TableName"), query_comparison_operator::less_than, prefix + U('{')));
+                table_query::generate_filter_condition(_XPLATSTR("TableName"), query_comparison_operator::less_than, prefix + _XPLATSTR('{')));
             query.set_filter_string(filter_string);
         }
 
@@ -76,7 +76,7 @@ namespace azure { namespace storage {
             {
                 table_entity entity = *itr;
 
-                utility::string_t table_name = entity.properties()[U("TableName")].string_value();
+                utility::string_t table_name = entity.properties()[_XPLATSTR("TableName")].string_value();
                 cloud_table current_table = instance->get_table_reference(std::move(table_name));
                 table_results.push_back(std::move(current_table));
             }

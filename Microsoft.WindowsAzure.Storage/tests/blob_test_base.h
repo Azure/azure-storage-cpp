@@ -25,7 +25,7 @@
 #include "test_base.h"
 #include "was/blob.h"
 
-const utility::string_t dummy_md5(U("MDAwMDAwMDA="));
+const utility::string_t dummy_md5(_XPLATSTR("MDAwMDAwMDA="));
 
 class blob_service_test_base : public test_base
 {
@@ -194,7 +194,7 @@ public:
 
     block_blob_test_base()
     {
-        m_blob = m_container.get_block_blob_reference(U("blockblob"));
+        m_blob = m_container.get_block_blob_reference(_XPLATSTR("blockblob"));
     }
 
     ~block_blob_test_base()
@@ -215,7 +215,7 @@ public:
 
     page_blob_test_base()
     {
-        m_blob = m_container.get_page_blob_reference(U("pageblob"));
+        m_blob = m_container.get_page_blob_reference(_XPLATSTR("pageblob"));
     }
 
     ~page_blob_test_base()
@@ -235,7 +235,7 @@ public:
 
     append_blob_test_base()
     {
-        m_blob = m_container.get_append_blob_reference(U("appendblob"));
+        m_blob = m_container.get_append_blob_reference(_XPLATSTR("appendblob"));
     }
 
     ~append_blob_test_base()

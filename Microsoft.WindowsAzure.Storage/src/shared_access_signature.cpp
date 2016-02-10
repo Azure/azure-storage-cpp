@@ -49,8 +49,8 @@ namespace azure { namespace storage { namespace protocol {
         if (core::logger::instance().should_log(context, client_log_level::log_level_verbose))
         {
             utility::string_t with_dots(string_to_sign);
-            std::replace(with_dots.begin(), with_dots.end(), U('\n'), U('.'));
-            core::logger::instance().log(context, client_log_level::log_level_verbose, U("StringToSign: ") + with_dots);
+            std::replace(with_dots.begin(), with_dots.end(), _XPLATSTR('\n'), _XPLATSTR('.'));
+            core::logger::instance().log(context, client_log_level::log_level_verbose, _XPLATSTR("StringToSign: ") + with_dots);
         }
     }
 
@@ -76,13 +76,13 @@ namespace azure { namespace storage { namespace protocol {
 
     void get_sas_string_to_sign(utility::ostringstream_t& str, const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource)
     {
-        str << policy.permissions_to_string() << U('\n');
-        str << convert_datetime_if_initialized(policy.start()) << U('\n');
-        str << convert_datetime_if_initialized(policy.expiry()) << U('\n');
-        str << resource << U('\n');
-        str << identifier << U('\n');
-        str << policy.address_or_range().to_string() << U('\n');
-        str << policy.protocols_to_string() << U('\n');
+        str << policy.permissions_to_string() << _XPLATSTR('\n');
+        str << convert_datetime_if_initialized(policy.start()) << _XPLATSTR('\n');
+        str << convert_datetime_if_initialized(policy.expiry()) << _XPLATSTR('\n');
+        str << resource << _XPLATSTR('\n');
+        str << identifier << _XPLATSTR('\n');
+        str << policy.address_or_range().to_string() << _XPLATSTR('\n');
+        str << policy.protocols_to_string() << _XPLATSTR('\n');
         str << header_value_storage_version;
     }
 
@@ -160,11 +160,11 @@ namespace azure { namespace storage { namespace protocol {
 
         utility::ostringstream_t str;
         get_sas_string_to_sign(str, identifier, policy, resource);
-        str << U('\n') << headers.cache_control();
-        str << U('\n') << headers.content_disposition();
-        str << U('\n') << headers.content_encoding();
-        str << U('\n') << headers.content_language();
-        str << U('\n') << headers.content_type();
+        str << _XPLATSTR('\n') << headers.cache_control();
+        str << _XPLATSTR('\n') << headers.content_disposition();
+        str << _XPLATSTR('\n') << headers.content_encoding();
+        str << _XPLATSTR('\n') << headers.content_language();
+        str << _XPLATSTR('\n') << headers.content_type();
 
         auto string_to_sign = str.str();
         log_sas_string_to_sign(string_to_sign);
@@ -244,10 +244,10 @@ namespace azure { namespace storage { namespace protocol {
 
         utility::ostringstream_t str;
         get_sas_string_to_sign(str, identifier, policy, resource);
-        str << U('\n') << start_partition_key;
-        str << U('\n') << start_row_key;
-        str << U('\n') << end_partition_key;
-        str << U('\n') << end_row_key;
+        str << _XPLATSTR('\n') << start_partition_key;
+        str << _XPLATSTR('\n') << start_row_key;
+        str << _XPLATSTR('\n') << end_partition_key;
+        str << _XPLATSTR('\n') << end_row_key;
 
         auto string_to_sign = str.str();
         log_sas_string_to_sign(string_to_sign);
@@ -290,15 +290,15 @@ namespace azure { namespace storage { namespace protocol {
         //// HMAC-SHA256(UTF8.Encode(StringToSign))
 
         utility::ostringstream_t str;
-        str << credentials.account_name() << U('\n');
-        str << policy.permissions_to_string() << U('\n');
-        str << policy.service_types_to_string() << U('\n');
-        str << policy.resource_types_to_string() << U('\n');
-        str << convert_datetime_if_initialized(policy.start()) << U('\n');
-        str << convert_datetime_if_initialized(policy.expiry()) << U('\n');
-        str << policy.address_or_range().to_string() << U('\n');
-        str << policy.protocols_to_string() << U('\n');
-        str << header_value_storage_version << U('\n');
+        str << credentials.account_name() << _XPLATSTR('\n');
+        str << policy.permissions_to_string() << _XPLATSTR('\n');
+        str << policy.service_types_to_string() << _XPLATSTR('\n');
+        str << policy.resource_types_to_string() << _XPLATSTR('\n');
+        str << convert_datetime_if_initialized(policy.start()) << _XPLATSTR('\n');
+        str << convert_datetime_if_initialized(policy.expiry()) << _XPLATSTR('\n');
+        str << policy.address_or_range().to_string() << _XPLATSTR('\n');
+        str << policy.protocols_to_string() << _XPLATSTR('\n');
+        str << header_value_storage_version << _XPLATSTR('\n');
 
         auto string_to_sign = str.str();
         log_sas_string_to_sign(string_to_sign);

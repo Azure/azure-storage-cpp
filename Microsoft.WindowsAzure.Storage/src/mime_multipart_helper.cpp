@@ -29,7 +29,7 @@ namespace azure { namespace storage {  namespace core {
         boundary_name.reserve(prefix.size() + 37);
 
         boundary_name.append(prefix);
-        boundary_name.push_back(U('_'));
+        boundary_name.push_back(_XPLATSTR('_'));
         boundary_name.append(utility::uuid_to_string(id));
 
         return boundary_name;
@@ -37,17 +37,17 @@ namespace azure { namespace storage {  namespace core {
 
     void write_line_break(utility::string_t& body_text)
     {
-        body_text.push_back(U('\r'));
-        body_text.push_back(U('\n'));
+        body_text.push_back(_XPLATSTR('\r'));
+        body_text.push_back(_XPLATSTR('\n'));
     }
 
     void write_boundary(utility::string_t& body_text, const utility::string_t& boundary_name, bool is_closure)
     {
-        body_text.append(U("--"));
+        body_text.append(_XPLATSTR("--"));
         body_text.append(boundary_name);
         if (is_closure)
         {
-            body_text.append(U("--"));
+            body_text.append(_XPLATSTR("--"));
         }
 
         write_line_break(body_text);
@@ -56,14 +56,14 @@ namespace azure { namespace storage {  namespace core {
     void write_mime_changeset_headers(utility::string_t& body_text)
     {
         body_text.append(web::http::header_names::content_type);
-        body_text.push_back(U(':'));
-        body_text.push_back(U(' '));
+        body_text.push_back(_XPLATSTR(':'));
+        body_text.push_back(_XPLATSTR(' '));
         body_text.append(protocol::header_value_content_type_http);
         write_line_break(body_text);
 
         body_text.append(protocol::header_content_transfer_encoding);
-        body_text.push_back(U(':'));
-        body_text.push_back(U(' '));
+        body_text.push_back(_XPLATSTR(':'));
+        body_text.push_back(_XPLATSTR(' '));
         body_text.append(protocol::header_value_content_transfer_encoding_binary);
         write_line_break(body_text);
 
@@ -73,9 +73,9 @@ namespace azure { namespace storage {  namespace core {
     void write_request_line(utility::string_t& body_text, const web::http::method& method, const web::http::uri& uri)
     {
         body_text.append(method);
-        body_text.push_back(U(' '));
+        body_text.push_back(_XPLATSTR(' '));
         body_text.append(uri.to_string());
-        body_text.push_back(U(' '));
+        body_text.push_back(_XPLATSTR(' '));
         body_text.append(protocol::http_version);
         write_line_break(body_text);
     }
@@ -88,8 +88,8 @@ namespace azure { namespace storage {  namespace core {
             const utility::string_t& header_value = it->second;
 
             body_text.append(header_name);
-            body_text.push_back(U(':'));
-            body_text.push_back(U(' '));
+            body_text.push_back(_XPLATSTR(':'));
+            body_text.push_back(_XPLATSTR(' '));
             body_text.append(header_value);
             write_line_break(body_text);
         }

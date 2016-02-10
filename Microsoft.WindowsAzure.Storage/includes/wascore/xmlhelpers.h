@@ -204,13 +204,13 @@ protected:
     /// <summary>
     /// Write the start element tag
     /// </summary>
-    void write_start_element(const utility::string_t& elementName, const utility::string_t& namespaceName = U(""));
+    void write_start_element(const utility::string_t& elementName, const utility::string_t& namespaceName = _XPLATSTR(""));
 
     /// <summary>
     /// Writes the start element tag with a prefix
     /// </summary>
     void write_start_element_with_prefix(const utility::string_t& elementPrefix, const utility::string_t& elementName,
-                                         const utility::string_t& namespaceName = U(""));
+                                         const utility::string_t& namespaceName = _XPLATSTR(""));
 
     /// <summary>
     /// Write the end element tag for the current element

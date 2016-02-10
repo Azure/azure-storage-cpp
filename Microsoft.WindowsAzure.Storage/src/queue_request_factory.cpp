@@ -94,7 +94,7 @@ namespace azure { namespace storage { namespace protocol {
 
         web::http::uri_builder builder(base_uri);
         builder.append_path(queue.name(), /* do_encoding */ true);
-        builder.append_path(U("messages"));
+        builder.append_path(_XPLATSTR("messages"));
         builder.append_path(message_id, /* do_encoding */ true);
 
         return builder.to_uri();
@@ -157,12 +157,12 @@ namespace azure { namespace storage { namespace protocol {
     {
         if (time_to_live.count() >= 0LL && time_to_live.count() != 604800LL)
         {
-            uri_builder.append_query(core::make_query_parameter(U("messagettl"), time_to_live.count(), /* do_encoding */ false));
+            uri_builder.append_query(core::make_query_parameter(_XPLATSTR("messagettl"), time_to_live.count(), /* do_encoding */ false));
         }
 
         if (initial_visibility_timeout.count() > 0LL)
         {
-            uri_builder.append_query(core::make_query_parameter(U("visibilitytimeout"), initial_visibility_timeout.count(), /* do_encoding */ false));
+            uri_builder.append_query(core::make_query_parameter(_XPLATSTR("visibilitytimeout"), initial_visibility_timeout.count(), /* do_encoding */ false));
         }
 
         web::http::http_request request = queue_base_request(web::http::methods::POST, uri_builder, timeout, context);
@@ -178,18 +178,18 @@ namespace azure { namespace storage { namespace protocol {
     {
         if (is_peek)
         {
-            uri_builder.append_query(U("peekonly=true"));
+            uri_builder.append_query(_XPLATSTR("peekonly=true"));
         }
 
         if (message_count > 1U)
         {
             // The service uses the default value 1
-            uri_builder.append_query(core::make_query_parameter(U("numofmessages"), message_count, /* do_encoding */ false));
+            uri_builder.append_query(core::make_query_parameter(_XPLATSTR("numofmessages"), message_count, /* do_encoding */ false));
         }
 
         if (!is_peek && visibility_timeout.count() > 0LL)
         {
-            uri_builder.append_query(core::make_query_parameter(U("visibilitytimeout"), visibility_timeout.count(), /* do_encoding */ false));
+            uri_builder.append_query(core::make_query_parameter(_XPLATSTR("visibilitytimeout"), visibility_timeout.count(), /* do_encoding */ false));
         }
 
         web::http::http_request request = queue_base_request(web::http::methods::GET, uri_builder, timeout, context);
@@ -198,7 +198,7 @@ namespace azure { namespace storage { namespace protocol {
 
     web::http::http_request delete_message(const cloud_queue_message& message, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(core::make_query_parameter(U("popreceipt"), message.pop_receipt()));
+        uri_builder.append_query(core::make_query_parameter(_XPLATSTR("popreceipt"), message.pop_receipt()));
 
         web::http::http_request request = queue_base_request(web::http::methods::DEL, uri_builder, timeout, context);
         return request;
@@ -206,8 +206,8 @@ namespace azure { namespace storage { namespace protocol {
 
     web::http::http_request update_message(const cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_contents, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        uri_builder.append_query(core::make_query_parameter(U("popreceipt"), message.pop_receipt()));
-        uri_builder.append_query(core::make_query_parameter(U("visibilitytimeout"), visibility_timeout.count(), /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(_XPLATSTR("popreceipt"), message.pop_receipt()));
+        uri_builder.append_query(core::make_query_parameter(_XPLATSTR("visibilitytimeout"), visibility_timeout.count(), /* do_encoding */ false));
 
         web::http::http_request request = queue_base_request(web::http::methods::PUT, uri_builder, timeout, context);
 

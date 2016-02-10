@@ -150,22 +150,22 @@ namespace azure { namespace storage { namespace protocol {
 
         if ((includes & blob_listing_details::snapshots) != 0)
         {
-            include_str << component_snapshots << U(',');
+            include_str << component_snapshots << _XPLATSTR(',');
         }
 
         if ((includes & blob_listing_details::metadata) != 0)
         {
-            include_str << component_metadata << U(',');
+            include_str << component_metadata << _XPLATSTR(',');
         }
 
         if ((includes & blob_listing_details::uncommitted_blobs) != 0)
         {
-            include_str << component_uncommitted_blobs << U(',');
+            include_str << component_uncommitted_blobs << _XPLATSTR(',');
         }
 
         if ((includes & blob_listing_details::copy) != 0)
         {
-            include_str << component_copy << U(',');
+            include_str << component_copy << _XPLATSTR(',');
         }
 
         auto include = include_str.str();
@@ -234,7 +234,7 @@ namespace azure { namespace storage { namespace protocol {
         if (offset < std::numeric_limits<utility::size64_t>::max())
         {
             utility::ostringstream_t value;
-            value << header_value_range_prefix << offset << U('-');
+            value << header_value_range_prefix << offset << _XPLATSTR('-');
             if (length > 0)
             {
                 length += offset - 1;

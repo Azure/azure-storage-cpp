@@ -32,28 +32,28 @@ namespace azure { namespace storage { namespace samples {
 
             // Create a table
             azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();
-            azure::storage::cloud_table table = table_client.get_table_reference(U("MySampleTable"));
+            azure::storage::cloud_table table = table_client.get_table_reference(_XPLATSTR("MySampleTable"));
             
             // Return value is true if the table did not exist and was successfully created.
             table.create_if_not_exists();
 
             // Insert a table entity
-            azure::storage::table_entity entity(U("MyPartitionKey"), U("MyRowKey"));
+            azure::storage::table_entity entity(_XPLATSTR("MyPartitionKey"), _XPLATSTR("MyRowKey"));
             azure::storage::table_entity::properties_type& properties = entity.properties();
             properties.reserve(8);
-            properties[U("StringProperty")] = azure::storage::entity_property(utility::string_t(U("some string")));
-            properties[U("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
-            properties[U("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
-            properties[U("Int32Property")] = azure::storage::entity_property(1234567890);
-            properties[U("Int64Property")] = azure::storage::entity_property((int64_t) 1234567890123456789LL);
-            properties[U("DoubleProperty")] = azure::storage::entity_property(9.1234567890123456789);
-            properties[U("BooleanProperty")] = azure::storage::entity_property(true);
-            properties[U("BinaryProperty")] = azure::storage::entity_property(std::vector<uint8_t>(10, 'X'));
+            properties[_XPLATSTR("StringProperty")] = azure::storage::entity_property(utility::string_t(_XPLATSTR("some string")));
+            properties[_XPLATSTR("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
+            properties[_XPLATSTR("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
+            properties[_XPLATSTR("Int32Property")] = azure::storage::entity_property(1234567890);
+            properties[_XPLATSTR("Int64Property")] = azure::storage::entity_property((int64_t) 1234567890123456789LL);
+            properties[_XPLATSTR("DoubleProperty")] = azure::storage::entity_property(9.1234567890123456789);
+            properties[_XPLATSTR("BooleanProperty")] = azure::storage::entity_property(true);
+            properties[_XPLATSTR("BinaryProperty")] = azure::storage::entity_property(std::vector<uint8_t>(10, 'X'));
             azure::storage::table_operation insert_operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_result insert_result = table.execute(insert_operation);
 
             // Retrieve a table entity
-            azure::storage::table_operation retrieve_operation = azure::storage::table_operation::retrieve_entity(U("MyPartitionKey"), U("MyRowKey"));
+            azure::storage::table_operation retrieve_operation = azure::storage::table_operation::retrieve_entity(_XPLATSTR("MyPartitionKey"), _XPLATSTR("MyRowKey"));
             azure::storage::table_result retrieve_result = table.execute(retrieve_operation);
 
             // Insert table entities in a batch
@@ -62,13 +62,13 @@ namespace azure { namespace storage { namespace samples {
             azure::storage::table_batch_operation batch_operation;
             for (int i = 0; i < 10; ++i)
             {
-                utility::string_t row_key = U("MyRowKey") + utility::conversions::print_string(i);
-                azure::storage::table_entity entity2(U("MyPartitionKey"), row_key);
+                utility::string_t row_key = _XPLATSTR("MyRowKey") + utility::conversions::print_string(i);
+                azure::storage::table_entity entity2(_XPLATSTR("MyPartitionKey"), row_key);
                 azure::storage::table_entity::properties_type& properties2 = entity2.properties();
                 properties2.reserve(3);
-                properties2[U("StringProperty")] = azure::storage::entity_property(utility::string_t(U("another string")));
-                properties2[U("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
-                properties2[U("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
+                properties2[_XPLATSTR("StringProperty")] = azure::storage::entity_property(utility::string_t(_XPLATSTR("another string")));
+                properties2[_XPLATSTR("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
+                properties2[_XPLATSTR("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
                 batch_operation.insert_entity(entity2);
             }
             std::vector<azure::storage::table_result> results = table.execute_batch(batch_operation);
@@ -76,9 +76,9 @@ namespace azure { namespace storage { namespace samples {
             // Query for some table entities
             azure::storage::table_query query;
             query.set_filter_string(azure::storage::table_query::combine_filter_conditions(
-                azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, U("MyPartitionKey")), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, _XPLATSTR("MyPartitionKey")), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("MyRowKey5"))));
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, _XPLATSTR("MyRowKey5"))));
             azure::storage::continuation_token token;
             do
             {
@@ -86,7 +86,7 @@ namespace azure { namespace storage { namespace samples {
                 for (std::vector<azure::storage::table_entity>::const_iterator it = segment.results().cbegin(); it != segment.results().cend(); ++it)
                 {
                     const azure::storage::table_entity::properties_type& properties = it->properties();
-                    ucout << U("PK: ") << it->partition_key() << U(", RK: ") << it->row_key() << U(", Prop: ") << utility::uuid_to_string(properties.at(U("GuidProperty")).guid_value()) << std::endl;
+                    ucout << _XPLATSTR("PK: ") << it->partition_key() << _XPLATSTR(", RK: ") << it->row_key() << _XPLATSTR(", Prop: ") << utility::uuid_to_string(properties.at(_XPLATSTR("GuidProperty")).guid_value()) << std::endl;
                 }
 
                 token = segment.continuation_token();
@@ -102,7 +102,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const azure::storage::storage_exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
 
             azure::storage::request_result result = e.result();
             azure::storage::storage_extended_error extended_error = result.extended_error();
@@ -113,7 +113,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const std::exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
         }
     }
 

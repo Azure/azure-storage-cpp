@@ -45,7 +45,7 @@ utility::string_t blob_service_test_base::get_random_container_name(size_t lengt
     name.resize(length);
     std::generate_n(name.begin(), length, [] () -> utility::char_t
     {
-        const utility::char_t possible_chars[] = { U("abcdefghijklmnopqrstuvwxyz1234567890") };
+        const utility::char_t possible_chars[] = { _XPLATSTR("abcdefghijklmnopqrstuvwxyz1234567890") };
         return possible_chars[std::rand() % (sizeof(possible_chars) / sizeof(utility::char_t) - 1)];
     });
 
@@ -94,10 +94,10 @@ void blob_service_test_base::check_parallelism(const azure::storage::operation_c
 
 web::http::uri blob_service_test_base::defiddler(const web::http::uri& uri)
 {
-    if (uri.host() == U("ipv4.fiddler"))
+    if (uri.host() == _XPLATSTR("ipv4.fiddler"))
     {
         web::http::uri_builder builder(uri);
-        builder.set_host(U("127.0.0.1"));
+        builder.set_host(_XPLATSTR("127.0.0.1"));
         return builder.to_uri();
     }
 

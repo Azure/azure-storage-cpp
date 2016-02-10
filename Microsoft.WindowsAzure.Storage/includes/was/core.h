@@ -236,7 +236,7 @@ namespace azure { namespace storage {
         explicit storage_credentials(utility::string_t sas_token)
             : m_sas_token(std::move(sas_token))
         {
-            if (m_sas_token.size() >= 1 && m_sas_token.at(0) == U('?'))
+            if (m_sas_token.size() >= 1 && m_sas_token.at(0) == _XPLATSTR('?'))
             {
                 m_sas_token = m_sas_token.substr(1);
             }

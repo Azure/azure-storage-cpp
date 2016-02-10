@@ -38,7 +38,7 @@
 
 namespace azure { namespace storage {  namespace core {
 
-    const utility::char_t hex_alphabet[16] = {U('0'), U('1'), U('2'), U('3'), U('4'), U('5'), U('6'), U('7'), U('8'), U('9'), U('a'), U('b'), U('c'), U('d'), U('e'), U('f')};
+    const utility::char_t hex_alphabet[16] = {_XPLATSTR('0'), _XPLATSTR('1'), _XPLATSTR('2'), _XPLATSTR('3'), _XPLATSTR('4'), _XPLATSTR('5'), _XPLATSTR('6'), _XPLATSTR('7'), _XPLATSTR('8'), _XPLATSTR('9'), _XPLATSTR('a'), _XPLATSTR('b'), _XPLATSTR('c'), _XPLATSTR('d'), _XPLATSTR('e'), _XPLATSTR('f')};
     const utility::datetime::interval_type second_interval = 10000000;
 
     utility::string_t make_query_parameter_impl(const utility::string_t& parameter_name, const utility::string_t& parameter_value)
@@ -47,7 +47,7 @@ namespace azure { namespace storage {  namespace core {
         result.reserve(parameter_name.size() + parameter_value.size() + 1);
 
         result.append(parameter_name);
-        result.push_back(U('='));
+        result.push_back(_XPLATSTR('='));
         result.append(parameter_value);
 
         return result;
@@ -170,7 +170,7 @@ namespace azure { namespace storage {  namespace core {
 
     utility::string_t single_quote(const utility::string_t& value)
     {
-        const utility::char_t SINGLE_QUOTE = U('\'');
+        const utility::char_t SINGLE_QUOTE = _XPLATSTR('\'');
 
         utility::string_t result;
         result.reserve(value.size() + 2U);
@@ -220,7 +220,7 @@ namespace azure { namespace storage {  namespace core {
         {
             // Skip the negative sign if present
             utility::char_t ch = *it;
-            if (ch == U('-'))
+            if (ch == _XPLATSTR('-'))
             {
                 ++it;
             }
@@ -235,7 +235,7 @@ namespace azure { namespace storage {  namespace core {
         {
             // Check that all remaining characters are digits
             utility::char_t ch = *it;
-            if (ch < U('0') || ch > U('9'))
+            if (ch < _XPLATSTR('0') || ch > _XPLATSTR('9'))
             {
                 return false;
             }

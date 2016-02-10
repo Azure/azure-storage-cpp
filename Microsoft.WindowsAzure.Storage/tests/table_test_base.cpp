@@ -20,7 +20,7 @@
 #include "check_macros.h"
 #include "wascore/streams.h"
 
-utility::string_t table_service_test_base::table_type_name = utility::string_t(U("table"));
+utility::string_t table_service_test_base::table_type_name = utility::string_t(_XPLATSTR("table"));
 
 azure::storage::cloud_table_client table_service_test_base::get_table_client()
 {
@@ -42,8 +42,8 @@ utility::string_t table_service_test_base::get_table_name()
     table_name.reserve(39U + table_type_name.size());
     table_name.append(object_name_prefix);
     table_name.append(table_type_name);
-    table_name.append(1, U('A'));
-    table_name.append(1, U('0'));
+    table_name.append(1, _XPLATSTR('A'));
+    table_name.append(1, _XPLATSTR('0'));
     table_name.append(get_random_string(charset, 10));
 
     return table_name;

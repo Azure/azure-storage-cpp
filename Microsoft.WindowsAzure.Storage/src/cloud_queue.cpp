@@ -397,7 +397,7 @@ namespace azure { namespace storage {
 
         // since 2015-02-21, canonicalized resource is changed from "/account/name" to "/queue/account/name"
         utility::ostringstream_t resource_str;
-        resource_str << U('/') << protocol::service_queue << U('/') << service_client().credentials().account_name() << U('/') << name();
+        resource_str << _XPLATSTR('/') << protocol::service_queue << _XPLATSTR('/') << service_client().credentials().account_name() << _XPLATSTR('/') << name();
 
         return protocol::get_queue_sas_token(stored_policy_identifier, policy, resource_str.str(), service_client().credentials());
     }

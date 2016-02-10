@@ -32,8 +32,8 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials);
 
-    const utility::string_t auth_name_shared_key(U("SharedKey"));
-    const utility::string_t auth_name_shared_key_lite(U("SharedKeyLite"));
+    const utility::string_t auth_name_shared_key(_XPLATSTR("SharedKey"));
+    const utility::string_t auth_name_shared_key_lite(_XPLATSTR("SharedKeyLite"));
 
 #pragma region Canonicalization
 
@@ -69,7 +69,7 @@ namespace azure { namespace storage { namespace protocol {
         /// <param name="value">The value.</param>
         void append(const utility::string_t& value)
         {
-            m_result << value << U('\n');
+            m_result << value << _XPLATSTR('\n');
         }
 
         /// <summary>

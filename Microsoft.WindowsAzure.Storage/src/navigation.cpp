@@ -30,7 +30,7 @@ namespace azure { namespace storage { namespace core {
         for (utility::string_t::const_iterator it = host.cbegin(); it != host.cend(); ++it)
         {
             utility::char_t c = *it;
-            if ((c < U('0') || c > U('9')) && c != U('.'))
+            if ((c < _XPLATSTR('0') || c > _XPLATSTR('9')) && c != _XPLATSTR('.'))
             {
                 return true;
             }
@@ -57,7 +57,7 @@ namespace azure { namespace storage { namespace core {
             if (path.size() > 0)
             {
                 // The path should always start with "/", but this code would still handle the case where it does not.
-                utility::string_t::size_type start_pos = path.find(U('/'), 1);
+                utility::string_t::size_type start_pos = path.find(_XPLATSTR('/'), 1);
                 if (start_pos == utility::string_t::npos)
                 {
                     start_pos = path.size();
@@ -134,7 +134,7 @@ namespace azure { namespace storage { namespace core {
             blob_name_str << *iter;
             for (iter++; iter != segments.cend(); iter++)
             {
-                blob_name_str << U('/') << *iter;
+                blob_name_str << _XPLATSTR('/') << *iter;
             }
 
             blob_name = blob_name_str.str();

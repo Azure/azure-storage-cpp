@@ -166,7 +166,7 @@ namespace azure { namespace storage { namespace protocol {
             if (element_name == xml_etag)
             {
                 utility::ostringstream_t str;
-                str << U('"') << get_current_element_text() << U('"');
+                str << _XPLATSTR('"') << get_current_element_text() << _XPLATSTR('"');
                 m_properties.m_etag = str.str();
                 return;
             }
@@ -473,22 +473,22 @@ namespace azure { namespace storage { namespace protocol {
     {
         if (element_name == xml_service_properties_allowed_origins)
         {
-            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            auto current_element_text = core::string_split(get_current_element_text(), _XPLATSTR(","));
             m_current_cors_rule.allowed_origins().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_allowed_methods)
         {
-            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            auto current_element_text = core::string_split(get_current_element_text(), _XPLATSTR(","));
             m_current_cors_rule.allowed_methods().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_exposed_headers)
         {
-            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            auto current_element_text = core::string_split(get_current_element_text(), _XPLATSTR(","));
             m_current_cors_rule.exposed_headers().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_allowed_headers)
         {
-            auto current_element_text = core::string_split(get_current_element_text(), U(","));
+            auto current_element_text = core::string_split(get_current_element_text(), _XPLATSTR(","));
             m_current_cors_rule.allowed_headers().swap(current_element_text);
         }
         else if (element_name == xml_service_properties_max_age)
@@ -583,7 +583,7 @@ namespace azure { namespace storage { namespace protocol {
 
     void list_queues_reader::handle_end_element(const utility::string_t& element_name)
     {
-        if (element_name == U("Queue") && get_parent_element_name() == U("Queues"))
+        if (element_name == _XPLATSTR("Queue") && get_parent_element_name() == _XPLATSTR("Queues"))
         {
             cloud_queue_list_item item(std::move(m_name), std::move(m_metadata));
             m_items.push_back(item);
@@ -594,31 +594,31 @@ namespace azure { namespace storage { namespace protocol {
 
     void message_reader::handle_element(const utility::string_t& element_name)
     {
-        if (element_name == U("MessageText"))
+        if (element_name == _XPLATSTR("MessageText"))
         {
             m_content = get_current_element_text();
         }
-        else if (element_name == U("MessageId"))
+        else if (element_name == _XPLATSTR("MessageId"))
         {
             m_id = get_current_element_text();
         }
-        else if (element_name == U("PopReceipt"))
+        else if (element_name == _XPLATSTR("PopReceipt"))
         {
             m_pop_receipt = get_current_element_text();
         }
-        else if (element_name == U("InsertionTime"))
+        else if (element_name == _XPLATSTR("InsertionTime"))
         {
             m_insertion_time = utility::datetime::from_string(get_current_element_text(), utility::datetime::RFC_1123);
         }
-        else if (element_name == U("ExpirationTime"))
+        else if (element_name == _XPLATSTR("ExpirationTime"))
         {
             m_expiration_time = utility::datetime::from_string(get_current_element_text(), utility::datetime::RFC_1123);
         }
-        else if (element_name == U("TimeNextVisible"))
+        else if (element_name == _XPLATSTR("TimeNextVisible"))
         {
             m_next_visible_time = utility::datetime::from_string(get_current_element_text(), utility::datetime::RFC_1123);
         }
-        else if (element_name == U("DequeueCount"))
+        else if (element_name == _XPLATSTR("DequeueCount"))
         {
             utility::istringstream_t stream(get_current_element_text());
             stream >> m_dequeue_count;
@@ -627,7 +627,7 @@ namespace azure { namespace storage { namespace protocol {
 
     void message_reader::handle_end_element(const utility::string_t& element_name)
     {
-        if (element_name == U("QueueMessage"))
+        if (element_name == _XPLATSTR("QueueMessage"))
         {
             cloud_message_list_item item(std::move(m_content), std::move(m_id), std::move(m_pop_receipt), m_insertion_time, m_expiration_time, m_next_visible_time, m_dequeue_count);
             m_items.push_back(item);
@@ -646,8 +646,8 @@ namespace azure { namespace storage { namespace protocol {
         std::ostringstream outstream;
         initialize(outstream);
 
-        write_start_element(U("QueueMessage"));
-        write_element(U("MessageText"), message.content_as_string());
+        write_start_element(_XPLATSTR("QueueMessage"));
+        write_element(_XPLATSTR("MessageText"), message.content_as_string());
 
         finalize();
         return outstream.str();
@@ -728,11 +728,11 @@ namespace azure { namespace storage { namespace protocol {
 
     void service_properties_writer::write_cors_rule(const service_properties::cors_rule& rule)
     {
-        write_element(xml_service_properties_allowed_origins, core::string_join(rule.allowed_origins(), U(",")));
-        write_element(xml_service_properties_allowed_methods, core::string_join(rule.allowed_methods(), U(",")));
+        write_element(xml_service_properties_allowed_origins, core::string_join(rule.allowed_origins(), _XPLATSTR(",")));
+        write_element(xml_service_properties_allowed_methods, core::string_join(rule.allowed_methods(), _XPLATSTR(",")));
         write_element(xml_service_properties_max_age, rule.max_age().count());
-        write_element(xml_service_properties_exposed_headers, core::string_join(rule.exposed_headers(), U(",")));
-        write_element(xml_service_properties_allowed_headers, core::string_join(rule.allowed_headers(), U(",")));
+        write_element(xml_service_properties_exposed_headers, core::string_join(rule.exposed_headers(), _XPLATSTR(",")));
+        write_element(xml_service_properties_allowed_headers, core::string_join(rule.allowed_headers(), _XPLATSTR(",")));
     }
 
     void service_properties_writer::write_retention_policy(bool enabled, int days)

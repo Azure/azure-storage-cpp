@@ -26,16 +26,16 @@
 
 namespace azure { namespace storage {
 
-    const utility::string_t query_comparison_operator::equal = U("eq");
-    const utility::string_t query_comparison_operator::not_equal = U("ne");
-    const utility::string_t query_comparison_operator::greater_than = U("gt");
-    const utility::string_t query_comparison_operator::greater_than_or_equal = U("ge");
-    const utility::string_t query_comparison_operator::less_than = U("lt");
-    const utility::string_t query_comparison_operator::less_than_or_equal = U("le");
+    const utility::string_t query_comparison_operator::equal = _XPLATSTR("eq");
+    const utility::string_t query_comparison_operator::not_equal = _XPLATSTR("ne");
+    const utility::string_t query_comparison_operator::greater_than = _XPLATSTR("gt");
+    const utility::string_t query_comparison_operator::greater_than_or_equal = _XPLATSTR("ge");
+    const utility::string_t query_comparison_operator::less_than = _XPLATSTR("lt");
+    const utility::string_t query_comparison_operator::less_than_or_equal = _XPLATSTR("le");
 
-    const utility::string_t query_logical_operator::op_and = U("and");
-    const utility::string_t query_logical_operator::op_not = U("not");
-    const utility::string_t query_logical_operator::op_or = U("or");
+    const utility::string_t query_logical_operator::op_and = _XPLATSTR("and");
+    const utility::string_t query_logical_operator::op_not = _XPLATSTR("not");
+    const utility::string_t query_logical_operator::op_or = _XPLATSTR("or");
 
     cloud_table::cloud_table(const storage_uri& uri)
         : m_client(create_service_client(uri, storage_credentials())), m_name(read_table_name(uri)), m_uri(create_uri(uri))
@@ -259,7 +259,7 @@ namespace azure { namespace storage {
 
         // since 2015-02-21, canonicalized resource is changed from "/account/name" to "/table/account/name"
         utility::ostringstream_t resource_str;
-        resource_str << U('/') << protocol::service_table << U('/') << service_client().credentials().account_name() << U('/') << table_name;
+        resource_str << _XPLATSTR('/') << protocol::service_table << _XPLATSTR('/') << service_client().credentials().account_name() << _XPLATSTR('/') << table_name;
 
         return protocol::get_table_sas_token(stored_policy_identifier, policy, name(), start_partition_key, start_row_key, end_partition_key, end_row_key, resource_str.str(), service_client().credentials());
     }

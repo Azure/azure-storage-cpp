@@ -75,7 +75,7 @@ namespace azure { namespace storage { namespace protocol {
 
         if (headers.match(web::http::header_names::content_range, value))
         {
-            auto slash = value.find(U('/'));
+            auto slash = value.find(_XPLATSTR('/'));
             value = value.substr(slash + 1);
             return utility::conversions::scan_string<utility::size64_t>(value);
         }

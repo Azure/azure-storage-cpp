@@ -67,7 +67,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (pInputStream == nullptr)
         {
             auto error = ERROR_NOT_ENOUGH_MEMORY;
-            log_error_message(U("XML reader IStream creation failed"), error);
+            log_error_message(_XPLATSTR("XML reader IStream creation failed"), error);
             throw utility::details::create_system_error(error);
         }
 
@@ -75,7 +75,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         {
 
             auto error = GetLastError();
-            log_error_message(U("XML reader CreateXmlReader failed"), error);
+            log_error_message(_XPLATSTR("XML reader CreateXmlReader failed"), error);
             throw utility::details::create_system_error(error);
         }
 
@@ -83,7 +83,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         {
 
             auto error = GetLastError();
-            log_error_message(U("XML reader SetProperty failed"), error);
+            log_error_message(_XPLATSTR("XML reader SetProperty failed"), error);
             throw utility::details::create_system_error(error);
         }
 
@@ -91,7 +91,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         {
 
             auto error = GetLastError();
-            log_error_message(U("XML reader SetInput failed"), error);
+            log_error_message(_XPLATSTR("XML reader SetInput failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else
@@ -194,7 +194,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_reader->GetLocalName(&pwszLocalName, NULL)))
         {
             auto error = GetLastError();
-            log_error_message(U("XML reader GetLocalName failed"), error);
+            log_error_message(_XPLATSTR("XML reader GetLocalName failed"), error);
             throw utility::details::create_system_error(error);
         }
         return utility::string_t(pwszLocalName);
@@ -212,7 +212,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_reader->GetQualifiedName(&pwszName, NULL)))
         {
             auto error = GetLastError();
-            log_error_message(U("XML reader GetQualified failed"), error);
+            log_error_message(_XPLATSTR("XML reader GetQualified failed"), error);
             throw utility::details::create_system_error(error);
         }
         return utility::string_t(pwszName);
@@ -230,7 +230,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_reader->GetValue(&pwszValue, NULL)))
         {
             auto error = GetLastError();
-            log_error_message(U("XML reader GetValue failed"), error);
+            log_error_message(_XPLATSTR("XML reader GetValue failed"), error);
             throw utility::details::create_system_error(error);
         }
 
@@ -247,7 +247,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_reader->MoveToFirstAttribute()))
         {
             auto error = GetLastError();
-            log_error_message(U("XML reader MoveToFirstAttribute failed"), error);
+            log_error_message(_XPLATSTR("XML reader MoveToFirstAttribute failed"), error);
             throw utility::details::create_system_error(error);
         }
         return (hr == S_OK);
@@ -263,7 +263,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_reader->MoveToNextAttribute()))
         {
             auto error = GetLastError();
-            log_error_message(U("XML reader MoveToNextAttribute failed"), error);
+            log_error_message(_XPLATSTR("XML reader MoveToNextAttribute failed"), error);
             throw utility::details::create_system_error(error);
         }
         return (hr == S_OK);
@@ -282,35 +282,35 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (pStream == nullptr)
         {
             auto error = ERROR_NOT_ENOUGH_MEMORY;
-            log_error_message(U("XML writer IStream creation failed"), error);
+            log_error_message(_XPLATSTR("XML writer IStream creation failed"), error);
             throw utility::details::create_system_error(error);
         }
 
         if (FAILED(hr = CreateXmlWriter(__uuidof(IXmlWriter), (void**)&m_writer, NULL)))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer CreateXmlWriter failed"), error);
+            log_error_message(_XPLATSTR("XML writer CreateXmlWriter failed"), error);
             throw utility::details::create_system_error(error);
         }
 
         if (FAILED(hr = m_writer->SetOutput(pStream)))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer SetOutput failed"), error);
+            log_error_message(_XPLATSTR("XML writer SetOutput failed"), error);
             throw utility::details::create_system_error(error);
         }
 
         if (FAILED(hr = m_writer->SetProperty(XmlWriterProperty_Indent, TRUE)))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer SetProperty failed"), error);
+            log_error_message(_XPLATSTR("XML writer SetProperty failed"), error);
             throw utility::details::create_system_error(error);
         }
 
         if (FAILED(hr = m_writer->WriteStartDocument(XmlStandalone_Omit)))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteStartDocument failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteStartDocument failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else // LINUX
@@ -328,13 +328,13 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteEndDocument()))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteEndDocument failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteEndDocument failed"), error);
             throw utility::details::create_system_error(error);
         }
         if (FAILED(hr = m_writer->Flush()))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer Flush failed"), error);
+            log_error_message(_XPLATSTR("XML writer Flush failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else // LINUX
@@ -351,7 +351,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteStartElement(elementPrefix.c_str(), elementName.c_str(), namespaceName.empty() ? NULL : namespaceName.c_str())))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteStartElement with prefix failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteStartElement with prefix failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else 
@@ -375,11 +375,11 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteStartElement(NULL, elementName.c_str(), namespaceName.empty() ? NULL : namespaceName.c_str())))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteStartElement failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteStartElement failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else 
-        write_start_element_with_prefix(U(""), elementName, namespaceName);
+        write_start_element_with_prefix(_XPLATSTR(""), elementName, namespaceName);
 #endif
     }
 
@@ -391,7 +391,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteEndElement()))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteEndElement failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteEndElement failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else 
@@ -407,7 +407,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteFullEndElement()))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteFullEndElement failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteFullEndElement failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else
@@ -423,7 +423,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteString(str.c_str())))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteString failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteString failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else
@@ -444,12 +444,12 @@ namespace azure { namespace storage { namespace core { namespace xml {
             value.empty() ? NULL : value.c_str())))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteAttributeString failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteAttributeString failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else
         UNREFERENCED_PARAMETER(namespaceUri);
-        if (prefix == U("xmlns"))
+        if (prefix == _XPLATSTR("xmlns"))
         {
             m_elementStack.top()->set_namespace_declaration(
                 value, name
@@ -473,11 +473,11 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteElementString(NULL, elementName.c_str(), NULL, value.c_str())))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteElementString failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteElementString failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else // LINUX
-        write_element_with_prefix(U(""), elementName, value);
+        write_element_with_prefix(_XPLATSTR(""), elementName, value);
 #endif
     }
 
@@ -489,7 +489,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (FAILED(hr = m_writer->WriteElementString(prefix.c_str(), elementName.c_str(), NULL, value.c_str())))
         {
             auto error = GetLastError();
-            log_error_message(U("XML writer WriteElementStringWithPrefix failed"), error);
+            log_error_message(_XPLATSTR("XML writer WriteElementStringWithPrefix failed"), error);
             throw utility::details::create_system_error(error);
         }
 #else

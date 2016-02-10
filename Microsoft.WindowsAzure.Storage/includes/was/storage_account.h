@@ -349,22 +349,22 @@ namespace azure { namespace storage {
             utility::string_t services;
             if (m_service_type & blob)
             {
-                services.push_back(U('b'));
+                services.push_back(_XPLATSTR('b'));
             }
 
             if (m_service_type & queue)
             {
-                services.push_back(U('q'));
+                services.push_back(_XPLATSTR('q'));
             }
 
             if (m_service_type & table)
             {
-                services.push_back(U('t'));
+                services.push_back(_XPLATSTR('t'));
             }
 
             if (m_service_type & file)
             {
-                services.push_back(U('f'));
+                services.push_back(_XPLATSTR('f'));
             }
 
             return services;
@@ -399,17 +399,17 @@ namespace azure { namespace storage {
             utility::string_t resource_types;
             if (m_resource_type & service)
             {
-                resource_types.push_back(U('s'));
+                resource_types.push_back(_XPLATSTR('s'));
             }
 
             if (m_resource_type & container)
             {
-                resource_types.push_back(U('c'));
+                resource_types.push_back(_XPLATSTR('c'));
             }
 
             if (m_resource_type & object)
             {
-                resource_types.push_back(U('o'));
+                resource_types.push_back(_XPLATSTR('o'));
             }
 
             return resource_types;

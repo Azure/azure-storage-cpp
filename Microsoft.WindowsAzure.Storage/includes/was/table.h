@@ -688,7 +688,7 @@ namespace azure { namespace storage {
 
         void set_value_impl(bool value)
         {
-            m_value = value ? U("true") : U("false");
+            m_value = value ? _XPLATSTR("true") : _XPLATSTR("false");
         }
 
         void set_value_impl(utility::datetime value)
@@ -1385,7 +1385,7 @@ namespace azure { namespace storage {
         /// <returns>A string containing the formatted filter condition.</returns>
         static const utility::string_t generate_filter_condition(const utility::string_t& property_name, const utility::string_t& comparison_operator, bool value)
         {
-            utility::string_t string_value = value ? U("true") : U("false");
+            utility::string_t string_value = value ? _XPLATSTR("true") : _XPLATSTR("false");
             return generate_filter_condition_impl(property_name, comparison_operator, string_value);
         }
 
@@ -1403,9 +1403,9 @@ namespace azure { namespace storage {
             utility::string_t string_value;
             string_value.reserve(string_data_value.size() + 10U);
 
-            string_value.append(U("datetime'"));
+            string_value.append(_XPLATSTR("datetime'"));
             string_value.append(string_data_value);
-            string_value.push_back(U('\''));
+            string_value.push_back(_XPLATSTR('\''));
 
             return generate_filter_condition_impl(property_name, comparison_operator, string_value);
         }
@@ -1433,9 +1433,9 @@ namespace azure { namespace storage {
             utility::string_t string_value;
             string_value.reserve(string_data_value.size() + 6U);
 
-            string_value.append(U("guid'"));
+            string_value.append(_XPLATSTR("guid'"));
             string_value.append(string_data_value);
-            string_value.push_back(U('\''));
+            string_value.push_back(_XPLATSTR('\''));
 
             return generate_filter_condition_impl(property_name, comparison_operator, string_value);
         }
@@ -1459,7 +1459,7 @@ namespace azure { namespace storage {
         static const utility::string_t generate_filter_condition(const utility::string_t& property_name, const utility::string_t& comparison_operator, int64_t value)
         {
             utility::ostringstream_t buffer;
-            buffer << value << U('L');
+            buffer << value << _XPLATSTR('L');
 
             return generate_filter_condition_impl(property_name, comparison_operator, buffer.str());
         }
@@ -1476,15 +1476,15 @@ namespace azure { namespace storage {
             utility::string_t result;
             result.reserve(left_filter.size() + logical_operator.size() + right_filter.size() + 6U);
 
-            result.push_back(U('('));
+            result.push_back(_XPLATSTR('('));
             result.append(left_filter);
-            result.push_back(U(')'));
-            result.push_back(U(' '));
+            result.push_back(_XPLATSTR(')'));
+            result.push_back(_XPLATSTR(' '));
             result.append(logical_operator);
-            result.push_back(U(' '));
-            result.push_back(U('('));
+            result.push_back(_XPLATSTR(' '));
+            result.push_back(_XPLATSTR('('));
             result.append(right_filter);
-            result.push_back(U(')'));
+            result.push_back(_XPLATSTR(')'));
 
             return result;
         }

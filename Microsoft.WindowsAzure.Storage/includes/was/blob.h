@@ -540,7 +540,7 @@ namespace azure { namespace storage {
         static access_condition generate_if_not_exists_condition()
         {
             access_condition condition;
-            condition.set_if_none_match_etag(U("*"));
+            condition.set_if_none_match_etag(_XPLATSTR("*"));
             return condition;
         }
 
@@ -552,7 +552,7 @@ namespace azure { namespace storage {
         static access_condition generate_if_exists_condition()
         {
             access_condition condition;
-            condition.set_if_match_etag(U("*"));
+            condition.set_if_match_etag(_XPLATSTR("*"));
             return condition;
         }
 
@@ -768,7 +768,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_less_than_or_equal(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_sequence_number = value;
             m_sequence_number_operator = sequence_number_operators::le;
         }
@@ -781,7 +781,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_less_than(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_sequence_number = value;
             m_sequence_number_operator = sequence_number_operators::lt;
         }
@@ -794,7 +794,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_equal(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_sequence_number = value;
             m_sequence_number_operator = sequence_number_operators::eq;
         }
@@ -836,7 +836,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to append blobs.</remarks>
         void set_max_size(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 1);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 1);
             m_max_size = value;
         }
 
@@ -859,7 +859,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to append blobs.</remarks>
         void set_append_position(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_append_position = value;
         }
 
@@ -989,7 +989,7 @@ namespace azure { namespace storage {
         {
             if (seconds != std::chrono::seconds::max())
             {
-                utility::assert_in_bounds(U("seconds"), seconds, protocol::minimum_lease_break_period, protocol::maximum_lease_break_period);
+                utility::assert_in_bounds(_XPLATSTR("seconds"), seconds, protocol::minimum_lease_break_period, protocol::maximum_lease_break_period);
             }
         }
 
@@ -1090,7 +1090,7 @@ namespace azure { namespace storage {
         {
             if (seconds.count() != -1)
             {
-                utility::assert_in_bounds(U("seconds"), seconds, protocol::minimum_fixed_lease_duration, protocol::maximum_fixed_lease_duration);
+                utility::assert_in_bounds(_XPLATSTR("seconds"), seconds, protocol::minimum_fixed_lease_duration, protocol::maximum_fixed_lease_duration);
             }
         }
 
@@ -1799,7 +1799,7 @@ namespace azure { namespace storage {
         /// ranging from between 1 and 64 MB inclusive.</param>
         void set_single_blob_upload_threshold_in_bytes(utility::size64_t value)
         {
-            utility::assert_in_bounds<utility::size64_t>(U("value"), value, 1 * 1024 * 1024, 64 * 1024 * 1024);
+            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, 64 * 1024 * 1024);
             m_single_blob_upload_threshold = value;
         }
 
@@ -1820,7 +1820,7 @@ namespace azure { namespace storage {
         /// <param name="value">The number of parallel block or page upload operations that may proceed.</param>
         void set_parallelism_factor(int value)
         {
-            utility::assert_in_bounds(U("value"), value, 0);
+            utility::assert_in_bounds(_XPLATSTR("value"), value, 0);
             m_parallelism_factor = value;
         }
 
@@ -1839,7 +1839,7 @@ namespace azure { namespace storage {
         /// <param name="value">The minimum number of bytes to buffer, being at least 16KB.</param>
         void set_stream_read_size_in_bytes(size_t value)
         {
-            utility::assert_in_bounds<size_t>(U("value"), value, 16 * 1024);
+            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024);
             m_stream_read_size = value;
         }
 
@@ -1858,7 +1858,7 @@ namespace azure { namespace storage {
         /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</param>
         void set_stream_write_size_in_bytes(size_t value)
         {
-            utility::assert_in_bounds<size_t>(U("value"), value, 16 * 1024, 4 * 1024 * 1024);
+            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, 4 * 1024 * 1024);
             m_stream_write_size = value;
         }
 
@@ -2075,7 +2075,7 @@ namespace azure { namespace storage {
         utility::string_t to_string() const
         {
             utility::ostringstream_t value;
-            value << protocol::header_value_range_prefix << m_start_offset << U('-') << m_end_offset;
+            value << protocol::header_value_range_prefix << m_start_offset << _XPLATSTR('-') << m_end_offset;
             return value.str();
         }
 

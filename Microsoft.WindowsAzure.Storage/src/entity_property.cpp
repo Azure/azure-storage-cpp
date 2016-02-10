@@ -39,11 +39,11 @@ namespace azure { namespace storage {
             throw std::runtime_error(protocol::error_entity_property_not_boolean);
         }
 
-        if (m_value.compare(U("false")) == 0)
+        if (m_value.compare(_XPLATSTR("false")) == 0)
         {
             return false;
         }
-        else if (m_value.compare(U("true")) == 0)
+        else if (m_value.compare(_XPLATSTR("true")) == 0)
         {
             return true;
         }

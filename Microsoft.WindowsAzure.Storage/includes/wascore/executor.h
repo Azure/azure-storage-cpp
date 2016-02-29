@@ -434,6 +434,11 @@ namespace azure { namespace storage { namespace core {
 
                 // 4. Set HTTP client configuration
                 web::http::client::http_client_config config;
+                if (instance->m_context.proxy().is_specified())
+                {
+                    config.set_proxy(instance->m_context.proxy());
+                }
+
                 config.set_timeout(instance->remaining_time());
 
                 size_t http_buffer_size = instance->m_request_options.http_buffer_size();

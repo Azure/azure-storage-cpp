@@ -1,6 +1,11 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v2.3:
+- Made HTTP/HTTPS proxy configurable programmatically
+- Upgraded Casablanca dependency to 2.8.0
+- Fixed a bug that the retry policy of a default service client request options is not used
+
 Changes in v2.2:
 - Default REST API version is 2015-04-05
 - Supported account SAS

@@ -18,6 +18,9 @@
 #include "stdafx.h"
 #include "test_base.h"
 #include "check_macros.h"
+#include "was/blob.h"
+#include "was/table.h"
+#include "was/queue.h"
 
 azure::storage::storage_location get_initial_location(azure::storage::location_mode mode)
 {
@@ -370,5 +373,21 @@ SUITE(Core)
             expected_retry_info_list.push_back(create_fake_retry_info(azure::storage::storage_location::primary, azure::storage::location_mode::primary_only, std::chrono::seconds(2)));
             verify_retry_results(policy, web::http::status_codes::InternalError, web::http::status_codes::NotFound, azure::storage::location_mode::secondary_then_primary, allowed_delta, expected_retry_info_list);
         }
+    }
+
+    TEST_FIXTURE(test_base, default_request_options_retry_policy)
+    {
+        azure::storage::blob_request_options b;
+        azure::storage::table_request_options t;
+        azure::storage::queue_request_options q;
+        CHECK(!b.retry_policy().is_valid());
+        CHECK(!t.retry_policy().is_valid());
+        CHECK(!q.retry_policy().is_valid());
+        b.apply_defaults(test_config::instance().account().create_cloud_blob_client().default_request_options(), azure::storage::blob_type::unspecified);
+        CHECK(b.retry_policy().is_valid());
+        t.apply_defaults(test_config::instance().account().create_cloud_table_client().default_request_options());
+        CHECK(t.retry_policy().is_valid());
+        q.apply_defaults(test_config::instance().account().create_cloud_queue_client().default_request_options());
+        CHECK(q.retry_policy().is_valid());
     }
 }

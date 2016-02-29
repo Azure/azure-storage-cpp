@@ -25,5 +25,6 @@ var searchData=
   ['protocol',['protocol',['../classazure_1_1storage_1_1shared__access__policy.html#a5438fc4359fccabbf47981c462aead27',1,'azure::storage::shared_access_policy']]],
   ['protocols',['protocols',['../classazure_1_1storage_1_1shared__access__policy.html#a3d1e6328073292afb65cb557f81fa474',1,'azure::storage::shared_access_policy']]],
   ['protocols_5fto_5fstring',['protocols_to_string',['../classazure_1_1storage_1_1shared__access__policy.html#afc09a4d98aa88dd87cff7f5efa806113',1,'azure::storage::shared_access_policy']]],
+  ['proxy',['proxy',['../classazure_1_1storage_1_1operation__context.html#a64dc494712f4f2288b1bf6624a683252',1,'azure::storage::operation_context']]],
   ['public_5faccess',['public_access',['../classazure_1_1storage_1_1blob__container__permissions.html#a9e340ab48d66bff2ba0d65d1ca380fb7',1,'azure::storage::blob_container_permissions']]]
 ];

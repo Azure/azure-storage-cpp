@@ -2,7 +2,9 @@ Azure Storage Client Library for C++
 History of Changes
 
 Changes in v2.3:
-- Made HTTP/HTTPS proxy configurable programmatically
+- Added the following interfaces to support programmatically configurable HTTP/HTTPS proxy
+  - operation_context::set_default_proxy
+  - operation_context::set_proxy
 - Upgraded Casablanca dependency to 2.8.0
 - Fixed a bug that the retry policy of a default service client request options is not used
 

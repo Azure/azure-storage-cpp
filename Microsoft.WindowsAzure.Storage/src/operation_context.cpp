@@ -22,10 +22,13 @@ namespace azure { namespace storage {
 
     client_log_level operation_context::m_global_log_level = client_log_level::log_level_off;
 
+    web::web_proxy operation_context::m_global_proxy;
+
     operation_context::operation_context()
         : m_impl(std::make_shared<_operation_context>())
     {
         set_log_level(default_log_level());
+        set_proxy(default_proxy());
         set_client_request_id(utility::uuid_to_string(utility::new_uuid()));
     }
 
@@ -37,6 +40,16 @@ namespace azure { namespace storage {
     void operation_context::set_default_log_level(client_log_level log_level)
     {
         m_global_log_level = log_level;
+    }
+
+    const web::web_proxy &operation_context::default_proxy()
+    {
+        return m_global_proxy;
+    }
+
+    void operation_context::set_default_proxy(web::web_proxy proxy)
+    {
+        m_global_proxy = std::move(proxy);
     }
 
 }} // namespace azure::storage

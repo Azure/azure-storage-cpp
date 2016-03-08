@@ -1540,6 +1540,27 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the proxy.
+        /// </summary>
+        /// <returns>An <see cref="web::web_proxy" /> object indicating the proxy.</returns>
+        const web::web_proxy &proxy() const
+        {
+            return m_proxy;
+        }
+
+        /// <summary>
+        /// Sets the proxy.
+        /// </summary>
+        /// <param name="proxy">An <see cref="web::web_proxy" /> object indicating the proxy.</param>
+        /// <remarks>
+        /// The proxy uri should be in the format "//host[:port]"
+        /// </remarks>
+        void set_proxy(web::web_proxy proxy)
+        {
+            m_proxy = std::move(proxy);
+        }
+
+        /// <summary>
         /// Gets the user headers provided for the request.
         /// </summary>
         /// <returns>A <see cref="web::http::http_headers" /> object containing user headers.</returns>
@@ -1654,6 +1675,7 @@ namespace azure { namespace storage {
         utility::datetime m_start_time;
         utility::datetime m_end_time;
         client_log_level m_log_level;
+        web::web_proxy m_proxy;
         std::vector<request_result> m_request_results;
         pplx::extensibility::critical_section_t m_request_results_lock;
 #ifndef WIN32
@@ -1824,6 +1846,42 @@ namespace azure { namespace storage {
             m_impl->set_response_received(value);
         }
 
+        /// <summary>
+        /// Gets the default proxy to be used for subsequently created instances of the <see cref="azure::storage::operation_context" /> class.
+        /// </summary>
+        /// <returns>A value of type <see cref="web::web_proxy" /> that specifies the default proxy by instances of the <see cref="azure::storage::operation_context" />.</returns>
+        WASTORAGE_API static const web::web_proxy &default_proxy();
+
+        /// <summary>
+        /// Sets the default proxy to be used for subsequently created instances of the <see cref="azure::storage::operation_context" /> class.
+        /// </summary>
+        /// <param name="proxy">A value of type <see cref="web::proxy" /> that specifies default proxy by instances of the <see cref="azure::storage::operation_context" />.</param>
+        /// <remarks>
+        /// The proxy uri should be in the format "//host[:port]"
+        /// </remarks>
+        WASTORAGE_API static void set_default_proxy(web::web_proxy proxy);
+
+        /// <summary>
+        /// Gets the proxy.
+        /// </summary>
+        /// <returns>The proxy.</returns>
+        const web::web_proxy &proxy() const
+        {
+            return m_impl->proxy();
+        }
+
+        /// <summary>
+        /// Sets the proxy.
+        /// </summary>
+        /// <param name="proxy">The proxy.</param>
+        /// <remarks>
+        /// The proxy uri should be in the format "//host[:port]"
+        /// </remarks>
+        void set_proxy(web::web_proxy proxy)
+        {
+            m_impl->set_proxy(std::move(proxy));
+        }
+
 #ifndef WIN32
         /// <summary>
         /// Gets the logger object on this operation context.
@@ -1862,6 +1920,7 @@ namespace azure { namespace storage {
 
         std::shared_ptr<_operation_context> m_impl;
         static client_log_level m_global_log_level;
+        static web::web_proxy m_global_proxy;
     };
 
     /// <summary>

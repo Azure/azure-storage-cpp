@@ -2,6 +2,7 @@ var searchData=
 [
   ['datetime_5fvalue',['datetime_value',['../classazure_1_1storage_1_1entity__property.html#a6bb76673dc3b500cde6d1333ff525c57',1,'azure::storage::entity_property']]],
   ['default_5flog_5flevel',['default_log_level',['../classazure_1_1storage_1_1operation__context.html#a775e4e6416d56eb1f59552f24495ded9',1,'azure::storage::operation_context']]],
+  ['default_5fproxy',['default_proxy',['../classazure_1_1storage_1_1operation__context.html#a7b6df16e6072c9ef608a72685e76744f',1,'azure::storage::operation_context']]],
   ['default_5frequest_5foptions',['default_request_options',['../classazure_1_1storage_1_1cloud__blob__client.html#a6ab878a05ab30c5fb8d2427cd6fe9451',1,'azure::storage::cloud_blob_client::default_request_options()'],['../classazure_1_1storage_1_1cloud__table__client.html#af548dcc6145d746d641c4b2f1cc87252',1,'azure::storage::cloud_table_client::default_request_options()']]],
   ['default_5fservice_5fversion',['default_service_version',['../classazure_1_1storage_1_1service__properties.html#aa826de4dd494bf50eff92ae51281db2c',1,'azure::storage::service_properties']]],
   ['delete_5fblob',['delete_blob',['../classazure_1_1storage_1_1cloud__blob.html#a3fc1c28d3c37ed1856239d4f7587813d',1,'azure::storage::cloud_blob::delete_blob()'],['../classazure_1_1storage_1_1cloud__blob.html#ae9fd632b1d146be5d2ecc0b83ac35a8e',1,'azure::storage::cloud_blob::delete_blob(delete_snapshots_option snapshots_option, const access_condition &amp;condition, const blob_request_options &amp;options, operation_context context)']]],

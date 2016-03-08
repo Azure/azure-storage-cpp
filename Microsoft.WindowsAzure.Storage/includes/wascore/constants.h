@@ -324,12 +324,12 @@ namespace azure { namespace storage { namespace protocol {
     // user agent
 #if defined(WIN32)
 #if defined(_MSC_VER)
-    const utility::string_t header_value_user_agent(U("Azure-Storage/2.2.0 (Native; Windows; MSC_VER ") + utility::conversions::to_string_t(std::to_string(_MSC_VER)) + U(")"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.3.0 (Native; Windows; MSC_VER ") + utility::conversions::to_string_t(std::to_string(_MSC_VER)) + U(")"));
 #else
-    const utility::string_t header_value_user_agent(U("Azure-Storage/2.2.0 (Native; Windows)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.3.0 (Native; Windows)"));
 #endif
 #else
-    const utility::string_t header_value_user_agent(U("Azure-Storage/2.2.0 (Native)"));
+    const utility::string_t header_value_user_agent(U("Azure-Storage/2.3.0 (Native)"));
 #endif
 
 }}} // namespace azure::storage::protocol

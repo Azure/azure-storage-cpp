@@ -186,8 +186,8 @@ void check_account_sas_permission_queue(azure::storage::cloud_storage_account ac
     auto sas_queue = sas_queue_client.get_queue_reference(queue_name);
 
     auto permission = policy.permission();
-    if (((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
-        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write)
+    if ((((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
+        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write))
         && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
     {
         sas_queue.create();
@@ -272,8 +272,8 @@ void check_account_sas_permission_table(azure::storage::cloud_storage_account ac
     auto sas_table = sas_table_client.get_table_reference(table_name);
 
     auto permission = policy.permission();
-    if (((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
-        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write)
+    if ((((permission & azure::storage::account_shared_access_policy::permissions::create) == azure::storage::account_shared_access_policy::permissions::create)
+        || ((permission & azure::storage::account_shared_access_policy::permissions::write) == azure::storage::account_shared_access_policy::permissions::write))
         && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::container) == azure::storage::account_shared_access_policy::resource_types::container))
     {
         sas_table.create();
@@ -701,9 +701,8 @@ SUITE(Core)
         {
             policy.set_permissions((uint8_t)i);
             check_account_sas_permission_blob(account, policy);
-            //Currently account SAS is supported only for the Blob and File services. It will be supported for the Table and Queue services in the near future.
-            //check_account_sas_permission_queue(account, policy);
-            //check_account_sas_permission_table(account, policy);
+            check_account_sas_permission_queue(account, policy);
+            check_account_sas_permission_table(account, policy);
         }
     }
 
@@ -723,9 +722,8 @@ SUITE(Core)
         {
             policy.set_service_type((azure::storage::account_shared_access_policy::service_types)i);
             check_account_sas_permission_blob(account, policy);
-            //Currently account SAS is supported only for the Blob and File services. It will be supported for the Table and Queue services in the near future.
-            //check_account_sas_permission_queue(account, policy);
-            //check_account_sas_permission_table(account, policy);
+            check_account_sas_permission_queue(account, policy);
+            check_account_sas_permission_table(account, policy);
         }
     }
 
@@ -745,9 +743,8 @@ SUITE(Core)
         {
             policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)i);
             check_account_sas_permission_blob(account, policy);
-            //Currently account SAS is supported only for the Blob and File services. It will be supported for the Table and Queue services in the near future.
-            //check_account_sas_permission_queue(account, policy);
-            //check_account_sas_permission_table(account, policy);
+            check_account_sas_permission_queue(account, policy);
+            check_account_sas_permission_table(account, policy);
         }
     }
 

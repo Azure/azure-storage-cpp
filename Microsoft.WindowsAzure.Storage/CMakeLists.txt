@@ -44,7 +44,9 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
  
   set(STRICT_CXX_FLAGS ${WARNINGS} "-Werror -pedantic")
  
-  add_definitions(-DBOOST_LOG_DYN_LINK)
+  if(NOT Boost_USE_STATIC_LIBS)
+    add_definitions(-DBOOST_LOG_DYN_LINK)
+  endif()
 else()
   message("-- Unknown compiler, success is doubtful.")
 endif()

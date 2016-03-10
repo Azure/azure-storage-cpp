@@ -476,7 +476,7 @@ SUITE(Core)
     TEST_FIXTURE(test_base, cloud_storage_account_endpoint_suffix_http)
     {
         utility::ostringstream_t str;
-        str << U("DefaultEndpointsProtocol=http;AccountName=") << test_account_name << ";AccountKey=" << test_account_key << ";EndpointSuffix=" << test_endpoint_suffix;
+        str << U("DefaultEndpointsProtocol=http;AccountName=") << test_account_name << U(";AccountKey=") << test_account_key << U(";EndpointSuffix=") << test_endpoint_suffix;
         auto account = azure::storage::cloud_storage_account::parse(str.str());
 
         CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().primary_uri().to_string());
@@ -499,7 +499,7 @@ SUITE(Core)
     TEST_FIXTURE(test_base, cloud_storage_account_endpoint_suffix_https)
     {
         utility::ostringstream_t str;
-        str << U("DefaultEndpointsProtocol=https;AccountName=") << test_account_name << ";AccountKey=" << test_account_key << ";EndpointSuffix=" << test_endpoint_suffix;
+        str << U("DefaultEndpointsProtocol=https;AccountName=") << test_account_name << U(";AccountKey=") << test_account_key << U(";EndpointSuffix=") << test_endpoint_suffix;
         auto account = azure::storage::cloud_storage_account::parse(str.str());
 
         CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().primary_uri().to_string());
@@ -606,11 +606,11 @@ SUITE(Core)
 
         for (int i = 1; i < 8; i++) {
             utility::ostringstream_t str;
-            str << U("DefaultEndpointsProtocol=") << scheme << ";";
-            if (i & 1) str << U("BlobEndpoint=") << endpoints[0] << ";";
-            if (i & 2) str << U("QueueEndpoint=") << endpoints[1] << ";";
-            if (i & 4) str << U("TableEndpoint=") << endpoints[2] << ";";
-            str << U("AccountName=") << account_name << ";";
+            str << U("DefaultEndpointsProtocol=") << scheme << U(";");
+            if (i & 1) str << U("BlobEndpoint=") << endpoints[0] << U(";");
+            if (i & 2) str << U("QueueEndpoint=") << endpoints[1] << U(";");
+            if (i & 4) str << U("TableEndpoint=") << endpoints[2] << U(";");
+            str << U("AccountName=") << account_name << U(";");
             str << U("AccountKey=") << account_key;
 
             auto account = azure::storage::cloud_storage_account::parse(str.str());

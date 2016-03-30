@@ -209,6 +209,7 @@
     <ClCompile Include="src\cloud_storage_account.cpp" />
     <ClCompile Include="src\cloud_table.cpp" />
     <ClCompile Include="src\cloud_table_client.cpp" />
+    <ClCompile Include="src\constants.cpp" />
     <ClCompile Include="src\hashing.cpp" />
     <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\mime_multipart_helper.cpp" />
@@ -240,6 +241,7 @@
     <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="includes\wascore\constants.dat" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

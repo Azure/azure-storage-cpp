@@ -236,6 +236,9 @@
     <ClCompile Include="src\cloud_append_blob.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\constants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="version.rc">
@@ -244,5 +247,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="includes\wascore\constants.dat">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

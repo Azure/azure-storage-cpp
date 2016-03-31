@@ -44,7 +44,7 @@ new `UnitTest++.vsnet2005.vcxproj` is generated and added to the solution.
 
 #### Configuration
 The only step to configure testing is to change the `test_configuration.json`
-file in `Microsoft.WindowsAzure.Storage/tests` folder. You should insert your
+file in `Microsoft.WindowsAzure.Storage\tests` folder. You should insert your
 storage account information into the file. If you want to run the tests against
 Azure Storage Emulator, change `target` to `devstore`. If you want to run the
 tests against real Azure Storage, use real connection string in `production`.
@@ -158,15 +158,15 @@ before contributions can be accepted.
 * Make sure you've signed the CLA before you start working on any change.
 * Discuss any proposed contribution with the team via a GitHub issue **before**
 starting development.
-* Code must be professional quality
-	* You should strive to mimic the style with which we have written the library
-	* Clean, well-commented, well-designed code
+* Code must be professional quality.
+	* You should strive to mimic the style with which we have written the library.
+	* Clean, well-commented, well-designed code.
 	* Try to limit the number of commits for a feature to 1-2. If you end up having
 	too many we may ask you to squash your changes into fewer commits.
 * [Changelog.txt](Changelog.txt) needs to be updated describing the new change.
-* [BreakingChanges](BreakingChanges) contains changes that break
+* [BreakingChanges.txt](BreakingChanges.txt) contains changes that break
 backward-compatibility.
-* Thoroughly test your feature
+* Thoroughly test your feature.
 
 ### Branching Policy
 Changes should be based on the `dev` branch. We're following [semver](http://semver.org/).

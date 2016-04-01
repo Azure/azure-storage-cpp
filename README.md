@@ -70,7 +70,7 @@ To get started with the coding, please visit the following articles:
 - [How to use Table Storage from C++](https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-tables/)
 - [How to use Queue Storage from C++](https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-queues)
 
-To accomplish specific tasks, please find the code samples at [samples folder](https://github.com/Azure/azure-storage-cpp/tree/master/Microsoft.WindowsAzure.Storage).
+To accomplish specific tasks, please find the code samples at [samples folder](Microsoft.WindowsAzure.Storage/samples).
 
 ## Getting Started on Linux
 As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux) to compile it. Current version of the library depends on Casablanca version 2.8.0.
@@ -135,5 +135,5 @@ Please note the current build script is only tested on Ubuntu 14.04. Please upda
 
 
 # Learn More
-- [Microsoft Azure Storage Client Library for C++ v2.0.0](https://github.com/Azure/azure-storage-cpp/blob/master/documentation/Microsoft%20Azure%20Storage%20Client%20Library%20for%20C%2B%2B%202.0.0.md)
+- [Microsoft Azure Storage Client Library for C++ v2.0.0](documentation/Microsoft%20Azure%20Storage%20Client%20Library%20for%20C%2B%2B%202.0.0.md)
 - [Microsoft Azure Storage Client Library for C++ v1.0.0 (General Availability)](http://blogs.msdn.com/b/windowsazurestorage/archive/2015/04/29/microsoft-azure-storage-client-library-for-c-v1-0-0-general-availability.aspx)

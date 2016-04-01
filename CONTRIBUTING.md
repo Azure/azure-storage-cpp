@@ -56,13 +56,6 @@ project properties for the unit test project, select **Configuration Properties-
 Debugging->Command Arguments**. Enter a space-separated list of `SUITE:TEST` and/or
 `SUITE`. For example: `Queue:Queue_Messages`, `Core`, or `Table TableClient`.
 
-### Samples
-Samples are under `Microsoft.WindowsAzure.Storage\samples`.
-
-### Testing Features
-As you develop a feature, you'll need to write tests to ensure quality. You should
-also run existing tests related to your change to address any unexpected breaks.
-
 ### Debug
 To use Fiddler, you need to set the system winhttp proxy. Open an administrator
 command prompt. Run `netsh.exe`. Set the proxy by executing the command: `winhttp
@@ -132,7 +125,6 @@ cd Binaries
 ```
 
 ### Samples
-Samples are under `Microsoft.WindowsAzure.Storage\samples`
 ```bash
 CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
@@ -145,10 +137,6 @@ cd Binaries
 ./samplestables           # run the tables sample
 ./samplesqueues           # run the queues sample
 ```
-
-### Testing Features
-As you develop a feature, you'll need to write tests to ensure quality. You should
-also run existing tests related to your change to address any unexpected breaks.
 
 ## Pull Requests
 
@@ -168,6 +156,10 @@ starting development.
 backward-compatibility.
 * Thoroughly test your feature.
 
+### Testing Features
+As you develop a feature, you'll need to write tests to ensure quality. You should
+also run existing tests related to your change to address any unexpected breaks.
+
 ### Branching Policy
 Changes should be based on the `dev` branch. We're following [semver](http://semver.org/).
 We generally release any breaking changes in the next major version (e.g. 1.0, 2.0)
@@ -176,7 +168,10 @@ and non-breaking changes in the next minor or major version (e.g. 2.1, 2.2).
 ### Adding Features for All Platforms
 We strive to release each new feature for each of our environments at the same time.
 Therefore, we ask that all contributions be written for both Window and Linux. This
-includes testing work for both platforms as well.
+includes testing work for both platforms as well. Because most of our code is written using
+standard C++11 and upon a cross-platform library Casablanca, we expect contributions are
+also using standard language and cross-platform libraries, so that it won't cause much effort
+for cross-platform support.
 
 ### Review Process
 We expect all guidelines to be met before accepting a pull request. As such, we will

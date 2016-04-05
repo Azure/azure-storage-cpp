@@ -133,8 +133,8 @@ make
 ```bash
 cd Binaries
 ./samplesblobs            # run the blobs sample
-./samplesjson             # run the tables sample with JSON payload
 ./samplestables           # run the tables sample
+./samplesjson             # run the tables sample with json_no_metadata to reduce payload size
 ./samplesqueues           # run the queues sample
 ```
 

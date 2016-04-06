@@ -13,7 +13,7 @@ other toolset should be usable.
 
 #### Open Solution
 Open the project from Visual Studio using **File->Open->Project/Solution...**
-and navigating to the `Microsoft.WindowsAzure.Storage.v140.sln` (for Visual
+and navigate to the `Microsoft.WindowsAzure.Storage.v140.sln` (for Visual
 Studio 2015) or `Microsoft.WindowsAzure.Storage.v120.sln` (for Visual Studio
 2013) solution file in the repo base folder. The dependent library Casablanca
 will be installed by NuGet upon building.

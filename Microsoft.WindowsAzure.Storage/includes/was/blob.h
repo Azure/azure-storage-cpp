@@ -1480,12 +1480,12 @@ namespace azure { namespace storage {
         int64_t m_page_blob_sequence_number;
         int m_append_blob_committed_block_count;
 
-        void copy_from_root(const cloud_blob_properties& root_blob_properties);
-        void update_etag_and_last_modified(const cloud_blob_properties& parsed_properties);
-        void update_size(const cloud_blob_properties& parsed_properties);
-        void update_page_blob_sequence_number(const cloud_blob_properties& parsed_properties);
-        void update_append_blob_committed_block_count(const cloud_blob_properties& parsed_properties);
-        void update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5);
+        WASTORAGE_API void copy_from_root(const cloud_blob_properties& root_blob_properties);
+        WASTORAGE_API void update_etag_and_last_modified(const cloud_blob_properties& parsed_properties);
+        WASTORAGE_API void update_size(const cloud_blob_properties& parsed_properties);
+        WASTORAGE_API void update_page_blob_sequence_number(const cloud_blob_properties& parsed_properties);
+        WASTORAGE_API void update_append_blob_committed_block_count(const cloud_blob_properties& parsed_properties);
+        WASTORAGE_API void update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5);
 
         friend class cloud_blob;
         friend class cloud_block_blob;
@@ -2288,7 +2288,7 @@ namespace azure { namespace storage {
         azure::storage::lease_state m_lease_state;
         azure::storage::lease_duration m_lease_duration;
 
-        void update_etag_and_last_modified(const cloud_blob_container_properties& parsed_properties);
+        WASTORAGE_API void update_etag_and_last_modified(const cloud_blob_container_properties& parsed_properties);
 
         friend class cloud_blob_container;
         friend class protocol::blob_response_parsers;
@@ -2730,7 +2730,7 @@ namespace azure { namespace storage {
             m_directory_delimiter = protocol::directory_delimiter;
         }
 
-        static void parse_blob_name_prefix(const utility::string_t& prefix, utility::string_t& container_name, utility::string_t& actual_prefix);
+        WASTORAGE_API static void parse_blob_name_prefix(const utility::string_t& prefix, utility::string_t& container_name, utility::string_t& actual_prefix);
 
         blob_request_options m_default_request_options;
         utility::string_t m_directory_delimiter;
@@ -2765,7 +2765,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="name">The name of the container.</param>
         /// <param name="client">The Blob service client.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
@@ -2774,7 +2774,7 @@ namespace azure { namespace storage {
         /// <param name="client">The Blob service client.</param>
         /// <param name="properties">The properties for the container.</param>
         /// <param name="metadata">The metadata for the container.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
         // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
@@ -3612,7 +3612,7 @@ namespace azure { namespace storage {
 
     private:
 
-        void init(storage_credentials credentials);
+        WASTORAGE_API void init(storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
 
         cloud_blob_client m_client;
@@ -5087,7 +5087,7 @@ namespace azure { namespace storage {
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
         WASTORAGE_API cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, azure::storage::copy_state copy_state);
 
-        void assert_no_snapshot() const;
+        WASTORAGE_API void assert_no_snapshot() const;
 
         void set_type(blob_type value)
         {
@@ -5100,7 +5100,7 @@ namespace azure { namespace storage {
 
     private:
 
-        void init(utility::string_t snapshot_time, storage_credentials credentials);
+        WASTORAGE_API void init(utility::string_t snapshot_time, storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
 
         utility::string_t m_name;
@@ -6959,7 +6959,7 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         friend class cloud_blob_container;
         friend class cloud_blob_directory;

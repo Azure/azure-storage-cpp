@@ -56,7 +56,7 @@ namespace azure { namespace storage { namespace core {
     class cryptography_hash_algorithm
     {
     public:
-        ~cryptography_hash_algorithm();
+        WASTORAGE_API ~cryptography_hash_algorithm();
 
         operator BCRYPT_ALG_HANDLE() const
         {
@@ -64,7 +64,7 @@ namespace azure { namespace storage { namespace core {
         }
 
     protected:
-        cryptography_hash_algorithm(LPCWSTR algorithm_id, ULONG flags);
+        WASTORAGE_API cryptography_hash_algorithm(LPCWSTR algorithm_id, ULONG flags);
 
     private:
         BCRYPT_ALG_HANDLE m_algorithm_handle;
@@ -107,16 +107,16 @@ namespace azure { namespace storage { namespace core {
     class cryptography_hash_provider_impl : public hash_provider_impl
     {
     public:
-        cryptography_hash_provider_impl(const cryptography_hash_algorithm& algorithm, const std::vector<uint8_t>& key);
-        ~cryptography_hash_provider_impl() override;
+        WASTORAGE_API cryptography_hash_provider_impl(const cryptography_hash_algorithm& algorithm, const std::vector<uint8_t>& key);
+        WASTORAGE_API ~cryptography_hash_provider_impl() override;
 
         bool is_enabled() const override
         {
             return true;
         }
 
-        void write(const uint8_t* data, size_t count) override;
-        void close() override;
+        WASTORAGE_API void write(const uint8_t* data, size_t count) override;
+        WASTORAGE_API void close() override;
 
         utility::string_t hash() const override
         {
@@ -132,13 +132,13 @@ namespace azure { namespace storage { namespace core {
     class hmac_sha256_hash_provider_impl : public cryptography_hash_provider_impl
     {
     public:
-        hmac_sha256_hash_provider_impl(const std::vector<uint8_t>& key);
+        WASTORAGE_API hmac_sha256_hash_provider_impl(const std::vector<uint8_t>& key);
     };
 
     class md5_hash_provider_impl : public cryptography_hash_provider_impl
     {
     public:
-        md5_hash_provider_impl();
+        WASTORAGE_API md5_hash_provider_impl();
     };
 
 #else // Linux

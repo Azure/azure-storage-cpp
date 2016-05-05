@@ -36,13 +36,13 @@ namespace azure { namespace storage { namespace core {
             m_empty_event.set();
         }
 
-        pplx::task<void> lock_async();
-        void unlock();
-        pplx::task<void> wait_all_async();
+        WASTORAGE_API pplx::task<void> lock_async();
+        WASTORAGE_API void unlock();
+        WASTORAGE_API pplx::task<void> wait_all_async();
 
     private:
 
-        pplx::task_completion_event<void> dequeue_pending();
+        WASTORAGE_API pplx::task_completion_event<void> dequeue_pending();
 
         int m_count;
         int m_initial_count;

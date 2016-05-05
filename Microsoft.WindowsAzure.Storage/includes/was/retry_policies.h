@@ -90,7 +90,7 @@ namespace azure { namespace storage {
         {
         }
 
-        void align_retry_interval(retry_info& retry_info);
+        WASTORAGE_API void align_retry_interval(retry_info& retry_info);
 
         /// <summary>
         /// The last attempt against the primary location.

@@ -240,10 +240,10 @@ namespace azure { namespace storage {
     private:
 
         WASTORAGE_API void initialize_default_endpoints(bool use_https);
-        static cloud_storage_account get_development_storage_account(const web::http::uri& proxy_uri);
-        static cloud_storage_account parse_devstore_settings(std::map<utility::string_t, utility::string_t> settings);
-        static cloud_storage_account parse_defaults_settings(std::map<utility::string_t, utility::string_t> settings);
-        static cloud_storage_account parse_explicit_settings(std::map<utility::string_t, utility::string_t> settings);
+        WASTORAGE_API static cloud_storage_account get_development_storage_account(const web::http::uri& proxy_uri);
+        WASTORAGE_API static cloud_storage_account parse_devstore_settings(std::map<utility::string_t, utility::string_t> settings);
+        WASTORAGE_API static cloud_storage_account parse_defaults_settings(std::map<utility::string_t, utility::string_t> settings);
+        WASTORAGE_API static cloud_storage_account parse_explicit_settings(std::map<utility::string_t, utility::string_t> settings);
 
         bool m_initialized;
         bool m_default_endpoints;

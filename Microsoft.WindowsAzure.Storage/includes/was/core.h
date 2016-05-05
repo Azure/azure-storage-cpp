@@ -765,8 +765,8 @@ namespace azure { namespace storage {
 
     private:
 
-        void parse_headers(const web::http::http_headers& headers);
-        void parse_body(const web::http::http_response& response);
+        WASTORAGE_API void parse_headers(const web::http::http_headers& headers);
+        WASTORAGE_API void parse_body(const web::http::http_response& response);
 
         bool m_is_response_available;
         utility::datetime m_start_time;

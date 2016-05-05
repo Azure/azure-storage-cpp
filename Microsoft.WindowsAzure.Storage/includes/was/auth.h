@@ -30,7 +30,7 @@ namespace azure { namespace storage {
 
 namespace azure { namespace storage { namespace protocol {
 
-    utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials);
+    WASTORAGE_API utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials);
 
     const utility::string_t auth_name_shared_key(U("SharedKey"));
     const utility::string_t auth_name_shared_key_lite(U("SharedKeyLite"));
@@ -77,18 +77,18 @@ namespace azure { namespace storage { namespace protocol {
         /// </summary>
         /// <param name="only_comp"><c>true</c> to include only the comp parameters in the canonicalization string, as
         /// for Shared Key Lite; <c>false</c> to include all URI parameters in the string.</param>
-        void append_resource(bool only_comp);
+        WASTORAGE_API void append_resource(bool only_comp);
 
         /// <summary>
         /// Appends a header to the canonicalization string.
         /// </summary>
         /// <param name="header_name">The header name.</param>
-        void append_header(const utility::string_t& header_name);
+        WASTORAGE_API void append_header(const utility::string_t& header_name);
 
         /// <summary>
         /// Appends Content-Length header to the canonicalization string.
         /// </summary>
-        void append_content_length_header();
+        WASTORAGE_API void append_content_length_header();
 
         /// <summary>
         /// Appends the Date header to the canonicalization string if it exists on the request. Optionally appends
@@ -96,12 +96,12 @@ namespace azure { namespace storage { namespace protocol {
         /// </summary>
         /// <param name="allow_x_ms_date"><c>true</c> to append the x_ms_date header; <c>false</c> to append 
         /// an empty string.</param>
-        void append_date_header(bool allow_x_ms_date);
+        WASTORAGE_API void append_date_header(bool allow_x_ms_date);
 
         /// <summary>
         /// Appends the x-ms- headers to the canonicalization string.
         /// </summary>
-        void append_x_ms_headers();
+        WASTORAGE_API void append_x_ms_headers();
 
     private:
         
@@ -433,11 +433,11 @@ namespace azure { namespace storage { namespace protocol {
 
 #pragma region Shared Access Signatures
 
-    utility::string_t get_account_sas_token(const utility::string_t& identifier, const account_shared_access_policy& policy, const storage_credentials& credentials);
-    utility::string_t get_blob_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials);
-    utility::string_t get_queue_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials);
-    utility::string_t get_table_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& table_name, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials);
-    storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource);
+    WASTORAGE_API utility::string_t get_account_sas_token(const utility::string_t& identifier, const account_shared_access_policy& policy, const storage_credentials& credentials);
+    WASTORAGE_API utility::string_t get_blob_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials);
+    WASTORAGE_API utility::string_t get_queue_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials);
+    WASTORAGE_API utility::string_t get_table_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& table_name, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials);
+    WASTORAGE_API storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource);
 
 #pragma endregion
 

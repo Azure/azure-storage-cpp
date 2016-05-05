@@ -728,7 +728,7 @@ namespace azure { namespace storage {
             m_default_request_options.set_retry_policy(exponential_retry_policy());
         }
 
-        queue_request_options get_modified_options(const queue_request_options& options) const;
+        WASTORAGE_API queue_request_options get_modified_options(const queue_request_options& options) const;
 
         queue_request_options m_default_request_options;
     };
@@ -1534,13 +1534,13 @@ namespace azure { namespace storage {
 
         WASTORAGE_API cloud_queue(cloud_queue_client client, utility::string_t name);
 
-        static cloud_queue_client create_service_client(const storage_uri& uri, storage_credentials credentials);
-        static utility::string_t read_queue_name(const storage_uri& uri);
-        static storage_uri create_uri(const storage_uri& uri);
-        queue_request_options get_modified_options(const queue_request_options& options) const;
-        pplx::task<bool> create_async_impl(const queue_request_options& options, operation_context context, bool allow_conflict);
-        pplx::task<bool> delete_async_impl(const queue_request_options& options, operation_context context, bool allow_not_found);
-        pplx::task<bool> exists_async_impl(const queue_request_options& options, operation_context context, bool allow_secondary) const;
+        WASTORAGE_API static cloud_queue_client create_service_client(const storage_uri& uri, storage_credentials credentials);
+        WASTORAGE_API static utility::string_t read_queue_name(const storage_uri& uri);
+        WASTORAGE_API static storage_uri create_uri(const storage_uri& uri);
+        WASTORAGE_API queue_request_options get_modified_options(const queue_request_options& options) const;
+        WASTORAGE_API pplx::task<bool> create_async_impl(const queue_request_options& options, operation_context context, bool allow_conflict);
+        WASTORAGE_API pplx::task<bool> delete_async_impl(const queue_request_options& options, operation_context context, bool allow_not_found);
+        WASTORAGE_API pplx::task<bool> exists_async_impl(const queue_request_options& options, operation_context context, bool allow_secondary) const;
 
         cloud_queue_client m_client;
         utility::string_t m_name;

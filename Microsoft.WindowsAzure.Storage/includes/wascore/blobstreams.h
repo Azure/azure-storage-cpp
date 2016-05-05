@@ -367,12 +367,12 @@ namespace azure { namespace storage { namespace core {
 
     protected:
 
-        pplx::task<void> upload_buffer();
-        pplx::task<void> commit_blob();
+        WASTORAGE_API pplx::task<void> upload_buffer();
+        WASTORAGE_API pplx::task<void> commit_blob();
 
     private:
 
-        utility::string_t get_next_block_id();
+        WASTORAGE_API utility::string_t get_next_block_id();
 
         std::shared_ptr<cloud_block_blob> m_blob;
         utility::string_t m_block_id_prefix;
@@ -490,8 +490,8 @@ namespace azure { namespace storage { namespace core {
 
     protected:
 
-        pplx::task<void> upload_buffer();
-        pplx::task<void> commit_blob();
+        WASTORAGE_API pplx::task<void> upload_buffer();
+        WASTORAGE_API pplx::task<void> commit_blob();
 
     private:
 

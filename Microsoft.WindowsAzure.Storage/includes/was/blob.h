@@ -5087,7 +5087,7 @@ namespace azure { namespace storage {
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
         WASTORAGE_API cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, azure::storage::copy_state copy_state);
 
-        WASTORAGE_API void assert_no_snapshot() const;
+        void assert_no_snapshot() const;
 
         void set_type(blob_type value)
         {

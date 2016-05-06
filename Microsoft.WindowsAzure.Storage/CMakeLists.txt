@@ -26,6 +26,11 @@ if(UNIX)
   endif()
 
   option(BUILD_SHARED_LIBS "Build shared Libraries." ON)
+
+  file(GLOB WAS_HEADERS includes/was/*.h)
+  install(FILES ${WAS_HEADERS} DESTINATION include/was)
+  file(GLOB WASCORE_HEADERS includes/wascore/*.h)
+  install(FILES ${WASCORE_HEADERS} DESTINATION include/wascore)
 else()
   message("-- Unsupported Build Platform.")
 endif()

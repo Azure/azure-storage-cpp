@@ -139,8 +139,8 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="UnitTest++\UnitTest++.vsnet2005.v120.vcxproj">
-      <Project>{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}</Project>
+    <ProjectReference Include="UnitTest++\UnitTest++.vsnet2005.vcxproj">
+      <Project>{64a4fefe-0461-4e95-8cc1-91ef5f57dbc6}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

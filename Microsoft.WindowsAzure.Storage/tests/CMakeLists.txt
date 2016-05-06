@@ -37,11 +37,5 @@ add_executable(${AZURESTORAGE_LIBRARY_TEST} ${SOURCES})
 
 target_link_libraries(${AZURESTORAGE_LIBRARY_TEST} ${AZURESTORAGE_LIBRARIES} ${UnitTest++_LIBRARIES})
 
-# Portions specific to cpprest binary versioning.
-if(UNIX)
-  set_target_properties(${AZURESTORAGE_LIBRARY_TEST} PROPERTIES
-    SOVERSION ${AZURESTORAGE_VERSION_MAJOR}.${AZURESTORAGE_VERSION_MINOR})
-endif()
-
 # Copy test configuration to output directory
 file(COPY test_configurations.json DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

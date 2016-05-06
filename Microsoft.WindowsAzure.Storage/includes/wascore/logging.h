@@ -31,18 +31,18 @@ namespace azure { namespace storage { namespace core {
             return m_instance;
         }
 
-        WASTORAGE_API ~logger();
+        ~logger();
 
-        WASTORAGE_API void log(azure::storage::operation_context context, client_log_level level, const std::string& message) const;
+        void log(azure::storage::operation_context context, client_log_level level, const std::string& message) const;
 
 #ifdef WIN32
-        WASTORAGE_API void log(azure::storage::operation_context context, client_log_level level, const std::wstring& message) const;
+        void log(azure::storage::operation_context context, client_log_level level, const std::wstring& message) const;
 #endif
-        WASTORAGE_API bool should_log(azure::storage::operation_context context, client_log_level level) const;
+        bool should_log(azure::storage::operation_context context, client_log_level level) const;
 
     private:
 
-        WASTORAGE_API logger();
+        logger();
 
         static logger m_instance;
     };

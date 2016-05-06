@@ -71,7 +71,7 @@ public:
     /// Parse the given xml string/stream. Returns true if it finished parsing the stream to the end, and false
     /// if it was asked to exit early via pause()
     /// </summary>
-    WASTORAGE_API bool parse();
+    bool parse();
 
 protected:
 
@@ -117,32 +117,32 @@ protected:
     /// <summary>
     /// Returns the parent element name
     /// </summary>
-    WASTORAGE_API utility::string_t get_parent_element_name(size_t pos = 0);
+    utility::string_t get_parent_element_name(size_t pos = 0);
 
     /// <summary>
     /// Returns the current element name
     /// </summary>
-    WASTORAGE_API utility::string_t get_current_element_name();
+    utility::string_t get_current_element_name();
 
     /// <summary>
     /// Returns the current element name with the prefix if any. 
     /// </summary>
-    WASTORAGE_API utility::string_t get_current_element_name_with_prefix();
+    utility::string_t get_current_element_name_with_prefix();
 
     /// <summary>
     /// Returns the current element value
     /// </summary>
-    WASTORAGE_API utility::string_t get_current_element_text();
+    utility::string_t get_current_element_text();
 
     /// <summary>
     /// Moves to the first attribute in the node
     /// </summary>
-    WASTORAGE_API bool move_to_first_attribute();
+    bool move_to_first_attribute();
 
     /// <summary>
     /// Moves to the next attribute in the node
     /// </summary>
-    WASTORAGE_API bool move_to_next_attribute();
+    bool move_to_next_attribute();
 
     /// <summary>
     /// Extracts the current element value into the provided type
@@ -157,7 +157,7 @@ protected:
     /// <summary>
     /// Initialize the reader
     /// </summary>
-    WASTORAGE_API void initialize(concurrency::streams::istream stream);
+    void initialize(concurrency::streams::istream stream);
 
     /// <summary>
     /// Can be called by the derived classes in the handle_* routines, to cause the parse routine to exit early,
@@ -194,33 +194,33 @@ protected:
     /// <summary>
     /// Initialize the writer
     /// </summary>
-    WASTORAGE_API void initialize(std::ostream& stream);
+    void initialize(std::ostream& stream);
 
     /// <summary>
     /// Finalize the writer
     /// </summary>
-    WASTORAGE_API void finalize();
+    void finalize();
 
     /// <summary>
     /// Write the start element tag
     /// </summary>
-    WASTORAGE_API void write_start_element(const utility::string_t& elementName, const utility::string_t& namespaceName = U(""));
+    void write_start_element(const utility::string_t& elementName, const utility::string_t& namespaceName = U(""));
 
     /// <summary>
     /// Writes the start element tag with a prefix
     /// </summary>
-    WASTORAGE_API void write_start_element_with_prefix(const utility::string_t& elementPrefix, const utility::string_t& elementName,
+    void write_start_element_with_prefix(const utility::string_t& elementPrefix, const utility::string_t& elementName,
                                          const utility::string_t& namespaceName = U(""));
 
     /// <summary>
     /// Write the end element tag for the current element
     /// </summary>
-    WASTORAGE_API void write_end_element();
+    void write_end_element();
 
     /// <summary>
     /// Write the full end element tag for the current element
     /// </summary>
-    WASTORAGE_API void write_full_end_element();
+    void write_full_end_element();
 
     /// <summary>
     /// Write an element including the name and text.
@@ -234,27 +234,27 @@ protected:
     /// <summary>
     /// Write an element including the name and text.
     /// </summary>
-    WASTORAGE_API void write_element(const utility::string_t& elementName, const utility::string_t& value);
+    void write_element(const utility::string_t& elementName, const utility::string_t& value);
 
     /// <summary>
     /// Write an element including the prefix, name and text.
     /// </summary>
-    WASTORAGE_API void write_element_with_prefix(const utility::string_t& prefix, const utility::string_t& elementName, const utility::string_t& value);
+    void write_element_with_prefix(const utility::string_t& prefix, const utility::string_t& elementName, const utility::string_t& value);
 
     /// <summary>
     /// Write raw data
     /// </summary>
-    WASTORAGE_API void write_raw(const utility::string_t& data);
+    void write_raw(const utility::string_t& data);
 
     /// <summary>
     /// Write a string
     /// </summary>
-    WASTORAGE_API void write_string(const utility::string_t& string);
+    void write_string(const utility::string_t& string);
 
     /// <summary>
     /// Write an attribute string with a prefix
     /// </summary>
-    WASTORAGE_API void write_attribute_string(const utility::string_t& prefix, const utility::string_t& name,
+    void write_attribute_string(const utility::string_t& prefix, const utility::string_t& name,
                                 const utility::string_t& namespaceUri, const utility::string_t& value);
 
 

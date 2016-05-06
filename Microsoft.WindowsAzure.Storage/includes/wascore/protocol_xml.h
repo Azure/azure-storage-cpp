@@ -319,7 +319,7 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        WASTORAGE_API std::string write(const std::vector<block_list_item>& blocks);
+        std::string write(const std::vector<block_list_item>& blocks);
     };
 
     template<typename Policy>
@@ -577,7 +577,7 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        WASTORAGE_API std::string write(const cloud_queue_message& message);
+        std::string write(const cloud_queue_message& message);
     };
 
     class service_properties_reader : public core::xml::xml_reader
@@ -597,8 +597,8 @@ namespace azure { namespace storage { namespace protocol {
 
     protected:
 
-        WASTORAGE_API virtual void handle_element(const utility::string_t& element_name);
-        WASTORAGE_API virtual void handle_end_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
 
         service_properties m_service_properties;
         service_properties::cors_rule m_current_cors_rule;
@@ -607,9 +607,9 @@ namespace azure { namespace storage { namespace protocol {
 
     private:
 
-        WASTORAGE_API void handle_logging(const utility::string_t& element_name);
-        WASTORAGE_API void handle_metrics(service_properties::metrics_properties& metrics, const utility::string_t& element_name);
-        WASTORAGE_API void handle_cors_rule(const utility::string_t& element_name);
+        void handle_logging(const utility::string_t& element_name);
+        void handle_metrics(service_properties::metrics_properties& metrics, const utility::string_t& element_name);
+        void handle_cors_rule(const utility::string_t& element_name);
     };
 
     class service_properties_writer : public core::xml::xml_writer
@@ -620,14 +620,14 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        WASTORAGE_API std::string write(const service_properties& properties, const service_properties_includes& includes);
+        std::string write(const service_properties& properties, const service_properties_includes& includes);
 
     private:
 
-        WASTORAGE_API void write_logging(const service_properties::logging_properties& logging);
-        WASTORAGE_API void write_metrics(const service_properties::metrics_properties& metrics);
-        WASTORAGE_API void write_cors_rule(const service_properties::cors_rule& rule);
-        WASTORAGE_API void write_retention_policy(bool enabled, int days);
+        void write_logging(const service_properties::logging_properties& logging);
+        void write_metrics(const service_properties::metrics_properties& metrics);
+        void write_cors_rule(const service_properties::cors_rule& rule);
+        void write_retention_policy(bool enabled, int days);
     };
 
     class service_stats_reader : public core::xml::xml_reader
@@ -653,7 +653,7 @@ namespace azure { namespace storage { namespace protocol {
 
     private:
 
-        WASTORAGE_API void handle_geo_replication_status(const utility::string_t& element_name);
+        void handle_geo_replication_status(const utility::string_t& element_name);
     };
 
 }}} // namespace azure::storage::protocol

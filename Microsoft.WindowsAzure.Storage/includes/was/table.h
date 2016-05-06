@@ -1942,7 +1942,7 @@ namespace azure { namespace storage {
             m_default_request_options.set_retry_policy(exponential_retry_policy());
         }
 
-        WASTORAGE_API table_request_options get_modified_options(const table_request_options& options) const;
+        table_request_options get_modified_options(const table_request_options& options) const;
 
         table_request_options m_default_request_options;
     };
@@ -2473,13 +2473,13 @@ namespace azure { namespace storage {
 
         WASTORAGE_API cloud_table(cloud_table_client client, utility::string_t name);
 
-        WASTORAGE_API static cloud_table_client create_service_client(const storage_uri& uri, storage_credentials credentials);
-        WASTORAGE_API static utility::string_t read_table_name(const storage_uri& uri);
-        WASTORAGE_API static storage_uri create_uri(const storage_uri& uri);
-        WASTORAGE_API table_request_options get_modified_options(const table_request_options& options) const;
-        WASTORAGE_API pplx::task<bool> create_async_impl(const table_request_options& options, operation_context context, bool allow_conflict);
-        WASTORAGE_API pplx::task<bool> delete_async_impl(const table_request_options& options, operation_context context, bool allow_not_found);
-        WASTORAGE_API pplx::task<bool> exists_async_impl(const table_request_options& options, operation_context context, bool allow_secondary) const;
+        static cloud_table_client create_service_client(const storage_uri& uri, storage_credentials credentials);
+        static utility::string_t read_table_name(const storage_uri& uri);
+        static storage_uri create_uri(const storage_uri& uri);
+        table_request_options get_modified_options(const table_request_options& options) const;
+        pplx::task<bool> create_async_impl(const table_request_options& options, operation_context context, bool allow_conflict);
+        pplx::task<bool> delete_async_impl(const table_request_options& options, operation_context context, bool allow_not_found);
+        pplx::task<bool> exists_async_impl(const table_request_options& options, operation_context context, bool allow_secondary) const;
 
         cloud_table_client m_client;
         utility::string_t m_name;

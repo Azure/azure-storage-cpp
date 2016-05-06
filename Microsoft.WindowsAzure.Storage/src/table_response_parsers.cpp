@@ -25,7 +25,7 @@ namespace azure { namespace storage { namespace protocol {
     utility::string_t table_response_parsers::parse_etag(const web::http::http_response& response)
     {
         web::http::http_headers headers = response.headers();
-        web::http::http_headers::const_iterator itr = headers.find(U("ETag"));
+        web::http::http_headers::const_iterator itr = headers.find(_XPLATSTR("ETag"));
 
         utility::string_t etag;
         if (itr != headers.end())
@@ -236,7 +236,7 @@ namespace azure { namespace storage { namespace protocol {
         if (document.is_object())
         {
             const web::json::object& results_obj = document.as_object();
-            web::json::object::const_iterator value_it = results_obj.find(U("value"));
+            web::json::object::const_iterator value_it = results_obj.find(_XPLATSTR("value"));
             if (value_it != results_obj.cend())
             {
                 const web::json::value& value_obj = value_it->second;

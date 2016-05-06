@@ -48,7 +48,7 @@ SUITE(TableClient)
 
     TEST_FIXTURE(table_service_test_base, TableClient_BaseUri)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net")));
 
         azure::storage::cloud_table_client client(base_uri);
 
@@ -60,8 +60,8 @@ SUITE(TableClient)
 
     TEST_FIXTURE(table_service_test_base, TableClient_BaseUriAndCredentials)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
         azure::storage::table_request_options default_request_options;
 
         azure::storage::cloud_table_client client(base_uri, credentials);
@@ -74,8 +74,8 @@ SUITE(TableClient)
 
     TEST_FIXTURE(table_service_test_base, TableClient_BaseUriAndCredentialsAndDefaultRequestOptions)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
         azure::storage::table_request_options default_request_options;
 
         azure::storage::cloud_table_client client(base_uri, credentials, default_request_options);
@@ -94,8 +94,8 @@ SUITE(TableClient)
 
     TEST_FIXTURE(table_service_test_base, TableClient_MoveConstructor)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.table.core.windows.net")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
         azure::storage::table_request_options default_request_options;
         default_request_options.set_payload_format(azure::storage::table_payload_format::json_no_metadata);
 

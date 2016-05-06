@@ -28,7 +28,7 @@ void blob_service_test_base_with_objects_to_delete::create_containers(const util
         auto index = utility::conversions::print_string(i);
         auto container = m_client.get_container_reference(prefix + index);
         m_containers_to_delete.push_back(container);
-        container.metadata()[U("index")] = index;
+        container.metadata()[_XPLATSTR("index")] = index;
         container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
     }
 }
@@ -40,7 +40,7 @@ void blob_service_test_base_with_objects_to_delete::create_blobs(const azure::st
         auto index = utility::conversions::print_string(i);
         auto blob = container.get_block_blob_reference(prefix + index);
         m_blobs_to_delete.push_back(blob);
-        blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
     }
 }
 
@@ -61,7 +61,7 @@ void blob_service_test_base_with_objects_to_delete::check_container_list(const s
         {
             if (iter->name() == list_iter->name())
             {
-                auto index_str = list_iter->metadata().find(U("index"));
+                auto index_str = list_iter->metadata().find(_XPLATSTR("index"));
                 CHECK(index_str != list_iter->metadata().end());
                 CHECK_UTF8_EQUAL(iter->name(), prefix + index_str->second);
                 containers.erase(iter);
@@ -216,7 +216,7 @@ SUITE(Blob)
         {
             auto index = utility::conversions::print_string(i);
             auto blob = m_container.get_block_blob_reference(prefix + index);
-            blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blobs.push_back(blob);
         }
 
@@ -224,7 +224,7 @@ SUITE(Blob)
         {
             auto index = utility::conversions::print_string(i);
             auto blob = m_container.get_block_blob_reference(prefix2 + index);
-            blob.upload_text(U("test2"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            blob.upload_text(_XPLATSTR("test2"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blobs2.push_back(blob);
         }
 
@@ -234,7 +234,7 @@ SUITE(Blob)
         auto listing = list_all_blobs_from_client(m_container.name(), azure::storage::blob_listing_details::none, 0, azure::storage::blob_request_options());
         CHECK(listing.empty());
 
-        listing = list_all_blobs_from_client(m_container.name() + U("/"), azure::storage::blob_listing_details::none, 0, azure::storage::blob_request_options());
+        listing = list_all_blobs_from_client(m_container.name() + _XPLATSTR("/"), azure::storage::blob_listing_details::none, 0, azure::storage::blob_request_options());
         CHECK_EQUAL(5U, listing.size());
         for (auto listing_iter = listing.begin(); listing_iter != listing.end(); ++listing_iter)
         {
@@ -252,7 +252,7 @@ SUITE(Blob)
 
         std::vector<azure::storage::cloud_blob> blobs_copy(blobs);
 
-        listing = list_all_blobs_from_client(m_container.name() + U("/") + prefix, azure::storage::blob_listing_details::none, 0, azure::storage::blob_request_options());
+        listing = list_all_blobs_from_client(m_container.name() + _XPLATSTR("/") + prefix, azure::storage::blob_listing_details::none, 0, azure::storage::blob_request_options());
         CHECK_EQUAL(3U, listing.size());
         for (auto listing_iter = listing.begin(); listing_iter != listing.end(); ++listing_iter)
         {

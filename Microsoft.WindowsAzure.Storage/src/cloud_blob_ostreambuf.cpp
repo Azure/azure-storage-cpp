@@ -192,7 +192,7 @@ namespace azure { namespace storage { namespace core {
     utility::string_t basic_cloud_block_blob_ostreambuf::get_next_block_id()
     {
         utility::ostringstream_t str;
-        str << m_block_id_prefix << U('-') << std::setw(6) << std::setfill(U('0')) << m_block_list.size();
+        str << m_block_id_prefix << _XPLATSTR('-') << std::setw(6) << std::setfill(_XPLATSTR('0')) << m_block_list.size();
         auto utf8_block_id = utility::conversions::to_utf8string(str.str());
         std::vector<unsigned char> block_id_as_array(utf8_block_id.cbegin(), utf8_block_id.cend());
         utility::string_t block_id(utility::conversions::to_base64(block_id_as_array));

@@ -1954,11 +1954,11 @@ namespace azure { namespace storage {
         {
             if (m_protocol == https_only)
             {
-                return U("https");
+                return _XPLATSTR("https");
             }
             else
             {
-                return U("https,http");
+                return _XPLATSTR("https,http");
             }
         }
 
@@ -2078,7 +2078,7 @@ namespace azure { namespace storage {
                 }
                 else
                 {
-                    return m_minimum_address + U("-") + m_maximum_address;
+                    return m_minimum_address + _XPLATSTR("-") + m_maximum_address;
                 }
             }
 
@@ -2117,42 +2117,42 @@ namespace azure { namespace storage {
             {
                 if (m_permission & read)
                 {
-                    permissions.push_back(U('r'));
+                    permissions.push_back(_XPLATSTR('r'));
                 }
 
                 if (m_permission & add)
                 {
-                    permissions.push_back(U('a'));
+                    permissions.push_back(_XPLATSTR('a'));
                 }
                 
                 if (m_permission & create)
                 {
-                    permissions.push_back(U('c'));
+                    permissions.push_back(_XPLATSTR('c'));
                 }
 
                 if (m_permission & write)
                 {
-                    permissions.push_back(U('w'));
+                    permissions.push_back(_XPLATSTR('w'));
                 }
 
                 if (m_permission & update)
                 {
-                    permissions.push_back(U('u'));
+                    permissions.push_back(_XPLATSTR('u'));
                 }
 
                 if (m_permission & del)
                 {
-                    permissions.push_back(U('d'));
+                    permissions.push_back(_XPLATSTR('d'));
                 }
 
                 if (m_permission & process)
                 {
-                    permissions.push_back(U('p'));
+                    permissions.push_back(_XPLATSTR('p'));
                 }
 
                 if (m_permission & list)
                 {
-                    permissions.push_back(U('l'));
+                    permissions.push_back(_XPLATSTR('l'));
                 }
             }
 
@@ -2171,35 +2171,35 @@ namespace azure { namespace storage {
             {
                 switch (*iter)
                 {
-                case U('r'):
+                case _XPLATSTR('r'):
                     m_permission |= read;
                     break;
 
-                case U('w'):
+                case _XPLATSTR('w'):
                     m_permission |= write;
                     break;
 
-                case U('d'):
+                case _XPLATSTR('d'):
                     m_permission |= del;
                     break;
 
-                case U('l'):
+                case _XPLATSTR('l'):
                     m_permission |= list;
                     break;
 
-                case U('a'):
+                case _XPLATSTR('a'):
                     m_permission |= add;
                     break;
 
-                case U('u'):
+                case _XPLATSTR('u'):
                     m_permission |= update;
                     break;
 
-                case U('p'):
+                case _XPLATSTR('p'):
                     m_permission |= process;
                     break;
 
-                case U('c'):
+                case _XPLATSTR('c'):
                     m_permission |= create;
                     break;
                 }

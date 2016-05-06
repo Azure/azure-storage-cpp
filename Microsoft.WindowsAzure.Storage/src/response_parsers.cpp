@@ -213,7 +213,7 @@ namespace azure { namespace storage { namespace protocol {
     {
         // Check if the response's actual content type matches the expected content type.
         // It is OK if the actual content type has additional parameters (e.g. application/json;odata=minimalmetadata;streaming=true;charset=utf-8).
-        return (actual.size() == expected.size() || (actual.size() > expected.size() && actual.at(expected.size()) == U(';'))) &&
+        return (actual.size() == expected.size() || (actual.size() > expected.size() && actual.at(expected.size()) == _XPLATSTR(';'))) &&
             std::equal(expected.cbegin(), expected.cend(), actual.cbegin());
     }
 

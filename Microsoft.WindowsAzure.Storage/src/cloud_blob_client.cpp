@@ -156,7 +156,7 @@ namespace azure { namespace storage {
 
     void cloud_blob_client::parse_blob_name_prefix(const utility::string_t& prefix, utility::string_t& container_name, utility::string_t& actual_prefix)
     {
-        auto first_slash = prefix.find(U('/'));
+        auto first_slash = prefix.find(_XPLATSTR('/'));
         if (first_slash == prefix.npos)
         {
             container_name = utility::string_t();

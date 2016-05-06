@@ -28,34 +28,34 @@ SUITE(Core)
 {
     TEST_FIXTURE(container_test_base, container_name_unicode)
     {
-        auto container = m_client.get_container_reference(U("容器1"));
+        auto container = m_client.get_container_reference(_XPLATSTR("容器1"));
         CHECK_STORAGE_EXCEPTION(container.exists(), error_invalid_characters_in_resource_name);
         CHECK_STORAGE_EXCEPTION(container.create_if_not_exists(), error_invalid_characters_in_resource_name);
     }
 
     TEST_FIXTURE(blob_test_base, directory_name_unicode)
     {
-        utility::string_t dir_name(U("目录1"));
-        utility::string_t blob_name(U("block_blob"));
+        utility::string_t dir_name(_XPLATSTR("目录1"));
+        utility::string_t blob_name(_XPLATSTR("block_blob"));
         auto dir = m_container.get_directory_reference(dir_name);
         auto blob = dir.get_block_blob_reference(blob_name);
-        blob.upload_text(U("test"));
+        blob.upload_text(_XPLATSTR("test"));
         CHECK(blob.exists());
-        CHECK(blob.name() == dir_name + U("/") + blob_name);
+        CHECK(blob.name() == dir_name + _XPLATSTR("/") + blob_name);
     }
 
     TEST_FIXTURE(blob_test_base, blob_name_unicode)
     {
-        utility::string_t blob_name(U("文件1"));
+        utility::string_t blob_name(_XPLATSTR("文件1"));
         auto blob = m_container.get_block_blob_reference(blob_name);
-        blob.upload_text(U("test2"));
+        blob.upload_text(_XPLATSTR("test2"));
         CHECK(blob.exists());
         CHECK(blob.name() == blob_name);
     }
 
     TEST_FIXTURE(queue_service_test_base, queue_name_unicode)
     {
-        utility::string_t queue_name(U("队列1"));
+        utility::string_t queue_name(_XPLATSTR("队列1"));
         azure::storage::cloud_queue_client client = get_queue_client();
         azure::storage::cloud_queue queue = client.get_queue_reference(queue_name);
         CHECK_STORAGE_EXCEPTION(queue.exists(), error_invalid_characters_in_resource_name);
@@ -64,7 +64,7 @@ SUITE(Core)
 
     TEST_FIXTURE(table_service_test_base, table_name_unicode)
     {
-        utility::string_t table_name(U("表格1"));
+        utility::string_t table_name(_XPLATSTR("表格1"));
         azure::storage::cloud_table_client client = get_table_client();
         azure::storage::cloud_table table = client.get_table_reference(table_name);
         CHECK(false == table.exists()); 

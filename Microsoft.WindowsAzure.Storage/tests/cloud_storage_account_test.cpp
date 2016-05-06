@@ -25,12 +25,12 @@
 #include "was/table.h"
 #include "wascore/constants.h"
 
-const utility::string_t test_uri(U("http://test/abc"));
-const utility::string_t token(U("sp=abcde&sig=1"));
-const utility::string_t token_with_api_version(azure::storage::protocol::uri_query_sas_api_version + U("=") + azure::storage::protocol::header_value_storage_version + U("&sig=1&sp=abcde"));
-const utility::string_t test_account_name(U("test"));
-const utility::string_t test_account_key(U("Fby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
-const utility::string_t test_endpoint_suffix(U("fake.endpoint.suffix"));
+const utility::string_t test_uri(_XPLATSTR("http://test/abc"));
+const utility::string_t token(_XPLATSTR("sp=abcde&sig=1"));
+const utility::string_t token_with_api_version(azure::storage::protocol::uri_query_sas_api_version + _XPLATSTR("=") + azure::storage::protocol::header_value_storage_version + _XPLATSTR("&sig=1&sp=abcde"));
+const utility::string_t test_account_name(_XPLATSTR("test"));
+const utility::string_t test_account_key(_XPLATSTR("Fby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+const utility::string_t test_endpoint_suffix(_XPLATSTR("fake.endpoint.suffix"));
 
 void check_credentials_equal(const azure::storage::storage_credentials& a, const azure::storage::storage_credentials& b)
 {
@@ -75,10 +75,10 @@ void check_account_sas_permission_blob(azure::storage::cloud_storage_account acc
     azure::storage::cloud_blob_client sas_blob_client(account.blob_endpoint(), sas_cred);
     auto blob_client = account.create_cloud_blob_client();
 
-    auto container_name = U("c") + test_base::get_random_string();
+    auto container_name = _XPLATSTR("c") + test_base::get_random_string();
     auto container = blob_client.get_container_reference(container_name);
     auto sas_container = sas_blob_client.get_container_reference(container_name);
-    auto blob_name = U("b") + test_base::get_random_string();
+    auto blob_name = _XPLATSTR("b") + test_base::get_random_string();
     auto blob = container.get_page_blob_reference(blob_name);
     auto sas_blob = sas_container.get_page_blob_reference(blob_name);
 
@@ -181,7 +181,7 @@ void check_account_sas_permission_queue(azure::storage::cloud_storage_account ac
     azure::storage::cloud_queue_client sas_queue_client(account.queue_endpoint(), sas_cred);
     auto queue_client = account.create_cloud_queue_client();
 
-    auto queue_name = U("q") + test_base::get_random_string();
+    auto queue_name = _XPLATSTR("q") + test_base::get_random_string();
     auto queue = queue_client.get_queue_reference(queue_name);
     auto sas_queue = sas_queue_client.get_queue_reference(queue_name);
 
@@ -209,7 +209,7 @@ void check_account_sas_permission_queue(azure::storage::cloud_storage_account ac
         CHECK_THROW(sas_queue_client.list_queues(queue_name), azure::storage::storage_exception);
     }
 
-    utility::string_t text(U("hello, world"));
+    utility::string_t text(_XPLATSTR("hello, world"));
     azure::storage::cloud_queue_message message(text);
     if (((permission & azure::storage::account_shared_access_policy::permissions::add) == azure::storage::account_shared_access_policy::permissions::add)
         && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
@@ -267,7 +267,7 @@ void check_account_sas_permission_table(azure::storage::cloud_storage_account ac
     azure::storage::cloud_table_client sas_table_client(account.table_endpoint(), sas_cred);
     auto table_client = account.create_cloud_table_client();
 
-    auto table_name = U("t") + test_base::get_random_string();
+    auto table_name = _XPLATSTR("t") + test_base::get_random_string();
     auto table = table_client.get_table_reference(table_name);
     auto sas_table = sas_table_client.get_table_reference(table_name);
 
@@ -295,7 +295,7 @@ void check_account_sas_permission_table(azure::storage::cloud_storage_account ac
         CHECK_THROW(sas_table_client.list_tables(table_name), azure::storage::storage_exception);
     }
 
-    auto op = azure::storage::table_operation::insert_entity(azure::storage::table_entity(U("pk"), U("rk")));
+    auto op = azure::storage::table_operation::insert_entity(azure::storage::table_entity(_XPLATSTR("pk"), _XPLATSTR("rk")));
     if (((permission & azure::storage::account_shared_access_policy::permissions::add) == azure::storage::account_shared_access_policy::permissions::add)
         && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
     {
@@ -308,9 +308,9 @@ void check_account_sas_permission_table(azure::storage::cloud_storage_account ac
     }
 
     azure::storage::table_query q;
-    q.set_filter_string(azure::storage::table_query::combine_filter_conditions(azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, U("pk")),
+    q.set_filter_string(azure::storage::table_query::combine_filter_conditions(azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, _XPLATSTR("pk")),
         azure::storage::query_logical_operator::op_and,
-        azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::equal, U("rk"))));
+        azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::equal, _XPLATSTR("rk"))));
     if (((permission & azure::storage::account_shared_access_policy::permissions::read) == azure::storage::account_shared_access_policy::permissions::read)
         && ((policy.resource_type() & azure::storage::account_shared_access_policy::resource_types::object) == azure::storage::account_shared_access_policy::resource_types::object))
     {
@@ -379,11 +379,11 @@ SUITE(Core)
             CHECK(!creds.is_shared_key());
 
             web::http::uri uri(test_uri);
-            CHECK_UTF8_EQUAL(test_uri + U("?") + token_with_api_version, creds.transform_uri(uri).to_string());
+            CHECK_UTF8_EQUAL(test_uri + _XPLATSTR("?") + token_with_api_version, creds.transform_uri(uri).to_string());
         }
 
         {
-            azure::storage::storage_credentials creds(U("?") + token);
+            azure::storage::storage_credentials creds(_XPLATSTR("?") + token);
 
             CHECK_UTF8_EQUAL(token, creds.sas_token());
             CHECK(creds.account_name().empty());
@@ -393,13 +393,13 @@ SUITE(Core)
             CHECK(!creds.is_shared_key());
 
             web::http::uri uri(test_uri);
-            CHECK_UTF8_EQUAL(test_uri + U("?") + token_with_api_version, creds.transform_uri(uri).to_string());
+            CHECK_UTF8_EQUAL(test_uri + _XPLATSTR("?") + token_with_api_version, creds.transform_uri(uri).to_string());
         }
     }
 
     TEST_FIXTURE(test_base, storage_credentials_empty_key)
     {
-        const utility::string_t defaults_connection_string(U("DefaultEndpointsProtocol=https;AccountName=") + test_account_name + U(";AccountKey="));
+        const utility::string_t defaults_connection_string(_XPLATSTR("DefaultEndpointsProtocol=https;AccountName=") + test_account_name + _XPLATSTR(";AccountKey="));
 
         azure::storage::storage_credentials creds(test_account_name, utility::string_t());
         CHECK(creds.sas_token().empty());
@@ -433,12 +433,12 @@ SUITE(Core)
     TEST_FIXTURE(test_base, cloud_storage_account_devstore)
     {
         auto account = azure::storage::cloud_storage_account::development_storage_account();
-        CHECK_UTF8_EQUAL(U("http://127.0.0.1:10000/devstoreaccount1"), account.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://127.0.0.1:10001/devstoreaccount1"), account.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://127.0.0.1:10002/devstoreaccount1"), account.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://127.0.0.1:10000/devstoreaccount1-secondary"), account.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://127.0.0.1:10001/devstoreaccount1-secondary"), account.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://127.0.0.1:10002/devstoreaccount1-secondary"), account.table_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://127.0.0.1:10000/devstoreaccount1"), account.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://127.0.0.1:10001/devstoreaccount1"), account.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://127.0.0.1:10002/devstoreaccount1"), account.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://127.0.0.1:10000/devstoreaccount1-secondary"), account.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://127.0.0.1:10001/devstoreaccount1-secondary"), account.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://127.0.0.1:10002/devstoreaccount1-secondary"), account.table_endpoint().secondary_uri().to_string());
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_default_http)
@@ -446,12 +446,12 @@ SUITE(Core)
         azure::storage::storage_credentials creds(test_account_name, test_account_key);
         azure::storage::cloud_storage_account account(creds, false);
 
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".blob.core.windows.net/"), account.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".queue.core.windows.net/"), account.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".table.core.windows.net/"), account.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.blob.core.windows.net/"), account.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.queue.core.windows.net/"), account.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.table.core.windows.net/"), account.table_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".blob.core.windows.net/"), account.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".queue.core.windows.net/"), account.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".table.core.windows.net/"), account.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.blob.core.windows.net/"), account.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.queue.core.windows.net/"), account.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.table.core.windows.net/"), account.table_endpoint().secondary_uri().to_string());
 
         auto account2 = azure::storage::cloud_storage_account::parse(account.to_string(true));
         check_account_equal(account, account2);
@@ -462,12 +462,12 @@ SUITE(Core)
         azure::storage::storage_credentials creds(test_account_name, test_account_key);
         azure::storage::cloud_storage_account account(creds, true);
 
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".blob.core.windows.net/"), account.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".queue.core.windows.net/"), account.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".table.core.windows.net/"), account.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.blob.core.windows.net/"), account.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.queue.core.windows.net/"), account.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.table.core.windows.net/"), account.table_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".blob.core.windows.net/"), account.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".queue.core.windows.net/"), account.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".table.core.windows.net/"), account.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.blob.core.windows.net/"), account.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.queue.core.windows.net/"), account.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.table.core.windows.net/"), account.table_endpoint().secondary_uri().to_string());
 
         auto account2 = azure::storage::cloud_storage_account::parse(account.to_string(true));
         check_account_equal(account, account2);
@@ -476,72 +476,72 @@ SUITE(Core)
     TEST_FIXTURE(test_base, cloud_storage_account_endpoint_suffix_http)
     {
         utility::ostringstream_t str;
-        str << U("DefaultEndpointsProtocol=http;AccountName=") << test_account_name << ";AccountKey=" << test_account_key << ";EndpointSuffix=" << test_endpoint_suffix;
+        str << _XPLATSTR("DefaultEndpointsProtocol=http;AccountName=") << test_account_name << _XPLATSTR(";AccountKey=") << test_account_key << _XPLATSTR(";EndpointSuffix=") << test_endpoint_suffix;
         auto account = azure::storage::cloud_storage_account::parse(str.str());
 
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".queue.") + test_endpoint_suffix + U("/"), account.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".table.") + test_endpoint_suffix + U("/"), account.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account.table_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".blob.") + test_endpoint_suffix + _XPLATSTR("/"), account.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".queue.") + test_endpoint_suffix + _XPLATSTR("/"), account.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".table.") + test_endpoint_suffix + _XPLATSTR("/"), account.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.blob.") + test_endpoint_suffix + _XPLATSTR("/"), account.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.queue.") + test_endpoint_suffix + _XPLATSTR("/"), account.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.table.") + test_endpoint_suffix + _XPLATSTR("/"), account.table_endpoint().secondary_uri().to_string());
 
         azure::storage::storage_credentials creds(test_account_name, test_account_key);
         azure::storage::cloud_storage_account account2(creds, test_endpoint_suffix, false);
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U(".table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".blob.") + test_endpoint_suffix + _XPLATSTR("/"), account2.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".queue.") + test_endpoint_suffix + _XPLATSTR("/"), account2.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR(".table.") + test_endpoint_suffix + _XPLATSTR("/"), account2.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.blob.") + test_endpoint_suffix + _XPLATSTR("/"), account2.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.queue.") + test_endpoint_suffix + _XPLATSTR("/"), account2.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://") + test_account_name + _XPLATSTR("-secondary.table.") + test_endpoint_suffix + _XPLATSTR("/"), account2.table_endpoint().secondary_uri().to_string());
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_endpoint_suffix_https)
     {
         utility::ostringstream_t str;
-        str << U("DefaultEndpointsProtocol=https;AccountName=") << test_account_name << ";AccountKey=" << test_account_key << ";EndpointSuffix=" << test_endpoint_suffix;
+        str << _XPLATSTR("DefaultEndpointsProtocol=https;AccountName=") << test_account_name << _XPLATSTR(";AccountKey=") << test_account_key << _XPLATSTR(";EndpointSuffix=") << test_endpoint_suffix;
         auto account = azure::storage::cloud_storage_account::parse(str.str());
 
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".queue.") + test_endpoint_suffix + U("/"), account.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".table.") + test_endpoint_suffix + U("/"), account.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account.table_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".blob.") + test_endpoint_suffix + _XPLATSTR("/"), account.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".queue.") + test_endpoint_suffix + _XPLATSTR("/"), account.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".table.") + test_endpoint_suffix + _XPLATSTR("/"), account.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.blob.") + test_endpoint_suffix + _XPLATSTR("/"), account.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.queue.") + test_endpoint_suffix + _XPLATSTR("/"), account.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.table.") + test_endpoint_suffix + _XPLATSTR("/"), account.table_endpoint().secondary_uri().to_string());
 
         azure::storage::storage_credentials creds(test_account_name, test_account_key);
         azure::storage::cloud_storage_account account2(creds, test_endpoint_suffix, true);
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U(".table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.blob.") + test_endpoint_suffix + U("/"), account2.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.queue.") + test_endpoint_suffix + U("/"), account2.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("https://") + test_account_name + U("-secondary.table.") + test_endpoint_suffix + U("/"), account2.table_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".blob.") + test_endpoint_suffix + _XPLATSTR("/"), account2.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".queue.") + test_endpoint_suffix + _XPLATSTR("/"), account2.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR(".table.") + test_endpoint_suffix + _XPLATSTR("/"), account2.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.blob.") + test_endpoint_suffix + _XPLATSTR("/"), account2.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.queue.") + test_endpoint_suffix + _XPLATSTR("/"), account2.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("https://") + test_account_name + _XPLATSTR("-secondary.table.") + test_endpoint_suffix + _XPLATSTR("/"), account2.table_endpoint().secondary_uri().to_string());
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_string_roundtrip)
     {
-        check_string_roundtrip(U("UseDevelopmentStorage=true"));
-        check_string_roundtrip(U("DevelopmentStorageProxyUri=http://ipv4.fiddler/;UseDevelopmentStorage=true"));
-        check_string_roundtrip(U("DefaultEndpointsProtocol=http;AccountName=test;AccountKey=abc="));
-        check_string_roundtrip(U("DefaultEndpointsProtocol=http;EndpointSuffix=test.suffix;AccountName=test;AccountKey=abc="));
-        check_string_roundtrip(U("DefaultEndpointsProtocol=http;EndpointSuffix=test.suffix;QueueEndpoint=https://alternate.queue.endpoint/;AccountName=test;AccountKey=abc="));
-        check_string_roundtrip(U("DefaultEndpointsProtocol=http;QueueEndpoint=https://alternate.queue.endpoint/;AccountName=test;AccountKey=abc="));
-        check_string_roundtrip(U("BlobEndpoint=https://alternate.blob.endpoint/;AccountName=test;AccountKey=abc="));
-        check_string_roundtrip(U("QueueEndpoint=https://alternate.queue.endpoint/;AccountName=test;AccountKey=abc="));
-        check_string_roundtrip(U("TableEndpoint=https://alternate.table.endpoint/;AccountName=test;AccountKey=abc="));
-        check_string_roundtrip(U("BlobEndpoint=https://alternate.blob.endpoint/"));
-        check_string_roundtrip(U("QueueEndpoint=https://alternate.queue.endpoint/"));
-        check_string_roundtrip(U("TableEndpoint=https://alternate.table.endpoint/"));
-        check_string_roundtrip(U("BlobEndpoint=https://alternate.blob.endpoint/;SharedAccessSignature=abc=def"));
-        check_string_roundtrip(U("QueueEndpoint=https://alternate.queue.endpoint/;SharedAccessSignature=abc=def"));
-        check_string_roundtrip(U("TableEndpoint=https://alternate.table.endpoint/;SharedAccessSignature=abc=def"));
+        check_string_roundtrip(_XPLATSTR("UseDevelopmentStorage=true"));
+        check_string_roundtrip(_XPLATSTR("DevelopmentStorageProxyUri=http://ipv4.fiddler/;UseDevelopmentStorage=true"));
+        check_string_roundtrip(_XPLATSTR("DefaultEndpointsProtocol=http;AccountName=test;AccountKey=abc="));
+        check_string_roundtrip(_XPLATSTR("DefaultEndpointsProtocol=http;EndpointSuffix=test.suffix;AccountName=test;AccountKey=abc="));
+        check_string_roundtrip(_XPLATSTR("DefaultEndpointsProtocol=http;EndpointSuffix=test.suffix;QueueEndpoint=https://alternate.queue.endpoint/;AccountName=test;AccountKey=abc="));
+        check_string_roundtrip(_XPLATSTR("DefaultEndpointsProtocol=http;QueueEndpoint=https://alternate.queue.endpoint/;AccountName=test;AccountKey=abc="));
+        check_string_roundtrip(_XPLATSTR("BlobEndpoint=https://alternate.blob.endpoint/;AccountName=test;AccountKey=abc="));
+        check_string_roundtrip(_XPLATSTR("QueueEndpoint=https://alternate.queue.endpoint/;AccountName=test;AccountKey=abc="));
+        check_string_roundtrip(_XPLATSTR("TableEndpoint=https://alternate.table.endpoint/;AccountName=test;AccountKey=abc="));
+        check_string_roundtrip(_XPLATSTR("BlobEndpoint=https://alternate.blob.endpoint/"));
+        check_string_roundtrip(_XPLATSTR("QueueEndpoint=https://alternate.queue.endpoint/"));
+        check_string_roundtrip(_XPLATSTR("TableEndpoint=https://alternate.table.endpoint/"));
+        check_string_roundtrip(_XPLATSTR("BlobEndpoint=https://alternate.blob.endpoint/;SharedAccessSignature=abc=def"));
+        check_string_roundtrip(_XPLATSTR("QueueEndpoint=https://alternate.queue.endpoint/;SharedAccessSignature=abc=def"));
+        check_string_roundtrip(_XPLATSTR("TableEndpoint=https://alternate.table.endpoint/;SharedAccessSignature=abc=def"));
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_string_empty_values)
     {
-        auto account = azure::storage::cloud_storage_account::parse(U(";BlobEndpoint=http://blobs/;;AccountName=test;;AccountKey=abc=;"));
-        CHECK_UTF8_EQUAL(U("BlobEndpoint=http://blobs/;AccountName=test;AccountKey=abc="), account.to_string(true));
+        auto account = azure::storage::cloud_storage_account::parse(_XPLATSTR(";BlobEndpoint=http://blobs/;;AccountName=test;;AccountKey=abc=;"));
+        CHECK_UTF8_EQUAL(_XPLATSTR("BlobEndpoint=http://blobs/;AccountName=test;AccountKey=abc="), account.to_string(true));
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_clients)
@@ -587,31 +587,31 @@ SUITE(Core)
 
     TEST_FIXTURE(test_base, cloud_storage_account_incorrect_devstore)
     {
-        CHECK_THROW(azure::storage::cloud_storage_account::parse(U("UseDevelopmentStorage=false")), std::invalid_argument);
-        CHECK_THROW(azure::storage::cloud_storage_account::parse(U("UseDevelopmentStorage=true;AccountName=devstoreaccount1")), std::invalid_argument);
-        CHECK_THROW(azure::storage::cloud_storage_account::parse(U("UseDevelopmentStorage=true;BlobEndpoint=http://127.0.0.1:1000/devstoreaccount1")), std::invalid_argument);
+        CHECK_THROW(azure::storage::cloud_storage_account::parse(_XPLATSTR("UseDevelopmentStorage=false")), std::invalid_argument);
+        CHECK_THROW(azure::storage::cloud_storage_account::parse(_XPLATSTR("UseDevelopmentStorage=true;AccountName=devstoreaccount1")), std::invalid_argument);
+        CHECK_THROW(azure::storage::cloud_storage_account::parse(_XPLATSTR("UseDevelopmentStorage=true;BlobEndpoint=http://127.0.0.1:1000/devstoreaccount1")), std::invalid_argument);
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_endpoints_in_connection_string)
     {
-        const utility::string_t default_endpoint_suffix(U("core.windows.net"));
+        const utility::string_t default_endpoint_suffix(_XPLATSTR("core.windows.net"));
         utility::string_t endpoints[] = {
-            U("http://customdomain.com/"),
-            U("http://customdomain2.com/"),
-            U("http://customdomain3.com/") };
+            _XPLATSTR("http://customdomain.com/"),
+            _XPLATSTR("http://customdomain2.com/"),
+            _XPLATSTR("http://customdomain3.com/") };
 
-        utility::string_t scheme(U("http"));
-        utility::string_t account_name(U("asdf"));
-        utility::string_t account_key(U("abc="));
+        utility::string_t scheme(_XPLATSTR("http"));
+        utility::string_t account_name(_XPLATSTR("asdf"));
+        utility::string_t account_key(_XPLATSTR("abc="));
 
         for (int i = 1; i < 8; i++) {
             utility::ostringstream_t str;
-            str << U("DefaultEndpointsProtocol=") << scheme << ";";
-            if (i & 1) str << U("BlobEndpoint=") << endpoints[0] << ";";
-            if (i & 2) str << U("QueueEndpoint=") << endpoints[1] << ";";
-            if (i & 4) str << U("TableEndpoint=") << endpoints[2] << ";";
-            str << U("AccountName=") << account_name << ";";
-            str << U("AccountKey=") << account_key;
+            str << _XPLATSTR("DefaultEndpointsProtocol=") << scheme << _XPLATSTR(";");
+            if (i & 1) str << _XPLATSTR("BlobEndpoint=") << endpoints[0] << _XPLATSTR(";");
+            if (i & 2) str << _XPLATSTR("QueueEndpoint=") << endpoints[1] << _XPLATSTR(";");
+            if (i & 4) str << _XPLATSTR("TableEndpoint=") << endpoints[2] << _XPLATSTR(";");
+            str << _XPLATSTR("AccountName=") << account_name << _XPLATSTR(";");
+            str << _XPLATSTR("AccountKey=") << account_key;
 
             auto account = azure::storage::cloud_storage_account::parse(str.str());
             if (i & 1) {
@@ -619,8 +619,8 @@ SUITE(Core)
                 CHECK(account.blob_endpoint().secondary_uri().is_empty());
             }
             else {
-                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U(".blob.") + default_endpoint_suffix + U("/"), account.blob_endpoint().primary_uri().to_string());
-                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U("-secondary.blob.") + default_endpoint_suffix + U("/"), account.blob_endpoint().secondary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + _XPLATSTR("://") + account_name + _XPLATSTR(".blob.") + default_endpoint_suffix + _XPLATSTR("/"), account.blob_endpoint().primary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + _XPLATSTR("://") + account_name + _XPLATSTR("-secondary.blob.") + default_endpoint_suffix + _XPLATSTR("/"), account.blob_endpoint().secondary_uri().to_string());
             }
 
             if (i & 2) {
@@ -628,8 +628,8 @@ SUITE(Core)
                 CHECK(account.queue_endpoint().secondary_uri().is_empty());
             }
             else {
-                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U(".queue.") + default_endpoint_suffix + U("/"), account.queue_endpoint().primary_uri().to_string());
-                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U("-secondary.queue.") + default_endpoint_suffix + U("/"), account.queue_endpoint().secondary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + _XPLATSTR("://") + account_name + _XPLATSTR(".queue.") + default_endpoint_suffix + _XPLATSTR("/"), account.queue_endpoint().primary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + _XPLATSTR("://") + account_name + _XPLATSTR("-secondary.queue.") + default_endpoint_suffix + _XPLATSTR("/"), account.queue_endpoint().secondary_uri().to_string());
             }
 
             if (i & 4) {
@@ -637,8 +637,8 @@ SUITE(Core)
                 CHECK(account.table_endpoint().secondary_uri().is_empty());
             }
             else {
-                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U(".table.") + default_endpoint_suffix + U("/"), account.table_endpoint().primary_uri().to_string());
-                CHECK_UTF8_EQUAL(scheme + U("://") + account_name + U("-secondary.table.") + default_endpoint_suffix + U("/"), account.table_endpoint().secondary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + _XPLATSTR("://") + account_name + _XPLATSTR(".table.") + default_endpoint_suffix + _XPLATSTR("/"), account.table_endpoint().primary_uri().to_string());
+                CHECK_UTF8_EQUAL(scheme + _XPLATSTR("://") + account_name + _XPLATSTR("-secondary.table.") + default_endpoint_suffix + _XPLATSTR("/"), account.table_endpoint().secondary_uri().to_string());
             }
         }
     }
@@ -647,9 +647,9 @@ SUITE(Core)
     {
         const int COUNT = 2;
         azure::storage::storage_credentials creds(test_account_name, test_account_key);
-        azure::storage::storage_uri blob_uris[] = { azure::storage::storage_uri(U("http://customdomain.com/")), azure::storage::storage_uri() };
-        azure::storage::storage_uri queue_uris[] = { azure::storage::storage_uri(U("http://customdomain2.com/")), azure::storage::storage_uri() };
-        azure::storage::storage_uri table_uris[] = { azure::storage::storage_uri(U("http://customdomain3.com/")), azure::storage::storage_uri() };
+        azure::storage::storage_uri blob_uris[] = { azure::storage::storage_uri(_XPLATSTR("http://customdomain.com/")), azure::storage::storage_uri() };
+        azure::storage::storage_uri queue_uris[] = { azure::storage::storage_uri(_XPLATSTR("http://customdomain2.com/")), azure::storage::storage_uri() };
+        azure::storage::storage_uri table_uris[] = { azure::storage::storage_uri(_XPLATSTR("http://customdomain3.com/")), azure::storage::storage_uri() };
 
         for (int i = 0; i < COUNT; ++i) {
             for (int j = 0; j < COUNT; ++j) {
@@ -676,13 +676,13 @@ SUITE(Core)
 
     TEST_FIXTURE(test_base, cloud_storage_account_devstore_proxy)
     {
-        auto account = azure::storage::cloud_storage_account::parse(U("UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://ipv4.fiddler"));
-        CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10000/devstoreaccount1"), account.blob_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10001/devstoreaccount1"), account.queue_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10002/devstoreaccount1"), account.table_endpoint().primary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10000/devstoreaccount1-secondary"), account.blob_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10001/devstoreaccount1-secondary"), account.queue_endpoint().secondary_uri().to_string());
-        CHECK_UTF8_EQUAL(U("http://ipv4.fiddler:10002/devstoreaccount1-secondary"), account.table_endpoint().secondary_uri().to_string());
+        auto account = azure::storage::cloud_storage_account::parse(_XPLATSTR("UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://ipv4.fiddler"));
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://ipv4.fiddler:10000/devstoreaccount1"), account.blob_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://ipv4.fiddler:10001/devstoreaccount1"), account.queue_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://ipv4.fiddler:10002/devstoreaccount1"), account.table_endpoint().primary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://ipv4.fiddler:10000/devstoreaccount1-secondary"), account.blob_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://ipv4.fiddler:10001/devstoreaccount1-secondary"), account.queue_endpoint().secondary_uri().to_string());
+        CHECK_UTF8_EQUAL(_XPLATSTR("http://ipv4.fiddler:10002/devstoreaccount1-secondary"), account.table_endpoint().secondary_uri().to_string());
     }
 
     TEST_FIXTURE(test_base, account_sas_permission)
@@ -692,7 +692,7 @@ SUITE(Core)
         azure::storage::account_shared_access_policy policy;
         policy.set_start(utility::datetime::utc_now());
         policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("0.0.0.0"), _XPLATSTR("255.255.255.255")));
         policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
         policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
         policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
@@ -713,7 +713,7 @@ SUITE(Core)
         azure::storage::account_shared_access_policy policy;
         policy.set_start(utility::datetime::utc_now());
         policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("0.0.0.0"), _XPLATSTR("255.255.255.255")));
         policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
         policy.set_permissions(0xFF);
         policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
@@ -734,7 +734,7 @@ SUITE(Core)
         azure::storage::account_shared_access_policy policy;
         policy.set_start(utility::datetime::utc_now());
         policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("0.0.0.0"), _XPLATSTR("255.255.255.255")));
         policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
         policy.set_permissions(0xFF);
         policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
@@ -755,7 +755,7 @@ SUITE(Core)
         azure::storage::account_shared_access_policy policy;
         policy.set_start(utility::datetime::utc_now());
         policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_seconds(10));
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("0.0.0.0"), _XPLATSTR("255.255.255.255")));
         policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
         policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
         policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
@@ -764,10 +764,10 @@ SUITE(Core)
         auto sas_token = account.get_shared_access_signature(policy);
         azure::storage::storage_credentials sas_cred(sas_token);
         azure::storage::cloud_blob_client sas_blob_client(account.blob_endpoint(), sas_cred);
-        sas_blob_client.list_containers(U("prefix"));
+        sas_blob_client.list_containers(_XPLATSTR("prefix"));
 
         std::this_thread::sleep_for(std::chrono::seconds(10));
-        CHECK_THROW(sas_blob_client.list_containers(U("prefix")), azure::storage::storage_exception);
+        CHECK_THROW(sas_blob_client.list_containers(_XPLATSTR("prefix")), azure::storage::storage_exception);
     }
 
     TEST_FIXTURE(test_base, account_sas_protocol)
@@ -775,13 +775,13 @@ SUITE(Core)
         auto account = test_config::instance().account();
         auto blob_host = account.blob_endpoint().primary_uri().host();
         web::uri_builder blob_endpoint;
-        blob_endpoint.set_scheme(U("http"));
+        blob_endpoint.set_scheme(_XPLATSTR("http"));
         blob_endpoint.set_host(blob_host);
         
         azure::storage::account_shared_access_policy policy;
         policy.set_start(utility::datetime::utc_now());
         policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_seconds(60));
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("0.0.0.0"), U("255.255.255.255")));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("0.0.0.0"), _XPLATSTR("255.255.255.255")));
         policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
         policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
         policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
@@ -790,13 +790,13 @@ SUITE(Core)
         auto sas_token = account.get_shared_access_signature(policy);
         azure::storage::storage_credentials sas_cred(sas_token);
         azure::storage::cloud_blob_client sas_blob_client(blob_endpoint.to_uri(), sas_cred);
-        sas_blob_client.list_containers(U("prefix"));
+        sas_blob_client.list_containers(_XPLATSTR("prefix"));
 
         policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_only);
         auto sas_token_https = account.get_shared_access_signature(policy);
         azure::storage::storage_credentials sas_cred_https(sas_token_https);
         azure::storage::cloud_blob_client sas_blob_client_https(blob_endpoint.to_uri(), sas_cred_https);
-        CHECK_THROW(sas_blob_client_https.list_containers(U("prefix")), azure::storage::storage_exception);
+        CHECK_THROW(sas_blob_client_https.list_containers(_XPLATSTR("prefix")), azure::storage::storage_exception);
     }
 
     TEST_FIXTURE(test_base, account_sas_address)
@@ -811,29 +811,29 @@ SUITE(Core)
         policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
         policy.set_permissions(0xFF);
 
-        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("256.256.255.255"))), std::invalid_argument);
-        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("::1"))), std::invalid_argument);
-        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("ipv4.fiddler"))), std::invalid_argument);
+        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("256.256.255.255"))), std::invalid_argument);
+        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("::1"))), std::invalid_argument);
+        CHECK_THROW(policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("ipv4.fiddler"))), std::invalid_argument);
         
-        utility::string_t min_addr(U("0.0.0.0"));
-        utility::string_t max_addr(U("255.0.0.0"));
-        utility::string_t expected_range = min_addr + U("-") + max_addr;
+        utility::string_t min_addr(_XPLATSTR("0.0.0.0"));
+        utility::string_t max_addr(_XPLATSTR("255.0.0.0"));
+        utility::string_t expected_range = min_addr + _XPLATSTR("-") + max_addr;
         policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(min_addr, max_addr));
         CHECK_UTF8_EQUAL(expected_range, policy.address_or_range().to_string());
         policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(max_addr, min_addr));
         CHECK_UTF8_EQUAL(expected_range, policy.address_or_range().to_string());
 
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(U("255.255.255.255")));
+        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("255.255.255.255")));
         auto sas_token = account.get_shared_access_signature(policy);
         azure::storage::storage_credentials sas_cred(sas_token);
         azure::storage::cloud_blob_client sas_blob_client(account.blob_endpoint(), sas_cred);
         azure::storage::operation_context op;
-        CHECK_THROW(sas_blob_client.list_containers(U("prefix"), azure::storage::container_listing_details::none, 0, azure::storage::blob_request_options(), op), azure::storage::storage_exception);
+        CHECK_THROW(sas_blob_client.list_containers(_XPLATSTR("prefix"), azure::storage::container_listing_details::none, 0, azure::storage::blob_request_options(), op), azure::storage::storage_exception);
         auto error_details = op.request_results().back().extended_error().details();
-        auto source_ip = error_details[U("SourceIP")];
+        auto source_ip = error_details[_XPLATSTR("SourceIP")];
 
         policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(source_ip));
         sas_token = account.get_shared_access_signature(policy);
-        azure::storage::cloud_blob_client(account.blob_endpoint(), azure::storage::storage_credentials(sas_token)).list_containers(U("prefix"));
+        azure::storage::cloud_blob_client(account.blob_endpoint(), azure::storage::storage_credentials(sas_token)).list_containers(_XPLATSTR("prefix"));
     }
 }

@@ -39,7 +39,7 @@ namespace azure { namespace storage { namespace samples {
 
             // Create a blob container
             azure::storage::cloud_blob_client blob_client = storage_account.create_cloud_blob_client();
-            azure::storage::cloud_blob_container container = blob_client.get_container_reference(U("my-sample-container"));
+            azure::storage::cloud_blob_container container = blob_client.get_container_reference(_XPLATSTR("my-sample-container"));
            
             // Return value is true if the container did not exist and was successfully created.
             container.create_if_not_exists();
@@ -50,16 +50,16 @@ namespace azure { namespace storage { namespace samples {
             container.upload_permissions(permissions);
 
             // Upload a blob from a file
-            concurrency::streams::istream input_stream = concurrency::streams::file_stream<uint8_t>::open_istream(U("DataFile.txt")).get();
-            azure::storage::cloud_block_blob blob1 = container.get_block_blob_reference(U("my-blob-1"));
+            concurrency::streams::istream input_stream = concurrency::streams::file_stream<uint8_t>::open_istream(_XPLATSTR("DataFile.txt")).get();
+            azure::storage::cloud_block_blob blob1 = container.get_block_blob_reference(_XPLATSTR("my-blob-1"));
             blob1.upload_from_stream(input_stream);
             input_stream.close().wait();
 
             // Upload some blobs from text
-            azure::storage::cloud_block_blob blob2 = container.get_block_blob_reference(U("my-blob-2"));
-            blob2.upload_text(U("more text"));
-            azure::storage::cloud_block_blob blob3 = container.get_block_blob_reference(U("my-directory/my-sub-directory/my-blob-3"));
-            blob3.upload_text(U("other text"));
+            azure::storage::cloud_block_blob blob2 = container.get_block_blob_reference(_XPLATSTR("my-blob-2"));
+            blob2.upload_text(_XPLATSTR("more text"));
+            azure::storage::cloud_block_blob blob3 = container.get_block_blob_reference(_XPLATSTR("my-directory/my-sub-directory/my-blob-3"));
+            blob3.upload_text(_XPLATSTR("other text"));
 
             // List blobs in the blob container
             azure::storage::continuation_token token;
@@ -70,11 +70,11 @@ namespace azure { namespace storage { namespace samples {
                 {
                     if (item.is_blob())
                     {
-                        ucout << U("Blob: ") << item.as_blob().uri().primary_uri().to_string() << std::endl;
+                        ucout << _XPLATSTR("Blob: ") << item.as_blob().uri().primary_uri().to_string() << std::endl;
                     }
                     else
                     {
-                        ucout << U("Directory: ") << item.as_directory().uri().primary_uri().to_string() << std::endl;
+                        ucout << _XPLATSTR("Directory: ") << item.as_directory().uri().primary_uri().to_string() << std::endl;
                     }
                 }
                 token = result.continuation_token();
@@ -84,14 +84,14 @@ namespace azure { namespace storage { namespace samples {
             // Download a blob to a stream
             concurrency::streams::container_buffer<std::vector<uint8_t>> buffer;
             concurrency::streams::ostream output_stream(buffer);
-            azure::storage::cloud_block_blob binary_blob = container.get_block_blob_reference(U("my-blob-1"));
+            azure::storage::cloud_block_blob binary_blob = container.get_block_blob_reference(_XPLATSTR("my-blob-1"));
             binary_blob.download_to_stream(output_stream);
-            ucout << U("Stream: ") << to_string(buffer.collection()) << std::endl;
+            ucout << _XPLATSTR("Stream: ") << to_string(buffer.collection()) << std::endl;
 
             // Download a blob as text
-            azure::storage::cloud_block_blob text_blob = container.get_block_blob_reference(U("my-blob-2"));
+            azure::storage::cloud_block_blob text_blob = container.get_block_blob_reference(_XPLATSTR("my-blob-2"));
             utility::string_t text = text_blob.download_text();
-            ucout << U("Text: ") << text << std::endl;
+            ucout << _XPLATSTR("Text: ") << text << std::endl;
 
             // Delete the blobs
             blob1.delete_blob();
@@ -99,13 +99,13 @@ namespace azure { namespace storage { namespace samples {
             blob3.delete_blob();
             
             // Create an append blob
-            azure::storage::cloud_append_blob append_blob = container.get_append_blob_reference(U("my-append-1"));
-            append_blob.properties().set_content_type(U("text/plain; charset=utf-8"));
+            azure::storage::cloud_append_blob append_blob = container.get_append_blob_reference(_XPLATSTR("my-append-1"));
+            append_blob.properties().set_content_type(_XPLATSTR("text/plain; charset=utf-8"));
             append_blob.create_or_replace();
 
             // Append two blocks
-            concurrency::streams::istream append_input_stream1 = concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(U("some text.")));
-            concurrency::streams::istream append_input_stream2 = concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(U("more text.")));
+            concurrency::streams::istream append_input_stream1 = concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(_XPLATSTR("some text.")));
+            concurrency::streams::istream append_input_stream2 = concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(_XPLATSTR("more text.")));
             append_blob.append_block(append_input_stream1, utility::string_t());
             append_blob.append_block(append_input_stream2, utility::string_t());
             append_input_stream1.close().wait();
@@ -113,7 +113,7 @@ namespace azure { namespace storage { namespace samples {
 
             // Download append blob as text
             utility::string_t append_text = append_blob.download_text();
-            ucout << U("Append Text: ") << append_text << std::endl;
+            ucout << _XPLATSTR("Append Text: ") << append_text << std::endl;
             
             // Delete the blob
             append_blob.delete_blob();
@@ -124,7 +124,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const azure::storage::storage_exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
 
             azure::storage::request_result result = e.result();
             azure::storage::storage_extended_error extended_error = result.extended_error();
@@ -135,7 +135,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const std::exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
         }
     }
 

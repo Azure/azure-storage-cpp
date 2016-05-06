@@ -40,7 +40,7 @@ SUITE(Core)
         }
         catch (azure::storage::storage_exception& ex)
         {
-            CHECK_UTF8_EQUAL(U("Md5Mismatch"), ex.result().extended_error().code());
+            CHECK_UTF8_EQUAL(_XPLATSTR("Md5Mismatch"), ex.result().extended_error().code());
             CHECK(!ex.result().extended_error().message().empty());
             CHECK(ex.result().extended_error().details().size() > 0);
         }
@@ -61,7 +61,7 @@ SUITE(Core)
         }
         catch (const azure::storage::storage_exception& e)
         {
-            CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
+            CHECK(e.result().extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
             CHECK(!e.result().extended_error().message().empty());
         }
     }

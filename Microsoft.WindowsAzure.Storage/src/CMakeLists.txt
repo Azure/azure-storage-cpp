@@ -57,7 +57,7 @@ add_library(${AZURESTORAGE_LIBRARY} ${SOURCES})
 
 target_link_libraries(${AZURESTORAGE_LIBRARIES})
 
-# Portions specific to cpprest binary versioning.
+# Portions specific to azure storage binary versioning and installation.
 if(UNIX)
   set_target_properties(${AZURESTORAGE_LIBRARY} PROPERTIES
     SOVERSION ${AZURESTORAGE_VERSION_MAJOR}

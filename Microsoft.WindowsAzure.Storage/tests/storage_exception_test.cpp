@@ -65,4 +65,28 @@ SUITE(Core)
             CHECK(!e.result().extended_error().message().empty());
         }
     }
+
+    TEST_FIXTURE(table_service_test_base, storage_extended_error_verify_xml_with_details)
+    {
+        utility::string_t table_name = get_table_name();
+        azure::storage::cloud_table_client client = get_table_client();
+        azure::storage::cloud_table table = client.get_table_reference(table_name);
+
+        azure::storage::table_request_options options;
+        azure::storage::operation_context context;
+        context.set_sending_request([](web::http::http_request &r, azure::storage::operation_context) {
+            r.headers()[_XPLATSTR("Accept")] = _XPLATSTR("application/xml");
+        });
+
+        try
+        {
+            table.exists(options, context);
+            CHECK(false);
+        }
+        catch (const azure::storage::storage_exception& e)
+        {
+            CHECK(e.result().extended_error().code().compare(_XPLATSTR("MediaTypeNotSupported")) == 0);
+            CHECK(!e.result().extended_error().message().empty());
+        }
+    }
 }

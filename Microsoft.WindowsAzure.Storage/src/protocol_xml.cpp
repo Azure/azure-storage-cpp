@@ -31,6 +31,14 @@ namespace azure { namespace storage { namespace protocol {
         {
             m_error_message = get_current_element_text();
         }
+        else if (element_name == xml_code_table && get_parent_element_name() == xml_error_root_table)
+        {
+            m_error_code = get_current_element_text();
+        }
+        else if (element_name == xml_message_table && get_parent_element_name() == xml_error_root_table)
+        {
+            m_error_message = get_current_element_text();
+        }
         else
         {
             m_details.insert(std::make_pair(element_name, get_current_element_text()));

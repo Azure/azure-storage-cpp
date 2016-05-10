@@ -280,6 +280,7 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t xml_name(_XPLATSTR("Name"));
     const utility::string_t xml_size(_XPLATSTR("Size"));
     const utility::string_t xml_error_root(_XPLATSTR("Error"));
+    const utility::string_t xml_error_root_table(_XPLATSTR("error"));
     const utility::string_t xml_code(_XPLATSTR("Code"));
     const utility::string_t xml_code_table(_XPLATSTR("code"));
     const utility::string_t xml_message(_XPLATSTR("Message"));

@@ -2765,7 +2765,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="name">The name of the container.</param>
         /// <param name="client">The Blob service client.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
@@ -2774,7 +2774,7 @@ namespace azure { namespace storage {
         /// <param name="client">The Blob service client.</param>
         /// <param name="properties">The properties for the container.</param>
         /// <param name="metadata">The metadata for the container.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
         // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 

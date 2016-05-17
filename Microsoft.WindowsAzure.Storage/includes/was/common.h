@@ -597,7 +597,7 @@ namespace azure { namespace storage {
             /// Initializes a new instance of the <see cref="azure::storage::service_properties::logging_properties" /> struct.
             /// </summary>
             logging_properties()
-                : m_delete_enabled(false), m_read_enabled(false), m_write_enabled(false), m_retention_enabled(false), m_retention_days(0)
+                : m_read_enabled(false), m_write_enabled(false), m_delete_enabled(false), m_retention_enabled(false), m_retention_days(0)
             {
             }
 
@@ -2311,7 +2311,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
         /// </summary>
         shared_access_policy()
-            : m_permission(none), m_protocol(protocols::https_or_http)
+            : m_protocol(protocols::https_or_http), m_permission(none)
         {
         }
 
@@ -2321,7 +2321,7 @@ namespace azure { namespace storage {
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
         shared_access_policy(utility::datetime expiry, uint8_t permission)
-            : m_permission(permission), m_expiry(expiry), m_protocol(protocols::https_or_http)
+            : m_expiry(expiry), m_protocol(protocols::https_or_http), m_permission(permission)
         {
         }
 
@@ -2332,7 +2332,7 @@ namespace azure { namespace storage {
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
         shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission)
-            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocols::https_or_http)
+            : m_start(start), m_expiry(expiry), m_protocol(protocols::https_or_http), m_permission(permission)
         {
         }
 
@@ -2345,7 +2345,7 @@ namespace azure { namespace storage {
         /// <param name="protocol">The allowed protocols for a shared access signature associated with this shared access policy.</param>
         /// <param name="address">The allowed IP address for a shared access signature associated with this shared access policy.</param>
         shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t address)
-            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(address)))
+            : m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(address))), m_permission(permission)
         {
         }
 
@@ -2359,7 +2359,7 @@ namespace azure { namespace storage {
         /// <param name="minimum_address">The minimum allowed address for an IP range for the shared access policy.</param>
         /// <param name="maximum_address">The maximum allowed address for an IP range for the shared access policy.</param>
         shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t minimum_address, utility::string_t maximum_address)
-            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(minimum_address), std::move(maximum_address)))
+            : m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(minimum_address), std::move(maximum_address))), m_permission(permission)
         {
         }
 

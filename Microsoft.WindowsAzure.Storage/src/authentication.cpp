@@ -139,8 +139,9 @@ namespace azure { namespace storage { namespace protocol {
         for (web::http::http_headers::const_iterator it = headers.begin(); it != headers.end(); ++it)
         {
             const utility::string_t& key = it->first;
-            if ((key.size() > ms_header_prefix.size()) &&
-                std::equal(ms_header_prefix.cbegin(), ms_header_prefix.cend(), key.cbegin()))
+            utility::string_t ms_header_prefix_local = utility::string_t(azure::storage::protocol::ms_header_prefix);
+            if ((key.size() > ms_header_prefix_local.size()) &&
+                std::equal(ms_header_prefix_local.cbegin(), ms_header_prefix_local.cend(), key.cbegin()))
             {
                 if (!it->second.empty())
                 {

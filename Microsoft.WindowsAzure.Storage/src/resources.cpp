@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------------------
-// <copyright file="resources.h" company="Microsoft">
+// <copyright file="resources.cpp" company="Microsoft">
 //    Copyright 2013 Microsoft Corporation
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
+//    Licensed under the Apache License, Version 2.0 (the "License")
 //    you may not use this file except in compliance with the License.
 //    You may obtain a copy of the License at
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -15,16 +15,13 @@
 // </copyright>
 // -----------------------------------------------------------------------------------------
 
-#pragma once
-
-#include "cpprest/asyncrt_utils.h"
-
-#include "wascore/basic_types.h"
+#include "stdafx.h"
+#include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace protocol {
 
 #define _RECOURSES
-#define DAT(a, b) extern const char* a;
+#define DAT(a, b) const char* a = b;
 #include "wascore/constants.dat"
 #undef DAT
 #undef _RECOURSES

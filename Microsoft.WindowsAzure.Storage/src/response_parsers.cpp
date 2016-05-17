@@ -199,10 +199,11 @@ namespace azure { namespace storage { namespace protocol {
         for (auto it = headers.begin(); it != headers.end(); ++it)
         {
             const utility::string_t& key = it->first;
-            if ((key.size() > ms_header_metadata_prefix.size()) &&
-                std::equal(ms_header_metadata_prefix.cbegin(), ms_header_metadata_prefix.cend(), key.cbegin()))
+            utility::string_t ms_header_metadata_prefix_local = utility::string_t(azure::storage::protocol::ms_header_metadata_prefix);
+            if ((key.size() > ms_header_metadata_prefix_local.size()) &&
+                std::equal(ms_header_metadata_prefix_local.cbegin(), ms_header_metadata_prefix_local.cend(), key.cbegin()))
             {
-                metadata.insert(std::make_pair(key.substr(ms_header_metadata_prefix.size()), it->second));
+                metadata.insert(std::make_pair(key.substr(ms_header_metadata_prefix_local.size()), it->second));
             }
         }
 

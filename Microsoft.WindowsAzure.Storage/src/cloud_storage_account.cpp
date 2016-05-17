@@ -26,24 +26,24 @@
 
 namespace azure { namespace storage {
 
-    const utility::string_t use_development_storage_setting_string(_XPLATSTR("UseDevelopmentStorage"));
-    const utility::string_t use_development_storage_setting_value(_XPLATSTR("true"));
-    const utility::string_t development_storage_proxy_uri_setting_string(_XPLATSTR("DevelopmentStorageProxyUri"));
-    const utility::string_t default_endpoints_protocol_setting_string(_XPLATSTR("DefaultEndpointsProtocol"));
-    const utility::string_t account_name_setting_string(_XPLATSTR("AccountName"));
-    const utility::string_t account_key_setting_string(_XPLATSTR("AccountKey"));
-    const utility::string_t blob_endpoint_setting_string(_XPLATSTR("BlobEndpoint"));
-    const utility::string_t queue_endpoint_setting_string(_XPLATSTR("QueueEndpoint"));
-    const utility::string_t table_endpoint_setting_string(_XPLATSTR("TableEndpoint"));
-    const utility::string_t endpoint_suffix_setting_string(_XPLATSTR("EndpointSuffix"));
-    const utility::string_t shared_access_signature_setting_string(_XPLATSTR("SharedAccessSignature"));
-    const utility::string_t devstore_account_name(_XPLATSTR("devstoreaccount1"));
-    const utility::string_t devstore_account_key(_XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
-    const utility::string_t secondary_location_account_suffix(_XPLATSTR("-secondary"));
-    const utility::string_t default_endpoint_suffix(_XPLATSTR("core.windows.net"));
-    const utility::string_t default_blob_hostname_prefix(_XPLATSTR("blob"));
-    const utility::string_t default_queue_hostname_prefix(_XPLATSTR("queue"));
-    const utility::string_t default_table_hostname_prefix(_XPLATSTR("table"));
+    const utility::char_t *use_development_storage_setting_string(_XPLATSTR("UseDevelopmentStorage"));
+    const utility::char_t *use_development_storage_setting_value(_XPLATSTR("true"));
+    const utility::char_t *development_storage_proxy_uri_setting_string(_XPLATSTR("DevelopmentStorageProxyUri"));
+    const utility::char_t *default_endpoints_protocol_setting_string(_XPLATSTR("DefaultEndpointsProtocol"));
+    const utility::char_t *account_name_setting_string(_XPLATSTR("AccountName"));
+    const utility::char_t *account_key_setting_string(_XPLATSTR("AccountKey"));
+    const utility::char_t *blob_endpoint_setting_string(_XPLATSTR("BlobEndpoint"));
+    const utility::char_t *queue_endpoint_setting_string(_XPLATSTR("QueueEndpoint"));
+    const utility::char_t *table_endpoint_setting_string(_XPLATSTR("TableEndpoint"));
+    const utility::char_t *endpoint_suffix_setting_string(_XPLATSTR("EndpointSuffix"));
+    const utility::char_t *shared_access_signature_setting_string(_XPLATSTR("SharedAccessSignature"));
+    const utility::char_t *devstore_account_name(_XPLATSTR("devstoreaccount1"));
+    const utility::char_t *devstore_account_key(_XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+    const utility::char_t *secondary_location_account_suffix(_XPLATSTR("-secondary"));
+    const utility::char_t *default_endpoint_suffix(_XPLATSTR("core.windows.net"));
+    const utility::char_t *default_blob_hostname_prefix(_XPLATSTR("blob"));
+    const utility::char_t *default_queue_hostname_prefix(_XPLATSTR("queue"));
+    const utility::char_t *default_table_hostname_prefix(_XPLATSTR("table"));
 
     storage_uri construct_default_endpoint(const utility::string_t& scheme, const utility::string_t& account_name, const utility::string_t& hostname_prefix, const utility::string_t& endpoint_suffix)
     {
@@ -88,7 +88,7 @@ namespace azure { namespace storage {
         builder.set_port(10002);
         web::uri table_endpoint_primary = builder.to_uri();
 
-        builder.set_path(devstore_account_name + secondary_location_account_suffix);
+        builder.set_path(utility::string_t(devstore_account_name).append(secondary_location_account_suffix));
 
         builder.set_port(10000);
         web::uri blob_endpoint_secondary = builder.to_uri();

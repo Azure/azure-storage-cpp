@@ -16,29 +16,13 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "wascore/constants.h"
 
 namespace azure { namespace storage { namespace protocol {
     
 #define _CONSTANTS
-#define DAT(a, b) WASTORAGE_API const utility::char_t* a = b;
+#define DAT(a, b) const utility::char_t* a = b;
 #include "wascore/constants.dat"
 #undef DAT
 #undef _CONSTANTS
-
-    // user agent
-    utility::string_t header_value_user_agent()
-    {
-#if defined(WIN32)
-#if defined(_MSC_VER)
-
-        return _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows; MSC_VER ") + utility::conversions::to_string_t(std::to_string(_MSC_VER)) + _XPLATSTR(")");
-#else
-        return _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows)");
-#endif
-#else
-        return _XPLATSTR("Azure-Storage/2.3.0 (Native)");
-#endif
-    }
 
 }}} // namespace azure::storage::protocol

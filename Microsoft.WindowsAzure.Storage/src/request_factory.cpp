@@ -33,7 +33,7 @@ namespace azure { namespace storage { namespace protocol {
         request.set_request_uri(uri_builder.to_uri());
 
         web::http::http_headers& headers = request.headers();
-        headers.add(web::http::header_names::user_agent, header_value_user_agent());
+        headers.add(web::http::header_names::user_agent, header_value_user_agent);
         headers.add(ms_header_version, header_value_storage_version);
 
         if (method == web::http::methods::PUT)

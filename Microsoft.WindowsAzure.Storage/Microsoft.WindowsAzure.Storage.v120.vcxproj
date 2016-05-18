@@ -216,6 +216,7 @@
     <ClCompile Include="src\operation_context.cpp" />
     <ClCompile Include="src\protocol_json.cpp" />
     <ClCompile Include="src\queue_request_factory.cpp" />
+    <ClCompile Include="src\resources.cpp" />
     <ClCompile Include="src\retry_policies.cpp" />
     <ClCompile Include="src\shared_access_signature.cpp" />
     <ClCompile Include="src\entity_property.cpp" />

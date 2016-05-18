@@ -222,7 +222,7 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
-    const utility::string_t get_accept_header(table_payload_format payload_format)
+    const utility::char_t* get_accept_header(table_payload_format payload_format)
     {
         switch (payload_format)
         {

@@ -293,6 +293,19 @@ DAT(xml_service_stats_geo_replication_status_live, _XPLATSTR("live"))
 DAT(xml_service_stats_geo_replication_status_bootstrap, _XPLATSTR("bootstrap"))
 DAT(xml_service_stats_geo_replication_last_sync_time, _XPLATSTR("LastSyncTime"))
 DAT(xml_url, _XPLATSTR("Url"))
+
+#define STR(x) #x
+#define VER(x) _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows; MSC_VER " STR(x) ")")
+#if defined(WIN32)
+#if defined(_MSC_VER)
+	DAT(header_value_user_agent, VER(_MSC_VER))
+#else
+	DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows)"))
+#endif
+#else
+	DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native)"))
+#endif
+
 #endif // _CONSTANTS
 
 #ifdef _RECOURSES

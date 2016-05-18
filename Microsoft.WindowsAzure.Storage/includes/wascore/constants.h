@@ -50,6 +50,4 @@ namespace azure { namespace storage { namespace protocol {
 #undef DAT
 #undef _CONSTANTS
 
-    extern utility::string_t header_value_user_agent();
-
 }}} // namespace azure::storage::protocol

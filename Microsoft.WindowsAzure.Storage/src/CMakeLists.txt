@@ -17,12 +17,14 @@ if(UNIX)
      entity_property.cpp
      shared_access_signature.cpp
      retry_policies.cpp
+	 resources.cpp
      queue_request_factory.cpp
      protocol_json.cpp
      operation_context.cpp
      mime_multipart_helper.cpp
      logging.cpp
      hashing.cpp
+	 constants.cpp
      cloud_table_client.cpp
      cloud_table.cpp
      cloud_storage_account.cpp

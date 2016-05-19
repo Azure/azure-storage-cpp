@@ -298,12 +298,12 @@ DAT(xml_url, _XPLATSTR("Url"))
 #define VER(x) _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows; MSC_VER " STR(x) ")")
 #if defined(WIN32)
 #if defined(_MSC_VER)
-	DAT(header_value_user_agent, VER(_MSC_VER))
+    DAT(header_value_user_agent, VER(_MSC_VER))
 #else
-	DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows)"))
+    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows)"))
 #endif
 #else
-	DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native)"))
+    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native)"))
 #endif
 
 #endif // _CONSTANTS

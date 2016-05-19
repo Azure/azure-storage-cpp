@@ -138,22 +138,18 @@ namespace azure { namespace storage { namespace protocol {
         const web::http::http_headers& headers = m_request.headers();
         for (web::http::http_headers::const_iterator it = headers.begin(); it != headers.end(); ++it)
         {
-			const utility::char_t *key = it->first.c_str();
+            const utility::char_t *key = it->first.c_str();
 #ifdef WIN32
-			size_t key_size = std::wcslen(key);
-			size_t ms_header_prefix_size = std::wcslen(ms_header_prefix);
-			if ((key_size > ms_header_prefix_size) &&
-				std::wcsncmp(ms_header_prefix, key, ms_header_prefix_size) == 0)
+            size_t key_size = std::wcslen(key);
+            size_t ms_header_prefix_size = std::wcslen(ms_header_prefix);
+            if ((key_size > ms_header_prefix_size) &&
+                std::wcsncmp(ms_header_prefix, key, ms_header_prefix_size) == 0)
 #else
-			size_t key_size = std::strlen(key);
-			size_t ms_header_prefix_size = std::strlen(ms_header_prefix);
-			if ((key_size > ms_header_prefix_size) &&
-				std::strncmp(ms_header_prefix, key, ms_header_prefix_size) == 0)
+            size_t key_size = std::strlen(key);
+            size_t ms_header_prefix_size = std::strlen(ms_header_prefix);
+            if ((key_size > ms_header_prefix_size) &&
+                std::strncmp(ms_header_prefix, key, ms_header_prefix_size) == 0)
 #endif // WIN32
-			//std::equal(ms_header_prefix, ms_header_prefix + std::strlen(ms_header_prefix), key);
-
-				//std::equal(ms_header_prefix, ms_header_prefix + ms_header_prefix_size, key))
-				// report as not safe.
             {
                 if (!it->second.empty())
                 {

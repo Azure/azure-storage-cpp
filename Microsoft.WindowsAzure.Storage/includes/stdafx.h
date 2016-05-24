@@ -25,7 +25,7 @@
 #include "targetver.h"
 
 #pragma warning(push)
-#pragma warning(disable: 4634 4635 4638 4251 4100 4503)
+#pragma warning(disable: 4634 4635 4638 4251 4100 4503 4996)
 
 #ifndef NOMINMAX
 #define NOMINMAX

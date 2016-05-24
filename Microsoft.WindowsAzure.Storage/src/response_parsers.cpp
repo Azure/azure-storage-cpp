@@ -198,12 +198,16 @@ namespace azure { namespace storage { namespace protocol {
         auto& headers = response.headers();
         for (auto it = headers.begin(); it != headers.end(); ++it)
         {
-            const utility::string_t& key = it->first;
-            utility::string_t ms_header_metadata_prefix_local = utility::string_t(azure::storage::protocol::ms_header_metadata_prefix);
-            if ((key.size() > ms_header_metadata_prefix_local.size()) &&
-                std::equal(ms_header_metadata_prefix_local.cbegin(), ms_header_metadata_prefix_local.cend(), key.cbegin()))
+            const utility::char_t *key = it->first.c_str();
+            size_t key_size = it->first.size();
+            size_t ms_header_metadata_prefix_size = sizeof(ms_header_metadata_prefix) / sizeof(utility::char_t) - 1;
+            // disables warning 4996 to bypass the usage of std::equal;
+            // a more secure usage of std::equal with 5 parameters is supported by c++14.
+            // to be compatible with c++11, warning 4996 is disabled.
+            if ((key_size > ms_header_metadata_prefix_size) &&
+                std::equal(ms_header_metadata_prefix, ms_header_metadata_prefix + ms_header_metadata_prefix_size, key, [](const utility::char_t &c1, const utility::char_t &c2) {return c1 == c2;}))
             {
-                metadata.insert(std::make_pair(key.substr(ms_header_metadata_prefix_local.size()), it->second));
+                metadata.insert(std::make_pair(it->first.substr(ms_header_metadata_prefix_size), it->second));
             }
         }
 

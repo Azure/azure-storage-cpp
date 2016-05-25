@@ -140,7 +140,6 @@ namespace azure { namespace storage { namespace protocol {
         {
             const utility::char_t *key = it->first.c_str();
             size_t key_size = it->first.size();
-            size_t ms_header_prefix_size = sizeof(ms_header_prefix)/sizeof(utility::char_t) - 1;
             // disables warning 4996 to bypass the usage of std::equal;
             // a more secure usage of std::equal with 5 parameters is supported by c++14.
             // to be compatible with c++11, warning 4996 is disabled.

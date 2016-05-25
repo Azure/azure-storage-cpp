@@ -308,7 +308,7 @@ DAT(xml_url, _XPLATSTR("Url"))
 
 #endif // _CONSTANTS
 
-#ifdef _RECOURSES
+#ifdef _RESOURCES
 DAT(error_blob_type_mismatch, "Blob type of the blob reference doesn't match blob type of the blob.")
 DAT(error_closed_stream, "Cannot access a closed stream.")
 DAT(error_lease_id_on_source, "A lease condition cannot be specified on the source of a copy.")
@@ -374,4 +374,4 @@ DAT(error_invalid_block_size, "Append block data should not exceed the maximum b
 
 DAT(error_invalid_ip_address, "Error when parsing IP address: IP address is invalid.")
 DAT(error_ip_must_be_ipv4_in_sas, "When specifying an IP Address in a SAS token, it must be an IPv4 address.")
-#endif // _RECOURSES
+#endif // _RESOURCES

@@ -23,10 +23,10 @@
 
 namespace azure { namespace storage { namespace protocol {
 
-#define _RECOURSES
-#define DAT(a, b) extern const char* a;
+#define _RESOURCES
+#define DAT(a, b) extern const char* a; const size_t a ## _size{ sizeof(b) / sizeof(utility::char_t) - 1 };
 #include "wascore/constants.dat"
 #undef DAT
-#undef _RECOURSES
+#undef _RESOURCES
 
 }}} // namespace azure::storage::protocol

@@ -45,7 +45,7 @@ namespace azure { namespace storage { namespace protocol {
     const std::chrono::seconds maximum_fixed_lease_duration(60);
 
 #define _CONSTANTS
-#define DAT(a,b) extern WASTORAGE_API const utility::char_t* a;
+#define DAT(a,b) extern WASTORAGE_API const utility::char_t* a; const size_t a ## _size{ sizeof(b) / sizeof(utility::char_t) - 1 };
 #include "constants.dat"
 #undef DAT
 #undef _CONSTANTS

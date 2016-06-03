@@ -175,6 +175,7 @@ namespace azure { namespace storage {
             command->set_authentication_handler(service_client().authentication_handler());
             command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
             {
+                properties->initialization();
                 protocol::preprocess_response_void(response, result, context);
                 properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             });
@@ -197,6 +198,10 @@ namespace azure { namespace storage {
             {
                 return blob_stream.close();
             });
+        }).then([this]() -> pplx::task<void>
+        {
+            this->properties().initialization();
+            return pplx::task_from_result();
         });
     }
 

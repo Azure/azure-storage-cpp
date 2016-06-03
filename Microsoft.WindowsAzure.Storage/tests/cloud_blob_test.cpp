@@ -104,6 +104,7 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
         }
     }
 
+    check_blob_no_stale_property(blob);
     CHECK_UTF8_EQUAL(expect_md5_header ? md5 : utility::string_t(), md5_header);
     CHECK_EQUAL(expected_request_count, context.request_results().size());
 
@@ -209,6 +210,23 @@ void blob_test_base::check_access(const utility::string_t& sas_token, uint8_t pe
     {
         CHECK_THROW(blob.delete_blob(azure::storage::delete_snapshots_option::none, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
     }
+}
+
+void blob_test_base::check_blob_no_stale_property(azure::storage::cloud_blob& blob)
+{
+    // check lease property
+    CHECK(blob.properties().lease_status() == azure::storage::lease_status::unspecified);
+    CHECK(blob.properties().lease_state() == azure::storage::lease_state::unspecified);
+    CHECK(blob.properties().lease_duration() == azure::storage::lease_duration::unspecified);
+
+    // check copy property
+    CHECK(blob.copy_state().source() == web::http::uri());
+    CHECK(blob.copy_state().status() == azure::storage::copy_status::invalid);
+    CHECK(blob.copy_state().completion_time() == utility::datetime());
+    CHECK(blob.copy_state().status_description() == utility::string_t());
+    CHECK(blob.copy_state().copy_id() == utility::string_t());
+    CHECK_EQUAL(blob.copy_state().bytes_copied(), 0);
+    CHECK_EQUAL(blob.copy_state().total_bytes(), 0);
 }
 
 #pragma endregion

@@ -229,6 +229,14 @@ void blob_test_base::check_blob_no_stale_property(azure::storage::cloud_blob& bl
     CHECK_EQUAL(blob.copy_state().total_bytes(), 0);
 }
 
+void container_test_base::check_container_no_stale_property(azure::storage::cloud_blob_container& container)
+{
+    // check lease property
+    CHECK(container.properties().lease_status() == azure::storage::lease_status::unspecified);
+    CHECK(container.properties().lease_state() == azure::storage::lease_state::unspecified);
+    CHECK(container.properties().lease_duration() == azure::storage::lease_duration::unspecified);
+}
+
 #pragma endregion
 
 SUITE(Blob)

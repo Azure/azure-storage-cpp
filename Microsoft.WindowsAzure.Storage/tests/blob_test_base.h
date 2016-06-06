@@ -163,6 +163,7 @@ protected:
     void check_public_access(azure::storage::blob_container_public_access_type access);
     std::vector<azure::storage::cloud_blob> list_all_blobs(const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options);
     void check_lease_access(azure::storage::cloud_blob_container& container, azure::storage::lease_state state, const utility::string_t& lease_id, bool fake, bool allow_delete);
+    static void check_container_no_stale_property(azure::storage::cloud_blob_container& container);
 
     azure::storage::cloud_blob_container m_container;
 };

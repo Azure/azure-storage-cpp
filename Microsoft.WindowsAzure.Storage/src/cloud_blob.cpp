@@ -208,8 +208,8 @@ namespace azure { namespace storage {
         auto properties = m_properties;
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            properties->initialization();
             protocol::preprocess_response_void(response, result, context);
+            properties->initialization();
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }

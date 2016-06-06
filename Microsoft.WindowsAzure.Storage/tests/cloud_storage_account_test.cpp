@@ -27,7 +27,7 @@
 
 const utility::string_t test_uri(_XPLATSTR("http://test/abc"));
 const utility::string_t token(_XPLATSTR("sp=abcde&sig=1"));
-const utility::string_t token_with_api_version(azure::storage::protocol::uri_query_sas_api_version + _XPLATSTR("=") + azure::storage::protocol::header_value_storage_version + _XPLATSTR("&sig=1&sp=abcde"));
+const utility::string_t token_with_api_version(utility::string_t(azure::storage::protocol::uri_query_sas_api_version) + _XPLATSTR("=") + azure::storage::protocol::header_value_storage_version + _XPLATSTR("&sig=1&sp=abcde"));
 const utility::string_t test_account_name(_XPLATSTR("test"));
 const utility::string_t test_account_key(_XPLATSTR("Fby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
 const utility::string_t test_endpoint_suffix(_XPLATSTR("fake.endpoint.suffix"));

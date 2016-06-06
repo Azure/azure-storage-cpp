@@ -209,12 +209,14 @@
     <ClCompile Include="src\cloud_storage_account.cpp" />
     <ClCompile Include="src\cloud_table.cpp" />
     <ClCompile Include="src\cloud_table_client.cpp" />
+    <ClCompile Include="src\constants.cpp" />
     <ClCompile Include="src\hashing.cpp" />
     <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\mime_multipart_helper.cpp" />
     <ClCompile Include="src\operation_context.cpp" />
     <ClCompile Include="src\protocol_json.cpp" />
     <ClCompile Include="src\queue_request_factory.cpp" />
+    <ClCompile Include="src\resources.cpp" />
     <ClCompile Include="src\retry_policies.cpp" />
     <ClCompile Include="src\shared_access_signature.cpp" />
     <ClCompile Include="src\entity_property.cpp" />
@@ -240,6 +242,7 @@
     <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="includes\wascore\constants.dat" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

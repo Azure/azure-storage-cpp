@@ -35,7 +35,6 @@ namespace azure { namespace storage {
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
-            properties->initialization();
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             properties->m_size = 0;
@@ -130,11 +129,7 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_append_blob::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
-        return upload_from_stream_internal_async(source, length, true, condition, options, context).then([this]() -> pplx::task<void>
-        {
-            this->properties().initialization();
-            return pplx::task_from_result();
-        });
+        return upload_from_stream_internal_async(source, length, true, condition, options, context);
     }
 
     pplx::task<void> cloud_append_blob::upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context)

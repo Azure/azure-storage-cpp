@@ -1226,16 +1226,6 @@ namespace azure { namespace storage {
         {
         }
 
-        /// <summary>
-        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_properties" /> class.
-        /// </summary>
-        void initialization()
-        {
-            m_lease_state = azure::storage::lease_state::unspecified;
-            m_lease_status = azure::storage::lease_status::unspecified;
-            m_lease_duration = azure::storage::lease_duration::unspecified;
-        }
-
 #if defined(_MSC_VER) && _MSC_VER < 1900
         // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
         // have implicitly-declared move constructor and move assignment operator.
@@ -1468,6 +1458,16 @@ namespace azure { namespace storage {
         }
 
     private:
+
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
 
         void set_type(blob_type value)
         {
@@ -2291,6 +2291,16 @@ namespace azure { namespace storage {
         }
 
     private:
+
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_container_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
 
         utility::string_t m_etag;
         utility::datetime m_last_modified;

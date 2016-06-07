@@ -507,4 +507,31 @@ SUITE(Blob)
         auto condition = azure::storage::access_condition::generate_if_max_size_less_than_or_equal_condition(512);
         CHECK_THROW(m_blob.upload_from_stream(stream, condition, azure::storage::blob_request_options(), m_context), std::invalid_argument);
     }
+    
+    TEST_FIXTURE(append_blob_test_base, append_block_stale_properties)
+    {
+        azure::storage::blob_request_options options;
+        azure::storage::operation_context op;
+
+        m_blob.create_or_replace(azure::storage::access_condition(), options, m_context);
+        check_blob_no_stale_property(m_blob);
+        auto lease_id = utility::uuid_to_string(utility::new_uuid());
+        m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(60)), lease_id);
+        m_blob.download_attributes(azure::storage::access_condition::generate_lease_condition(lease_id), options, op);
+        m_blob.delete_blob(azure::storage::delete_snapshots_option::none, azure::storage::access_condition::generate_lease_condition(lease_id), options, op);
+
+        m_blob.create_or_replace(azure::storage::access_condition(), options, m_context);
+        check_blob_no_stale_property(m_blob);
+        lease_id = utility::uuid_to_string(utility::new_uuid());
+        m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(60)), lease_id);
+        m_blob.download_attributes(azure::storage::access_condition::generate_lease_condition(lease_id), options, op);
+        m_blob.delete_blob(azure::storage::delete_snapshots_option::none, azure::storage::access_condition::generate_lease_condition(lease_id), options, op);
+
+        m_blob.create_or_replace(azure::storage::access_condition(), options, m_context);
+        check_blob_no_stale_property(m_blob);
+        lease_id = utility::uuid_to_string(utility::new_uuid());
+        m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(60)), lease_id);
+        m_blob.download_attributes(azure::storage::access_condition::generate_lease_condition(lease_id), options, op);
+        m_blob.delete_blob(azure::storage::delete_snapshots_option::none, azure::storage::access_condition::generate_lease_condition(lease_id), options, op);
+    }
 }

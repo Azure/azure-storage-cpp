@@ -20,10 +20,10 @@
 
 namespace azure { namespace storage { namespace protocol {
 
-#define _RECOURSES
+#define _RESOURCES
 #define DAT(a, b) const char* a = b;
 #include "wascore/constants.dat"
 #undef DAT
-#undef _RECOURSES
+#undef _RESOURCES
 
 }}} // namespace azure::storage::protocol

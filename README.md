@@ -16,7 +16,7 @@ The Azure Storage Client Library for C++ allows you to build applications agains
 
 # Getting started
 
-For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes. 
+For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes.
 Download the [NuGet Package](http://www.nuget.org/packages/wastorage).
 
 ## Requirements
@@ -33,7 +33,7 @@ We gladly accept community contributions.
 
 - **Issues:** Report bugs on the [Issues page](https://github.com/Azure/azure-storage-cpp/issues) in GitHub.
 - **Forums:** Communicate with the Azure Storage development team on the [Azure Storage Forum](https://social.msdn.microsoft.com/Forums/azure/en-US/home?forum=windowsazuredata) or [StackOverflow](http://stackoverflow.com/questions/tagged/azure).
-- **Source Code Contributions:** Please follow the [contribution guidelines for Azure open source](http://azure.github.io/guidelines/) for instructions about contributing to the source project. 
+- **Source Code Contributions:** Please follow the [contribution guidelines for Azure open source](http://azure.github.io/guidelines/) for instructions about contributing to the source project.
 
 For general suggestions about Azure, use our [Azure feedback forum](http://feedback.azure.com/forums/34192--general-feedback).
 
@@ -133,6 +133,44 @@ cd Binaries
 
 Please note the current build script is only tested on Ubuntu 14.04. Please update the script accordingly for other distributions.
 
+## Getting Started on OSX
+
+*Note that OSX is not officially supported yet, but it has been seen to work, YMMV. This build has been tested to work when the dependencies are installed via homebrew, YMMV if using FINK or MacPorts*
+
+Install dependecies with homebrew:
+
+```
+brew install glibmm libxml++ libsigc++ ossp-uuid gettext openssl
+```
+
+As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X) to compile it. Current version of the library depends on Casablanca version 2.8.0.
+
+Once this is complete, then:
+
+- Clone the project using git:
+```bash
+git clone https://github.com/Azure/azure-storage-cpp.git
+```
+The project is cloned to a folder called `azure-storage-cpp`. Always use the master branch, which contains the latest release.
+- Install additional dependencies:
+```bash
+sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev
+```
+- Build the SDK for Release:
+```bash
+cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage
+mkdir build.release
+cd build.release
+CASABLANCA_DIR=<path to Casablanca> cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=<path to openssl> -DGETTEXT_LIB_DIR=<path to gettext lib dir>
+make
+```
+In the above command, replace `<path to Casablanca>` to point to your local installation of Casablanca. <path to openssl> to your local openssl, it is recommended not to use the version that comes with OSX, rather use one from Homebrew or the like. <path to gettext lib dir> is similar, although you go all the way to the lib dir. For example, if the file `libcpprest.so` exists at location `~/Github/Casablanca/cpprestsdk/Release/build.release/Binaries/libcpprest.so`, and you've installed the dependencies through homebrew then your `cmake` command should be:
+```bash
+CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DGETTEXT_LIB_DIR=/usr/local/opt/gettext/lib
+```
+The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
+
+*As yet the unit tests don't build, because cmake won't find UnitTest++ even though it is installed via Homebrew*
 
 # Learn More
 - [Microsoft Azure Storage Client Library for C++ v2.0.0](documentation/Microsoft%20Azure%20Storage%20Client%20Library%20for%20C%2B%2B%202.0.0.md)

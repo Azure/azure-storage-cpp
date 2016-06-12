@@ -1533,6 +1533,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Return the cached storage uri for queue's operations.
         /// </summary>
+        /// <remarks>Cached storage uri for queue's operations. Mainly influence get_message_async, get_messages_async, peek_message_async, peek_messages_async, clear_async, add_message_async</remarks>
         const storage_uri& get_queue_message_uri()
         {
             return m_queue_message_uri;
@@ -1541,6 +1542,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Return the cached storage uri for queue's operations.
         /// </summary>
+        /// <remarks>Cached storage uri for queue's operations. Mainly influence get_message_async, get_messages_async, peek_message_async, peek_messages_async, clear_async, add_message_async</remarks>
         const storage_uri& get_queue_message_uri() const
         {
             return m_queue_message_uri;

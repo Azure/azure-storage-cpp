@@ -15,7 +15,25 @@ option(BUILD_SAMPLES "Build sample codes" OFF)
 if(UNIX)
   find_package(Boost REQUIRED COMPONENTS log log_setup random system thread locale regex filesystem chrono date_time)
   find_package(Threads REQUIRED)
-  find_package(OpenSSL REQUIRED)
+  if(APPLE)
+	 message(WARNING "On OSX you must specify OPENSSL_ROOT_DIR, it is currently ${OPENSSL_ROOT_DIR}")
+
+	  # this isn't ideal because it requires the user to set OPENSSL_ROOT_DIR rather than being automated
+	  set(OPENSSL_FOUND 1)
+	  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include")
+	  set(OPENSSL_LIBRARIES
+		"${OPENSSL_ROOT_DIR}/lib/libcrypto.dylib"
+		"${OPENSSL_ROOT_DIR}/lib/libssl.dylib"
+		)
+
+		message(WARNING "On OSX you must specify GETTEXT_LIB_DIR, it is currently ${GETTEXT_LIB_DIR}")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -L${GETTEXT_LIB_DIR}")
+
+		
+
+  else()
+  	find_package(OpenSSL REQUIRED)
+  endif()
   find_package(Glibmm REQUIRED)
   find_package(LibXML++ REQUIRED)
   find_package(UUID REQUIRED)
@@ -46,15 +64,31 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
   set(WARNINGS "${WARNINGS} ${LINUX_SUPPRESSIONS}")
 
   set(LD_FLAGS "${LD_FLAGS} -Wl,-z,defs")
- 
+
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-strict-aliasing")
- 
+
   set(STRICT_CXX_FLAGS ${WARNINGS} "-Werror -pedantic")
- 
-  if (BUILD_SHARED_LIBS)    
-    add_definitions(-DBOOST_LOG_DYN_LINK)    
-  endif()    
-  add_definitions(-D_TURN_OFF_PLATFORM_STRING)  
+
+  if (BUILD_SHARED_LIBS)
+    add_definitions(-DBOOST_LOG_DYN_LINK)
+  endif()
+  add_definitions(-D_TURN_OFF_PLATFORM_STRING)
+elseif((CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+	message("-- Setting clang options")
+
+	set(WARNINGS "-Wall -Wextra -Wcast-qual -Wconversion -Wformat=2 -Winit-self -Winvalid-pch -Wmissing-format-attribute -Wmissing-include-dirs -Wpacked -Wredundant-decls")
+	set(OSX_SUPPRESSIONS "-Wno-overloaded-virtual -Wno-sign-conversion -Wno-deprecated -Wno-unknown-pragmas -Wno-reorder -Wno-char-subscripts -Wno-switch -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated -Wno-unused-value -Wno-unknown-warning-option -Wno-return-type-c-linkage -Wno-unused-function -Wno-sign-compare -Wno-shorten-64-to-32 -Wno-reorder -Wno-unused-local-typedefs")
+	set(WARNINGS "${WARNINGS} ${OSX_SUPPRESSIONS}")
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wno-return-type-c-linkage -Wno-unneeded-internal-declaration")
+	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-strict-aliasing")
+	if (BUILD_SHARED_LIBS)
+		add_definitions(-DBOOST_LOG_DYN_LINK)
+	endif()
+	add_definitions(-D_TURN_OFF_PLATFORM_STRING)
 else()
   message("-- Unknown compiler, success is doubtful.")
 endif()
@@ -80,7 +114,7 @@ add_subdirectory(src)
 
 if(BUILD_TESTS)
   set(AZURESTORAGE_LIBRARY_TEST azurestoragetest)
-  add_subdirectory(tests) 
+  add_subdirectory(tests)
 endif()
 
 if(BUILD_SAMPLES)

@@ -1,3 +1,4 @@
+include_directories(${Boost_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR})
 include_directories(${AZURESTORAGE_INCLUDE_DIRS})
 
 # THE ORDER OF FILES IS VERY /VERY/ IMPORTANT
@@ -54,6 +55,7 @@ endif()
 if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS}")
 
 add_library(${AZURESTORAGE_LIBRARY} ${SOURCES})
 
@@ -71,4 +73,3 @@ if(UNIX)
     ARCHIVE DESTINATION lib
     )
 endif()
-

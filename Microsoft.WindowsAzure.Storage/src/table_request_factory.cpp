@@ -387,7 +387,7 @@ namespace azure { namespace storage { namespace protocol {
         return web::json::value::null();
     }
 
-    web::http::http_request table_base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request table_base_request(web::http::method method, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = base_request(method, uri_builder, timeout, context);
 
@@ -397,7 +397,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::method method = get_http_method(operation_type);
         web::http::http_request request = table_base_request(method, uri_builder, timeout, context);
@@ -422,7 +422,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::method method = get_http_method(operation.operation_type());
         web::http::http_request request = table_base_request(method, uri_builder, timeout, context);
@@ -439,7 +439,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         utility::string_t batch_boundary_name = core::generate_boundary_name(_XPLATSTR("batch"));
         utility::string_t changeset_boundary_name = core::generate_boundary_name(_XPLATSTR("changeset"));
@@ -511,7 +511,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_query(table_payload_format payload_format, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_query(table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = table_base_request(web::http::methods::GET, uri_builder, timeout, context);
 
@@ -521,14 +521,14 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = base_request(web::http::methods::GET, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request set_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = base_request(web::http::methods::PUT, uri_builder, timeout, context);

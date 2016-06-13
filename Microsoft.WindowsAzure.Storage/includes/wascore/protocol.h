@@ -27,44 +27,44 @@ namespace azure { namespace storage { namespace protocol {
 
     // Common request factory methods
 
-    web::http::http_request base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_service_stats(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request base_request(web::http::method method, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_service_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_service_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_service_stats(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     void add_optional_header(web::http::http_headers& headers, const utility::string_t& header, const utility::string_t& value);
     void add_metadata(web::http::http_request& request, const cloud_metadata& metadata);
 
     // Blob request factory methods
 
-    web::http::http_request create_blob_container(blob_container_public_access_type access_type, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request delete_blob_container(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_blob_container_properties(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_blob_container_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_blob_container_acl(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_blob_container_acl(blob_container_public_access_type access_type, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request list_containers(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request list_blobs(const utility::string_t& prefix, const utility::string_t& delimiter, blob_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request lease_blob_container(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request lease_blob(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_block(const utility::string_t& block_id, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_block_list(block_listing_filter listing_filter, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_page_ranges(utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_page(page_range range, page_write write, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request append_block(const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_block_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_page_blob(utility::size64_t size, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_append_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_blob_properties(const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_blob_properties(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request resize_page_blob(utility::size64_t size, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_page_blob_sequence_number(const azure::storage::sequence_number& sequence_number, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request snapshot_blob(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_blob_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request delete_blob(delete_snapshots_option snapshots_option, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request create_blob_container(blob_container_public_access_type access_type, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_blob_container(const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_blob_container_properties(const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_blob_container_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_blob_container_acl(const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_blob_container_acl(blob_container_public_access_type access_type, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_containers(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_blobs(const utility::string_t& prefix, const utility::string_t& delimiter, blob_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request lease_blob_container(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request lease_blob(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_block(const utility::string_t& block_id, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_block_list(block_listing_filter listing_filter, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_page_ranges(utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_page(page_range range, page_write write, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request append_block(const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_block_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_page_blob(utility::size64_t size, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_append_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_blob_properties(const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_blob_properties(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request resize_page_blob(utility::size64_t size, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_page_blob_sequence_number(const azure::storage::sequence_number& sequence_number, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request snapshot_blob(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_blob_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_blob(delete_snapshots_option snapshots_option, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     void add_lease_id(web::http::http_request& request, const access_condition& condition);
     void add_sequence_number_condition(web::http::http_request& request, const access_condition& condition);
     void add_access_condition(web::http::http_request& request, const access_condition& condition);
@@ -78,12 +78,12 @@ namespace azure { namespace storage { namespace protocol {
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_operation& operation);
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_batch_operation& operation);
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_query& query, const continuation_token& token);
-    web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request execute_query(table_payload_format payload_format, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request execute_query(table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     utility::string_t get_property_type_name(edm_type property_type);
     utility::string_t get_multipart_content_type(const utility::string_t& boundary_name);
 
@@ -93,18 +93,18 @@ namespace azure { namespace storage { namespace protocol {
     storage_uri generate_queue_uri(const cloud_queue_client& service_client, const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token);
     storage_uri generate_queue_message_uri(const cloud_queue_client& service_client, const cloud_queue& queue);
     storage_uri generate_queue_message_uri(const cloud_queue_client& service_client, const cloud_queue& queue, const cloud_queue_message& message);
-    web::http::http_request list_queues(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request create_queue(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request delete_queue(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request add_message(const cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_messages(size_t message_count, std::chrono::seconds visibility_timeout, bool is_peek, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request delete_message(const cloud_queue_message& message, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request update_message(const cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_contents, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request clear_messages(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request download_queue_metadata(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request upload_queue_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_queue_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_queue_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_queues(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request create_queue(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_queue(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request add_message(const cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_messages(size_t message_count, std::chrono::seconds visibility_timeout, bool is_peek, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_message(const cloud_queue_message& message, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request update_message(const cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_contents, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request clear_messages(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request download_queue_metadata(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request upload_queue_metadata(const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_queue_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_queue_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
 
     // Common response parsers
 

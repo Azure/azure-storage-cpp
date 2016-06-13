@@ -41,6 +41,7 @@ SUITE(Blob)
         auto same_blob = m_container.get_page_blob_reference(m_blob.name());
         CHECK(!same_blob.exists(azure::storage::blob_request_options(), m_context));
         m_blob.create(1024, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(1024, m_blob.properties().size());
         CHECK_EQUAL(0, same_blob.properties().size());
         CHECK(same_blob.exists(azure::storage::blob_request_options(), m_context));
@@ -49,6 +50,7 @@ SUITE(Blob)
         CHECK(!same_blob.exists(azure::storage::blob_request_options(), m_context));
         CHECK_EQUAL(1024, same_blob.properties().size());
         m_blob.create(2048, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(2048, m_blob.properties().size());
         CHECK_EQUAL(1024, same_blob.properties().size());
         CHECK(same_blob.exists(azure::storage::blob_request_options(), m_context));
@@ -59,6 +61,7 @@ SUITE(Blob)
     {
         m_blob.properties().set_content_language(_XPLATSTR("tr,en"));
         m_blob.create(1024, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(1024, m_blob.properties().size());
 
         m_blob.properties().set_content_language(_XPLATSTR("en"));
@@ -74,6 +77,7 @@ SUITE(Blob)
     {
         m_blob.properties().set_content_language(_XPLATSTR("tr,en"));
         m_blob.create(512, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(512, m_blob.properties().size());
         CHECK_EQUAL(0, m_blob.properties().page_blob_sequence_number());
         
@@ -110,6 +114,7 @@ SUITE(Blob)
     {
         int64_t seq = get_random_int64() & 0x7FFFFFFFFFFFFFFFllu;
         m_blob.create(512, seq, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         m_blob.set_sequence_number(azure::storage::sequence_number::increment(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(seq + 1, m_blob.properties().page_blob_sequence_number());
     }
@@ -131,6 +136,7 @@ SUITE(Blob)
         });
 
         m_blob.create(12 * 1024 * 1024, 0, azure::storage::access_condition(), options, m_context);
+        check_blob_no_stale_property(m_blob);
 
         options.set_use_transactional_md5(false);
         for (int i = 0; i < 3; ++i)
@@ -405,6 +411,7 @@ SUITE(Blob)
     TEST_FIXTURE(page_blob_test_base, page_blob_constructor)
     {
         m_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK(!m_blob.properties().etag().empty());
 
         azure::storage::cloud_page_blob blob1(m_blob.uri());
@@ -431,6 +438,7 @@ SUITE(Blob)
         m_blob.metadata()[_XPLATSTR("key1")] = _XPLATSTR("value1");
         m_blob.metadata()[_XPLATSTR("key2")] = _XPLATSTR("value2");
         m_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
 
         auto same_blob = m_container.get_page_blob_reference(m_blob.name());
         CHECK(same_blob.metadata().empty());
@@ -445,6 +453,7 @@ SUITE(Blob)
         m_blob.metadata()[_XPLATSTR("key1")] = _XPLATSTR("value1");
         m_blob.metadata()[_XPLATSTR("key2")] = _XPLATSTR("value2");
         m_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
 
         auto snapshot1 = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(2U, snapshot1.metadata().size());

@@ -1460,6 +1460,16 @@ namespace azure { namespace storage {
 
     private:
 
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
+
         void set_type(blob_type value)
         {
             m_type = value;
@@ -2282,6 +2292,16 @@ namespace azure { namespace storage {
         }
 
     private:
+
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_container_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
 
         utility::string_t m_etag;
         utility::datetime m_last_modified;

@@ -97,6 +97,7 @@ SUITE(Blob)
         CHECK(!m_container.exists(azure::storage::blob_request_options(), m_context));
         CHECK(!m_container.delete_container_if_exists(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
         CHECK(m_container.create_if_not_exists(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context));
+        check_container_no_stale_property(m_container);
         CHECK(!m_container.create_if_not_exists(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context));
         CHECK(m_container.exists(azure::storage::blob_request_options(), m_context));
         CHECK(m_container.delete_container_if_exists(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
@@ -108,23 +109,27 @@ SUITE(Blob)
     {
         m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
         check_public_access(azure::storage::blob_container_public_access_type::off);
+        check_container_no_stale_property(m_container);
     }
 
     TEST_FIXTURE(container_test_base, container_create_public_blob)
     {
         m_container.create(azure::storage::blob_container_public_access_type::blob, azure::storage::blob_request_options(), m_context);
         check_public_access(azure::storage::blob_container_public_access_type::blob);
+        check_container_no_stale_property(m_container);
     }
 
     TEST_FIXTURE(container_test_base, container_create_public_container)
     {
         m_container.create(azure::storage::blob_container_public_access_type::container, azure::storage::blob_request_options(), m_context);
         check_public_access(azure::storage::blob_container_public_access_type::container);
+        check_container_no_stale_property(m_container);
     }
 
     TEST_FIXTURE(container_test_base, container_set_public_access)
     {
         m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        check_container_no_stale_property(m_container);
         azure::storage::blob_container_permissions permissions;
 
         permissions.set_public_access(azure::storage::blob_container_public_access_type::container);
@@ -146,6 +151,7 @@ SUITE(Blob)
         m_container.metadata()[_XPLATSTR("key1")] = _XPLATSTR("value1");
         m_container.metadata()[_XPLATSTR("key2")] = _XPLATSTR("value2");
         m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        check_container_no_stale_property(m_container);
 
         auto same_container = m_client.get_container_reference(m_container.name());
         CHECK(same_container.metadata().empty());
@@ -181,6 +187,7 @@ SUITE(Blob)
     TEST_FIXTURE(container_test_base, container_list_blobs)
     {
         m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        check_container_no_stale_property(m_container);
         std::map<utility::string_t, azure::storage::cloud_blob> blobs;
 
         for (int i = 0; i < 4; i++)
@@ -203,6 +210,7 @@ SUITE(Blob)
             blob.metadata()[_XPLATSTR("index")] = index;
             
             blob.create(i * 512, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            check_container_no_stale_property(m_container);
             blobs[blob.name()] = blob;
         }
 
@@ -213,6 +221,7 @@ SUITE(Blob)
             blob.metadata()[_XPLATSTR("index")] = index;
 
             blob.create_or_replace(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            check_container_no_stale_property(m_container);
 
             std::vector<uint8_t> buffer;
             buffer.resize((i + 1) * 8 * 1024);

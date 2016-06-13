@@ -25,21 +25,18 @@
 namespace azure { namespace storage {
 
     cloud_queue::cloud_queue(const storage_uri& uri)
-        : m_client(create_service_client(uri, storage_credentials())), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
+        : m_client(create_service_client(uri, storage_credentials())), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1)), m_queue_message_uri(core::append_path_to_uri(m_uri, _XPLATSTR("messages")))
     {
-        m_queue_message_uri = protocol::generate_queue_message_uri(m_client, *this);
     }
 
     cloud_queue::cloud_queue(const storage_uri& uri, storage_credentials credentials)
-        : m_client(create_service_client(uri, std::move(credentials))), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
+        : m_client(create_service_client(uri, std::move(credentials))), m_name(read_queue_name(uri)), m_uri(create_uri(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1)), m_queue_message_uri(core::append_path_to_uri(m_uri, _XPLATSTR("messages")))
     {
-        m_queue_message_uri = protocol::generate_queue_message_uri(m_client, *this);
     }
 
     cloud_queue::cloud_queue(cloud_queue_client client, utility::string_t name)
-        : m_client(std::move(client)), m_name(std::move(name)), m_uri(core::append_path_to_uri(m_client.base_uri(), m_name)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1))
+        : m_client(std::move(client)), m_name(std::move(name)), m_uri(core::append_path_to_uri(m_client.base_uri(), m_name)), m_metadata(std::make_shared<cloud_metadata>()), m_approximate_message_count(std::make_shared<int>(-1)), m_queue_message_uri(core::append_path_to_uri(m_uri, _XPLATSTR("messages")))
     {
-        m_queue_message_uri = protocol::generate_queue_message_uri(m_client, *this);
     }
 
     pplx::task<void> cloud_queue::create_async(const queue_request_options& options, operation_context context)
@@ -316,11 +313,10 @@ namespace azure { namespace storage {
     pplx::task<void> cloud_queue::download_attributes_async(const queue_request_options& options, operation_context context)
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
         auto metadata = m_metadata;
         auto approximate_message_count = m_approximate_message_count;
-        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
+        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::download_queue_metadata, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
@@ -336,9 +332,8 @@ namespace azure { namespace storage {
     pplx::task<void> cloud_queue::upload_metadata_async(const queue_request_options& options, operation_context context)
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
-        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
+        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::upload_queue_metadata, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -348,9 +343,8 @@ namespace azure { namespace storage {
     pplx::task<queue_permissions> cloud_queue::download_permissions_async(const queue_request_options& options, operation_context context) const
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
-        std::shared_ptr<core::storage_command<queue_permissions>> command = std::make_shared<core::storage_command<queue_permissions>>(uri);
+        std::shared_ptr<core::storage_command<queue_permissions>> command = std::make_shared<core::storage_command<queue_permissions>>(uri());
         command->set_build_request(std::bind(protocol::get_queue_acl, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
@@ -369,12 +363,11 @@ namespace azure { namespace storage {
     pplx::task<void> cloud_queue::upload_permissions_async(const queue_permissions& permissions, const queue_request_options& options, operation_context context)
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
         protocol::access_policy_writer<queue_shared_access_policy> writer;
         concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(writer.write(permissions.policies())));
 
-        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri);
+        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::set_queue_acl, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -433,9 +426,8 @@ namespace azure { namespace storage {
     pplx::task<bool> cloud_queue::create_async_impl(const queue_request_options& options, operation_context context, bool allow_conflict)
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
-        std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri);
+        std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri());
         command->set_build_request(std::bind(protocol::create_queue, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([allow_conflict] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
@@ -454,9 +446,8 @@ namespace azure { namespace storage {
     pplx::task<bool> cloud_queue::delete_async_impl(const queue_request_options& options, operation_context context, bool allow_not_found)
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
-        std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri);
+        std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri());
         command->set_build_request(std::bind(protocol::delete_queue, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([allow_not_found] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
@@ -475,9 +466,8 @@ namespace azure { namespace storage {
     pplx::task<bool> cloud_queue::exists_async_impl(const queue_request_options& options, operation_context context, bool allow_secondary) const
     {
         queue_request_options modified_options = get_modified_options(options);
-        storage_uri uri = protocol::generate_queue_uri(service_client(), *this);
 
-        std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri);
+        std::shared_ptr<core::storage_command<bool>> command = std::make_shared<core::storage_command<bool>>(uri());
         command->set_build_request(std::bind(protocol::download_queue_metadata, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(allow_secondary ? core::command_location_mode::primary_or_secondary : core::command_location_mode::primary_only);

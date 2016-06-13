@@ -1220,9 +1220,10 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_properties" /> class.
         /// </summary>
         cloud_blob_properties()
-            : m_type(blob_type::unspecified), m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0),
-            m_lease_state(azure::storage::lease_state::unspecified), m_lease_status(azure::storage::lease_status::unspecified),
-            m_lease_duration(azure::storage::lease_duration::unspecified), m_size(0)
+            :  m_size(0), m_type(blob_type::unspecified), m_lease_status(azure::storage::lease_status::unspecified),
+            m_lease_state(azure::storage::lease_state::unspecified),
+            m_lease_duration(azure::storage::lease_duration::unspecified),
+            m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0)
         {
         }
 
@@ -1459,6 +1460,16 @@ namespace azure { namespace storage {
 
     private:
 
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
+
         void set_type(blob_type value)
         {
             m_type = value;
@@ -1653,10 +1664,10 @@ namespace azure { namespace storage {
             m_use_transactional_md5(false),
             m_store_blob_content_md5(false),
             m_disable_content_md5_validation(false),
-            m_single_blob_upload_threshold(protocol::default_single_blob_upload_threshold),
-            m_stream_read_size(protocol::max_block_size),
-            m_stream_write_size(protocol::max_block_size),
             m_parallelism_factor(1),
+            m_single_blob_upload_threshold(protocol::default_single_blob_upload_threshold),
+            m_stream_write_size(protocol::max_block_size),
+            m_stream_read_size(protocol::max_block_size),
             m_absorb_conditional_errors_on_retry(false)
         {
         }
@@ -2282,6 +2293,16 @@ namespace azure { namespace storage {
 
     private:
 
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_container_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
+
         utility::string_t m_etag;
         utility::datetime m_last_modified;
         azure::storage::lease_status m_lease_status;
@@ -2765,7 +2786,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="name">The name of the container.</param>
         /// <param name="client">The Blob service client.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
@@ -2774,7 +2795,7 @@ namespace azure { namespace storage {
         /// <param name="client">The Blob service client.</param>
         /// <param name="properties">The properties for the container.</param>
         /// <param name="metadata">The metadata for the container.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
         // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
@@ -3887,7 +3908,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
         /// </summary>
         cloud_blob()
-            : m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()), m_copy_state(std::make_shared<azure::storage::copy_state>())
+            : m_properties(std::make_shared<cloud_blob_properties>()), m_metadata(std::make_shared<cloud_metadata>()), m_copy_state(std::make_shared<azure::storage::copy_state>())
         {
             set_type(blob_type::unspecified);
         }
@@ -6982,8 +7003,9 @@ namespace azure { namespace storage {
         /// <param name="metadata">User-defined metadata for the blob.</param>
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
         explicit list_blob_item(utility::string_t blob_name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state)
-            : m_is_blob(true), m_name(std::move(blob_name)), m_snapshot_time(std::move(snapshot_time)), m_container(std::move(container)),
-            m_properties(std::move(properties)), m_metadata(std::move(metadata)), m_copy_state(std::move(copy_state))
+            : m_is_blob(true), m_name(std::move(blob_name)), m_container(std::move(container)),
+            m_snapshot_time(std::move(snapshot_time)), m_properties(std::move(properties)),
+            m_metadata(std::move(metadata)), m_copy_state(std::move(copy_state))
         {
         }
 

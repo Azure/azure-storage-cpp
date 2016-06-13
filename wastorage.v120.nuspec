@@ -22,6 +22,7 @@
     <file src="Microsoft.WindowsAzure.Storage\includes\was\*.h" target="build\native\include\was" />
     <file src="Microsoft.WindowsAzure.Storage\includes\wascore\basic_types.h" target="build\native\include\wascore" />
     <file src="Microsoft.WindowsAzure.Storage\includes\wascore\constants.h" target="build\native\include\wascore" />
+    <file src="Microsoft.WindowsAzure.Storage\includes\wascore\constants.dat" target="build\native\include\wascore" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.lib" target="lib\native\v120\Win32\Debug" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.dll" target="lib\native\v120\Win32\Debug" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.pdb" target="lib\native\v120\Win32\Debug" />

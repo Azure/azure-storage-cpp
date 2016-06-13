@@ -163,6 +163,7 @@ protected:
     void check_public_access(azure::storage::blob_container_public_access_type access);
     std::vector<azure::storage::cloud_blob> list_all_blobs(const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options);
     void check_lease_access(azure::storage::cloud_blob_container& container, azure::storage::lease_state state, const utility::string_t& lease_id, bool fake, bool allow_delete);
+    static void check_container_no_stale_property(azure::storage::cloud_blob_container& container);
 
     azure::storage::cloud_blob_container m_container;
 };
@@ -186,6 +187,7 @@ protected:
     static azure::storage::operation_context upload_and_download(azure::storage::cloud_blob& blob, size_t buffer_size, size_t buffer_offset, size_t blob_size, bool use_seekable_stream, const azure::storage::blob_request_options& options, size_t expected_request_count, bool expect_md5_header);
     void check_access(const utility::string_t& sas_token, uint8_t permissions, const azure::storage::cloud_blob_shared_access_headers& headers, const azure::storage::cloud_blob& original_blob);
     void check_lease_access(azure::storage::cloud_blob& blob, azure::storage::lease_state state, const utility::string_t& lease_id, bool fake);
+    static void check_blob_no_stale_property(azure::storage::cloud_blob& blob);
 };
 
 class block_blob_test_base : public blob_test_base

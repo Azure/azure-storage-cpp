@@ -752,7 +752,7 @@ namespace azure { namespace storage {
         /// <param name="etag">The entity's current ETag.</param>
         /// <param name="properties">The entity's properties, indexed by property name.</param>
         table_entity(utility::string_t partition_key, utility::string_t row_key, utility::string_t etag, properties_type properties)
-            : m_partition_key(std::move(partition_key)), m_row_key(std::move(row_key)), m_etag(std::move(etag)), m_properties(std::move(properties))
+            : m_properties(std::move(properties)), m_partition_key(std::move(partition_key)), m_row_key(std::move(row_key)), m_etag(std::move(etag))
         {
         }
 

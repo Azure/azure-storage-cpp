@@ -138,9 +138,13 @@ namespace azure { namespace storage { namespace protocol {
         const web::http::http_headers& headers = m_request.headers();
         for (web::http::http_headers::const_iterator it = headers.begin(); it != headers.end(); ++it)
         {
-            const utility::string_t& key = it->first;
-            if ((key.size() > ms_header_prefix.size()) &&
-                std::equal(ms_header_prefix.cbegin(), ms_header_prefix.cend(), key.cbegin()))
+            const utility::char_t *key = it->first.c_str();
+            size_t key_size = it->first.size();
+            // disables warning 4996 to bypass the usage of std::equal;
+            // a more secure usage of std::equal with 5 parameters is supported by c++14.
+            // to be compatible with c++11, warning 4996 is disabled.
+            if ((key_size > ms_header_prefix_size) &&
+                std::equal(ms_header_prefix, ms_header_prefix + ms_header_prefix_size, key, [](const utility::char_t &c1, const utility::char_t &c2) {return c1 == c2;}))
             {
                 if (!it->second.empty())
                 {

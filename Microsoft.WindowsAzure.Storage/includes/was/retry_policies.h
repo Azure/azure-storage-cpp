@@ -178,8 +178,9 @@ namespace azure { namespace storage {
         /// <param name="delta_backoff">The delta backoff.</param>
         /// <param name="max_attempts">The maximum number of retries to attempt.</param>
         basic_exponential_retry_policy(std::chrono::seconds delta_backoff, int max_attempts)
-            : basic_common_retry_policy(max_attempts), m_delta_backoff(delta_backoff),
-            m_rand_distribution(static_cast<double>(delta_backoff.count()) * 0.8, static_cast<double>(delta_backoff.count()) * 1.2)
+            : basic_common_retry_policy(max_attempts),
+            m_rand_distribution(static_cast<double>(delta_backoff.count()) * 0.8, static_cast<double>(delta_backoff.count()) * 1.2),
+            m_delta_backoff(delta_backoff)
         {
         }
 

@@ -41,7 +41,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class.
         /// </summary>
         cloud_storage_account()
-            : m_initialized(false), m_is_development_storage_account(false), m_default_endpoints(false)
+            : m_initialized(false), m_default_endpoints(false), m_is_development_storage_account(false)
         {
         }
 
@@ -54,7 +54,7 @@ namespace azure { namespace storage {
         /// <param name="queue_endpoint">The Queue service endpoint.</param>
         /// <param name="table_endpoint">The Table service endpoint.</param>
         cloud_storage_account(const storage_credentials& credentials, const storage_uri& blob_endpoint, const storage_uri& queue_endpoint, const storage_uri& table_endpoint)
-            : m_initialized(true), m_is_development_storage_account(false), m_credentials(credentials), m_blob_endpoint(blob_endpoint), m_queue_endpoint(queue_endpoint), m_table_endpoint(table_endpoint), m_default_endpoints(false)
+            : m_initialized(true), m_default_endpoints(false), m_is_development_storage_account(false), m_blob_endpoint(blob_endpoint), m_queue_endpoint(queue_endpoint), m_table_endpoint(table_endpoint), m_credentials(credentials)
         {
         }
 
@@ -65,7 +65,7 @@ namespace azure { namespace storage {
         /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
         /// <param name="use_https"><c>true</c> to use HTTPS to connect to storage service endpoints; otherwise, <c>false</c>.</param>
         cloud_storage_account(const storage_credentials& credentials, bool use_https)
-            : m_initialized(true), m_is_development_storage_account(false), m_credentials(credentials), m_default_endpoints(true)
+            : m_initialized(true), m_default_endpoints(true), m_is_development_storage_account(false), m_credentials(credentials)
         {
             initialize_default_endpoints(use_https);
         }
@@ -78,7 +78,7 @@ namespace azure { namespace storage {
         /// <param name="endpoint_suffix">The DNS endpoint suffix for the storage services, e.g., &quot;core.windows.net&quot;.</param>
         /// <param name="use_https"><c>true</c> to use HTTPS to connect to storage service endpoints; otherwise, <c>false</c>.</param>
         cloud_storage_account(const storage_credentials& credentials, const utility::string_t& endpoint_suffix, bool use_https)
-            : m_initialized(true), m_is_development_storage_account(false), m_credentials(credentials), m_default_endpoints(true), m_endpoint_suffix(endpoint_suffix)
+            : m_initialized(true), m_default_endpoints(true), m_is_development_storage_account(false), m_credentials(credentials), m_endpoint_suffix(endpoint_suffix)
         {
             initialize_default_endpoints(use_https);
         }

@@ -110,7 +110,7 @@ namespace azure { namespace storage {
 
         queue_request_options modified_options = get_modified_options(options);
 
-        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(get_queue_message_uri());
+        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(queue_message_uri());
         command->set_build_request(std::bind(protocol::add_message, message, time_to_live, initial_visibility_timeout, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -131,7 +131,7 @@ namespace azure { namespace storage {
 
         queue_request_options modified_options = get_modified_options(options);
 
-        std::shared_ptr<core::storage_command<cloud_queue_message>> command = std::make_shared<core::storage_command<cloud_queue_message>>(get_queue_message_uri());
+        std::shared_ptr<core::storage_command<cloud_queue_message>> command = std::make_shared<core::storage_command<cloud_queue_message>>(queue_message_uri());
         command->set_build_request(std::bind(protocol::get_messages, 1U, visibility_timeout, /* is_peek */ false, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<cloud_queue_message>, cloud_queue_message(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -172,7 +172,7 @@ namespace azure { namespace storage {
 
         queue_request_options modified_options = get_modified_options(options);
 
-        std::shared_ptr<core::storage_command<std::vector<cloud_queue_message>>> command = std::make_shared<core::storage_command<std::vector<cloud_queue_message>>>(get_queue_message_uri());
+        std::shared_ptr<core::storage_command<std::vector<cloud_queue_message>>> command = std::make_shared<core::storage_command<std::vector<cloud_queue_message>>>(queue_message_uri());
         command->set_build_request(std::bind(protocol::get_messages, message_count, visibility_timeout, /* is_peek */ false, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<cloud_queue_message>>, std::vector<cloud_queue_message>(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -200,7 +200,7 @@ namespace azure { namespace storage {
     {
         queue_request_options modified_options = get_modified_options(options);
 
-        std::shared_ptr<core::storage_command<cloud_queue_message>> command = std::make_shared<core::storage_command<cloud_queue_message>>(get_queue_message_uri());
+        std::shared_ptr<core::storage_command<cloud_queue_message>> command = std::make_shared<core::storage_command<cloud_queue_message>>(queue_message_uri());
         command->set_build_request(std::bind(protocol::get_messages, 1U, std::chrono::seconds(0LL), /* is_peek */ true, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<cloud_queue_message>, cloud_queue_message(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -226,7 +226,7 @@ namespace azure { namespace storage {
     {
         queue_request_options modified_options = get_modified_options(options);
 
-        std::shared_ptr<core::storage_command<std::vector<cloud_queue_message>>> command = std::make_shared<core::storage_command<std::vector<cloud_queue_message>>>(get_queue_message_uri());
+        std::shared_ptr<core::storage_command<std::vector<cloud_queue_message>>> command = std::make_shared<core::storage_command<std::vector<cloud_queue_message>>>(queue_message_uri());
         command->set_build_request(std::bind(protocol::get_messages, message_count, std::chrono::seconds(0LL), /* is_peek */ true, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<cloud_queue_message>>, std::vector<cloud_queue_message>(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -303,7 +303,7 @@ namespace azure { namespace storage {
     {
         queue_request_options modified_options = get_modified_options(options);
 
-        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(get_queue_message_uri());
+        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(queue_message_uri());
         command->set_build_request(std::bind(protocol::clear_messages, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));

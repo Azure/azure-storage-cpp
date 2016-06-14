@@ -1531,19 +1531,10 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Return the cached storage uri for queue's operations.
+        /// Return the storage uri for queue message's operations.
         /// </summary>
-        /// <remarks>Cached storage uri for queue's operations. Mainly influence get_message_async, get_messages_async, peek_message_async, peek_messages_async, clear_async, add_message_async</remarks>
-        const storage_uri& get_queue_message_uri()
-        {
-            return m_queue_message_uri;
-        }
-
-        /// <summary>
-        /// Return the cached storage uri for queue's operations.
-        /// </summary>
-        /// <remarks>Cached storage uri for queue's operations. Mainly influence get_message_async, get_messages_async, peek_message_async, peek_messages_async, clear_async, add_message_async</remarks>
-        const storage_uri& get_queue_message_uri() const
+        /// <remarks>storage uri for queue message's operations.</remarks>
+        const storage_uri& queue_message_uri() const
         {
             return m_queue_message_uri;
         }

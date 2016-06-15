@@ -59,9 +59,11 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_etag_from_timestamp(const utility::string_t& timestampStr)
     {
-        utility::ostringstream_t value;
-        value << _XPLATSTR("W/\"datetime'") << web::http::uri::encode_data_string(timestampStr) << _XPLATSTR("'\"");
-        return value.str();
+        utility::string_t value;
+        value.append(_XPLATSTR("W/\"datetime'"));
+        value.append(web::http::uri::encode_data_string(timestampStr));
+        value.append(_XPLATSTR("'\""));
+        return value;
     }
 
     table_entity parse_table_entity(const web::json::value& document)

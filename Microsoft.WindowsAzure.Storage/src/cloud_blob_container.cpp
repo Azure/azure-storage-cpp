@@ -70,11 +70,17 @@ namespace azure { namespace storage {
         }
 
         // since 2015-02-21, canonicalized resource is changed from "/account/name" to "/blob/account/name"
-        utility::ostringstream_t resource_str;
-        resource_str << _XPLATSTR('/') << protocol::service_blob << _XPLATSTR('/') << service_client().credentials().account_name() << _XPLATSTR('/') << name();
+        utility::string_t resource_str;
+        resource_str.reserve(service_client().credentials().account_name().size() + name().size() + 7);
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(protocol::service_blob);
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(service_client().credentials().account_name());
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(name());
 
         // Future resource type changes from "c" => "container"
-        return protocol::get_blob_sas_token(stored_policy_identifier, policy, cloud_blob_shared_access_headers(), _XPLATSTR("c"), resource_str.str(), service_client().credentials());
+        return protocol::get_blob_sas_token(stored_policy_identifier, policy, cloud_blob_shared_access_headers(), _XPLATSTR("c"), resource_str, service_client().credentials());
     }
 
     cloud_blob cloud_blob_container::get_blob_reference(utility::string_t blob_name) const

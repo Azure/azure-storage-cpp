@@ -130,14 +130,16 @@ namespace azure { namespace storage { namespace core {
         }
         else
         {
-            utility::ostringstream_t blob_name_str;
-            blob_name_str << *iter;
+            utility::string_t blob_name_str;
+            blob_name_str.reserve(256);
+            blob_name_str.append(*iter);
             for (iter++; iter != segments.cend(); iter++)
             {
-                blob_name_str << _XPLATSTR('/') << *iter;
+                blob_name_str.append(_XPLATSTR("/"));
+                blob_name_str.append(*iter);
             }
 
-            blob_name = blob_name_str.str();
+            blob_name.swap(blob_name_str);
         }
 
         return true;

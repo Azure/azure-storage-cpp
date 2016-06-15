@@ -258,10 +258,16 @@ namespace azure { namespace storage {
         std::transform(table_name.begin(), table_name.end(), table_name.begin(), core::utility_char_tolower);
 
         // since 2015-02-21, canonicalized resource is changed from "/account/name" to "/table/account/name"
-        utility::ostringstream_t resource_str;
-        resource_str << _XPLATSTR('/') << protocol::service_table << _XPLATSTR('/') << service_client().credentials().account_name() << _XPLATSTR('/') << table_name;
+        utility::string_t resource_str;
+        resource_str.reserve(service_client().credentials().account_name().size() + table_name.size() + 8);
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(protocol::service_table);
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(service_client().credentials().account_name());
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(table_name);
 
-        return protocol::get_table_sas_token(stored_policy_identifier, policy, name(), start_partition_key, start_row_key, end_partition_key, end_row_key, resource_str.str(), service_client().credentials());
+        return protocol::get_table_sas_token(stored_policy_identifier, policy, name(), start_partition_key, start_row_key, end_partition_key, end_row_key, resource_str, service_client().credentials());
     }
 
     cloud_table_client cloud_table::create_service_client(const storage_uri& uri, storage_credentials credentials)

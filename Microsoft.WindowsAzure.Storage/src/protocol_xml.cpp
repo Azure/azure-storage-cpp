@@ -173,9 +173,11 @@ namespace azure { namespace storage { namespace protocol {
 
             if (element_name == xml_etag)
             {
-                utility::ostringstream_t str;
-                str << _XPLATSTR('"') << get_current_element_text() << _XPLATSTR('"');
-                m_properties.m_etag = str.str();
+                utility::string_t str;
+                str.append(_XPLATSTR("\""));
+                str.append(get_current_element_text());
+                str.append(_XPLATSTR("\""));
+                m_properties.m_etag.swap(str);
                 return;
             }
 

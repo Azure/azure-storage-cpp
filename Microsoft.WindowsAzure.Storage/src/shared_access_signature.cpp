@@ -74,16 +74,16 @@ namespace azure { namespace storage { namespace protocol {
         return builder;
     }
 
-    void get_sas_string_to_sign(utility::ostringstream_t& str, const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource)
+    void get_sas_string_to_sign(utility::string_t& str, const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource)
     {
-        str << policy.permissions_to_string() << _XPLATSTR('\n');
-        str << convert_datetime_if_initialized(policy.start()) << _XPLATSTR('\n');
-        str << convert_datetime_if_initialized(policy.expiry()) << _XPLATSTR('\n');
-        str << resource << _XPLATSTR('\n');
-        str << identifier << _XPLATSTR('\n');
-        str << policy.address_or_range().to_string() << _XPLATSTR('\n');
-        str << policy.protocols_to_string() << _XPLATSTR('\n');
-        str << header_value_storage_version;
+        str.append(policy.permissions_to_string()).append(_XPLATSTR("\n"));
+        str.append(convert_datetime_if_initialized(policy.start())).append(_XPLATSTR("\n"));
+        str.append(convert_datetime_if_initialized(policy.expiry())).append(_XPLATSTR("\n"));
+        str.append(resource).append(_XPLATSTR("\n"));
+        str.append(identifier).append(_XPLATSTR("\n"));
+        str.append(policy.address_or_range().to_string()).append(_XPLATSTR("\n"));
+        str.append(policy.protocols_to_string()).append(_XPLATSTR("\n"));
+        str.append(header_value_storage_version);
     }
 
     storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource)
@@ -158,15 +158,15 @@ namespace azure { namespace storage { namespace protocol {
         ////
         //// Note that the final five headers are invalid for the 2012-02-12 version.
 
-        utility::ostringstream_t str;
-        get_sas_string_to_sign(str, identifier, policy, resource);
-        str << _XPLATSTR('\n') << headers.cache_control();
-        str << _XPLATSTR('\n') << headers.content_disposition();
-        str << _XPLATSTR('\n') << headers.content_encoding();
-        str << _XPLATSTR('\n') << headers.content_language();
-        str << _XPLATSTR('\n') << headers.content_type();
+        utility::string_t string_to_sign;
+        string_to_sign.reserve(256);
+        get_sas_string_to_sign(string_to_sign, identifier, policy, resource);
+        string_to_sign.append(_XPLATSTR("\n")).append(headers.cache_control());
+        string_to_sign.append(_XPLATSTR("\n")).append(headers.content_disposition());
+        string_to_sign.append(_XPLATSTR("\n")).append(headers.content_encoding());
+        string_to_sign.append(_XPLATSTR("\n")).append(headers.content_language());
+        string_to_sign.append(_XPLATSTR("\n")).append(headers.content_type());
 
-        auto string_to_sign = str.str();
         log_sas_string_to_sign(string_to_sign);
 
         return calculate_hmac_sha256_hash(string_to_sign, credentials);
@@ -204,10 +204,10 @@ namespace azure { namespace storage { namespace protocol {
         ////
         //// HMAC-SHA256(UTF8.Encode(StringToSign))
 
-        utility::ostringstream_t str;
-        get_sas_string_to_sign(str, identifier, policy, resource);
+        utility::string_t string_to_sign;
+        string_to_sign.reserve(256);
+        get_sas_string_to_sign(string_to_sign, identifier, policy, resource);
 
-        auto string_to_sign = str.str();
         log_sas_string_to_sign(string_to_sign);
 
         return calculate_hmac_sha256_hash(string_to_sign, credentials);
@@ -242,14 +242,13 @@ namespace azure { namespace storage { namespace protocol {
         ////
         //// HMAC-SHA256(UTF8.Encode(StringToSign))
 
-        utility::ostringstream_t str;
-        get_sas_string_to_sign(str, identifier, policy, resource);
-        str << _XPLATSTR('\n') << start_partition_key;
-        str << _XPLATSTR('\n') << start_row_key;
-        str << _XPLATSTR('\n') << end_partition_key;
-        str << _XPLATSTR('\n') << end_row_key;
+        utility::string_t string_to_sign;
+        get_sas_string_to_sign(string_to_sign, identifier, policy, resource);
+        string_to_sign.append(_XPLATSTR("\n")).append(start_partition_key);
+        string_to_sign.append(_XPLATSTR("\n")).append(start_row_key);
+        string_to_sign.append(_XPLATSTR("\n")).append(end_partition_key);
+        string_to_sign.append(_XPLATSTR("\n")).append(end_row_key);
 
-        auto string_to_sign = str.str();
         log_sas_string_to_sign(string_to_sign);
 
         return calculate_hmac_sha256_hash(string_to_sign, credentials);
@@ -289,18 +288,17 @@ namespace azure { namespace storage { namespace protocol {
         ////
         //// HMAC-SHA256(UTF8.Encode(StringToSign))
 
-        utility::ostringstream_t str;
-        str << credentials.account_name() << _XPLATSTR('\n');
-        str << policy.permissions_to_string() << _XPLATSTR('\n');
-        str << policy.service_types_to_string() << _XPLATSTR('\n');
-        str << policy.resource_types_to_string() << _XPLATSTR('\n');
-        str << convert_datetime_if_initialized(policy.start()) << _XPLATSTR('\n');
-        str << convert_datetime_if_initialized(policy.expiry()) << _XPLATSTR('\n');
-        str << policy.address_or_range().to_string() << _XPLATSTR('\n');
-        str << policy.protocols_to_string() << _XPLATSTR('\n');
-        str << header_value_storage_version << _XPLATSTR('\n');
+        utility::string_t string_to_sign;
+        string_to_sign.append(credentials.account_name()).append(_XPLATSTR("\n"));
+        string_to_sign.append(policy.permissions_to_string()).append(_XPLATSTR("\n"));
+        string_to_sign.append(policy.service_types_to_string()).append(_XPLATSTR("\n"));
+        string_to_sign.append(policy.resource_types_to_string()).append(_XPLATSTR("\n"));
+        string_to_sign.append(convert_datetime_if_initialized(policy.start())).append(_XPLATSTR("\n"));
+        string_to_sign.append(convert_datetime_if_initialized(policy.expiry())).append(_XPLATSTR("\n"));
+        string_to_sign.append(policy.address_or_range().to_string()).append(_XPLATSTR("\n"));
+        string_to_sign.append(policy.protocols_to_string()).append(_XPLATSTR("\n"));
+        string_to_sign.append(header_value_storage_version).append(_XPLATSTR("\n"));
 
-        auto string_to_sign = str.str();
         log_sas_string_to_sign(string_to_sign);
 
         return calculate_hmac_sha256_hash(string_to_sign, credentials);

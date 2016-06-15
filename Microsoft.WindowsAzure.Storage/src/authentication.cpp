@@ -70,7 +70,8 @@ namespace azure { namespace storage { namespace protocol {
 
     void canonicalizer_helper::append_resource(bool query_only_comp)
     {
-        m_result.append(_XPLATSTR("/")).append(m_account_name);
+        m_result.append(_XPLATSTR("/"));
+        m_result.append(m_account_name);
 
         web::http::uri uri = m_request.request_uri();
         const utility::string_t& resource = uri.path();
@@ -87,7 +88,8 @@ namespace azure { namespace storage { namespace protocol {
             std::map<utility::string_t, utility::string_t>::iterator it = query_map.find(_XPLATSTR("comp"));
             if (it != query_map.end())
             {
-                m_result.append(_XPLATSTR("?comp=")).append(it->second);
+                m_result.append(_XPLATSTR("?comp="));
+                m_result.append(it->second);
             }
         }
         else
@@ -98,7 +100,10 @@ namespace azure { namespace storage { namespace protocol {
                 utility::string_t parameter_name = it->first;
                 std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), core::utility_char_tolower);
 
-                m_result.append(_XPLATSTR("\n")).append(parameter_name).append(_XPLATSTR(":")).append(it->second);
+                m_result.append(_XPLATSTR("\n"));
+                m_result.append(parameter_name);
+                m_result.append(_XPLATSTR(":"));
+                m_result.append(it->second);
             }
         }
     }
@@ -155,7 +160,8 @@ namespace azure { namespace storage { namespace protocol {
                 {
                     utility::string_t transformed_key(key);
                     std::transform(transformed_key.begin(), transformed_key.end(), transformed_key.begin(), core::utility_char_tolower);
-                    m_result.append(transformed_key).append(_XPLATSTR(":"));
+                    m_result.append(transformed_key);
+                    m_result.append(_XPLATSTR(":"));
                     append(it->second);
                 }
             }

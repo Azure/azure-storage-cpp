@@ -243,6 +243,7 @@ namespace azure { namespace storage { namespace protocol {
         //// HMAC-SHA256(UTF8.Encode(StringToSign))
 
         utility::string_t string_to_sign;
+        string_to_sign.reserve(256);
         get_sas_string_to_sign(string_to_sign, identifier, policy, resource);
         string_to_sign.append(_XPLATSTR("\n")).append(start_partition_key);
         string_to_sign.append(_XPLATSTR("\n")).append(start_row_key);
@@ -289,6 +290,7 @@ namespace azure { namespace storage { namespace protocol {
         //// HMAC-SHA256(UTF8.Encode(StringToSign))
 
         utility::string_t string_to_sign;
+        string_to_sign.reserve(256);
         string_to_sign.append(credentials.account_name()).append(_XPLATSTR("\n"));
         string_to_sign.append(policy.permissions_to_string()).append(_XPLATSTR("\n"));
         string_to_sign.append(policy.service_types_to_string()).append(_XPLATSTR("\n"));

@@ -15,25 +15,33 @@ option(BUILD_SAMPLES "Build sample codes" OFF)
 if(UNIX)
   find_package(Boost REQUIRED COMPONENTS log log_setup random system thread locale regex filesystem chrono date_time)
   find_package(Threads REQUIRED)
-  if(APPLE)
-	 message(WARNING "On OSX you must specify OPENSSL_ROOT_DIR, it is currently ${OPENSSL_ROOT_DIR}")
+  if(APPLE AND NOT OPENSSL_ROOT_DIR)
+    # Prefer a homebrew version of OpenSSL over the one in /usr/lib
+    file(GLOB OPENSSL_ROOT_DIR /usr/local/Cellar/openssl/*)
 
-	  # this isn't ideal because it requires the user to set OPENSSL_ROOT_DIR rather than being automated
-	  set(OPENSSL_FOUND 1)
-	  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include")
-	  set(OPENSSL_LIBRARIES
-		"${OPENSSL_ROOT_DIR}/lib/libcrypto.dylib"
-		"${OPENSSL_ROOT_DIR}/lib/libssl.dylib"
-		)
+	# Prefer the latest (make the latest one first)
+    list(REVERSE OPENSSL_ROOT_DIR)
 
-		message(WARNING "On OSX you must specify GETTEXT_LIB_DIR, it is currently ${GETTEXT_LIB_DIR}")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -L${GETTEXT_LIB_DIR}")
+	# There is a dependency chain Libxml++ -> glibmm -> gobject -> glib -> lintl, however, for some reason,
+	# with homebrew at least, the -L for where lintl resides is left out. So, we try to find it where homebrew
+	# would put it, or allow the user to specify it
+	if(NOT GETTEXT_LIB_DIR)
+		message(WARNING "No GETTEXT_LIB_DIR specified, assuming: /usr/local/opt/gettext/lib")
+		set(GETTEXT_LIB_DIR "/usr/local/opt/gettext/lib")
+	endif()
+	# If we didn't find it where homebrew would put it, and it hasn't been specified, then we have to throw an error
+	if(NOT IS_DIRECTORY "${GETTEXT_LIB_DIR}")
+		message(ERROR "We couldn't find your gettext lib directory (${GETTEXT_LIB_DIR}). Please re-run cmake with -DGETTEXT_LIB_DIR=<your gettext lib dir>. This is usually where libintl.a and libintl.dylib reside.")
+	endif()
 
-		
-
-  else()
-  	find_package(OpenSSL REQUIRED)
+	# if we actually have a GETTEXT_LIB_DIR we add the linker flag for it
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -L${GETTEXT_LIB_DIR}")
   endif()
+
+  set(_OPENSSL_VERSION "")
+  find_package(OpenSSL 1.0.0 REQUIRED)
+
+
   find_package(Glibmm REQUIRED)
   find_package(LibXML++ REQUIRED)
   find_package(UUID REQUIRED)
@@ -100,6 +108,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Binaries)
 
 set(AZURESTORAGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/includes)
 set(AZURESTORAGE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/includes ${CASABLANCA_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS} ${LibXML++_INCLUDE_DIRS} ${UUID_INCLUDE_DIRS} ${Glibmm_INCLUDE_DIRS})
+
 
 set(AZURESTORAGE_LIBRARY azurestorage)
 set(AZURESTORAGE_LIBRARIES ${AZURESTORAGE_LIBRARY} ${CASABLANCA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_FRAMEWORK} ${OPENSSL_LIBRARIES} ${LibXML++_LIBRARIES} ${UUID_LIBRARIES} ${Glibmm_LIBRARIES})

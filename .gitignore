@@ -187,4 +187,4 @@ Microsoft.WindowsAzure.Storage/build.*/
 # OSX detritus
 # ==========================
 
-*.DS_Store
+.DS_Store

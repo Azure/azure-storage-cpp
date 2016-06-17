@@ -193,7 +193,22 @@ CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk cmake .. -DCMAKE_BUILD_TYPE=Releas
 ```
 The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
 
-*As yet the unit tests don't build, because cmake won't find UnitTest++ even though it is installed via Homebrew*
+To build and run unit tests:
+- Install UnitTest++ library:
+```bash
+brew install unittest-cpp
+```
+- Build the test code:
+```bash
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+make
+```
+- Run unit tests
+```bash
+cd Binaries
+vi test_configurations.json # modify test config file to include your storage account credentials
+./azurestoragetest
+```
 
 # Learn More
 - [Microsoft Azure Storage Client Library for C++ v2.0.0](documentation/Microsoft%20Azure%20Storage%20Client%20Library%20for%20C%2B%2B%202.0.0.md)

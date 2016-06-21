@@ -126,14 +126,14 @@ namespace azure { namespace storage { namespace protocol {
         return storage_uri(std::move(primary_uri), std::move(secondary_uri));
     }
 
-    web::http::http_request queue_base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request queue_base_request(web::http::method method, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = base_request(method, uri_builder, timeout, context);
 
         return request;
     }
 
-    web::http::http_request list_queues(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request list_queues(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
 
@@ -141,19 +141,19 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request create_queue(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request create_queue(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = queue_base_request(web::http::methods::PUT, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request delete_queue(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request delete_queue(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = queue_base_request(web::http::methods::DEL, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request add_message(const cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request add_message(const cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         if (time_to_live.count() >= 0LL && time_to_live.count() != 604800LL)
         {
@@ -174,7 +174,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_messages(size_t message_count, std::chrono::seconds visibility_timeout, bool is_peek, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_messages(size_t message_count, std::chrono::seconds visibility_timeout, bool is_peek, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         if (is_peek)
         {
@@ -196,7 +196,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request delete_message(const cloud_queue_message& message, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request delete_message(const cloud_queue_message& message, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(_XPLATSTR("popreceipt"), message.pop_receipt()));
 
@@ -204,7 +204,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request update_message(const cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_contents, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request update_message(const cloud_queue_message& message, std::chrono::seconds visibility_timeout, bool update_contents, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(_XPLATSTR("popreceipt"), message.pop_receipt()));
         uri_builder.append_query(core::make_query_parameter(_XPLATSTR("visibilitytimeout"), visibility_timeout.count(), /* do_encoding */ false));
@@ -221,20 +221,20 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request clear_messages(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request clear_messages(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = queue_base_request(web::http::methods::DEL, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request download_queue_metadata(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request download_queue_metadata(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_metadata, /* do_encoding */ false));
         web::http::http_request request = queue_base_request(web::http::methods::HEAD, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request upload_queue_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request upload_queue_metadata(const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         // TODO: Make a copy of needed data so it is OK for the main object class to be destructed mid-operation
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_metadata, /* do_encoding */ false));
@@ -243,14 +243,14 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_queue_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_queue_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = queue_base_request(web::http::methods::GET, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request set_queue_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_queue_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = queue_base_request(web::http::methods::PUT, uri_builder, timeout, context);

@@ -44,7 +44,7 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
-    web::http::http_request create_blob_container(blob_container_public_access_type access_type, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request create_blob_container(blob_container_public_access_type access_type, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -53,7 +53,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request delete_blob_container(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request delete_blob_container(const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::DEL, uri_builder, timeout, context));
@@ -61,7 +61,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_blob_container_properties(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_blob_container_properties(const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::HEAD, uri_builder, timeout, context));
@@ -69,13 +69,13 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request set_blob_container_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_blob_container_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         return set_blob_metadata(metadata, condition, uri_builder, timeout, context);
     }
 
-    web::http::http_request get_blob_container_acl(const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_blob_container_acl(const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
@@ -84,7 +84,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request set_blob_container_acl(blob_container_public_access_type access_type, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_blob_container_acl(blob_container_public_access_type access_type, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
@@ -94,7 +94,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request list_containers(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request list_containers(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
 
@@ -122,7 +122,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request list_blobs(const utility::string_t& prefix, const utility::string_t& delimiter, blob_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request list_blobs(const utility::string_t& prefix, const utility::string_t& delimiter, blob_listing_details::values includes, int max_results, const continuation_token& token, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
@@ -179,7 +179,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request lease(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request lease(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_lease, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -203,7 +203,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request lease_blob_container(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request lease_blob_container(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         web::http::http_request request(lease(lease_action, proposed_lease_id, duration, break_period, uri_builder, timeout, context));
@@ -211,7 +211,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request lease_blob(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request lease_blob(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const lease_time& duration, const lease_break_period& break_period, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(lease(lease_action, proposed_lease_id, duration, break_period, uri_builder, timeout, context));
         add_access_condition(request, condition);
@@ -249,7 +249,7 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
-    web::http::http_request put_block(const utility::string_t& block_id, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_block(const utility::string_t& block_id, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_block_id, block_id));
@@ -259,7 +259,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -270,7 +270,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_block_list(block_listing_filter listing_filter, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_block_list(block_listing_filter listing_filter, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
 
@@ -295,7 +295,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_page_ranges(utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_page_ranges(utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page_list, /* do_encoding */ false));
@@ -305,7 +305,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_page(page_range range, page_write write, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_page(page_range range, page_write write, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -330,7 +330,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request append_block(const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request append_block(const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_append_block, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -340,7 +340,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_block_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_block_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_blob_type, header_value_blob_type_block);
@@ -350,7 +350,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_page_blob(utility::size64_t size, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_page_blob(utility::size64_t size, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         web::http::http_headers& headers = request.headers();
@@ -363,7 +363,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_append_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_append_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_blob_type, header_value_blob_type_append);
@@ -373,7 +373,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
@@ -388,7 +388,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_blob_properties(const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_blob_properties(const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
         web::http::http_request request(base_request(web::http::methods::HEAD, uri_builder, timeout, context));
@@ -396,7 +396,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request set_blob_properties(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_blob_properties(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -406,7 +406,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request resize_page_blob(utility::size64_t size, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request resize_page_blob(utility::size64_t size, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -415,7 +415,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request set_page_blob_sequence_number(const azure::storage::sequence_number& sequence_number, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_page_blob_sequence_number(const azure::storage::sequence_number& sequence_number, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -442,7 +442,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request snapshot_blob(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request snapshot_blob(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_snapshot, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -451,7 +451,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request set_blob_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_blob_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_metadata, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -460,7 +460,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request delete_blob(delete_snapshots_option snapshots_option, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request delete_blob(delete_snapshots_option snapshots_option, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         if (!snapshot_time.empty() && (snapshots_option != delete_snapshots_option::none))
         {
@@ -483,7 +483,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_copy_source, source.to_string());
@@ -493,7 +493,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_copy, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_copy_id, copy_id));

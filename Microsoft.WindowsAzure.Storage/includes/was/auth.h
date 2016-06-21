@@ -60,7 +60,7 @@ namespace azure { namespace storage { namespace protocol {
         /// <returns>The canonicalized string.</returns>
         utility::string_t str() const
         {
-            return m_result.str();
+            return m_result;
         }
 
         /// <summary>
@@ -69,7 +69,8 @@ namespace azure { namespace storage { namespace protocol {
         /// <param name="value">The value.</param>
         void append(const utility::string_t& value)
         {
-            m_result << value << _XPLATSTR('\n');
+            m_result.append(value);
+            m_result.append(_XPLATSTR("\n"));
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace azure { namespace storage { namespace protocol {
         
         const web::http::http_request& m_request;
         const utility::string_t& m_account_name;
-        utility::ostringstream_t m_result;
+        utility::string_t m_result;
     };
 
     /// <summary>

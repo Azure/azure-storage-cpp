@@ -56,25 +56,31 @@ namespace azure { namespace storage { namespace protocol {
                 core::logger::instance().log(context, client_log_level::log_level_verbose, _XPLATSTR("StringToSign: ") + with_dots);
             }
 
-            utility::ostringstream_t header_value;
-            header_value << m_canonicalizer->authentication_scheme() << _XPLATSTR(" ") << m_credentials.account_name() << _XPLATSTR(":") << calculate_hmac_sha256_hash(string_to_sign, m_credentials);
+            utility::string_t header_value;
+            header_value.reserve(256);
+            header_value.append(m_canonicalizer->authentication_scheme());
+            header_value.append(_XPLATSTR(" "));
+            header_value.append(m_credentials.account_name());
+            header_value.append(_XPLATSTR(":"));
+            header_value.append(calculate_hmac_sha256_hash(string_to_sign, m_credentials));
 
-            headers.add(web::http::header_names::authorization, header_value.str());
+            headers.add(web::http::header_names::authorization, header_value);
         }
     }
 
     void canonicalizer_helper::append_resource(bool query_only_comp)
     {
-        m_result << _XPLATSTR("/") << m_account_name;
+        m_result.append(_XPLATSTR("/"));
+        m_result.append(m_account_name);
 
         web::http::uri uri = m_request.request_uri();
         const utility::string_t& resource = uri.path();
         if (resource.front() != _XPLATSTR('/'))
         {
-            m_result << _XPLATSTR("/");
+            m_result.append(_XPLATSTR("/"));
         }
 
-        m_result << resource;
+        m_result.append(resource);
 
         std::map<utility::string_t, utility::string_t> query_map = web::http::uri::split_query(web::http::uri::decode(uri.query()));
         if (query_only_comp)
@@ -82,7 +88,8 @@ namespace azure { namespace storage { namespace protocol {
             std::map<utility::string_t, utility::string_t>::iterator it = query_map.find(_XPLATSTR("comp"));
             if (it != query_map.end())
             {
-                m_result << _XPLATSTR("?comp=") << it->second;
+                m_result.append(_XPLATSTR("?comp="));
+                m_result.append(it->second);
             }
         }
         else
@@ -93,7 +100,10 @@ namespace azure { namespace storage { namespace protocol {
                 utility::string_t parameter_name = it->first;
                 std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), core::utility_char_tolower);
 
-                m_result << _XPLATSTR("\n") << parameter_name << _XPLATSTR(":") << it->second;
+                m_result.append(_XPLATSTR("\n"));
+                m_result.append(parameter_name);
+                m_result.append(_XPLATSTR(":"));
+                m_result.append(it->second);
             }
         }
     }
@@ -150,7 +160,8 @@ namespace azure { namespace storage { namespace protocol {
                 {
                     utility::string_t transformed_key(key);
                     std::transform(transformed_key.begin(), transformed_key.end(), transformed_key.begin(), core::utility_char_tolower);
-                    m_result << transformed_key << _XPLATSTR(":");
+                    m_result.append(transformed_key);
+                    m_result.append(_XPLATSTR(":"));
                     append(it->second);
                 }
             }

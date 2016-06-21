@@ -136,19 +136,21 @@ namespace azure { namespace storage { namespace protocol {
 
         if (!query.select_columns().empty())
         {
-            utility::ostringstream_t select_builder;
-            select_builder << _XPLATSTR("PartitionKey,RowKey,Timestamp");
+            utility::string_t select_builder;
+            select_builder.reserve(128);
+            select_builder.append(_XPLATSTR("PartitionKey,RowKey,Timestamp"));
 
             std::vector<utility::string_t> select_columns = query.select_columns();
             for(std::vector<utility::string_t>::const_iterator itr = select_columns.cbegin(); itr != select_columns.cend(); ++itr)
             {
                 if (itr->compare(_XPLATSTR("PartitionKey")) != 0 && itr->compare(_XPLATSTR("RowKey")) != 0 && itr->compare(_XPLATSTR("Timestamp")) != 0)
                 {
-                    select_builder << _XPLATSTR(',') << *itr;
+                    select_builder.append(_XPLATSTR(","));
+                    select_builder.append(*itr);
                 }
             }
 
-            builder.append_query(core::make_query_parameter(_XPLATSTR("$select"), select_builder.str()));
+            builder.append_query(core::make_query_parameter(_XPLATSTR("$select"), select_builder));
         }
 
         if (!token.empty())

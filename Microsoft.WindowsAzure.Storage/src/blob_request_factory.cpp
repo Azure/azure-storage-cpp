@@ -126,7 +126,7 @@ namespace azure { namespace storage { namespace protocol {
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
-        utility::ostringstream_t include_str;
+        utility::string_t include;
 
         if (!prefix.empty())
         {
@@ -150,25 +150,28 @@ namespace azure { namespace storage { namespace protocol {
 
         if ((includes & blob_listing_details::snapshots) != 0)
         {
-            include_str << component_snapshots << _XPLATSTR(',');
+            include.append(component_snapshots);
+            include.append(_XPLATSTR(","));
         }
 
         if ((includes & blob_listing_details::metadata) != 0)
         {
-            include_str << component_metadata << _XPLATSTR(',');
+            include.append(component_metadata);
+            include.append(_XPLATSTR(","));
         }
 
         if ((includes & blob_listing_details::uncommitted_blobs) != 0)
         {
-            include_str << component_uncommitted_blobs << _XPLATSTR(',');
+            include.append(component_uncommitted_blobs);
+            include.append(_XPLATSTR(","));
         }
 
         if ((includes & blob_listing_details::copy) != 0)
         {
-            include_str << component_copy << _XPLATSTR(',');
+            include.append(component_copy);
+            include.append(_XPLATSTR(","));
         }
 
-        auto include = include_str.str();
         if (!include.empty())
         {
             include.pop_back();

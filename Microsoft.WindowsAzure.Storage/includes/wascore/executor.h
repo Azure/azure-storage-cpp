@@ -375,9 +375,10 @@ namespace azure { namespace storage { namespace core {
 
                 if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                 {
-                    utility::ostringstream_t str;
-                    str << _XPLATSTR("Starting ") << instance->m_request.method() << _XPLATSTR(" request to ") << instance->m_request.request_uri().to_string();
-                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                    utility::string_t str;
+                    str.reserve(256);
+                    str.append(_XPLATSTR("Starting ")).append(instance->m_request.method()).append(_XPLATSTR(" request to ")).append(instance->m_request.request_uri().to_string());
+                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                 }
 
                 // 2. Set Headers
@@ -457,9 +458,10 @@ namespace azure { namespace storage { namespace core {
 
                     if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                     {
-                        utility::ostringstream_t str;
-                        str << _XPLATSTR("Response received. Status code = ") << response.status_code() << _XPLATSTR(". Reason = ") << response.reason_phrase();
-                        logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                        utility::string_t str;
+                        str.reserve(128);
+                        str.append(_XPLATSTR("Response received. Status code = ")).append(utility::conversions::print_string(response.status_code())).append(_XPLATSTR(". Reason = ")).append(response.reason_phrase());
+                        logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                     }
 
                     try
@@ -642,9 +644,10 @@ namespace azure { namespace storage { namespace core {
 
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                         {
-                            utility::ostringstream_t str;
-                            str << _XPLATSTR("Retrying failed operation, number of retries: ") << instance->m_retry_count;
-                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                            utility::string_t str;
+                            str.reserve(128);
+                            str.append(_XPLATSTR("Retrying failed operation, number of retries: ")).append(utility::conversions::print_string(instance->m_retry_count));
+                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                         }
 
                         return complete_after(retry.retry_interval()).then([]() -> bool

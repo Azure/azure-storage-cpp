@@ -47,13 +47,28 @@ namespace azure { namespace storage {
 
     storage_uri construct_default_endpoint(const utility::string_t& scheme, const utility::string_t& account_name, const utility::string_t& hostname_prefix, const utility::string_t& endpoint_suffix)
     {
-        utility::ostringstream_t primary;
-        primary << scheme << _XPLATSTR("://") << account_name << _XPLATSTR('.') << hostname_prefix << _XPLATSTR('.') << endpoint_suffix;
+        utility::string_t primary;
+        primary.reserve(scheme.size() + account_name.size() + hostname_prefix.size() + endpoint_suffix.size() + 5);
+        primary.append(scheme);
+        primary.append(_XPLATSTR("://"));
+        primary.append(account_name);
+        primary.append(_XPLATSTR("."));
+        primary.append(hostname_prefix);
+        primary.append(_XPLATSTR("."));
+        primary.append(endpoint_suffix);
 
-        utility::ostringstream_t secondary;
-        secondary << scheme << _XPLATSTR("://") << account_name << secondary_location_account_suffix << _XPLATSTR('.') << hostname_prefix << _XPLATSTR('.') << endpoint_suffix;
+        utility::string_t secondary;
+        secondary.reserve(scheme.size() + account_name.size() + hostname_prefix.size() + endpoint_suffix.size() + 10);
+        secondary.append(scheme);
+        secondary.append(_XPLATSTR("://"));
+        secondary.append(account_name);
+        secondary.append(secondary_location_account_suffix);
+        secondary.append(_XPLATSTR("."));
+        secondary.append(hostname_prefix);
+        secondary.append(_XPLATSTR("."));
+        secondary.append(endpoint_suffix);
 
-        return storage_uri(web::http::uri(primary.str()), web::http::uri(secondary.str()));
+        return storage_uri(web::http::uri(primary), web::http::uri(secondary));
     }
 
     void cloud_storage_account::initialize_default_endpoints(bool use_https)
@@ -365,15 +380,18 @@ namespace azure { namespace storage {
         }
 
         bool semicolon = false;
-        utility::ostringstream_t result;
+        utility::string_t result;
+        result.reserve(256);
         for (auto iter = m_settings.cbegin(); iter != m_settings.cend(); ++iter)
         {
             if (semicolon)
             {
-                result << _XPLATSTR(';');
+                result.append(_XPLATSTR(";"));
             }
 
-            result << iter->first << _XPLATSTR('=') << iter->second;
+            result.append(iter->first);
+            result.append(_XPLATSTR("="));
+            result.append(iter->second);
             semicolon = true;
         }
 
@@ -381,17 +399,27 @@ namespace azure { namespace storage {
         {
             if (m_credentials.is_shared_key())
             {
-                result << _XPLATSTR(';') << account_name_setting_string << _XPLATSTR('=') << m_credentials.account_name();
-                result << _XPLATSTR(';') << account_key_setting_string << _XPLATSTR('=') << (export_secrets ? utility::conversions::to_base64(m_credentials.account_key()) : _XPLATSTR("[key hidden]"));
+                result.append(_XPLATSTR(";"));
+                result.append(account_name_setting_string);
+                result.append(_XPLATSTR("="));
+                result.append(m_credentials.account_name());
+
+                result.append(_XPLATSTR(";"));
+                result.append(account_key_setting_string);
+                result.append(_XPLATSTR("="));
+                result.append((export_secrets ? utility::conversions::to_base64(m_credentials.account_key()) : _XPLATSTR("[key hidden]")));
             }
 
             if (m_credentials.is_sas())
             {
-                result << _XPLATSTR(';') << shared_access_signature_setting_string << _XPLATSTR('=') << (export_secrets ? m_credentials.sas_token() : _XPLATSTR("[key hidden]"));
+                result.append(_XPLATSTR(";"));
+                result.append(shared_access_signature_setting_string);
+                result.append(_XPLATSTR("="));
+                result.append((export_secrets ? m_credentials.sas_token() : _XPLATSTR("[key hidden]")));
             }
         }
 
-        return result.str();
+        return result;
     }
 
     utility::string_t cloud_storage_account::get_shared_access_signature(const account_shared_access_policy& policy) const

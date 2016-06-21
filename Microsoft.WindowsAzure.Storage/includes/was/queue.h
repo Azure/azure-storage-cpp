@@ -1530,6 +1530,15 @@ namespace azure { namespace storage {
             *m_metadata = std::move(value);
         }
 
+        /// <summary>
+        /// Return the storage uri for queue message's operations.
+        /// </summary>
+        /// <remarks>storage uri for queue message's operations.</remarks>
+        const storage_uri& queue_message_uri() const
+        {
+            return m_queue_message_uri;
+        }
+
     private:
 
         WASTORAGE_API cloud_queue(cloud_queue_client client, utility::string_t name);
@@ -1547,6 +1556,8 @@ namespace azure { namespace storage {
         storage_uri m_uri;
         std::shared_ptr<int> m_approximate_message_count;
         std::shared_ptr<cloud_metadata> m_metadata;
+
+        storage_uri m_queue_message_uri;
 
         friend class cloud_queue_client;
     };

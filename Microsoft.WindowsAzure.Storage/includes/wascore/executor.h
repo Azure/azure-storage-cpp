@@ -178,7 +178,7 @@ namespace azure { namespace storage { namespace core {
             m_calculate_response_body_md5 = value;
         }
 
-        void set_build_request(std::function<web::http::http_request(web::http::uri_builder, const std::chrono::seconds&, operation_context)> value)
+        void set_build_request(std::function<web::http::http_request(web::http::uri_builder&, const std::chrono::seconds&, operation_context)> value)
         {
             m_build_request = value;
         }
@@ -237,7 +237,7 @@ namespace azure { namespace storage { namespace core {
         bool m_calculate_response_body_md5;
         command_location_mode m_location_mode;
 
-        std::function<web::http::http_request(web::http::uri_builder, const std::chrono::seconds&, operation_context)> m_build_request;
+        std::function<web::http::http_request(web::http::uri_builder&, const std::chrono::seconds&, operation_context)> m_build_request;
         std::function<void(web::http::http_request&, operation_context)> m_sign_request;
         std::function<bool(utility::size64_t, operation_context)> m_recover_request;
 

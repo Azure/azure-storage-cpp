@@ -88,7 +88,7 @@ sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev
 ```
 - Build the SDK for Release:
 ```bash
-cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage
+cd azure-storage-cpp/Microsoft.WindowsAzure.Storage
 mkdir build.release
 cd build.release
 CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release

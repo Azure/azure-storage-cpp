@@ -25,9 +25,11 @@ namespace azure { namespace storage {
     class cloud_blob_client;
     class cloud_queue_client;
     class cloud_table_client;
+    class cloud_file_client;
     class blob_request_options;
     class queue_request_options;
     class table_request_options;
+    class file_request_options;
     class account_shared_access_policy;
 
     /// <summary>
@@ -55,6 +57,20 @@ namespace azure { namespace storage {
         /// <param name="table_endpoint">The Table service endpoint.</param>
         cloud_storage_account(const storage_credentials& credentials, const storage_uri& blob_endpoint, const storage_uri& queue_endpoint, const storage_uri& table_endpoint)
             : m_initialized(true), m_default_endpoints(false), m_is_development_storage_account(false), m_blob_endpoint(blob_endpoint), m_queue_endpoint(queue_endpoint), m_table_endpoint(table_endpoint), m_credentials(credentials)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::cloud_storage_account" /> class using the specified
+        /// credentials and service endpoints.
+        /// </summary>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
+        /// <param name="blob_endpoint">The Blob service endpoint.</param>
+        /// <param name="queue_endpoint">The Queue service endpoint.</param>
+        /// <param name="table_endpoint">The Table service endpoint.</param>
+        /// <param name="file_endpoint">The File service endpoint.</param>
+        cloud_storage_account(const storage_credentials& credentials, const storage_uri& blob_endpoint, const storage_uri& queue_endpoint, const storage_uri& table_endpoint, const storage_uri& file_endpoint)
+            : m_initialized(true), m_is_development_storage_account(false), m_credentials(credentials), m_blob_endpoint(blob_endpoint), m_queue_endpoint(queue_endpoint), m_table_endpoint(table_endpoint), m_file_endpoint(file_endpoint), m_default_endpoints(false)
         {
         }
 
@@ -111,6 +127,7 @@ namespace azure { namespace storage {
                 m_blob_endpoint = std::move(other.m_blob_endpoint);
                 m_queue_endpoint = std::move(other.m_queue_endpoint);
                 m_table_endpoint = std::move(other.m_table_endpoint);
+                m_file_endpoint = std::move(other.m_file_endpoint);
                 m_credentials = std::move(other.m_credentials);
                 m_endpoint_suffix = std::move(other.m_endpoint_suffix);
                 m_settings = std::move(other.m_settings);
@@ -164,6 +181,18 @@ namespace azure { namespace storage {
         WASTORAGE_API cloud_table_client create_cloud_table_client(const table_request_options& default_request_options) const;
 
         /// <summary>
+        /// Creates the File service client.
+        /// </summary>
+        /// <returns>A client object that specifies the Blob service endpoint.</returns>
+        WASTORAGE_API cloud_file_client create_cloud_file_client() const;
+
+        /// <summary>
+        /// Creates the File service client.
+        /// </summary>
+        /// <returns>A client object that specifies the Blob service endpoint.</returns>
+        WASTORAGE_API cloud_file_client create_cloud_file_client(const file_request_options& default_request_options) const;
+
+        /// <summary>
         /// Returns a connection string for this storage account, without sensitive data.
         /// </summary>
         /// <returns>A connection string.</returns>
@@ -213,6 +242,15 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the endpoint for the File service for all location.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::storage_uri" /> object containing the Table service endpoint for all locations.</returns>
+        const storage_uri& file_endpoint() const
+        {
+            return m_file_endpoint;
+        }
+
+        /// <summary>
         /// Gets the credentials used to create this <see cref="azure::storage::cloud_storage_account" /> object.
         /// </summary>
         /// <returns>The credentials used to create the <see cref="azure::storage::cloud_storage_account" /> object.</returns>
@@ -251,6 +289,7 @@ namespace azure { namespace storage {
         storage_uri m_blob_endpoint;
         storage_uri m_queue_endpoint;
         storage_uri m_table_endpoint;
+        storage_uri m_file_endpoint;
         storage_credentials m_credentials;
         utility::string_t m_endpoint_suffix;
         std::map<utility::string_t, utility::string_t> m_settings;

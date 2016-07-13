@@ -261,7 +261,7 @@ namespace azure { namespace storage { namespace protocol {
 
             if (element_name == xml_copy_status)
             {
-                m_copy_state.m_status = blob_response_parsers::parse_copy_status(get_current_element_text());
+                m_copy_state.m_status = response_parsers::parse_copy_status(get_current_element_text());
                 return;
             }
 
@@ -273,13 +273,13 @@ namespace azure { namespace storage { namespace protocol {
 
             if (element_name == xml_copy_progress)
             {
-                blob_response_parsers::parse_copy_progress(get_current_element_text(), m_copy_state.m_bytes_copied, m_copy_state.m_total_bytes);
+                response_parsers::parse_copy_progress(get_current_element_text(), m_copy_state.m_bytes_copied, m_copy_state.m_total_bytes);
                 return;
             }
 
             if (element_name == xml_copy_completion_time)
             {
-                m_copy_state.m_completion_time = blob_response_parsers::parse_copy_completion_time(get_current_element_text());
+                m_copy_state.m_completion_time = response_parsers::parse_copy_completion_time(get_current_element_text());
                 return;
             }
 
@@ -661,6 +661,205 @@ namespace azure { namespace storage { namespace protocol {
 
         finalize();
         return outstream.str();
+    }
+
+    void list_shares_reader::handle_begin_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_enumeration_results)
+        {
+            if (move_to_first_attribute())
+            {
+                do
+                {
+                    if (get_current_element_name() == xml_service_endpoint)
+                    {
+                        m_service_uri = web::http::uri(get_current_element_text());
+                    }
+                } while (move_to_next_attribute());
+            }
+        }
+    }
+
+    void list_shares_reader::handle_element(const utility::string_t& element_name)
+    {
+        if (get_parent_element_name() == xml_metadata)
+        {
+            m_metadata[element_name] = get_current_element_text();
+            return;
+        }
+
+        if (get_parent_element_name() == xml_properties)
+        {
+            if (element_name == xml_last_modified)
+            {
+                m_properties.m_last_modified = parse_last_modified(get_current_element_text());
+                return;
+            }
+
+            if (element_name == xml_etag)
+            {
+                m_properties.m_etag = get_current_element_text();
+                return;
+            }
+
+            if (element_name == xml_quota)
+            {
+                extract_current_element(m_properties.m_quota);
+                return;
+            }
+        }
+
+        if (element_name == xml_name)
+        {
+            m_name = get_current_element_text();
+            m_uri = web::http::uri_builder(m_service_uri).append_path(m_name, true).to_uri();
+            return;
+        }
+
+        if (element_name == xml_next_marker)
+        {
+            m_next_marker = get_current_element_text();
+            return;
+        }
+    }
+
+    void list_shares_reader::handle_end_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_share && get_parent_element_name() == xml_shares)
+        {
+            // End of the data for a Share. Create an item and add it to the list
+            m_items.push_back(cloud_file_share_list_item(std::move(m_uri), std::move(m_name), std::move(m_metadata), std::move(m_properties)));
+
+            m_uri = web::uri();
+            m_name = utility::string_t();
+            m_metadata = azure::storage::cloud_metadata();
+            m_properties = azure::storage::cloud_file_share_properties();
+        }
+    }
+
+    void get_share_stats_reader::handle_begin_element(const utility::string_t& element_name)
+    {
+        UNREFERENCED_PARAMETER(element_name);
+    }
+
+    void get_share_stats_reader::handle_element(const utility::string_t& element_name)
+    {
+        if (element_name == _XPLATSTR("ShareUsage"))
+        {
+            extract_current_element(m_quota);
+            return;
+        }
+    }
+
+    void get_share_stats_reader::handle_end_element(const utility::string_t& element_name)
+    {
+        UNREFERENCED_PARAMETER(element_name);
+    }
+
+    void list_files_and_directories_reader::handle_begin_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_enumeration_results)
+        {
+            if (move_to_first_attribute())
+            {
+                do
+                {
+                    utility::string_t current_element_name = get_current_element_name();
+                    if (current_element_name == xml_service_endpoint)
+                    {
+                        m_service_uri = web::http::uri(get_current_element_text());
+                    }
+                    else if (current_element_name == _XPLATSTR("ShareName"))
+                    {
+                        m_share_name = get_current_element_text();
+                    }
+                    else if (current_element_name == _XPLATSTR("DirectoryPath"))
+                    {
+                        m_directory_path = get_current_element_text();
+                    }
+                } while (move_to_next_attribute());
+            }
+        }
+    }
+
+    void list_files_and_directories_reader::handle_element(const utility::string_t& element_name)
+    {
+        if (get_parent_element_name() == xml_properties)
+        {
+            if (element_name == _XPLATSTR("Content-Length"))
+            {
+                extract_current_element(m_size);
+                return;
+            }
+        }
+
+        if (element_name == _XPLATSTR("File"))
+        {
+            m_is_file = true;
+            return;
+        }
+
+        if (element_name == _XPLATSTR("Directory"))
+        {
+            m_is_file = false;
+            return;
+        }
+
+        if (element_name == xml_name)
+        {
+            m_name = get_current_element_text();
+            return;
+        }
+
+        if (element_name == xml_next_marker)
+        {
+            m_next_marker = get_current_element_text();
+            return;
+        }
+    }
+
+    void list_files_and_directories_reader::handle_end_element(const utility::string_t& element_name)
+    {
+        if ((element_name == _XPLATSTR("File") || element_name == _XPLATSTR("Directory")) && get_parent_element_name() == _XPLATSTR("Entries"))
+        {
+            // End of the data for a file or directory. Create an item and add it to the list
+            if (element_name == _XPLATSTR("File"))
+            {
+                m_is_file = true;
+            }
+            m_items.push_back(list_file_and_directory_item(m_is_file, std::move(m_name), m_size));
+
+            m_is_file = false;
+            m_name = utility::string_t();
+            m_size = 0;
+        }
+    }
+
+    void list_file_ranges_reader::handle_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_start && m_start == -1)
+        {
+            extract_current_element(m_start);
+        }
+        else if (element_name == xml_end && m_end == -1)
+        {
+            extract_current_element(m_end);
+        }
+    }
+
+    void list_file_ranges_reader::handle_end_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_range)
+        {
+            if (m_start != -1 && m_end != -1)
+            {
+                file_range range(m_start, m_end);
+                m_range_list.push_back(range);
+            }
+
+            m_start = -1;
+            m_end = -1;
+        }
     }
 
     std::string service_properties_writer::write(const service_properties& properties, const service_properties_includes& includes)

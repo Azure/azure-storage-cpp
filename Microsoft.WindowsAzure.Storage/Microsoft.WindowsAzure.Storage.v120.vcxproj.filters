@@ -102,6 +102,12 @@
     <ClInclude Include="includes\was\error_code_strings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\was\file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\wascore\filestream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\async_semaphore.cpp">
@@ -240,6 +246,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\resources.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cloud_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cloud_file_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cloud_file_directory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cloud_file_ostreambuf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cloud_file_share.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\file_request_factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\file_response_parsers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

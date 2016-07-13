@@ -1,6 +1,18 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v2.4:
+- Added support for file service: file client, file share, file directory and file.
+- Performance improvements with URI cache, string concat, uri builder parameters.
+- Fixed the bug that cloud_blob_container didn't exported by dll.
+- Fixed the bug that xml parser for table's error message.
+- Fixed the bug that copying blob from other accounts doesn't use source credentials.
+- Fixed the bug that network took too long time to close while network error happened.
+- Fixed the bug that blob name with reserved characters didn't split with right order.
+- Fixed the but that blob properties didn't clear after delettion.
+- Fixed the coding style for static string to prevent ODR issue.
+- Fixed the build issue on OS X, but not offically suporting OS X.
+
 Changes in v2.3:
 - Added the following interfaces to support programmatically configurable HTTP/HTTPS proxy
   - operation_context::set_default_proxy

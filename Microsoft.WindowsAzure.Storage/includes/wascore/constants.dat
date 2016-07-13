@@ -25,6 +25,7 @@ DAT(double_negative_infinity, _XPLATSTR("-Infinity"))
 DAT(service_blob, _XPLATSTR("blob"))
 DAT(service_table, _XPLATSTR("table"))
 DAT(service_queue, _XPLATSTR("queue"))
+DAT(service_file, _XPLATSTR("file"))
 
 // uri query parameters
 DAT(uri_query_timeout, _XPLATSTR("timeout"))
@@ -79,6 +80,8 @@ DAT(resource_blob, _XPLATSTR("blob"))
 DAT(resource_block_list_all, _XPLATSTR("all"))
 DAT(resource_block_list_committed, _XPLATSTR("committed"))
 DAT(resource_block_list_uncommitted, _XPLATSTR("uncommitted"))
+DAT(resource_share, _XPLATSTR("share"))
+DAT(resource_directory, _XPLATSTR("directory"))
 
 // components
 DAT(component_list, _XPLATSTR("list"))
@@ -96,6 +99,8 @@ DAT(component_page, _XPLATSTR("page"))
 DAT(component_append_block, _XPLATSTR("appendblock"))
 DAT(component_copy, _XPLATSTR("copy"))
 DAT(component_acl, _XPLATSTR("acl"))
+DAT(component_range_list, _XPLATSTR("rangelist"))
+DAT(component_range, _XPLATSTR("range"))
 
 // common resources
 DAT(root_container, _XPLATSTR("$root"))
@@ -162,6 +167,7 @@ DAT(ms_header_continuation_next_table_name, _XPLATSTR("x-ms-continuation-NextTab
 DAT(ms_header_approximate_messages_count, _XPLATSTR("x-ms-approximate-messages-count"))
 DAT(ms_header_pop_receipt, _XPLATSTR("x-ms-popreceipt"))
 DAT(ms_header_time_next_visible, _XPLATSTR("x-ms-time-next-visible"))
+DAT(ms_header_share_quota, _XPLATSTR("x-ms-share-quota"))
 
 // header values
 DAT(header_value_storage_version, _XPLATSTR("2015-04-05"))
@@ -293,12 +299,20 @@ DAT(xml_service_stats_geo_replication_status_live, _XPLATSTR("live"))
 DAT(xml_service_stats_geo_replication_status_bootstrap, _XPLATSTR("bootstrap"))
 DAT(xml_service_stats_geo_replication_last_sync_time, _XPLATSTR("LastSyncTime"))
 DAT(xml_url, _XPLATSTR("Url"))
+DAT(xml_quota, _XPLATSTR("Quota"))
+DAT(xml_range, _XPLATSTR("Range"))
+DAT(xml_share, _XPLATSTR("Share"))
+DAT(xml_shares, _XPLATSTR("Shares"))
 
 #define STR(x) #x
 #define VER(x) _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows; MSC_VER " STR(x) ")")
 #if defined(WIN32)
 #if defined(_MSC_VER)
-    DAT(header_value_user_agent, VER(_MSC_VER))
+    #if _MSC_VER == 1800
+        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows; MSC_VER 1800 )"))
+    #else
+        DAT(header_value_user_agent, VER(_MSC_VER))
+    #endif
 #else
     DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.3.0 (Native; Windows)"))
 #endif
@@ -319,9 +333,11 @@ DAT(error_sas_missing_credentials, "Cannot create Shared Access Signature unless
 DAT(error_client_timeout, "The client could not finish the operation within specified timeout.")
 DAT(error_cannot_modify_snapshot, "Cannot perform this operation on a blob representing a snapshot.")
 DAT(error_page_blob_size_unknown, "The size of the page blob could not be determined, because stream is not seekable and a length argument is not provided.")
+DAT(error_file_size_unknown, "The size of the file could not be determined, because stream is not seekable and a length argument is not provided.")
 DAT(error_stream_short, "The requested number of bytes exceeds the length of the stream remaining from the specified position.")
 DAT(error_stream_length, "The length of the stream exceeds the permitted length.")
 DAT(error_unsupported_text_blob, "Only plain text with utf-8 encoding is supported.")
+DAT(error_unsupported_text, "Only plain text with utf-8 encoding is supported.")
 DAT(error_multiple_snapshots, "Cannot provide snapshot time as part of the address and as constructor parameter. Either pass in the address or use a different constructor.")
 DAT(error_multiple_credentials, "Cannot provide credentials as part of the address and as constructor parameter. Either pass in the address or use a different constructor.")
 DAT(error_uri_missing_location, "The Uri for the target storage location is not specified. Please consider changing the request's location mode.")

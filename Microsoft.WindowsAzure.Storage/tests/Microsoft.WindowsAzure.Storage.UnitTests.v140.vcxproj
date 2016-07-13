@@ -91,6 +91,7 @@
   <ItemGroup>
     <ClInclude Include="blob_test_base.h" />
     <ClInclude Include="check_macros.h" />
+    <ClInclude Include="file_test_base.h" />
     <ClInclude Include="queue_test_base.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="table_test_base.h" />
@@ -108,7 +109,12 @@
     <ClCompile Include="cloud_blob_directory_test.cpp" />
     <ClCompile Include="cloud_blob_test.cpp" />
     <ClCompile Include="cloud_block_blob_test.cpp" />
+    <ClCompile Include="cloud_file_client_test.cpp" />
+    <ClCompile Include="cloud_file_directory_test.cpp" />
+    <ClCompile Include="cloud_file_share_test.cpp" />
+    <ClCompile Include="cloud_file_test.cpp" />
     <ClCompile Include="executor_test.cpp" />
+    <ClCompile Include="file_test_base.cpp" />
     <ClCompile Include="queue_test_base.cpp" />
     <ClCompile Include="result_iterator_test.cpp" />
     <ClCompile Include="service_properties_test.cpp" />

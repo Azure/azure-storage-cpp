@@ -24,6 +24,7 @@
 namespace azure { namespace storage {
 
     class cloud_blob_shared_access_headers;
+    class cloud_file_shared_access_headers;
     class account_shared_access_policy;
 
 }} // namespace azure::storage
@@ -54,6 +55,12 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        
+        // Prevents the compiler from generating default assignment operator.
+        canonicalizer_helper& operator=(canonicalizer_helper& other) = delete;
+
+#endif
         /// <summary>
         /// Returns the canonicalized string.
         /// </summary>
@@ -438,6 +445,7 @@ namespace azure { namespace storage { namespace protocol {
     utility::string_t get_blob_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials);
     utility::string_t get_queue_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials);
     utility::string_t get_table_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& table_name, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials);
+    utility::string_t get_file_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_file_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials);
     storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource);
 
 #pragma endregion

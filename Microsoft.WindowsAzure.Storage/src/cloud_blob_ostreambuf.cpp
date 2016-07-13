@@ -23,24 +23,6 @@
 
 namespace azure { namespace storage { namespace core {
 
-    pplx::task<void> basic_cloud_blob_ostreambuf::_close_write()
-    {
-        if (m_committed)
-        {
-            throw std::logic_error(protocol::error_closed_stream);
-        }
-
-        m_committed = true;
-        basic_ostreambuf<basic_cloud_blob_ostreambuf::char_type>::_close_write().wait();
-        
-        if (m_blob_hash_provider.is_enabled())
-        {
-            m_blob_hash_provider.close();
-        }
-
-        return commit_blob();
-    }
-
     pplx::task<bool> basic_cloud_blob_ostreambuf::_sync()
     {
         upload_buffer();
@@ -56,80 +38,6 @@ namespace azure { namespace storage { namespace core {
             {
                 return pplx::task_from_exception<bool>(this_pointer->m_currentException);
             }
-        });
-    }
-
-    std::shared_ptr<basic_cloud_blob_ostreambuf::buffer_to_upload> basic_cloud_blob_ostreambuf::prepare_buffer()
-    {
-        utility::string_t block_md5;
-        if (m_block_hash_provider.is_enabled())
-        {
-            m_block_hash_provider.close();
-            block_md5 = m_block_hash_provider.hash();
-            m_block_hash_provider = hash_provider::create_md5_hash_provider();
-        }
-
-        auto buffer = std::make_shared<basic_cloud_blob_ostreambuf::buffer_to_upload>(m_buffer, block_md5);
-        m_buffer = concurrency::streams::container_buffer<std::vector<char_type>>();
-        m_buffer_size = m_next_buffer_size;
-        return buffer;
-    }
-
-    pplx::task<basic_cloud_blob_ostreambuf::int_type> basic_cloud_blob_ostreambuf::_putc(concurrency::streams::ostream::traits::char_type ch)
-    {
-        pplx::task<void> upload_task = pplx::task_from_result();
-
-        m_current_streambuf_offset += 1;
-        auto result = m_buffer.putc(ch).get();
-        if (m_buffer_size == m_buffer.in_avail())
-        {
-            upload_task = upload_buffer();
-        }
-
-        return upload_task.then([result] () -> basic_cloud_blob_ostreambuf::int_type
-        {
-            return result;
-        });
-    }
-
-    pplx::task<size_t> basic_cloud_blob_ostreambuf::_putn(const concurrency::streams::ostream::traits::char_type* ptr, size_t count)
-    {
-        pplx::task<void> upload_task = pplx::task_from_result();
-        
-        m_current_streambuf_offset += count;
-        auto remaining = count;
-        while (remaining > 0)
-        {
-            auto write_size = m_buffer_size - m_buffer.in_avail();
-            if (write_size > remaining)
-            {
-                write_size = remaining;
-            }
-
-            if (m_block_hash_provider.is_enabled())
-            {
-                m_block_hash_provider.write(ptr, write_size);
-            }
-
-            if (m_blob_hash_provider.is_enabled())
-            {
-                m_blob_hash_provider.write(ptr, write_size);
-            }
-
-            // The streambuf is waited because it is a memory buffer, so does not involve async I/O
-            m_buffer.putn_nocopy(ptr, write_size).wait();
-            if (m_buffer_size == m_buffer.size())
-            {
-                upload_task = upload_buffer();
-            }
-
-            ptr += write_size;
-            remaining -= write_size;
-        }
-
-        return upload_task.then([count] () -> size_t
-        {
-            return count;
         });
     }
 
@@ -175,14 +83,14 @@ namespace azure { namespace storage { namespace core {
         });
     }
 
-    pplx::task<void> basic_cloud_block_blob_ostreambuf::commit_blob()
+    pplx::task<void> basic_cloud_block_blob_ostreambuf::commit_close()
     {
         auto this_pointer = std::dynamic_pointer_cast<basic_cloud_block_blob_ostreambuf>(shared_from_this());
         return _sync().then([this_pointer] (bool) -> pplx::task<void>
         {
-            if (this_pointer->m_blob_hash_provider.is_enabled())
+            if (this_pointer->m_total_hash_provider.is_enabled())
             {
-                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_blob_hash_provider.hash());
+                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_total_hash_provider.hash());
             }
 
             return this_pointer->m_blob->upload_block_list_async(this_pointer->m_block_list, this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
@@ -243,14 +151,14 @@ namespace azure { namespace storage { namespace core {
         });
     }
 
-    pplx::task<void> basic_cloud_page_blob_ostreambuf::commit_blob()
+    pplx::task<void> basic_cloud_page_blob_ostreambuf::commit_close()
     {
-        if (m_blob_hash_provider.is_enabled())
+        if (m_total_hash_provider.is_enabled())
         {
             auto this_pointer = std::dynamic_pointer_cast<basic_cloud_page_blob_ostreambuf>(shared_from_this());
             return _sync().then([this_pointer] (bool) -> pplx::task<void>
             {
-                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_blob_hash_provider.hash());
+                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_total_hash_provider.hash());
                 return this_pointer->m_blob->upload_properties_async(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
             });
         }
@@ -332,14 +240,14 @@ namespace azure { namespace storage { namespace core {
         });
     }
 
-    pplx::task<void> basic_cloud_append_blob_ostreambuf::commit_blob()
+    pplx::task<void> basic_cloud_append_blob_ostreambuf::commit_close()
     {
-        if (m_blob_hash_provider.is_enabled())
+        if (m_total_hash_provider.is_enabled())
         {
             auto this_pointer = std::dynamic_pointer_cast<basic_cloud_append_blob_ostreambuf>(shared_from_this());
             return _sync().then([this_pointer](bool) -> pplx::task<void>
             {
-                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_blob_hash_provider.hash());
+                this_pointer->m_blob->properties().set_content_md5(this_pointer->m_total_hash_provider.hash());
                 return this_pointer->m_blob->upload_properties_async(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
             });
         }

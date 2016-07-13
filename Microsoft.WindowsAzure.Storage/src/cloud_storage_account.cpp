@@ -21,6 +21,7 @@
 #include "was/blob.h"
 #include "was/queue.h"
 #include "was/table.h"
+#include "was/file.h"
 #include "was/storage_account.h"
 #include "wascore/resources.h"
 
@@ -35,6 +36,7 @@ namespace azure { namespace storage {
     const utility::char_t *blob_endpoint_setting_string(_XPLATSTR("BlobEndpoint"));
     const utility::char_t *queue_endpoint_setting_string(_XPLATSTR("QueueEndpoint"));
     const utility::char_t *table_endpoint_setting_string(_XPLATSTR("TableEndpoint"));
+    const utility::char_t *file_endpoint_setting_string(_XPLATSTR("FileEndpoint"));
     const utility::char_t *endpoint_suffix_setting_string(_XPLATSTR("EndpointSuffix"));
     const utility::char_t *shared_access_signature_setting_string(_XPLATSTR("SharedAccessSignature"));
     const utility::char_t *devstore_account_name(_XPLATSTR("devstoreaccount1"));
@@ -44,6 +46,7 @@ namespace azure { namespace storage {
     const utility::char_t *default_blob_hostname_prefix(_XPLATSTR("blob"));
     const utility::char_t *default_queue_hostname_prefix(_XPLATSTR("queue"));
     const utility::char_t *default_table_hostname_prefix(_XPLATSTR("table"));
+    const utility::char_t *default_file_hostname_prefix(_XPLATSTR("file"));
 
     storage_uri construct_default_endpoint(const utility::string_t& scheme, const utility::string_t& account_name, const utility::string_t& hostname_prefix, const utility::string_t& endpoint_suffix)
     {
@@ -78,6 +81,7 @@ namespace azure { namespace storage {
         m_blob_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_blob_hostname_prefix, endpoint_suffix);
         m_queue_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_queue_hostname_prefix, endpoint_suffix);
         m_table_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_table_hostname_prefix, endpoint_suffix);
+        m_file_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_file_hostname_prefix, endpoint_suffix);
     }
 
     cloud_storage_account cloud_storage_account::get_development_storage_account(const web::http::uri& proxy_uri)
@@ -102,6 +106,8 @@ namespace azure { namespace storage {
         web::uri queue_endpoint_primary = builder.to_uri();
         builder.set_port(10002);
         web::uri table_endpoint_primary = builder.to_uri();
+        builder.set_port(10003);
+        web::uri file_endpoint_primary = builder.to_uri();
 
         builder.set_path(utility::string_t(devstore_account_name).append(secondary_location_account_suffix));
 
@@ -111,11 +117,14 @@ namespace azure { namespace storage {
         web::uri queue_endpoint_secondary = builder.to_uri();
         builder.set_port(10002);
         web::uri table_endpoint_secondary = builder.to_uri();
+        builder.set_port(10003);
+        web::uri file_endpoint_secondary = builder.to_uri();
 
         cloud_storage_account account(storage_credentials(devstore_account_name, devstore_account_key),
             storage_uri(std::move(blob_endpoint_primary), std::move(blob_endpoint_secondary)),
             storage_uri(std::move(queue_endpoint_primary), std::move(queue_endpoint_secondary)),
-            storage_uri(std::move(table_endpoint_primary), std::move(table_endpoint_secondary)));
+            storage_uri(std::move(table_endpoint_primary), std::move(table_endpoint_secondary)),
+            storage_uri(std::move(file_endpoint_primary), std::move(file_endpoint_secondary)));
         
         account.m_is_development_storage_account = true;
         account.m_settings.insert(std::make_pair(use_development_storage_setting_string, use_development_storage_setting_value));
@@ -245,16 +254,19 @@ namespace azure { namespace storage {
             utility::string_t blob_endpoint;
             utility::string_t queue_endpoint;
             utility::string_t table_endpoint;
+            utility::string_t file_endpoint;
             get_setting(settings, blob_endpoint_setting_string, blob_endpoint);
             get_setting(settings, queue_endpoint_setting_string, queue_endpoint);
             get_setting(settings, table_endpoint_setting_string, table_endpoint);
+            get_setting(settings, file_endpoint_setting_string, file_endpoint);
 
             if (settings.empty())
             {
                 cloud_storage_account account(storage_credentials(account_name, account_key),
                     blob_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_blob_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(blob_endpoint)),
                     queue_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_queue_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(queue_endpoint)),
-                    table_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_table_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(table_endpoint)));
+                    table_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_table_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(table_endpoint)),
+                    file_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_file_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(file_endpoint)));
 
                 account.m_endpoint_suffix = endpoint_suffix;
                 return account;
@@ -269,17 +281,20 @@ namespace azure { namespace storage {
         utility::string_t blob_endpoint;
         utility::string_t queue_endpoint;
         utility::string_t table_endpoint;
+        utility::string_t file_endpoint;
         get_setting(settings, blob_endpoint_setting_string, blob_endpoint);
         get_setting(settings, queue_endpoint_setting_string, queue_endpoint);
         get_setting(settings, table_endpoint_setting_string, table_endpoint);
+        get_setting(settings, file_endpoint_setting_string, file_endpoint);
         storage_credentials credentials(get_credentials(settings));
         
-        if (settings.empty() && (!blob_endpoint.empty() || !queue_endpoint.empty() || !table_endpoint.empty()))
+        if (settings.empty() && (!blob_endpoint.empty() || !queue_endpoint.empty() || !table_endpoint.empty() || !file_endpoint.empty()))
         {
             return cloud_storage_account(credentials,
                 blob_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(blob_endpoint)),
                 queue_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(queue_endpoint)),
-                table_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(table_endpoint)));
+                table_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(table_endpoint)),
+                file_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(file_endpoint)));
         }
 
         return cloud_storage_account();
@@ -347,6 +362,16 @@ namespace azure { namespace storage {
         return cloud_table_client(m_table_endpoint, m_credentials, default_request_options);
     }
 
+    cloud_file_client cloud_storage_account::create_cloud_file_client() const
+    {
+        return cloud_file_client(m_file_endpoint, m_credentials);
+    }
+
+    cloud_file_client cloud_storage_account::create_cloud_file_client(const file_request_options& default_request_options) const
+    {
+        return cloud_file_client(m_file_endpoint, m_credentials, default_request_options);
+    }
+
     utility::string_t cloud_storage_account::to_string(bool export_secrets)
     {
         if (m_settings.empty())
@@ -375,6 +400,11 @@ namespace azure { namespace storage {
                 if (!m_table_endpoint.primary_uri().is_empty())
                 {
                     m_settings.insert(std::make_pair(table_endpoint_setting_string, m_table_endpoint.primary_uri().to_string()));
+                }
+
+                if (!m_file_endpoint.primary_uri().is_empty())
+                {
+                    m_settings.insert(std::make_pair(file_endpoint_setting_string, m_file_endpoint.primary_uri().to_string()));
                 }
             }
         }

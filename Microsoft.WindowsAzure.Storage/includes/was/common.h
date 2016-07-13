@@ -35,6 +35,8 @@ namespace azure { namespace storage {
     namespace protocol
     {
         class service_stats_reader;
+        class response_parsers;
+        class list_blobs_reader;
     }
 
     /// <summary>
@@ -493,6 +495,20 @@ namespace azure { namespace storage {
         {
             service_properties_includes includes;
             includes.set_logging(true);
+            includes.set_hour_metrics(true);
+            includes.set_minute_metrics(true);
+            includes.set_cors(true);
+            return includes;
+        }
+
+        /// <summary>
+        /// Gets an <see cref="azure::storage::service_properties_includes" /> object that includes all available file service properties.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::service_properties_includes" /> object with all file service properties set to <c>true</c>.</returns>
+        static service_properties_includes file()
+        {
+            service_properties_includes includes;
+            includes.set_logging(false);
             includes.set_hour_metrics(true);
             includes.set_minute_metrics(true);
             includes.set_cors(true);
@@ -2665,6 +2681,161 @@ namespace azure { namespace storage {
         option_with_default<std::chrono::seconds> m_maximum_execution_time;
         option_with_default<azure::storage::location_mode> m_location_mode;
         option_with_default<size_t> m_http_buffer_size;
+    };
+
+    /// <summary>
+    /// Represents the status of a blob copy operation.
+    /// </summary>
+    enum class copy_status
+    {
+        /// <summary>
+        /// The copy status is invalid.
+        /// </summary>
+        invalid,
+
+        /// <summary>
+        /// The copy operation is pending.
+        /// </summary>
+        pending,
+
+        /// <summary>
+        /// The copy operation succeeded.
+        /// </summary>
+        success,
+
+        /// <summary>
+        /// The copy operation has been aborted.
+        /// </summary>
+        aborted,
+
+        /// <summary>
+        /// The copy operation encountered an error.
+        /// </summary>
+        failed
+    };
+
+    /// <summary>
+    /// Represents the attributes of a copy blob operation.
+    /// </summary>
+    class copy_state
+    {
+    public:
+
+        copy_state()
+            : m_bytes_copied(0), m_total_bytes(0), m_status(copy_status::invalid)
+        {
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::copy_state" /> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::copy_state" /> object.</param>
+        copy_state(copy_state&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to an <see cref="azure::storage::copy_state" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::copy_state" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::copy_state" /> object with properties set.</returns>
+        copy_state& operator=(copy_state&& other)
+        {
+            if (this != &other)
+            {
+                m_copy_id = std::move(other.m_copy_id);
+                m_completion_time = std::move(other.m_completion_time);
+                m_status_description = std::move(other.m_status_description);
+                m_bytes_copied = std::move(other.m_bytes_copied);
+                m_total_bytes = std::move(other.m_total_bytes);
+                m_status = std::move(other.m_status);
+                m_source = std::move(other.m_source);
+            }
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Gets the ID of the copy blob operation.
+        /// </summary>
+        /// <returns>An ID string for the copy operation.</returns>
+        const utility::string_t& copy_id() const
+        {
+            return m_copy_id;
+        }
+
+        /// <summary>
+        /// Gets the time that the copy blob operation completed, and indicates whether completion was due 
+        /// to a successful copy, whether the operation was cancelled, or whether the operation failed.
+        /// </summary>
+        /// <returns>A <see cref="utility::datetime" /> containing the completion time.</returns>
+        utility::datetime completion_time() const
+        {
+            return m_completion_time;
+        }
+
+        /// <summary>
+        /// Gets the status of the copy blob operation.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::copy_status" /> enumeration indicating the status of the copy operation.</returns>
+        copy_status status() const
+        {
+            return m_status;
+        }
+
+        /// <summary>
+        /// Gets the URI of the source blob for a copy operation.
+        /// </summary>
+        /// <returns>A <see cref="web::http::uri" /> indicating the source of a copy operation.</returns>
+        const web::http::uri& source() const
+        {
+            return m_source;
+        }
+
+        /// <summary>
+        /// Gets the number of bytes copied in the operation so far.
+        /// </summary>
+        /// <returns>The number of bytes copied in the operation so far.</returns>
+        int64_t bytes_copied() const
+        {
+            return m_bytes_copied;
+        }
+
+        /// <summary>
+        /// Gets the total number of bytes in the source blob for the copy operation.
+        /// </summary>
+        /// <returns>The number of bytes in the source blob.</returns>
+        int64_t total_bytes() const
+        {
+            return m_total_bytes;
+        }
+
+        /// <summary>
+        /// Gets the description of the current status of the copy blob operation, if status is available.
+        /// </summary>
+        /// <returns>A status description string.</returns>
+        const utility::string_t& status_description() const
+        {
+            return m_status_description;
+        }
+
+    private:
+
+        utility::string_t m_copy_id;
+        utility::datetime m_completion_time;
+        utility::string_t m_status_description;
+        int64_t m_bytes_copied;
+        int64_t m_total_bytes;
+        copy_status m_status;
+        web::http::uri m_source;
+
+        friend class protocol::response_parsers;
+        friend class protocol::list_blobs_reader;
     };
 
 }} // namespace azure::storage

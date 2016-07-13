@@ -22,6 +22,7 @@
 #include "was/blob.h"
 #include "was/queue.h"
 #include "was/table.h"
+#include "was/file.h"
 
 void add_metrics_1(azure::storage::service_properties::metrics_properties& metrics)
 {
@@ -241,6 +242,88 @@ void test_service_properties(const Client& client, const Options& options, azure
     }
 }
 
+template<>
+void test_service_properties(const azure::storage::cloud_file_client& client, const azure::storage::file_request_options& options, azure::storage::operation_context context, bool default_version_supported)
+{
+    azure::storage::service_properties props;
+    add_metrics_1(props.hour_metrics());
+    add_metrics_2(props.minute_metrics());
+    add_cors_rule_1(props.cors());
+    add_cors_rule_2(props.cors());
+
+    azure::storage::service_properties temp_props;
+    add_metrics_2(temp_props.hour_metrics());
+    add_metrics_1(temp_props.minute_metrics());
+    add_cors_rule_2(temp_props.cors());
+
+    client.upload_service_properties(props, azure::storage::service_properties_includes::file(), options, context);
+    check_service_properties(props, client.download_service_properties(options, context));
+
+    {
+        azure::storage::service_properties_includes includes;
+        includes.set_hour_metrics(true);
+        client.upload_service_properties(temp_props, includes, options, context);
+        add_metrics_2(props.hour_metrics());
+        check_service_properties(props, client.download_service_properties(options, context));
+        add_metrics_1(temp_props.hour_metrics());
+    }
+
+    {
+        azure::storage::service_properties_includes includes;
+        includes.set_minute_metrics(true);
+        client.upload_service_properties(temp_props, includes, options, context);
+        add_metrics_1(props.minute_metrics());
+        check_service_properties(props, client.download_service_properties(options, context));
+        add_metrics_2(temp_props.minute_metrics());
+    }
+
+    {
+        azure::storage::service_properties_includes includes;
+        includes.set_cors(true);
+        client.upload_service_properties(temp_props, includes, options, context);
+        props.cors().erase(props.cors().begin());
+        check_service_properties(props, client.download_service_properties(options, context));
+        temp_props.cors().clear();
+    }
+
+    {
+        azure::storage::service_properties_includes includes;
+        includes.set_hour_metrics(true);
+        includes.set_minute_metrics(true);
+        includes.set_cors(true);
+        client.upload_service_properties(temp_props, includes, options, context);
+        add_metrics_1(props.hour_metrics());
+        add_metrics_2(props.minute_metrics());
+        props.cors().clear();
+        check_service_properties(props, client.download_service_properties(options, context));
+    }
+
+    {
+        azure::storage::service_properties_includes includes;
+        includes.set_hour_metrics(true);
+        includes.set_minute_metrics(true);
+        includes.set_cors(true);
+        add_metrics_3(temp_props.hour_metrics());
+        add_metrics_4(temp_props.minute_metrics());
+        client.upload_service_properties(temp_props, includes, options, context);
+        add_metrics_3(props.hour_metrics());
+        add_metrics_4(props.minute_metrics());
+        props.cors().clear();
+        check_service_properties(props, client.download_service_properties(options, context));
+    }
+
+    props.set_default_service_version(_XPLATSTR("2013-08-15"));
+    if (default_version_supported)
+    {
+        client.upload_service_properties(props, azure::storage::service_properties_includes::all(), options, context);
+        check_service_properties(props, client.download_service_properties(options, context));
+    }
+    else
+    {
+        CHECK_THROW(client.upload_service_properties(props, azure::storage::service_properties_includes::all(), options, context), azure::storage::storage_exception);
+    }
+}
+
 SUITE(Client)
 {
     TEST_FIXTURE(test_base, blob_service_properties)
@@ -259,6 +342,12 @@ SUITE(Client)
     {
         auto client = test_config::instance().account().create_cloud_table_client();
         test_service_properties(client, azure::storage::table_request_options(), m_context, false);
+    }
+
+    TEST_FIXTURE(test_base, file_service_properties)
+    {
+        auto client = test_config::instance().account().create_cloud_file_client();
+        test_service_properties(client, azure::storage::file_request_options(), m_context, false);
     }
 
     TEST_FIXTURE(test_base, blob_service_stats)

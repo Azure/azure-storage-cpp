@@ -13,6 +13,10 @@ The Azure Storage Client Library for C++ allows you to build applications agains
     - Create/Delete Queues
     - Insert/Peek Queue Messages
     - Advanced Queue Operations
+- Files
+    - Create/Delete/Resize Shares
+    - Create/Delete Directories
+    - Create/Read/Update/Delete Files
 
 # Getting started
 
@@ -125,6 +129,7 @@ make
 To run the samples:
 ```bash
 cd Binaries
+vi ../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
 ./samplesblobs            # run the blobs sample
 ./samplesjson             # run the tables sample with JSON payload
 ./samplestables           # run the tables sample

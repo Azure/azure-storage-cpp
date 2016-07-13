@@ -20,12 +20,20 @@ if(UNIX)
      retry_policies.cpp
      resources.cpp
      queue_request_factory.cpp
+     file_request_factory.cpp
+     file_response_parsers.cpp
      protocol_json.cpp
      operation_context.cpp
      mime_multipart_helper.cpp
      logging.cpp
      hashing.cpp
      constants.cpp
+     streams.cpp
+     cloud_file_ostreambuf.cpp
+     cloud_file.cpp
+     cloud_file_directory.cpp
+     cloud_file_share.cpp
+     cloud_file_client.cpp
      cloud_table_client.cpp
      cloud_table.cpp
      cloud_storage_account.cpp

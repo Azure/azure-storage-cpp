@@ -150,6 +150,101 @@ namespace azure { namespace storage { namespace core {
         return parse_blob_uri(uri.primary_uri(), container_name, blob_name);
     }
 
+    bool parse_file_directory_uri(const web::http::uri& uri, utility::string_t& share_name, utility::string_t& directory_name)
+    {
+        auto segments = web::http::uri::split_path(uri.path());
+        auto iter = segments.cbegin();
+
+        if (use_path_style(uri))
+        {
+            if (iter == segments.cend())
+            {
+                return false;
+            }
+
+            iter++;
+        }
+
+        if (iter == segments.cend())
+        {
+            return false;
+        }
+
+        share_name = *(iter++);
+        if (iter == segments.cend())
+        {
+            directory_name = utility::string_t();
+            return false;
+        }
+        else
+        {
+            directory_name = *(segments.crbegin());
+        }
+
+        return true;
+    }
+
+    bool parse_file_directory_uri(const storage_uri& uri, utility::string_t& share_name, utility::string_t& directory_name)
+    {
+        return parse_blob_uri(uri.primary_uri(), share_name, directory_name);
+    }
+
+    bool parse_file_uri(const web::http::uri& uri, utility::string_t& share_name, utility::string_t& directory_name, utility::string_t& file_name)
+    {
+        auto segments = web::http::uri::split_path(uri.path());
+        auto iter = segments.cbegin();
+
+        if (use_path_style(uri))
+        {
+            if (iter == segments.cend())
+            {
+                return false;
+            }
+
+            iter++;
+        }
+
+        if (iter == segments.cend())
+        {
+            return false;
+        }
+
+        share_name = *(iter++);
+        auto iter_end = segments.cend();
+        --iter_end;
+        if (iter == segments.cend())
+        {
+            directory_name = utility::string_t();
+            file_name = utility::string_t();
+            return false;
+        }
+        else if (iter == iter_end)
+        {
+            directory_name = utility::string_t();
+            file_name = *(iter);
+            return true;
+        }
+        else
+        {
+            utility::ostringstream_t directory_name_str;
+            directory_name_str << *iter;
+            for (iter++; iter != iter_end; iter++)
+            {
+                directory_name_str << _XPLATSTR('/') << *iter;
+            }
+
+            directory_name = directory_name_str.str();
+            file_name = *iter_end;
+        }
+
+        return true;
+    }
+
+    bool parse_file_uri(const storage_uri& uri, utility::string_t& share_name, utility::string_t& directory_name, utility::string_t& file_name)
+    {
+        return parse_file_uri(uri.primary_uri(), share_name, directory_name, file_name);
+    }
+
     web::http::uri create_stripped_uri(const web::http::uri& uri)
     {
         web::http::uri_builder builder;

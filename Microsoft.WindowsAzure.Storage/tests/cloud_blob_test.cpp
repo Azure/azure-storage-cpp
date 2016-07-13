@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "blob_test_base.h"
 #include "check_macros.h"
+#include "file_test_base.h"
 
 #include "cpprest/producerconsumerstream.h"
 
@@ -651,10 +652,10 @@ SUITE(Blob)
 
             auto dest_read_sas = dest.get_shared_access_signature(read_policy);
             azure::storage::cloud_block_blob dest_read_blob = azure::storage::cloud_block_blob(dest.uri(), azure::storage::storage_credentials(dest_read_sas));
-            
+
             auto dest_write_sas = dest.get_shared_access_signature(write_policy);
             azure::storage::cloud_block_blob dest_write_blob = azure::storage::cloud_block_blob(dest.uri(), azure::storage::storage_credentials(dest_write_sas));
-        
+
             /// try to copy from source blob to dest blob with wrong access condition.
             CHECK_THROW(dest_write_blob.start_copy(source_blob, azure::storage::access_condition::generate_if_match_condition(_XPLATSTR("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
             CHECK_EQUAL(web::http::status_codes::PreconditionFailed, m_context.request_results().back().http_status_code());
@@ -663,6 +664,38 @@ SUITE(Blob)
             auto copy_id = dest_write_blob.start_copy(source_blob, azure::storage::access_condition::generate_if_match_condition(source.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             CHECK(wait_for_copy(dest_read_blob));
             CHECK_THROW(dest_write_blob.abort_copy(copy_id, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+            CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
+        }
+    }
+
+    /// <summary>
+    /// Test blob copy from a cloud_file object.
+    /// </summary>
+    TEST_FIXTURE(blob_test_base, blob_copy_from_file)
+    {
+        azure::storage::file_shared_access_policy read_policy(utility::datetime::utc_now() + utility::datetime::from_minutes(10), azure::storage::file_shared_access_policy::permissions::read);
+        azure::storage::blob_shared_access_policy write_policy(utility::datetime::utc_now() + utility::datetime::from_minutes(10), azure::storage::blob_shared_access_policy::permissions::write);
+
+        for (size_t i = 0; i < 2; ++i)
+        {
+            auto file_name = this->get_random_string();
+            auto share = test_config::instance().account().create_cloud_file_client().get_share_reference(_XPLATSTR("testshare"));
+            share.create_if_not_exists();
+            auto source = share.get_root_directory_reference().get_file_reference(file_name);
+            source.upload_text(_XPLATSTR("1"), azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+
+            /// create source file with specified sas credentials, only read access to source blob.
+            auto source_sas = source.get_shared_access_signature(read_policy);
+            azure::storage::cloud_file source_file = azure::storage::cloud_file(source.uri(), azure::storage::storage_credentials(source_sas));
+
+            /// create dest blobs with specified sas credentials, only read access to dest read blob and only write access to dest write blob.
+            auto dest_blob_name = this->get_random_string();
+            auto dest = m_container.get_block_blob_reference(dest_blob_name);
+
+            /// try to copy from source file to dest blob, use dest_read_blob to check copy stats.
+            auto copy_id = dest.start_copy(source_file, azure::storage::file_access_condition(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            CHECK(wait_for_copy(dest));
+            CHECK_THROW(dest.abort_copy(copy_id, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
             CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
         }
     }

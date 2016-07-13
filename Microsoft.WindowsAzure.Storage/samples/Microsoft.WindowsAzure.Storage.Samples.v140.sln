@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Stor
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.JsonPayloadFormat.v140", "JsonPayloadFormat\Microsoft.WindowsAzure.Storage.JsonPayloadFormat.v140.vcxproj", "{BF42EBC0-0CEC-4053-8145-11917E03F7BD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.FilesGettingStarted.v140", "FilesGettingStarted\Microsoft.WindowsAzure.Storage.FilesGettingStarted.v140.vcxproj", "{69B7A340-02D1-4685-9319-4804558321A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -60,6 +62,12 @@ Global
 		{BF42EBC0-0CEC-4053-8145-11917E03F7BD}.Release|Win32.ActiveCfg = Release|Win32
 		{BF42EBC0-0CEC-4053-8145-11917E03F7BD}.Release|Win32.Build.0 = Release|Win32
 		{BF42EBC0-0CEC-4053-8145-11917E03F7BD}.Release|x64.ActiveCfg = Release|Win32
+		{69B7A340-02D1-4685-9319-4804558321A1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{69B7A340-02D1-4685-9319-4804558321A1}.Debug|Win32.Build.0 = Debug|Win32
+		{69B7A340-02D1-4685-9319-4804558321A1}.Debug|x64.ActiveCfg = Debug|Win32
+		{69B7A340-02D1-4685-9319-4804558321A1}.Release|Win32.ActiveCfg = Release|Win32
+		{69B7A340-02D1-4685-9319-4804558321A1}.Release|Win32.Build.0 = Release|Win32
+		{69B7A340-02D1-4685-9319-4804558321A1}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

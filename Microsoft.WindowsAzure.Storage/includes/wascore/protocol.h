@@ -21,6 +21,7 @@
 #include "was/blob.h"
 #include "was/queue.h"
 #include "was/table.h"
+#include "was/file.h"
 #include "wascore/executor.h"
 
 namespace azure { namespace storage { namespace protocol {
@@ -106,6 +107,33 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request get_queue_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_queue_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
 
+    // File request factory methods
+    web::http::http_request list_shares(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request create_file_share(const utility::size64_t max_size, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_file_share(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file_share_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_share_properties(const cloud_file_share_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_share_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file_share_stats(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_files_and_directories(int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request create_file_directory(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_file_directory(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file_directory_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_directory_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request create_file(const int64_t length, const cloud_metadata& metadata, const cloud_file_properties& properties,  web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_file(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_properties(const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request copy_file(const web::http::uri& source, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request copy_file_from_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request abort_copy_file(const utility::string_t& copy_id, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_file_ranges(utility::size64_t start_offset, utility::size64_t length, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_file_range(file_range range, file_range_write write, utility::string_t content_md5, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file(utility::size64_t start_offset, utility::size64_t length, bool md5_validation, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    
     // Common response parsers
 
     template<typename T>
@@ -144,6 +172,7 @@ namespace azure { namespace storage { namespace protocol {
     utility::string_t get_header_value(const web::http::http_response& response, const utility::string_t& header);
     utility::string_t get_header_value(const web::http::http_headers& headers, const utility::string_t& header);
 
+    utility::size64_t parse_quota(const web::http::http_response& response);
     utility::string_t parse_etag(const web::http::http_response& response);
     utility::datetime parse_last_modified(const web::http::http_response& response);
     utility::string_t parse_lease_id(const web::http::http_response& response);
@@ -154,15 +183,20 @@ namespace azure { namespace storage { namespace protocol {
     cloud_metadata parse_metadata(const web::http::http_response& response);
     storage_extended_error parse_extended_error(const web::http::http_response& response);
 
+    class response_parsers
+    {
+    public:
+        static copy_state parse_copy_state(const web::http::http_response& response);
+        static utility::datetime parse_copy_completion_time(const utility::string_t& value);
+        static bool parse_copy_progress(const utility::string_t& value, int64_t& bytes_copied, int64_t& bytes_total);
+        static copy_status parse_copy_status(const utility::string_t& value);
+    };
+
     class blob_response_parsers
     {
     public:
         static blob_type parse_blob_type(const utility::string_t& value);
         static utility::size64_t parse_blob_size(const web::http::http_response& response);
-        static copy_state parse_copy_state(const web::http::http_response& response);
-        static utility::datetime parse_copy_completion_time(const utility::string_t& value);
-        static bool parse_copy_progress(const utility::string_t& value, int64_t& bytes_copied, int64_t& bytes_total);
-        static copy_status parse_copy_status(const utility::string_t& value);
         static blob_container_public_access_type parse_public_access_type(const web::http::http_response& response);
 
         static cloud_blob_container_properties parse_blob_container_properties(const web::http::http_response& response);
@@ -176,6 +210,14 @@ namespace azure { namespace storage { namespace protocol {
         static continuation_token parse_continuation_token(const web::http::http_response& response, const request_result& result);
         static std::vector<table_result> parse_batch_results(const web::http::http_response& response, Concurrency::streams::stringstreambuf& response_buffer, bool is_query, size_t batch_size);
         static std::vector<table_entity> parse_query_results(const web::json::value& obj);
+    };
+
+    class file_response_parsers
+    {
+    public:
+        static cloud_file_share_properties parse_file_share_properties(const web::http::http_response& response);
+        static cloud_file_directory_properties parse_file_directory_properties(const web::http::http_response& response);
+        static cloud_file_properties parse_file_properties(const web::http::http_response& response);
     };
 
 }}} // namespace azure::storage::protocol

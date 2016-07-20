@@ -620,9 +620,50 @@ SUITE(Blob)
         CHECK_THROW(copy.start_copy(defiddler(blob.uri().primary_uri()), azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(_XPLATSTR("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
         CHECK_EQUAL(web::http::status_codes::PreconditionFailed, m_context.request_results().back().http_status_code());
 
+        // copy from cloud_blob object within same account using shared key.
         auto copy2 = m_container.get_block_blob_reference(_XPLATSTR("copy2"));
         copy2.start_copy(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK(wait_for_copy(copy2));
         CHECK_THROW(copy2.start_copy(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(_XPLATSTR("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+    }
+
+    /// <summary>
+    /// Test blob copy from a cloud_blob object using sas token.
+    /// </summary>
+    TEST_FIXTURE(blob_test_base, blob_copy_with_sas_token)
+    {
+        azure::storage::blob_shared_access_policy read_policy(utility::datetime::utc_now() + utility::datetime::from_minutes(10), azure::storage::blob_shared_access_policy::permissions::read);
+        azure::storage::blob_shared_access_policy write_policy(utility::datetime::utc_now() + utility::datetime::from_minutes(10), azure::storage::blob_shared_access_policy::permissions::write);
+
+        for (size_t i = 0; i < 2; ++i)
+        {
+            auto source_blob_name = this->get_random_string();
+            auto source = m_container.get_block_blob_reference(source_blob_name);
+            source.upload_text(_XPLATSTR("1"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+
+            /// create source blob with specified sas credentials, only read access to source blob.
+            auto source_sas = source.get_shared_access_signature(read_policy);
+            azure::storage::cloud_block_blob source_blob = azure::storage::cloud_block_blob(source.uri(), azure::storage::storage_credentials(source_sas));
+
+            /// create dest blobs with specified sas credentials, only read access to dest read blob and only write access to dest write blob.
+            auto dest_blob_name = this->get_random_string();
+            auto dest = m_container.get_block_blob_reference(dest_blob_name);
+
+            auto dest_read_sas = dest.get_shared_access_signature(read_policy);
+            azure::storage::cloud_block_blob dest_read_blob = azure::storage::cloud_block_blob(dest.uri(), azure::storage::storage_credentials(dest_read_sas));
+            
+            auto dest_write_sas = dest.get_shared_access_signature(write_policy);
+            azure::storage::cloud_block_blob dest_write_blob = azure::storage::cloud_block_blob(dest.uri(), azure::storage::storage_credentials(dest_write_sas));
+        
+            /// try to copy from source blob to dest blob with wrong access condition.
+            CHECK_THROW(dest_write_blob.start_copy(source_blob, azure::storage::access_condition::generate_if_match_condition(_XPLATSTR("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+            CHECK_EQUAL(web::http::status_codes::PreconditionFailed, m_context.request_results().back().http_status_code());
+
+            /// try to copy from source blob to dest blob, use dest_read_blob to check copy stats.
+            auto copy_id = dest_write_blob.start_copy(source_blob, azure::storage::access_condition::generate_if_match_condition(source.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            CHECK(wait_for_copy(dest_read_blob));
+            CHECK_THROW(dest_write_blob.abort_copy(copy_id, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+            CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
+        }
     }
 }

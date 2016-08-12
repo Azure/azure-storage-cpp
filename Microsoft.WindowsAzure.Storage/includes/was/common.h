@@ -2491,6 +2491,7 @@ namespace azure { namespace storage {
             {
                 m_operation_expiry_time = std::move(other.m_operation_expiry_time);
                 m_retry_policy = std::move(other.m_retry_policy);
+                m_noactivity_timeout = std::move(other.m_noactivity_timeout);
                 m_server_timeout = std::move(other.m_server_timeout);
                 m_maximum_execution_time = std::move(other.m_maximum_execution_time);
                 m_location_mode = std::move(other.m_location_mode);
@@ -2516,6 +2517,16 @@ namespace azure { namespace storage {
         void set_retry_policy(azure::storage::retry_policy retry_policy)
         {
             m_retry_policy = retry_policy;
+        }
+
+        const std::chrono::seconds noactivity_timeout() const
+        {
+            return m_noactivity_timeout;
+        }
+
+        void set_noactivity_timeout(std::chrono::seconds noactivity_timeout)
+        {
+            m_noactivity_timeout = noactivity_timeout;
         }
 
         /// <summary>
@@ -2625,6 +2636,7 @@ namespace azure { namespace storage {
                 m_retry_policy = other.m_retry_policy;
             }
 
+            m_noactivity_timeout.merge(other.m_noactivity_timeout);
             m_server_timeout.merge(other.m_server_timeout);
             m_maximum_execution_time.merge(other.m_maximum_execution_time);
             m_location_mode.merge(other.m_location_mode);
@@ -2648,6 +2660,7 @@ namespace azure { namespace storage {
 
         utility::datetime m_operation_expiry_time;
         azure::storage::retry_policy m_retry_policy;
+        option_with_default<std::chrono::seconds> m_noactivity_timeout;
         option_with_default<std::chrono::seconds> m_server_timeout;
         option_with_default<std::chrono::seconds> m_maximum_execution_time;
         option_with_default<azure::storage::location_mode> m_location_mode;

@@ -35,6 +35,8 @@ namespace azure { namespace storage { namespace protocol {
     // the maximum value for a signed long on g++, divided by 1000.
     // Choosing to set it to 24 days to align with .NET.
     const std::chrono::seconds default_maximum_execution_time(24 * 24 * 60 * 60);
+    // the following value is used to exit the network connection if there is no activity in network.
+    const std::chrono::seconds default_noactivity_timeout(60);
     // For the following value, "0" means "don't send a timeout to the service"
     const std::chrono::seconds default_server_timeout(0);
 

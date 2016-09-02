@@ -610,7 +610,7 @@ namespace azure { namespace storage {
     pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
     {
         web::http::uri raw_source_uri = source.snapshot_qualified_uri().primary_uri();
-        web::http::uri source_uri = service_client().credentials().transform_uri(raw_source_uri);
+        web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
 
         return start_copy_async(source_uri, source_condition, destination_condition, options, context);
     }

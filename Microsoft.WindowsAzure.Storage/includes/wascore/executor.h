@@ -440,7 +440,8 @@ namespace azure { namespace storage { namespace core {
                     config.set_proxy(instance->m_context.proxy());
                 }
 
-                config.set_timeout(instance->remaining_time());
+                instance->remaining_time();
+                config.set_timeout(instance->m_request_options.noactivity_timeout());
 
                 size_t http_buffer_size = instance->m_request_options.http_buffer_size();
                 if (http_buffer_size > 0)

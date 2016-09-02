@@ -82,14 +82,14 @@ namespace azure { namespace storage { namespace protocol {
 
         m_result.append(resource);
 
-        std::map<utility::string_t, utility::string_t> query_map = web::http::uri::split_query(web::http::uri::decode(uri.query()));
+        std::map<utility::string_t, utility::string_t> query_map = web::http::uri::split_query(uri.query());
         if (query_only_comp)
         {
             std::map<utility::string_t, utility::string_t>::iterator it = query_map.find(_XPLATSTR("comp"));
             if (it != query_map.end())
             {
                 m_result.append(_XPLATSTR("?comp="));
-                m_result.append(it->second);
+                m_result.append(web::http::uri::decode(it->second));
             }
         }
         else
@@ -103,7 +103,7 @@ namespace azure { namespace storage { namespace protocol {
                 m_result.append(_XPLATSTR("\n"));
                 m_result.append(parameter_name);
                 m_result.append(_XPLATSTR(":"));
-                m_result.append(it->second);
+                m_result.append(web::http::uri::decode(it->second));
             }
         }
     }

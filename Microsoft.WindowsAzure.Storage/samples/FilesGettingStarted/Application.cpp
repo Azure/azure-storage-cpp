@@ -31,7 +31,7 @@ namespace azure { namespace storage { namespace samples {
             // Initialize storage account
             azure::storage::cloud_storage_account storage_account = azure::storage::cloud_storage_account::parse(storage_connection_string);
 
-            // Create a file
+            // Create share, directory
             azure::storage::cloud_file_client file_client = storage_account.create_cloud_file_client();
             azure::storage::cloud_file_share share = file_client.get_share_reference(_XPLATSTR("my-sample-share"));
             azure::storage::cloud_file_directory directory = share.get_directory_reference(_XPLATSTR("my-sample-directory"));

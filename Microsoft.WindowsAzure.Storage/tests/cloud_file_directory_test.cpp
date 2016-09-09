@@ -294,44 +294,6 @@ SUITE(File)
         CHECK(files_one.empty());
     }
 
-    TEST_FIXTURE(file_directory_test_base, directory_list_files_and_directories_segmented)
-    {
-        const size_t size = 10010;
-        std::map<utility::string_t, bool> directories;
-        std::vector<pplx::task<bool>> tasks;
-        for (size_t i = 0; i < size; ++i)
-        {
-            utility::string_t name;
-            do
-            {
-                name = get_random_string();
-            } while (directories.find(name) != directories.end());
-            directories[name] = true;
-            tasks.push_back(m_share.get_directory_reference(name).create_if_not_exists_async());
-        }
-        when_all(tasks.begin(), tasks.end()).wait();
-
-        int step = 0;
-        azure::storage::list_file_and_diretory_result_iterator end_of_list;
-        for (auto iter = m_share.get_root_directory_reference().list_files_and_directories(); iter != end_of_list; ++iter)
-        {
-            ++step;
-            if (iter->is_directory())
-            {
-                auto iterator = directories.find(iter->name());
-                if (iterator != directories.end())
-                {
-                    iterator->second = false;
-                }
-            }
-        }
-
-        for (auto iter = directories.begin(); iter != directories.end(); ++iter)
-        {
-            CHECK_EQUAL(false, iter->second);
-        }
-    }
-
     TEST_FIXTURE(file_directory_test_base, directory_get_directory_ref)
     {
         m_directory.create_if_not_exists(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);

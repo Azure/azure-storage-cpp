@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -97,11 +97,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>Advanced Queue Operations</li>
 </ul>
 </li>
+<li>Files<ul>
+<li>Create/Delete/Resize Shares</li>
+<li>Create/Delete Directories</li>
+<li>Create/Read/Update/Delete Files</li>
+</ul>
+</li>
 </ul>
 <h1>Getting started</h1>
 <p>For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes. Download the <a href="http://www.nuget.org/packages/wastorage">NuGet Package</a>.</p>
 <h2>Requirements</h2>
-<p>To call Azure services, you must first have an Azure subscription. Sign up for a <a href="/en-us/pricing/free-trial/">free trial</a> or use your <a href="/en-us/pricing/member-offers/msdn-benefits-details/">MSDN subscriber benefits</a>.</p>
+<p>To call Azure services, you must first have an Azure subscription. Sign up for a <a href="https://azure.microsoft.com/en-us/pricing/free-trial/">free trial</a> or use your <a href="https://azure.microsoft.com/en-us/pricing/member-offers/msdn-benefits-details/">MSDN subscriber benefits</a>.</p>
 <h2>Need Help?</h2>
 <p>Be sure to check out the <a href="https://social.msdn.microsoft.com/Forums/azure/en-US/home?forum=windowsazuredata">Azure Storage Forum</a> on MSDN if you need help, or use <a href="http://stackoverflow.com/questions/tagged/azure">StackOverflow</a>.</p>
 <h2>Collaborate &amp; Contribute</h2>
@@ -109,7 +115,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <ul>
 <li><b>Issues:</b> Report bugs on the <a href="https://github.com/Azure/azure-storage-cpp/issues">Issues page</a> in GitHub.</li>
 <li><b>Forums:</b> Communicate with the Azure Storage development team on the <a href="https://social.msdn.microsoft.com/Forums/azure/en-US/home?forum=windowsazuredata">Azure Storage Forum</a> or <a href="http://stackoverflow.com/questions/tagged/azure">StackOverflow</a>.</li>
-<li><b>Source Code Contributions:</b> Please follow the <a href="http://azure.github.io/guidelines.html">contribution guidelines for Azure open source</a> for instructions about contributing to the source project.</li>
+<li><b>Source Code Contributions:</b> Please follow the <a href="http://azure.github.io/guidelines/">contribution guidelines for Azure open source</a> for instructions about contributing to the source project.</li>
 </ul>
 <p>For general suggestions about Azure, use our <a href="http://feedback.azure.com/forums/34192--general-feedback">Azure feedback forum</a>.</p>
 <h2>Download &amp; Install</h2>
@@ -131,7 +137,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li><a href="https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-tables/">How to use Table Storage from C++</a></li>
 <li><a href="https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-queues">How to use Queue Storage from C++</a></li>
 </ul>
-<p>To accomplish specific tasks, please find the code samples at <a href="https://github.com/Azure/azure-storage-cpp/tree/master/Microsoft.WindowsAzure.Storage">samples folder</a>.</p>
+<p>To accomplish specific tasks, please find the code samples at <a href="Microsoft.WindowsAzure.Storage/samples">samples folder</a>.</p>
 <h2>Getting Started on Linux</h2>
 <p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux">these instructions</a> to compile it. Current version of the library depends on Casablanca version 2.8.0.</p>
 <p>Once this is complete, then:</p>
@@ -140,7 +146,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --> The project is cloned to a folder called <code>azure-storage-cpp</code>. Always use the master branch, which contains the latest release.</li>
 <li>Install additional dependencies: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev</div>
 </div><!-- fragment --></li>
-<li>Build the SDK for Release: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage</div>
+<li>Build the SDK for Release: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd azure-storage-cpp/Microsoft.WindowsAzure.Storage</div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;mkdir build.release</div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;cd build.release</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;CASABLANCA_DIR=&lt;path to Casablanca&gt; CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release</div>
@@ -162,20 +168,66 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>To build sample code: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;CASABLANCA_DIR=&lt;path to Casablanca&gt; CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON</div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;make</div>
 </div><!-- fragment --><p> To run the samples: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd Binaries</div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;./samplesblobs            # run the blobs sample</div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;./samplesjson             # run the tables sample with JSON payload</div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;./samplestables           # run the tables sample</div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;./samplesqueues           # run the queues sample</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;vi ../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;./samplesblobs            # run the blobs sample</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;./samplesjson             # run the tables sample with JSON payload</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;./samplestables           # run the tables sample</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;./samplesqueues           # run the queues sample</div>
 </div><!-- fragment --><p>Please note the current build script is only tested on Ubuntu 14.04. Please update the script accordingly for other distributions.</p>
+<h2>Getting Started on OSX</h2>
+<p><em>Note that OSX is not officially supported yet, but it has been seen to work, YMMV. This build has been tested to work when the dependencies are installed via homebrew, YMMV if using FINK or MacPorts</em></p>
+<p>Install dependecies with homebrew:</p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;brew install libxml++ ossp-uuid openssl</div>
+</div><!-- fragment --><p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. If you are using homebrew you can install it from there: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;brew install cpprestsdk</div>
+</div><!-- fragment --><p>Otherwise, you may need to build it. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X">these instructions</a> to compile it. Current version of the library depends on Casablanca version 2.8.0.</p>
+<p>Once this is complete, then:</p>
+<ul>
+<li>Clone the project using git: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;git clone https://github.com/Azure/azure-storage-cpp.git</div>
+</div><!-- fragment --> The project is cloned to a folder called <code>azure-storage-cpp</code>. Always use the master branch, which contains the latest release.</li>
+</ul>
+<p><b>Some notes about building</b>:</p><ul>
+<li>If you're using homebrew, there seems to be an issue with the pkg-config files, which means that, by default, a -L flag to tell the linker where libintl lives is left out. We've accounted for this in our CMAKE file, by looking in the usual directory that homebrew puts those libs. If you are not using homebrew, you will get an error stating that you need to tell us where those libs live.</li>
+<li>Similarly, for openssl, you don't want to use the version that comes with OSX, it is old. We've accounted for this in the CMAKE script by setting the search paths to where homebrew puts openssl, so if you're not using homebrew you'll need to tell us where a more recent version of openssl lives.</li>
+<li>Build the SDK for Release if you are using hombrew: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;mkdir build.release</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;cd build.release</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;cmake .. -DCMAKE_BUILD_TYPE=Release</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;make</div>
+</div><!-- fragment --></li>
+<li>OR, Build the SDK for Release if you are not using homebrew</li>
+</ul>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd azure-storage-cpp/Microsoft.WindowsAzure.Storage</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;mkdir build.release</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;cd build.release</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;CASABLANCA_DIR=&lt;path to casablanca&gt; cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=&lt;path to openssl&gt; -DGETTEXT_LIB_DIR=&lt;path to gettext lib dir&gt;</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;make</div>
+</div><!-- fragment --><p>In the above command, replace:</p><ul>
+<li><code>&lt;path to Casablanca&gt;</code> to point to your local installation of Casablanca. For example, if the file <code>libcpprest.so</code> exists at location <code>~/Github/Casablanca/cpprestsdk/Release/build.release/Binaries/libcpprest.dylib</code>, then &lt;path to="" casablanca&gt;=""&gt; should be <code>~/Github/Casablanca/cpprestsdk</code></li>
+<li><code>&lt;path to openssl&gt;</code> to your local openssl, it is recommended not to use the version that comes with OSX, rather use one from Homebrew or the like. This should be the path that contains the <code>lib</code> and <code>include</code> directories</li>
+<li><code>&lt;path to gettext lib dir&gt;</code> is the directory which contains <code>libintl.dylib</code></li>
+</ul>
+<p>For example you might use: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DGETTEXT_LIB_DIR=/usr/local/opt/gettext/lib</div>
+</div><!-- fragment --><p> The library is generated under <code>azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/</code>.</p>
+<p>To build and run unit tests:</p><ul>
+<li>Install UnitTest++ library: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;brew install unittest-cpp</div>
+</div><!-- fragment --></li>
+<li>Build the test code: <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;make</div>
+</div><!-- fragment --></li>
+<li>Run unit tests <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd Binaries</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;vi test_configurations.json # modify test config file to include your storage account credentials</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;./azurestoragetest</div>
+</div><!-- fragment --></li>
+</ul>
 <h1>Learn More</h1>
 <ul>
-<li>https://github.com/Azure/azure-storage-cpp/blob/master/documentation/Microsoft%20Azure%20Storage%20Client%20Library%20for%20C%2B%2B%202.0.0.md "Microsoft Azure Storage Client Library for C++ v2.0.0"</li>
+<li>documentation/Microsoft%20Azure%20Storage%20Client%20Library%20for%20C%2B%2B%202.0.0.md "Microsoft Azure Storage Client Library for C++ v2.0.0"</li>
 <li><a href="http://blogs.msdn.com/b/windowsazurestorage/archive/2015/04/29/microsoft-azure-storage-client-library-for-c-v1-0-0-general-availability.aspx">Microsoft Azure Storage Client Library for C++ v1.0.0 (General Availability)</a> </li>
 </ul>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 29 2016 17:25:58 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 13 2016 14:26:18 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

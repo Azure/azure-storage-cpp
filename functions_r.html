@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -122,6 +122,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>read
 : <a class="el" href="classazure_1_1storage_1_1account__shared__access__policy.html#a01a4c30303ef46927c492e87b6c84f07adc494338d1a212405daa6862b70f0257">azure::storage::account_shared_access_policy</a>
 , <a class="el" href="classazure_1_1storage_1_1blob__shared__access__policy.html#aa1f9c565c4546e342ca5aab5d4c8dc2aa33e64c8f435b49290bdd3cc70a600d0e">azure::storage::blob_shared_access_policy</a>
+, <a class="el" href="classazure_1_1storage_1_1file__shared__access__policy.html#ac5c629624b4260e358d78aa9a53c3d89a47f235eac0056afa1a553605d04866fa">azure::storage::file_shared_access_policy</a>
 , <a class="el" href="classazure_1_1storage_1_1queue__shared__access__policy.html#a7bbd7cd1cfbb1a76db46f56479bfd4c6ab7244413f3ac60bfdfd4d83a93ca23e0">azure::storage::queue_shared_access_policy</a>
 , <a class="el" href="classazure_1_1storage_1_1table__shared__access__policy.html#aa34920dd88a8369322fc27b036c41ab6a9fb0b1aee6c50421d04b8a0a07b012fa">azure::storage::table_shared_access_policy</a>
 </li>
@@ -130,7 +131,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>release_lease()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a30fc2db304081b5f9b7d05cfb0cd25b7">azure::storage::cloud_blob</a>
-, <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a9ed25370e8c5f8070e2d40274cf469f7">azure::storage::cloud_blob_container</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a221f011fe43a8048a4a1a570fd80a6da">azure::storage::cloud_blob_container</a>
 </li>
 <li>release_lease_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#ac01799e93e094b07e34f88190a2be5d7">azure::storage::cloud_blob</a>
@@ -138,7 +139,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>renew_lease()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#af75df346dd6e2dff653c2eb67e4f2886">azure::storage::cloud_blob</a>
-, <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a321e7fdcbe841005c988d79ce20e83b3">azure::storage::cloud_blob_container</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a087b75072713c0c280d6d8baf16af12d">azure::storage::cloud_blob_container</a>
 </li>
 <li>renew_lease_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a886170472a188aeb7660340557d2bb5e">azure::storage::cloud_blob</a>
@@ -158,10 +159,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classazure_1_1storage_1_1operation__context.html#adc574bae89fde6167428f711f6dd181e">azure::storage::operation_context</a>
 </li>
 <li>resize()
-: <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#aac88d22945c6ed55dc4c4ae445d3607f">azure::storage::cloud_page_blob</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__file.html#aa25d61bf5ee4539a41ea67833493e1c3">azure::storage::cloud_file</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__share.html#ab35937ed4c06632d55e76198eeeb210e">azure::storage::cloud_file_share</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#aac88d22945c6ed55dc4c4ae445d3607f">azure::storage::cloud_page_blob</a>
 </li>
 <li>resize_async()
-: <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ad9bccd9514fa7ef08ea1090a8b74bd91">azure::storage::cloud_page_blob</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a7e550c320f73e2a68a317412bd205df3">azure::storage::cloud_file</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__share.html#af863d746bd5b3ba0cae7b6f55c1c162a">azure::storage::cloud_file_share</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ad9bccd9514fa7ef08ea1090a8b74bd91">azure::storage::cloud_page_blob</a>
 </li>
 <li>resource_type()
 : <a class="el" href="classazure_1_1storage_1_1account__shared__access__policy.html#a3b975cc0d0ce44d921427f015ad3d0d1">azure::storage::account_shared_access_policy</a>
@@ -179,7 +184,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classazure_1_1storage_1_1result__iterator.html#ad84d0f33f2bc4c0e3ba1b9e495fffcd0">azure::storage::result_iterator&lt; result_type &gt;</a>
 </li>
 <li>result_segment()
-: <a class="el" href="classazure_1_1storage_1_1result__segment.html#abef7c6a64631c07035b4838f7e1695b7">azure::storage::result_segment&lt; result_type &gt;</a>
+: <a class="el" href="classazure_1_1storage_1_1result__segment.html#ad9c011a4d31ee66ff481bf180a21125b">azure::storage::result_segment&lt; result_type &gt;</a>
 </li>
 <li>results()
 : <a class="el" href="classazure_1_1storage_1_1result__segment.html#a2cf48ca501898a9f6d415ce91ad5a128">azure::storage::result_segment&lt; result_type &gt;</a>
@@ -219,7 +224,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 29 2016 17:25:59 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 13 2016 14:26:18 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

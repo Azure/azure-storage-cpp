@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -122,6 +122,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>last_modified()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__container__properties.html#a1e831f2e82b87dfad6511ae6c38ba6bc">azure::storage::cloud_blob_container_properties</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__properties.html#adbaf1e3c831a6a7fe0ed9a4be76deb25">azure::storage::cloud_blob_properties</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__directory__properties.html#ae9c6c116aa48c5cef126db47b4cf7842">azure::storage::cloud_file_directory_properties</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__properties.html#a413a2c631570f0946be48f50681971aa">azure::storage::cloud_file_properties</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__share__properties.html#a3c2829cfc235ee5e838509983518ddef">azure::storage::cloud_file_share_properties</a>
 </li>
 <li>last_request_result()
 : <a class="el" href="classazure_1_1storage_1_1retry__context.html#aee5788f6436b532a18a9d4695e492c2b">azure::storage::retry_context</a>
@@ -150,6 +153,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>lease_time()
 : <a class="el" href="classazure_1_1storage_1_1lease__time.html#a77f533be2677d9e8b74f20533fb2cf90">azure::storage::lease_time</a>
 </li>
+<li>length()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__properties.html#a0655553ea00c6788d790f4b973237721">azure::storage::cloud_file_properties</a>
+</li>
 <li>linear_retry_policy()
 : <a class="el" href="classazure_1_1storage_1_1linear__retry__policy.html#ae4874e117ba442c77b8d128c646181f6">azure::storage::linear_retry_policy</a>
 </li>
@@ -164,7 +170,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>list_blobs_segmented()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__client.html#ab5a085427eeb86d8c90dc7e82200331d">azure::storage::cloud_blob_client</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a29340e520a9a040cbac214b067003cec">azure::storage::cloud_blob_container</a>
-, <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a24bdad2ca26e54b9c655bfc90c5f7199">azure::storage::cloud_blob_directory</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a72b41e7df431d2d6668f8dd21d710dc8">azure::storage::cloud_blob_directory</a>
 </li>
 <li>list_blobs_segmented_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__client.html#ae18b49383addbe7a05b4ef2b861673d1">azure::storage::cloud_blob_client</a>
@@ -180,17 +186,44 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>list_containers_segmented_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__client.html#a23fdeefde310be05fd69c785a2893c02">azure::storage::cloud_blob_client</a>
 </li>
+<li>list_file_and_directory_item()
+: <a class="el" href="classazure_1_1storage_1_1list__file__and__directory__item.html#a6e09a29fc228344554cd23c2070b954e">azure::storage::list_file_and_directory_item</a>
+</li>
+<li>list_files_and_directories()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__directory.html#a4de8d250c2175f54cbe04fbafd92b9de">azure::storage::cloud_file_directory</a>
+</li>
+<li>list_files_and_directories_segmented()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__directory.html#afa8382154f252f3bbfd77415ea4479f3">azure::storage::cloud_file_directory</a>
+</li>
+<li>list_files_and_directories_segmented_async()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__directory.html#a94b6a7bb00157860251828bb1db7fc0c">azure::storage::cloud_file_directory</a>
+</li>
 <li>list_queues()
-: <a class="el" href="classazure_1_1storage_1_1cloud__queue__client.html#a5f1f7521bcb43cf931e09a994323fafb">azure::storage::cloud_queue_client</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__queue__client.html#a7a3c6bf9de7f8b2964f196d4e66a7fed">azure::storage::cloud_queue_client</a>
 </li>
 <li>list_queues_segmented()
-: <a class="el" href="classazure_1_1storage_1_1cloud__queue__client.html#a2a6f0b845e8eb2f278a9b1a0994c0274">azure::storage::cloud_queue_client</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__queue__client.html#a57abec3fddbb871a2bd15e7d6596db67">azure::storage::cloud_queue_client</a>
 </li>
 <li>list_queues_segmented_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__queue__client.html#ab5819b3d1309bdb7647300771a6b9ebd">azure::storage::cloud_queue_client</a>
 </li>
+<li>list_ranges()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a2f6ccff3f25feec431c1be5809899552">azure::storage::cloud_file</a>
+</li>
+<li>list_ranges_async()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file.html#afa1d00ad6e83c1fe3068f376506f6a6a">azure::storage::cloud_file</a>
+</li>
+<li>list_shares()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__client.html#a896700a2a69193c09d41e365a3f6c810">azure::storage::cloud_file_client</a>
+</li>
+<li>list_shares_segmented()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__client.html#a3b1daacf10276a6164f49aa588115a64">azure::storage::cloud_file_client</a>
+</li>
+<li>list_shares_segmented_async()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__client.html#ab857ce2326b7550c739979f685e29866">azure::storage::cloud_file_client</a>
+</li>
 <li>list_tables()
-: <a class="el" href="classazure_1_1storage_1_1cloud__table__client.html#a494aba6af96891446903bfe229d89c25">azure::storage::cloud_table_client</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__table__client.html#a4a1c74bfb1ea8a312a99ee060d0c3b95">azure::storage::cloud_table_client</a>
 </li>
 <li>list_tables_segmented()
 : <a class="el" href="classazure_1_1storage_1_1cloud__table__client.html#a29868e1b177b68fb76f347f0234f7cb0">azure::storage::cloud_table_client</a>
@@ -205,10 +238,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classazure_1_1storage_1_1operation__context.html#acd7c97efe68007c5a5b7f95a277b06ca">azure::storage::operation_context</a>
 </li>
 <li>logger()
-: <a class="el" href="classazure_1_1storage_1_1operation__context.html#a77e47aa2646dc38c1ac223ce110052eb">azure::storage::operation_context</a>
+: <a class="el" href="classazure_1_1storage_1_1operation__context.html#a577256470d04d13200b803ed1c8d2d75">azure::storage::operation_context</a>
 </li>
 <li>logging()
-: <a class="el" href="classazure_1_1storage_1_1service__properties.html#a77e7225879dd810878772b85aeae44fa">azure::storage::service_properties</a>
+: <a class="el" href="classazure_1_1storage_1_1service__properties.html#a43a76fd4f5cc426e0f6393fb9c94c34b">azure::storage::service_properties</a>
 , <a class="el" href="classazure_1_1storage_1_1service__properties__includes.html#a30bdb937f2c9ffb9c9f20ea53f3519c4">azure::storage::service_properties_includes</a>
 </li>
 <li>logging_properties()
@@ -218,7 +251,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 29 2016 17:26:00 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 13 2016 14:26:19 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

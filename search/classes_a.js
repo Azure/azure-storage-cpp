@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['no_5fretry_5fpolicy',['no_retry_policy',['../classazure_1_1storage_1_1no__retry__policy.html',1,'azure::storage']]],
-  ['null_5fhash_5fprovider_5fimpl',['null_hash_provider_impl',['../classazure_1_1storage_1_1core_1_1null__hash__provider__impl.html',1,'azure::storage::core']]]
+  ['md5_5fhash_5fprovider_5fimpl',['md5_hash_provider_impl',['../classazure_1_1storage_1_1core_1_1md5__hash__provider__impl.html',1,'azure::storage::core']]],
+  ['metrics_5fproperties',['metrics_properties',['../classazure_1_1storage_1_1service__properties_1_1metrics__properties.html',1,'azure::storage::service_properties']]]
 ];

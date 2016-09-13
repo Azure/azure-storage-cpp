@@ -4,6 +4,8 @@ var searchData=
   ['basic_5fcloud_5fblob_5fistreambuf',['basic_cloud_blob_istreambuf',['../classazure_1_1storage_1_1core_1_1basic__cloud__blob__istreambuf.html',1,'azure::storage::core']]],
   ['basic_5fcloud_5fblob_5fostreambuf',['basic_cloud_blob_ostreambuf',['../classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf.html',1,'azure::storage::core']]],
   ['basic_5fcloud_5fblock_5fblob_5fostreambuf',['basic_cloud_block_blob_ostreambuf',['../classazure_1_1storage_1_1core_1_1basic__cloud__block__blob__ostreambuf.html',1,'azure::storage::core']]],
+  ['basic_5fcloud_5ffile_5fostreambuf',['basic_cloud_file_ostreambuf',['../classazure_1_1storage_1_1core_1_1basic__cloud__file__ostreambuf.html',1,'azure::storage::core']]],
+  ['basic_5fcloud_5fostreambuf',['basic_cloud_ostreambuf',['../classazure_1_1storage_1_1core_1_1basic__cloud__ostreambuf.html',1,'azure::storage::core']]],
   ['basic_5fcloud_5fpage_5fblob_5fostreambuf',['basic_cloud_page_blob_ostreambuf',['../classazure_1_1storage_1_1core_1_1basic__cloud__page__blob__ostreambuf.html',1,'azure::storage::core']]],
   ['basic_5fhash_5fwrapper_5fstreambuf',['basic_hash_wrapper_streambuf',['../classazure_1_1storage_1_1core_1_1basic__hash__wrapper__streambuf.html',1,'azure::storage::core']]],
   ['basic_5fistreambuf',['basic_istreambuf',['../classazure_1_1storage_1_1core_1_1basic__istreambuf.html',1,'azure::storage::core']]],

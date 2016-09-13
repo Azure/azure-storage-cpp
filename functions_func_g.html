@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -184,6 +184,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>get_directory_reference()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a41b0a38632f22b6d48a4323279ad2b95">azure::storage::cloud_blob_container</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__share.html#a1a5df11e5083ee91157fc50b7114af92">azure::storage::cloud_file_share</a>
+</li>
+<li>get_file_reference()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__directory.html#a39bb6e2c7551d9a16863bd48aa3ff84d">azure::storage::cloud_file_directory</a>
 </li>
 <li>get_location_uri()
 : <a class="el" href="classazure_1_1storage_1_1storage__uri.html#aa1d521c52d1578a27a2d75840ddd6fea">azure::storage::storage_uri</a>
@@ -195,7 +199,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classazure_1_1storage_1_1cloud__queue.html#a46949fb82313d3e345125342c8e154dd">azure::storage::cloud_queue</a>
 </li>
 <li>get_messages()
-: <a class="el" href="classazure_1_1storage_1_1cloud__queue.html#a01b6951c17cb9f99d09e2aaef441b490">azure::storage::cloud_queue</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__queue.html#a7e30d7e5337ebecdeab7c671294aa765">azure::storage::cloud_queue</a>
 </li>
 <li>get_messages_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__queue.html#a72fa18d35fb04d4bd29a3f7a8d8d88ec">azure::storage::cloud_queue</a>
@@ -204,9 +208,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#aff8a1eef88c7c5b0bdbc94cc2d1ce8a2">azure::storage::cloud_blob_container</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a89a88c1b67849ac4c03550d6dda04997">azure::storage::cloud_blob_directory</a>
 </li>
+<li>get_parent_directory_reference()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a0f3288614a9e5dd46ccbb9ad0f1e0cda">azure::storage::cloud_file</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__directory.html#a2c7ee718a763ee2b772568900ada9766">azure::storage::cloud_file_directory</a>
+</li>
 <li>get_parent_reference()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#abe3805a2462659ba1397f3074cad5c44">azure::storage::cloud_blob</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#a640197848633aab06bbb27b892f21f81">azure::storage::cloud_blob_directory</a>
+</li>
+<li>get_parent_share_reference()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a018ac8d2bbad99cf032e07427c9794ee">azure::storage::cloud_file</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__directory.html#a9deea27350f8eaca18516797015ca92d">azure::storage::cloud_file_directory</a>
 </li>
 <li>get_queue_reference()
 : <a class="el" href="classazure_1_1storage_1_1cloud__queue__client.html#a38c441d5392dcbe367794327e303b88b">azure::storage::cloud_queue_client</a>
@@ -214,15 +226,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>get_root_container_reference()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__client.html#a49d671fcbcb2f3a571a1e256de4ea9fe">azure::storage::cloud_blob_client</a>
 </li>
+<li>get_root_directory_reference()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__share.html#a7f1f6be8db79e2c182211f21663b69f2">azure::storage::cloud_file_share</a>
+</li>
+<li>get_share_reference()
+: <a class="el" href="classazure_1_1storage_1_1cloud__file__client.html#ad4d524d3932a5b51afbe0953a1260efc">azure::storage::cloud_file_client</a>
+</li>
 <li>get_shared_access_signature()
-: <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a2cfec5db76925256ec4e7d903ae92adb">azure::storage::cloud_blob</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#abe939d5c92112c71c17ab65713cd2d64">azure::storage::cloud_blob</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__container.html#a41d109f568299097b9a69a743683a613">azure::storage::cloud_blob_container</a>
-, <a class="el" href="classazure_1_1storage_1_1cloud__queue.html#a58a3970e8558f011b085b97d03becae7">azure::storage::cloud_queue</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a59ccc1e22f4610949cd45463fc8e7927">azure::storage::cloud_file</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__share.html#ab748d407315b402e2ef8fefb388c187d">azure::storage::cloud_file_share</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__queue.html#a19f6a9ed083edf5693580fc64c9cc8b2">azure::storage::cloud_queue</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__storage__account.html#a3388adbc706eadceef34e13f3d6193d3">azure::storage::cloud_storage_account</a>
-, <a class="el" href="classazure_1_1storage_1_1cloud__table.html#acad68e774d7d9430a959c7d59afb1972">azure::storage::cloud_table</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__table.html#a26859b04387cb3779971a7016fa83143">azure::storage::cloud_table</a>
 </li>
 <li>get_subdirectory_reference()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__directory.html#aaa3fc9f20a540c351b7f85c02221e5c9">azure::storage::cloud_blob_directory</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file__directory.html#a9f6dfb1d8e6904bd19910afd2b29ba24">azure::storage::cloud_file_directory</a>
 </li>
 <li>get_table_reference()
 : <a class="el" href="classazure_1_1storage_1_1cloud__table__client.html#a246ab730ff58c5e4f4eb08faab369f97">azure::storage::cloud_table_client</a>
@@ -234,7 +255,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 29 2016 17:26:00 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 13 2016 14:26:19 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

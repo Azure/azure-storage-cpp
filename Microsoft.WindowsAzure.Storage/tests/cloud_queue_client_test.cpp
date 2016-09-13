@@ -47,7 +47,7 @@ SUITE(QueueClient)
 
     TEST_FIXTURE(queue_service_test_base, QueueClient_BaseUri)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net")));
 
         azure::storage::cloud_queue_client client(base_uri);
 
@@ -58,8 +58,8 @@ SUITE(QueueClient)
 
     TEST_FIXTURE(queue_service_test_base, QueueClient_BaseUriAndCredentials)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
         azure::storage::queue_request_options default_request_options;
 
         azure::storage::cloud_queue_client client(base_uri, credentials);
@@ -71,8 +71,8 @@ SUITE(QueueClient)
 
     TEST_FIXTURE(queue_service_test_base, QueueClient_BaseUriAndCredentialsAndDefaultRequestOptions)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
         azure::storage::queue_request_options default_request_options;
 
         azure::storage::cloud_queue_client client(base_uri, credentials, default_request_options);
@@ -90,8 +90,8 @@ SUITE(QueueClient)
 
     TEST_FIXTURE(queue_service_test_base, QueueClient_MoveConstructor)
     {
-        azure::storage::storage_uri base_uri(web::http::uri(U("https://myaccount.queue.core.windows.net")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri base_uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
         azure::storage::queue_request_options default_request_options;
         default_request_options.set_location_mode(azure::storage::location_mode::secondary_only);
 
@@ -114,8 +114,8 @@ SUITE(QueueClient)
         {
             azure::storage::cloud_queue queue = get_queue();
 
-            queue.metadata().insert(std::make_pair(U("aaa"), U("111")));
-            queue.metadata().insert(std::make_pair(U("bbb"), U("222")));
+            queue.metadata().insert(std::make_pair(_XPLATSTR("aaa"), _XPLATSTR("111")));
+            queue.metadata().insert(std::make_pair(_XPLATSTR("bbb"), _XPLATSTR("222")));
             queue.upload_metadata();
 
             queues[i] = queue;
@@ -206,8 +206,8 @@ SUITE(QueueClient)
                         CHECK(!queue.uri().primary_uri().is_empty());
 
                         CHECK_EQUAL(2U, queue.metadata().size());
-                        CHECK(queue.metadata()[U("aaa")].compare(U("111")) == 0);
-                        CHECK(queue.metadata()[U("bbb")].compare(U("222")) == 0);
+                        CHECK(queue.metadata()[_XPLATSTR("aaa")].compare(_XPLATSTR("111")) == 0);
+                        CHECK(queue.metadata()[_XPLATSTR("bbb")].compare(_XPLATSTR("222")) == 0);
 
                         is_found[i] = true;
                     }

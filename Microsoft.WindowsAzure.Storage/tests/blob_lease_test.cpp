@@ -19,7 +19,7 @@
 #include "blob_test_base.h"
 #include "check_macros.h"
 
-const utility::string_t fake_guid(U("d30a3ff7-d28b-4ce5-a381-c5d7f94be411"));
+const utility::string_t fake_guid(_XPLATSTR("d30a3ff7-d28b-4ce5-a381-c5d7f94be411"));
 
 void blob_test_base::check_lease_access(azure::storage::cloud_blob& blob, azure::storage::lease_state state, const utility::string_t& lease_id, bool fake)
 {
@@ -97,7 +97,7 @@ SUITE(Blob)
 {
     TEST_FIXTURE(block_blob_test_base, blob_lease_acquire_infinite)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto my_lease_id = utility::uuid_to_string(utility::new_uuid());
         check_lease_access(m_blob, azure::storage::lease_state::available, my_lease_id, true);
@@ -115,7 +115,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_acquire_non_infinite)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         check_lease_access(m_blob, azure::storage::lease_state::available, fake_guid, true);
 
@@ -136,7 +136,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_acquire_proposed_id)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(), fake_guid, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_UTF8_EQUAL(fake_guid, lease_id);
@@ -145,7 +145,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_acquire_invalid_duration)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         CHECK_THROW(m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(14)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
         CHECK_THROW(m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(61)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
@@ -153,7 +153,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_renew)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(40)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         auto lease_condition = azure::storage::access_condition::generate_lease_condition(lease_id);
@@ -172,7 +172,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_change)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
@@ -188,7 +188,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_release)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_THROW(m_blob.release_lease(azure::storage::access_condition::generate_lease_condition(fake_guid), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
@@ -199,7 +199,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_break_infinite_immediately)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         m_blob.break_lease(azure::storage::lease_break_period(), azure::storage::access_condition::generate_lease_condition(fake_guid), azure::storage::blob_request_options(), m_context);
@@ -208,7 +208,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_break_infinite_period)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         m_blob.break_lease(azure::storage::lease_break_period(std::chrono::seconds(20)), azure::storage::access_condition::generate_lease_condition(fake_guid), azure::storage::blob_request_options(), m_context);
@@ -220,7 +220,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_break_non_infinite_remaining)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(60)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         m_blob.break_lease(azure::storage::lease_break_period(), azure::storage::access_condition::generate_lease_condition(fake_guid), azure::storage::blob_request_options(), m_context);
@@ -232,7 +232,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, blob_lease_break_non_infinite_period)
     {
-        m_blob.upload_text(U("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
 
         auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(std::chrono::seconds(60)), utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         m_blob.break_lease(azure::storage::lease_break_period(std::chrono::seconds(20)), azure::storage::access_condition::generate_lease_condition(fake_guid), azure::storage::blob_request_options(), m_context);

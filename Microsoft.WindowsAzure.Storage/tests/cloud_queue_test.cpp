@@ -36,24 +36,24 @@ SUITE(Queue)
 
     TEST_FIXTURE(queue_service_test_base, Queue_Uri)
     {
-        azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.queue.core.windows.net/myqueue")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net/myqueue")));
+        azure::storage::storage_uri uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net/myqueue")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net/myqueue")));
 
         azure::storage::cloud_queue queue1(uri);
 
-        web::http::uri expected_primary_uri(U("https://myaccount.queue.core.windows.net"));
-        web::http::uri expected_secondary_uri(U("https://myaccount-secondary.queue.core.windows.net"));
+        web::http::uri expected_primary_uri(_XPLATSTR("https://myaccount.queue.core.windows.net"));
+        web::http::uri expected_secondary_uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net"));
 
         CHECK(queue1.service_client().base_uri().primary_uri() == expected_primary_uri);
         CHECK(queue1.service_client().base_uri().secondary_uri() == expected_secondary_uri);
         CHECK(queue1.service_client().credentials().is_anonymous());
-        CHECK(queue1.name().compare(U("myqueue")) == 0);
+        CHECK(queue1.name().compare(_XPLATSTR("myqueue")) == 0);
         CHECK(queue1.uri().primary_uri() == uri.primary_uri());
         CHECK(queue1.uri().secondary_uri() == uri.secondary_uri());
         CHECK_EQUAL(-1, queue1.approximate_message_count());
 
-        utility::string_t sas_token(U("se=2013-05-14T18%3A23%3A15Z&sig=mysignature&sp=raup&st=2013-05-14T17%3A23%3A15Z&sv=2012-02-12"));
+        utility::string_t sas_token(_XPLATSTR("se=2013-05-14T18%3A23%3A15Z&sig=mysignature&sp=raup&st=2013-05-14T17%3A23%3A15Z&sv=2012-02-12"));
 
-        azure::storage::storage_uri sas_uri(web::http::uri(U("https://myaccount.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")));
+        azure::storage::storage_uri sas_uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")));
 
         azure::storage::cloud_queue queue2(sas_uri);
 
@@ -61,7 +61,7 @@ SUITE(Queue)
         CHECK(queue2.service_client().base_uri().secondary_uri() == expected_secondary_uri);
         CHECK(queue2.service_client().credentials().is_sas());
         CHECK(queue2.service_client().credentials().sas_token() == sas_token);
-        CHECK(queue2.name().compare(U("myqueue")) == 0);
+        CHECK(queue2.name().compare(_XPLATSTR("myqueue")) == 0);
         CHECK(queue2.uri().primary_uri() == uri.primary_uri());
         CHECK(queue2.uri().secondary_uri() == uri.secondary_uri());
         CHECK_EQUAL(-1, queue2.approximate_message_count());
@@ -69,26 +69,26 @@ SUITE(Queue)
 
     TEST_FIXTURE(queue_service_test_base, Queue_UriAndCredentials)
     {
-        azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.queue.core.windows.net/myqueue")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net/myqueue")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net/myqueue")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net/myqueue")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
 
         azure::storage::cloud_queue queue1(uri, credentials);
 
-        web::http::uri expected_primary_uri(U("https://myaccount.queue.core.windows.net"));
-        web::http::uri expected_secondary_uri(U("https://myaccount-secondary.queue.core.windows.net"));
+        web::http::uri expected_primary_uri(_XPLATSTR("https://myaccount.queue.core.windows.net"));
+        web::http::uri expected_secondary_uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net"));
 
         CHECK(queue1.service_client().base_uri().primary_uri() == expected_primary_uri);
         CHECK(queue1.service_client().base_uri().secondary_uri() == expected_secondary_uri);
         CHECK(queue1.service_client().credentials().is_shared_key());
-        CHECK(queue1.name().compare(U("myqueue")) == 0);
+        CHECK(queue1.name().compare(_XPLATSTR("myqueue")) == 0);
         CHECK(queue1.uri().primary_uri() == uri.primary_uri());
         CHECK(queue1.uri().secondary_uri() == uri.secondary_uri());
         CHECK_EQUAL(-1, queue1.approximate_message_count());
 
-        utility::string_t sas_token(U("sv=2012-02-12&st=2013-05-14T17%3A23%3A15Z&se=2013-05-14T18%3A23%3A15Z&sp=raup&sig=mysignature"));
-        utility::string_t invalid_sas_token(U("sv=2012-02-12&st=2013-05-14T17%3A23%3A15Z&se=2013-05-14T18%3A23%3A15Z&sp=raup&sig=invalid"));
+        utility::string_t sas_token(_XPLATSTR("sv=2012-02-12&st=2013-05-14T17%3A23%3A15Z&se=2013-05-14T18%3A23%3A15Z&sp=raup&sig=mysignature"));
+        utility::string_t invalid_sas_token(_XPLATSTR("sv=2012-02-12&st=2013-05-14T17%3A23%3A15Z&se=2013-05-14T18%3A23%3A15Z&sp=raup&sig=invalid"));
 
-        azure::storage::storage_uri sas_uri(web::http::uri(U("https://myaccount.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")), web::http::uri(U("https://myaccount-secondary.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")));
+        azure::storage::storage_uri sas_uri(web::http::uri(_XPLATSTR("https://myaccount.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")), web::http::uri(_XPLATSTR("https://myaccount-secondary.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")));
         azure::storage::storage_credentials sas_credentials(sas_token);
 
         CHECK_THROW(azure::storage::cloud_queue(sas_uri, sas_credentials), std::invalid_argument);
@@ -283,8 +283,8 @@ SUITE(Queue)
             azure::storage::operation_context context;
 
             azure::storage::cloud_metadata metadata;
-            metadata[U("MyMetadata1")] = U("AAA");
-            metadata[U("MyMetadata2")] = U("BBB");
+            metadata[_XPLATSTR("MyMetadata1")] = _XPLATSTR("AAA");
+            metadata[_XPLATSTR("MyMetadata2")] = _XPLATSTR("BBB");
 
             queue1.set_metadata(metadata);
             queue1.upload_metadata();
@@ -298,7 +298,7 @@ SUITE(Queue)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::Conflict, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("QueueAlreadyExists")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("QueueAlreadyExists")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -315,7 +315,7 @@ SUITE(Queue)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("QueueAlreadyExists")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("QueueAlreadyExists")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -381,7 +381,7 @@ SUITE(Queue)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("QueueNotFound")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("QueueNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -398,7 +398,7 @@ SUITE(Queue)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("QueueNotFound")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("QueueNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
     }
@@ -608,7 +608,7 @@ SUITE(Queue)
 
         for (int i = 0; i < MESSAGE_COUNT; ++i)
         {
-            azure::storage::cloud_queue_message message(U("Hello World!"));
+            azure::storage::cloud_queue_message message(_XPLATSTR("Hello World!"));
             queue.add_message(message);
         }
 
@@ -646,65 +646,65 @@ SUITE(Queue)
 
         CHECK(queue1.metadata().empty());
 
-        queue1.metadata().insert(std::make_pair(U("aaa"), U("111")));
-        queue1.metadata().insert(std::make_pair(U("bbb"), U("222")));
-        queue1.metadata().insert(std::make_pair(U("ccc"), U("333")));
+        queue1.metadata().insert(std::make_pair(_XPLATSTR("aaa"), _XPLATSTR("111")));
+        queue1.metadata().insert(std::make_pair(_XPLATSTR("bbb"), _XPLATSTR("222")));
+        queue1.metadata().insert(std::make_pair(_XPLATSTR("ccc"), _XPLATSTR("333")));
 
         queue1.upload_metadata(options, context);
 
         CHECK_EQUAL(3U, queue1.metadata().size());
-        CHECK(queue1.metadata()[U("aaa")].compare(U("111")) == 0);
-        CHECK(queue1.metadata()[U("bbb")].compare(U("222")) == 0);
-        CHECK(queue1.metadata()[U("ccc")].compare(U("333")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("aaa")].compare(_XPLATSTR("111")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("bbb")].compare(_XPLATSTR("222")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("ccc")].compare(_XPLATSTR("333")) == 0);
 
         queue1.download_attributes(options, context);
 
         CHECK_EQUAL(3U, queue1.metadata().size());
-        CHECK(queue1.metadata()[U("aaa")].compare(U("111")) == 0);
-        CHECK(queue1.metadata()[U("bbb")].compare(U("222")) == 0);
-        CHECK(queue1.metadata()[U("ccc")].compare(U("333")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("aaa")].compare(_XPLATSTR("111")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("bbb")].compare(_XPLATSTR("222")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("ccc")].compare(_XPLATSTR("333")) == 0);
 
         queue2.download_attributes(options, context);
 
         CHECK_EQUAL(3U, queue2.metadata().size());
-        CHECK(queue2.metadata()[U("aaa")].compare(U("111")) == 0);
-        CHECK(queue2.metadata()[U("bbb")].compare(U("222")) == 0);
-        CHECK(queue2.metadata()[U("ccc")].compare(U("333")) == 0);
+        CHECK(queue2.metadata()[_XPLATSTR("aaa")].compare(_XPLATSTR("111")) == 0);
+        CHECK(queue2.metadata()[_XPLATSTR("bbb")].compare(_XPLATSTR("222")) == 0);
+        CHECK(queue2.metadata()[_XPLATSTR("ccc")].compare(_XPLATSTR("333")) == 0);
 
-        queue2.metadata().erase(U("bbb"));
+        queue2.metadata().erase(_XPLATSTR("bbb"));
 
         CHECK_EQUAL(2U, queue2.metadata().size());
-        CHECK(queue2.metadata()[U("aaa")].compare(U("111")) == 0);
-        CHECK(queue2.metadata()[U("ccc")].compare(U("333")) == 0);
+        CHECK(queue2.metadata()[_XPLATSTR("aaa")].compare(_XPLATSTR("111")) == 0);
+        CHECK(queue2.metadata()[_XPLATSTR("ccc")].compare(_XPLATSTR("333")) == 0);
 
         queue2.upload_metadata(options, context);
 
         CHECK_EQUAL(2U, queue2.metadata().size());
-        CHECK(queue2.metadata()[U("aaa")].compare(U("111")) == 0);
-        CHECK(queue2.metadata()[U("ccc")].compare(U("333")) == 0);
+        CHECK(queue2.metadata()[_XPLATSTR("aaa")].compare(_XPLATSTR("111")) == 0);
+        CHECK(queue2.metadata()[_XPLATSTR("ccc")].compare(_XPLATSTR("333")) == 0);
 
         queue1.download_attributes(options, context);
 
         CHECK_EQUAL(2U, queue1.metadata().size());
-        CHECK(queue1.metadata()[U("aaa")].compare(U("111")) == 0);
-        CHECK(queue1.metadata()[U("ccc")].compare(U("333")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("aaa")].compare(_XPLATSTR("111")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("ccc")].compare(_XPLATSTR("333")) == 0);
 
-        queue1.metadata().insert(std::make_pair(U("ddd"), U("")));
+        queue1.metadata().insert(std::make_pair(_XPLATSTR("ddd"), _XPLATSTR("")));
         CHECK_THROW(queue1.upload_metadata(options, context), std::invalid_argument);
-        queue1.metadata().erase(U("ddd"));
+        queue1.metadata().erase(_XPLATSTR("ddd"));
 
-        queue1.metadata().insert(std::make_pair(U("ddd"), U(" ")));
+        queue1.metadata().insert(std::make_pair(_XPLATSTR("ddd"), _XPLATSTR(" ")));
         CHECK_THROW(queue1.upload_metadata(options, context), std::invalid_argument);
-        queue1.metadata().erase(U("ddd"));
+        queue1.metadata().erase(_XPLATSTR("ddd"));
 
-        queue1.metadata().insert(std::make_pair(U("ddd"), U(" \t\r\n ")));
+        queue1.metadata().insert(std::make_pair(_XPLATSTR("ddd"), _XPLATSTR(" \t\r\n ")));
         CHECK_THROW(queue1.upload_metadata(options, context), std::invalid_argument);
-        queue1.metadata().erase(U("ddd"));
+        queue1.metadata().erase(_XPLATSTR("ddd"));
 
         azure::storage::operation_context whitespace_metadata_context;
         whitespace_metadata_context.set_sending_request([](web::http::http_request& request, azure::storage::operation_context)
         {
-            request.headers().add(U("x-ms-meta-mywhitespacekey"), U(""));
+            request.headers().add(_XPLATSTR("x-ms-meta-mywhitespacekey"), _XPLATSTR(""));
         });
 
         queue1.upload_metadata(options, whitespace_metadata_context);
@@ -712,7 +712,7 @@ SUITE(Queue)
         queue1.download_attributes(options, context);
 
         CHECK(!queue1.metadata().empty());
-        CHECK(queue1.metadata()[U("mywhitespacekey")].compare(U("")) == 0);
+        CHECK(queue1.metadata()[_XPLATSTR("mywhitespacekey")].compare(_XPLATSTR("")) == 0);
 
         queue1.delete_queue();
     }
@@ -740,7 +740,7 @@ SUITE(Queue)
         catch (const azure::storage::storage_exception& e)
         {
             CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
-            CHECK(e.result().extended_error().code().compare(U("QueueNotFound")) == 0);
+            CHECK(e.result().extended_error().code().compare(_XPLATSTR("QueueNotFound")) == 0);
             CHECK(!e.result().extended_error().message().empty());
         }
 
@@ -757,7 +757,7 @@ SUITE(Queue)
         CHECK(context.request_results()[0].request_date().is_initialized());
         CHECK(context.request_results()[0].content_md5().empty());
         CHECK(context.request_results()[0].etag().empty());
-        CHECK(context.request_results()[0].extended_error().code().compare(U("QueueNotFound")) == 0);
+        CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("QueueNotFound")) == 0);
         CHECK(!context.request_results()[0].extended_error().message().empty());
     }
 
@@ -1463,8 +1463,8 @@ SUITE(Queue)
         }
 
         {
-            utility::string_t id = U("");
-            utility::string_t pop_receipt = U("ABCDEF");
+            utility::string_t id = _XPLATSTR("");
+            utility::string_t pop_receipt = _XPLATSTR("ABCDEF");
 
             azure::storage::cloud_queue_message message(id, pop_receipt);
             std::chrono::seconds visibility_timeout;
@@ -1478,8 +1478,8 @@ SUITE(Queue)
         }
 
         {
-            utility::string_t id = U("12345");
-            utility::string_t pop_receipt = U("");
+            utility::string_t id = _XPLATSTR("12345");
+            utility::string_t pop_receipt = _XPLATSTR("");
 
             azure::storage::cloud_queue_message message(id, pop_receipt);
             std::chrono::seconds visibility_timeout;
@@ -1493,8 +1493,8 @@ SUITE(Queue)
         }
 
         {
-            utility::string_t id = U("12345");
-            utility::string_t pop_receipt = U("ABCDEF");
+            utility::string_t id = _XPLATSTR("12345");
+            utility::string_t pop_receipt = _XPLATSTR("ABCDEF");
 
             azure::storage::cloud_queue_message message(id, pop_receipt);
             std::chrono::seconds visibility_timeout;
@@ -1508,8 +1508,8 @@ SUITE(Queue)
         }
 
         {
-            utility::string_t id = U("12345");
-            utility::string_t pop_receipt = U("ABCDEF");
+            utility::string_t id = _XPLATSTR("12345");
+            utility::string_t pop_receipt = _XPLATSTR("ABCDEF");
 
             azure::storage::cloud_queue_message message(id, pop_receipt);
             std::chrono::seconds visibility_timeout;
@@ -1527,8 +1527,8 @@ SUITE(Queue)
     {
         azure::storage::cloud_queue queue = get_queue();
 
-        utility::string_t policy_name1 = U("policy1");
-        utility::string_t policy_name2 = U("policy2");
+        utility::string_t policy_name1 = _XPLATSTR("policy1");
+        utility::string_t policy_name2 = _XPLATSTR("policy2");
 
         uint8_t permission1 = azure::storage::queue_shared_access_policy::permissions::read | azure::storage::queue_shared_access_policy::permissions::add;
         uint8_t permission2 = azure::storage::queue_shared_access_policy::permissions::read | azure::storage::queue_shared_access_policy::permissions::update;

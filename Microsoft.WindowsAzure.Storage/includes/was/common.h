@@ -35,6 +35,8 @@ namespace azure { namespace storage {
     namespace protocol
     {
         class service_stats_reader;
+        class response_parsers;
+        class list_blobs_reader;
     }
 
     /// <summary>
@@ -500,6 +502,20 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets an <see cref="azure::storage::service_properties_includes" /> object that includes all available file service properties.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::service_properties_includes" /> object with all file service properties set to <c>true</c>.</returns>
+        static service_properties_includes file()
+        {
+            service_properties_includes includes;
+            includes.set_logging(false);
+            includes.set_hour_metrics(true);
+            includes.set_minute_metrics(true);
+            includes.set_cors(true);
+            return includes;
+        }
+
+        /// <summary>
         /// Indicates whether logging properties are to be included when the service properties are next modified.
         /// </summary>
         /// <returns><c>true</c> if logging properties are to be included; otherwise, <c>false</c>.</returns>
@@ -597,7 +613,7 @@ namespace azure { namespace storage {
             /// Initializes a new instance of the <see cref="azure::storage::service_properties::logging_properties" /> struct.
             /// </summary>
             logging_properties()
-                : m_delete_enabled(false), m_read_enabled(false), m_write_enabled(false), m_retention_enabled(false), m_retention_days(0)
+                : m_read_enabled(false), m_write_enabled(false), m_delete_enabled(false), m_retention_enabled(false), m_retention_days(0)
             {
             }
 
@@ -1954,11 +1970,11 @@ namespace azure { namespace storage {
         {
             if (m_protocol == https_only)
             {
-                return U("https");
+                return _XPLATSTR("https");
             }
             else
             {
-                return U("https,http");
+                return _XPLATSTR("https,http");
             }
         }
 
@@ -2078,7 +2094,7 @@ namespace azure { namespace storage {
                 }
                 else
                 {
-                    return m_minimum_address + U("-") + m_maximum_address;
+                    return m_minimum_address + _XPLATSTR("-") + m_maximum_address;
                 }
             }
 
@@ -2117,42 +2133,42 @@ namespace azure { namespace storage {
             {
                 if (m_permission & read)
                 {
-                    permissions.push_back(U('r'));
+                    permissions.push_back(_XPLATSTR('r'));
                 }
 
                 if (m_permission & add)
                 {
-                    permissions.push_back(U('a'));
+                    permissions.push_back(_XPLATSTR('a'));
                 }
                 
                 if (m_permission & create)
                 {
-                    permissions.push_back(U('c'));
+                    permissions.push_back(_XPLATSTR('c'));
                 }
 
                 if (m_permission & write)
                 {
-                    permissions.push_back(U('w'));
+                    permissions.push_back(_XPLATSTR('w'));
                 }
 
                 if (m_permission & update)
                 {
-                    permissions.push_back(U('u'));
+                    permissions.push_back(_XPLATSTR('u'));
                 }
 
                 if (m_permission & del)
                 {
-                    permissions.push_back(U('d'));
+                    permissions.push_back(_XPLATSTR('d'));
                 }
 
                 if (m_permission & process)
                 {
-                    permissions.push_back(U('p'));
+                    permissions.push_back(_XPLATSTR('p'));
                 }
 
                 if (m_permission & list)
                 {
-                    permissions.push_back(U('l'));
+                    permissions.push_back(_XPLATSTR('l'));
                 }
             }
 
@@ -2171,35 +2187,35 @@ namespace azure { namespace storage {
             {
                 switch (*iter)
                 {
-                case U('r'):
+                case _XPLATSTR('r'):
                     m_permission |= read;
                     break;
 
-                case U('w'):
+                case _XPLATSTR('w'):
                     m_permission |= write;
                     break;
 
-                case U('d'):
+                case _XPLATSTR('d'):
                     m_permission |= del;
                     break;
 
-                case U('l'):
+                case _XPLATSTR('l'):
                     m_permission |= list;
                     break;
 
-                case U('a'):
+                case _XPLATSTR('a'):
                     m_permission |= add;
                     break;
 
-                case U('u'):
+                case _XPLATSTR('u'):
                     m_permission |= update;
                     break;
 
-                case U('p'):
+                case _XPLATSTR('p'):
                     m_permission |= process;
                     break;
 
-                case U('c'):
+                case _XPLATSTR('c'):
                     m_permission |= create;
                     break;
                 }
@@ -2311,7 +2327,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::shared_access_policy" /> class.
         /// </summary>
         shared_access_policy()
-            : m_permission(none), m_protocol(protocols::https_or_http)
+            : m_protocol(protocols::https_or_http), m_permission(none)
         {
         }
 
@@ -2321,7 +2337,7 @@ namespace azure { namespace storage {
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
         shared_access_policy(utility::datetime expiry, uint8_t permission)
-            : m_permission(permission), m_expiry(expiry), m_protocol(protocols::https_or_http)
+            : m_expiry(expiry), m_protocol(protocols::https_or_http), m_permission(permission)
         {
         }
 
@@ -2332,7 +2348,7 @@ namespace azure { namespace storage {
         /// <param name="expiry">The expiration date and time for the shared access policy.</param>
         /// <param name="permission">A mask specifying permissions for the shared access policy.</param>
         shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission)
-            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocols::https_or_http)
+            : m_start(start), m_expiry(expiry), m_protocol(protocols::https_or_http), m_permission(permission)
         {
         }
 
@@ -2345,7 +2361,7 @@ namespace azure { namespace storage {
         /// <param name="protocol">The allowed protocols for a shared access signature associated with this shared access policy.</param>
         /// <param name="address">The allowed IP address for a shared access signature associated with this shared access policy.</param>
         shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t address)
-            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(address)))
+            : m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(address))), m_permission(permission)
         {
         }
 
@@ -2359,7 +2375,7 @@ namespace azure { namespace storage {
         /// <param name="minimum_address">The minimum allowed address for an IP range for the shared access policy.</param>
         /// <param name="maximum_address">The maximum allowed address for an IP range for the shared access policy.</param>
         shared_access_policy(utility::datetime start, utility::datetime expiry, uint8_t permission, protocols protocol, utility::string_t minimum_address, utility::string_t maximum_address)
-            : m_permission(permission), m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(minimum_address), std::move(maximum_address)))
+            : m_start(start), m_expiry(expiry), m_protocol(protocol), m_ip_address_or_range(ip_address_or_range(std::move(minimum_address), std::move(maximum_address))), m_permission(permission)
         {
         }
 
@@ -2491,6 +2507,7 @@ namespace azure { namespace storage {
             {
                 m_operation_expiry_time = std::move(other.m_operation_expiry_time);
                 m_retry_policy = std::move(other.m_retry_policy);
+                m_noactivity_timeout = std::move(other.m_noactivity_timeout);
                 m_server_timeout = std::move(other.m_server_timeout);
                 m_maximum_execution_time = std::move(other.m_maximum_execution_time);
                 m_location_mode = std::move(other.m_location_mode);
@@ -2516,6 +2533,16 @@ namespace azure { namespace storage {
         void set_retry_policy(azure::storage::retry_policy retry_policy)
         {
             m_retry_policy = retry_policy;
+        }
+
+        const std::chrono::seconds noactivity_timeout() const
+        {
+            return m_noactivity_timeout;
+        }
+
+        void set_noactivity_timeout(std::chrono::seconds noactivity_timeout)
+        {
+            m_noactivity_timeout = noactivity_timeout;
         }
 
         /// <summary>
@@ -2625,6 +2652,7 @@ namespace azure { namespace storage {
                 m_retry_policy = other.m_retry_policy;
             }
 
+            m_noactivity_timeout.merge(other.m_noactivity_timeout);
             m_server_timeout.merge(other.m_server_timeout);
             m_maximum_execution_time.merge(other.m_maximum_execution_time);
             m_location_mode.merge(other.m_location_mode);
@@ -2648,10 +2676,166 @@ namespace azure { namespace storage {
 
         utility::datetime m_operation_expiry_time;
         azure::storage::retry_policy m_retry_policy;
+        option_with_default<std::chrono::seconds> m_noactivity_timeout;
         option_with_default<std::chrono::seconds> m_server_timeout;
         option_with_default<std::chrono::seconds> m_maximum_execution_time;
         option_with_default<azure::storage::location_mode> m_location_mode;
         option_with_default<size_t> m_http_buffer_size;
+    };
+
+    /// <summary>
+    /// Represents the status of a blob copy operation.
+    /// </summary>
+    enum class copy_status
+    {
+        /// <summary>
+        /// The copy status is invalid.
+        /// </summary>
+        invalid,
+
+        /// <summary>
+        /// The copy operation is pending.
+        /// </summary>
+        pending,
+
+        /// <summary>
+        /// The copy operation succeeded.
+        /// </summary>
+        success,
+
+        /// <summary>
+        /// The copy operation has been aborted.
+        /// </summary>
+        aborted,
+
+        /// <summary>
+        /// The copy operation encountered an error.
+        /// </summary>
+        failed
+    };
+
+    /// <summary>
+    /// Represents the attributes of a copy blob operation.
+    /// </summary>
+    class copy_state
+    {
+    public:
+
+        copy_state()
+            : m_bytes_copied(0), m_total_bytes(0), m_status(copy_status::invalid)
+        {
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::copy_state" /> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::copy_state" /> object.</param>
+        copy_state(copy_state&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to an <see cref="azure::storage::copy_state" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::copy_state" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::copy_state" /> object with properties set.</returns>
+        copy_state& operator=(copy_state&& other)
+        {
+            if (this != &other)
+            {
+                m_copy_id = std::move(other.m_copy_id);
+                m_completion_time = std::move(other.m_completion_time);
+                m_status_description = std::move(other.m_status_description);
+                m_bytes_copied = std::move(other.m_bytes_copied);
+                m_total_bytes = std::move(other.m_total_bytes);
+                m_status = std::move(other.m_status);
+                m_source = std::move(other.m_source);
+            }
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Gets the ID of the copy blob operation.
+        /// </summary>
+        /// <returns>An ID string for the copy operation.</returns>
+        const utility::string_t& copy_id() const
+        {
+            return m_copy_id;
+        }
+
+        /// <summary>
+        /// Gets the time that the copy blob operation completed, and indicates whether completion was due 
+        /// to a successful copy, whether the operation was cancelled, or whether the operation failed.
+        /// </summary>
+        /// <returns>A <see cref="utility::datetime" /> containing the completion time.</returns>
+        utility::datetime completion_time() const
+        {
+            return m_completion_time;
+        }
+
+        /// <summary>
+        /// Gets the status of the copy blob operation.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::copy_status" /> enumeration indicating the status of the copy operation.</returns>
+        copy_status status() const
+        {
+            return m_status;
+        }
+
+        /// <summary>
+        /// Gets the URI of the source blob for a copy operation.
+        /// </summary>
+        /// <returns>A <see cref="web::http::uri" /> indicating the source of a copy operation.</returns>
+        const web::http::uri& source() const
+        {
+            return m_source;
+        }
+
+        /// <summary>
+        /// Gets the number of bytes copied in the operation so far.
+        /// </summary>
+        /// <returns>The number of bytes copied in the operation so far.</returns>
+        int64_t bytes_copied() const
+        {
+            return m_bytes_copied;
+        }
+
+        /// <summary>
+        /// Gets the total number of bytes in the source blob for the copy operation.
+        /// </summary>
+        /// <returns>The number of bytes in the source blob.</returns>
+        int64_t total_bytes() const
+        {
+            return m_total_bytes;
+        }
+
+        /// <summary>
+        /// Gets the description of the current status of the copy blob operation, if status is available.
+        /// </summary>
+        /// <returns>A status description string.</returns>
+        const utility::string_t& status_description() const
+        {
+            return m_status_description;
+        }
+
+    private:
+
+        utility::string_t m_copy_id;
+        utility::datetime m_completion_time;
+        utility::string_t m_status_description;
+        int64_t m_bytes_copied;
+        int64_t m_total_bytes;
+        copy_status m_status;
+        web::http::uri m_source;
+
+        friend class protocol::response_parsers;
+        friend class protocol::list_blobs_reader;
     };
 
 }} // namespace azure::storage

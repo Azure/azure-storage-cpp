@@ -41,6 +41,14 @@ namespace azure { namespace storage { namespace protocol {
         return get_header_value(response.headers(), header);
     }
 
+    utility::size64_t parse_quota(const web::http::http_response& response)
+    {
+        utility::size64_t value;
+        utility::istringstream_t iss(get_header_value(response, protocol::ms_header_share_quota));
+        iss >> value;
+        return value;
+    }
+
     utility::string_t parse_etag(const web::http::http_response& response)
     {
         return get_header_value(response, web::http::header_names::etag);
@@ -198,22 +206,96 @@ namespace azure { namespace storage { namespace protocol {
         auto& headers = response.headers();
         for (auto it = headers.begin(); it != headers.end(); ++it)
         {
-            const utility::string_t& key = it->first;
-            if ((key.size() > ms_header_metadata_prefix.size()) &&
-                std::equal(ms_header_metadata_prefix.cbegin(), ms_header_metadata_prefix.cend(), key.cbegin()))
+            const utility::char_t *key = it->first.c_str();
+            size_t key_size = it->first.size();
+            // disables warning 4996 to bypass the usage of std::equal;
+            // a more secure usage of std::equal with 5 parameters is supported by c++14.
+            // to be compatible with c++11, warning 4996 is disabled.
+            if ((key_size > ms_header_metadata_prefix_size) &&
+                std::equal(ms_header_metadata_prefix, ms_header_metadata_prefix + ms_header_metadata_prefix_size, key, [](const utility::char_t &c1, const utility::char_t &c2) {return c1 == c2;}))
             {
-                metadata.insert(std::make_pair(key.substr(ms_header_metadata_prefix.size()), it->second));
+                metadata.insert(std::make_pair(it->first.substr(ms_header_metadata_prefix_size), it->second));
             }
         }
 
         return metadata;
     }
 
+    copy_state response_parsers::parse_copy_state(const web::http::http_response& response)
+    {
+        copy_state state;
+
+        auto& headers = response.headers();
+        auto status = get_header_value(headers, ms_header_copy_status);
+        if (!status.empty())
+        {
+            state.m_status = parse_copy_status(status);
+            state.m_copy_id = get_header_value(headers, ms_header_copy_id);
+            state.m_source = get_header_value(headers, ms_header_copy_source);
+            state.m_completion_time = parse_copy_completion_time(get_header_value(headers, ms_header_copy_completion_time));
+            state.m_status_description = get_header_value(headers, ms_header_copy_status_description);
+            parse_copy_progress(get_header_value(headers, ms_header_copy_progress), state.m_bytes_copied, state.m_total_bytes);
+        }
+
+        return state;
+    }
+
+    utility::datetime response_parsers::parse_copy_completion_time(const utility::string_t& value)
+    {
+        if (!value.empty())
+        {
+            return utility::datetime::from_string(value, utility::datetime::date_format::RFC_1123);
+        }
+        else
+        {
+            return utility::datetime();
+        }
+    }
+
+    bool response_parsers::parse_copy_progress(const utility::string_t& value, int64_t& bytes_copied, int64_t& bytes_total)
+    {
+        if (!value.empty())
+        {
+            utility::istringstream_t str(value);
+            utility::char_t slash;
+            str >> bytes_copied >> slash >> bytes_total;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    copy_status response_parsers::parse_copy_status(const utility::string_t& value)
+    {
+        if (value == header_value_copy_pending)
+        {
+            return copy_status::pending;
+        }
+        else if (value == header_value_copy_success)
+        {
+            return copy_status::success;
+        }
+        else if (value == header_value_copy_aborted)
+        {
+            return copy_status::aborted;
+        }
+        else if (value == header_value_copy_failed)
+        {
+            return copy_status::failed;
+        }
+        else
+        {
+            return copy_status::invalid;
+        }
+    }
+
     bool is_matching_content_type(const utility::string_t& actual, const utility::string_t& expected)
     {
         // Check if the response's actual content type matches the expected content type.
         // It is OK if the actual content type has additional parameters (e.g. application/json;odata=minimalmetadata;streaming=true;charset=utf-8).
-        return (actual.size() == expected.size() || (actual.size() > expected.size() && actual.at(expected.size()) == U(';'))) &&
+        return (actual.size() == expected.size() || (actual.size() > expected.size() && actual.at(expected.size()) == _XPLATSTR(';'))) &&
             std::equal(expected.cbegin(), expected.cend(), actual.cbegin());
     }
 

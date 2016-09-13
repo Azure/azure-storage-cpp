@@ -112,10 +112,18 @@ namespace azure { namespace storage {
         }
 
         // since 2015-02-21, canonicalized resource is changed from "/account/container/name" to "/blob/account/container/name"
-        utility::ostringstream_t resource_str;
-        resource_str << U('/') << protocol::service_blob << U('/') << service_client().credentials().account_name() << U('/') << container().name() << U('/') << name();
+        utility::string_t resource_str;
+        resource_str.reserve(service_client().credentials().account_name().size() + container().name().size() + name().size() + 8);
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(protocol::service_blob);
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(service_client().credentials().account_name());
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(container().name());
+        resource_str.append(_XPLATSTR("/"));
+        resource_str.append(name());
 
-        return protocol::get_blob_sas_token(stored_policy_identifier, policy, headers, U("b"), resource_str.str(), service_client().credentials());
+        return protocol::get_blob_sas_token(stored_policy_identifier, policy, headers, _XPLATSTR("b"), resource_str, service_client().credentials());
     }
 
     pplx::task<concurrency::streams::istream> cloud_blob::open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context)
@@ -150,7 +158,7 @@ namespace azure { namespace storage {
             protocol::preprocess_response_void(response, result, context);
             properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), false);
             *metadata = protocol::parse_metadata(response);
-            *copy_state = protocol::blob_response_parsers::parse_copy_state(response);
+            *copy_state = protocol::response_parsers::parse_copy_state(response);
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }
@@ -204,7 +212,13 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::delete_blob, snapshots_option, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+        auto properties = m_properties;
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
+        {
+            protocol::preprocess_response_void(response, result, context);
+            properties->initialization();
+        });
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
@@ -487,7 +501,7 @@ namespace azure { namespace storage {
             {
                 properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), offset != std::numeric_limits<utility::size64_t>::max());
                 *metadata = protocol::parse_metadata(response);
-                *copy_state = protocol::blob_response_parsers::parse_copy_state(response);
+                *copy_state = protocol::response_parsers::parse_copy_state(response);
 
                 download_info->m_response_length = result.content_length();
                 download_info->m_response_md5 = result.content_md5();
@@ -564,7 +578,7 @@ namespace azure { namespace storage {
             protocol::preprocess_response_void(response, result, context);
             properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), false);
             *metadata = protocol::parse_metadata(response);
-            *copy_state = protocol::blob_response_parsers::parse_copy_state(response);
+            *copy_state = protocol::response_parsers::parse_copy_state(response);
             return true;
         });
         return core::executor<bool>::execute_async(command, modified_options, context);
@@ -586,7 +600,7 @@ namespace azure { namespace storage {
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
-            auto new_state = protocol::blob_response_parsers::parse_copy_state(response);
+            auto new_state = protocol::response_parsers::parse_copy_state(response);
             *copy_state = new_state;
             return new_state.copy_id();
         });
@@ -596,9 +610,23 @@ namespace azure { namespace storage {
     pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
     {
         web::http::uri raw_source_uri = source.snapshot_qualified_uri().primary_uri();
-        web::http::uri source_uri = service_client().credentials().transform_uri(raw_source_uri);
+        web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
 
         return start_copy_async(source_uri, source_condition, destination_condition, options, context);
+    }
+
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source)
+    {
+        return start_copy_async(source, file_access_condition(), access_condition(), blob_request_options(), operation_context());
+    }
+
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+    {
+        UNREFERENCED_PARAMETER(source_condition);
+        web::http::uri raw_source_uri = source.uri().primary_uri();
+        web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
+
+        return start_copy_async(source_uri, access_condition(), destination_condition, options, context);
     }
 
     pplx::task<void> cloud_blob::abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context) const

@@ -48,7 +48,7 @@ public:
 
     test_base()
     {
-        print_client_request_id(m_context, U("test fixture"));
+        print_client_request_id(m_context, _XPLATSTR("test fixture"));
     }
 
     ~test_base()

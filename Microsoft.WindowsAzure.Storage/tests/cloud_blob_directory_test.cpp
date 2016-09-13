@@ -19,7 +19,7 @@
 #include "blob_test_base.h"
 #include "check_macros.h"
 
-const utility::string_t delimiters[] = { U("$"), U("@"), U("-"), U("%"), U("/"), U("||") };
+const utility::string_t delimiters[] = { _XPLATSTR("$"), _XPLATSTR("@"), _XPLATSTR("-"), _XPLATSTR("%"), _XPLATSTR("/"), _XPLATSTR("||") };
 
 #pragma region Fixture
 
@@ -148,29 +148,29 @@ std::vector<azure::storage::cloud_blob> list_entire_blob_tree(const azure::stora
 
 void check_parents(const azure::storage::cloud_blob_container& container, const utility::string_t& delimiter)
 {
-    auto dir1 = container.get_directory_reference(U("dir1"));
-    CHECK_UTF8_EQUAL(U("dir1") + delimiter, dir1.prefix());
+    auto dir1 = container.get_directory_reference(_XPLATSTR("dir1"));
+    CHECK_UTF8_EQUAL(_XPLATSTR("dir1") + delimiter, dir1.prefix());
 
-    auto dir2 = dir1.get_subdirectory_reference(U("dir2"));
-    CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter, dir2.prefix());
+    auto dir2 = dir1.get_subdirectory_reference(_XPLATSTR("dir2"));
+    CHECK_UTF8_EQUAL(_XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter, dir2.prefix());
 
-    auto dir3 = dir2.get_subdirectory_reference(U("dir3"));
-    CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter, dir3.prefix());
+    auto dir3 = dir2.get_subdirectory_reference(_XPLATSTR("dir3"));
+    CHECK_UTF8_EQUAL(_XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("dir3") + delimiter, dir3.prefix());
 
-    auto blob = dir3.get_blob_reference(U("blob"));
-    CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("blob"), blob.name());
+    auto blob = dir3.get_blob_reference(_XPLATSTR("blob"));
+    CHECK_UTF8_EQUAL(_XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("dir3") + delimiter + _XPLATSTR("blob"), blob.name());
 
-    auto block_blob = dir3.get_block_blob_reference(U("block_blob"));
+    auto block_blob = dir3.get_block_blob_reference(_XPLATSTR("block_blob"));
     CHECK(azure::storage::blob_type::block_blob == block_blob.type());
-    CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("block_blob"), block_blob.name());
+    CHECK_UTF8_EQUAL(_XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("dir3") + delimiter + _XPLATSTR("block_blob"), block_blob.name());
 
-    auto page_blob = dir3.get_page_blob_reference(U("page_blob"));
+    auto page_blob = dir3.get_page_blob_reference(_XPLATSTR("page_blob"));
     CHECK(azure::storage::blob_type::page_blob == page_blob.type());
-    CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("page_blob"), page_blob.name());
+    CHECK_UTF8_EQUAL(_XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("dir3") + delimiter + _XPLATSTR("page_blob"), page_blob.name());
 
-    auto append_blob = dir3.get_append_blob_reference(U("append_blob"));
+    auto append_blob = dir3.get_append_blob_reference(_XPLATSTR("append_blob"));
     CHECK(azure::storage::blob_type::append_blob == append_blob.type());
-    CHECK_UTF8_EQUAL(U("dir1") + delimiter + U("dir2") + delimiter + U("dir3") + delimiter + U("append_blob"), append_blob.name());
+    CHECK_UTF8_EQUAL(_XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("dir3") + delimiter + _XPLATSTR("append_blob"), append_blob.name());
 
     auto blob_parent = blob.get_parent_reference();
     CHECK_UTF8_EQUAL(dir3.prefix(), blob_parent.prefix());
@@ -184,8 +184,8 @@ void check_parents(const azure::storage::cloud_blob_container& container, const 
     auto dir1_parent = dir2_parent.get_parent_reference();
     CHECK(!dir1_parent.is_valid());
 
-    auto root_blob = container.get_blob_reference(U("blob"));
-    CHECK_UTF8_EQUAL(U("blob"), root_blob.name());
+    auto root_blob = container.get_blob_reference(_XPLATSTR("blob"));
+    CHECK_UTF8_EQUAL(_XPLATSTR("blob"), root_blob.name());
 
     auto root_blob_parent = root_blob.get_parent_reference();
     CHECK(!root_blob_parent.is_valid());
@@ -223,15 +223,15 @@ SUITE(Blob)
             auto container = m_client.get_container_reference(m_container.name());
 
             std::vector<azure::storage::cloud_blob> blobs;
-            blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("dir1") + delimiter + U("dir2") + delimiter + U("blob1")));
-            blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("dir1") + delimiter + U("dir2") + delimiter + U("blob2")));
-            blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("dir1") + delimiter + U("blob3")));
-            blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("dir1") + delimiter + U("blob4")));
-            blobs.push_back(container.get_block_blob_reference(U("block_blobs") + delimiter + U("blob5")));
-            blobs.push_back(container.get_page_blob_reference(U("page_blobs") + delimiter + U("dir1") + delimiter + U("dir2") + delimiter + U("blob6")));
-            blobs.push_back(container.get_page_blob_reference(U("page_blobs") + delimiter + U("blob7")));
-            blobs.push_back(container.get_append_blob_reference(U("append_blobs") + delimiter + U("dir1") + delimiter + U("dir3") + delimiter + U("blob8")));
-            blobs.push_back(container.get_append_blob_reference(U("append_blobs") + delimiter + U("blob9")));
+            blobs.push_back(container.get_block_blob_reference(_XPLATSTR("block_blobs") + delimiter + _XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("blob1")));
+            blobs.push_back(container.get_block_blob_reference(_XPLATSTR("block_blobs") + delimiter + _XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("blob2")));
+            blobs.push_back(container.get_block_blob_reference(_XPLATSTR("block_blobs") + delimiter + _XPLATSTR("dir1") + delimiter + _XPLATSTR("blob3")));
+            blobs.push_back(container.get_block_blob_reference(_XPLATSTR("block_blobs") + delimiter + _XPLATSTR("dir1") + delimiter + _XPLATSTR("blob4")));
+            blobs.push_back(container.get_block_blob_reference(_XPLATSTR("block_blobs") + delimiter + _XPLATSTR("blob5")));
+            blobs.push_back(container.get_page_blob_reference(_XPLATSTR("page_blobs") + delimiter + _XPLATSTR("dir1") + delimiter + _XPLATSTR("dir2") + delimiter + _XPLATSTR("blob6")));
+            blobs.push_back(container.get_page_blob_reference(_XPLATSTR("page_blobs") + delimiter + _XPLATSTR("blob7")));
+            blobs.push_back(container.get_append_blob_reference(_XPLATSTR("append_blobs") + delimiter + _XPLATSTR("dir1") + delimiter + _XPLATSTR("dir3") + delimiter + _XPLATSTR("blob8")));
+            blobs.push_back(container.get_append_blob_reference(_XPLATSTR("append_blobs") + delimiter + _XPLATSTR("blob9")));
 
             create_blob_tree(container, blobs, delimiter, m_context);
 

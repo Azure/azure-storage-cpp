@@ -22,6 +22,6 @@
 namespace azure { namespace storage { namespace samples {
 
     // TODO: Put your account name and account key here
-    utility::string_t storage_connection_string(U("DefaultEndpointsProtocol=https;AccountName=myaccountname;AccountKey=myaccountkey"));
+    utility::string_t storage_connection_string(_XPLATSTR("DefaultEndpointsProtocol=https;AccountName=myaccountname;AccountKey=myaccountkey"));
 
 }}} // namespace azure::storage::samples

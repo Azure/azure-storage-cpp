@@ -46,7 +46,7 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t path;
         if (create_table)
         {
-            path.append(U("Tables"));
+            path.append(_XPLATSTR("Tables"));
         }
         else
         {
@@ -54,9 +54,9 @@ namespace azure { namespace storage { namespace protocol {
 
             path.reserve(modified_table_name.size() + 8U);
 
-            path.append(U("Tables("));
+            path.append(_XPLATSTR("Tables("));
             path.append(modified_table_name);
-            path.push_back(U(')'));
+            path.push_back(_XPLATSTR(')'));
         }
 
         web::http::uri_builder builder(base_uri);
@@ -84,11 +84,11 @@ namespace azure { namespace storage { namespace protocol {
             path.reserve(table.name().size() + modified_partition_key.size() + modified_row_key.size() + 23U);
 
             path.append(table.name());
-            path.append(U("(PartitionKey="));
+            path.append(_XPLATSTR("(PartitionKey="));
             path.append(modified_partition_key);
-            path.append(U(",RowKey="));
+            path.append(_XPLATSTR(",RowKey="));
             path.append(modified_row_key);
-            path.push_back(U(')'));
+            path.push_back(_XPLATSTR(')'));
         }
 
         web::http::uri_builder builder(base_uri);
@@ -106,7 +106,7 @@ namespace azure { namespace storage { namespace protocol {
             return web::http::uri();
         }
 
-        utility::string_t path(U("$batch"));
+        utility::string_t path(_XPLATSTR("$batch"));
 
         web::http::uri_builder builder(base_uri);
         builder.append_path(path, /* do_encoding */ true);
@@ -126,29 +126,31 @@ namespace azure { namespace storage { namespace protocol {
 
         if (!query.filter_string().empty())
         {
-            builder.append_query(core::make_query_parameter(U("$filter"), query.filter_string()));
+            builder.append_query(core::make_query_parameter(_XPLATSTR("$filter"), query.filter_string()));
         }
 
         if (query.take_count() >= 0)
         {
-            builder.append_query(core::make_query_parameter(U("$top"), query.take_count(), /* do_encoding */ false));
+            builder.append_query(core::make_query_parameter(_XPLATSTR("$top"), query.take_count(), /* do_encoding */ false));
         }
 
         if (!query.select_columns().empty())
         {
-            utility::ostringstream_t select_builder;
-            select_builder << U("PartitionKey,RowKey,Timestamp");
+            utility::string_t select_builder;
+            select_builder.reserve(128);
+            select_builder.append(_XPLATSTR("PartitionKey,RowKey,Timestamp"));
 
             std::vector<utility::string_t> select_columns = query.select_columns();
             for(std::vector<utility::string_t>::const_iterator itr = select_columns.cbegin(); itr != select_columns.cend(); ++itr)
             {
-                if (itr->compare(U("PartitionKey")) != 0 && itr->compare(U("RowKey")) != 0 && itr->compare(U("Timestamp")) != 0)
+                if (itr->compare(_XPLATSTR("PartitionKey")) != 0 && itr->compare(_XPLATSTR("RowKey")) != 0 && itr->compare(_XPLATSTR("Timestamp")) != 0)
                 {
-                    select_builder << U(',') << *itr;
+                    select_builder.append(_XPLATSTR(","));
+                    select_builder.append(*itr);
                 }
             }
 
-            builder.append_query(core::make_query_parameter(U("$select"), select_builder.str()));
+            builder.append_query(core::make_query_parameter(_XPLATSTR("$select"), select_builder));
         }
 
         if (!token.empty())
@@ -222,7 +224,7 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
-    const utility::string_t& get_accept_header(table_payload_format payload_format)
+    const utility::char_t* get_accept_header(table_payload_format payload_format)
     {
         switch (payload_format)
         {
@@ -253,7 +255,7 @@ namespace azure { namespace storage { namespace protocol {
         {
             if (operation_type == table_operation_type::insert_operation)
             {
-                headers.add(header_prefer, U("return-no-content"));
+                headers.add(header_prefer, _XPLATSTR("return-no-content"));
             }
 
             headers.add(web::http::header_names::content_type, header_value_content_type_json);
@@ -273,7 +275,7 @@ namespace azure { namespace storage { namespace protocol {
             if (operation.entity().etag().empty())
             {
                 // Default to update/merge/delete any present entity
-                etag = U("*");
+                etag = _XPLATSTR("*");
             }
             else
             {
@@ -299,10 +301,10 @@ namespace azure { namespace storage { namespace protocol {
             fields.reserve(properties.size() * 2 + 2);
 
             web::json::value partition_key_value(operation.entity().partition_key());
-            fields.push_back(std::make_pair(U("PartitionKey"), std::move(partition_key_value)));
+            fields.push_back(std::make_pair(_XPLATSTR("PartitionKey"), std::move(partition_key_value)));
 
             web::json::value row_key_value(operation.entity().row_key());
-            fields.push_back(std::make_pair(U("RowKey"), std::move(row_key_value)));
+            fields.push_back(std::make_pair(_XPLATSTR("RowKey"), std::move(row_key_value)));
 
             for (table_entity::properties_type::const_iterator it = properties.cbegin(); it != properties.cend(); ++it)
             {
@@ -336,7 +338,7 @@ namespace azure { namespace storage { namespace protocol {
                             utility::string_t modified_string_value;
                             modified_string_value.reserve(string_value.size() + 2);
                             modified_string_value.append(string_value);
-                            modified_string_value.append(U(".0"));
+                            modified_string_value.append(_XPLATSTR(".0"));
 
                             requires_type = true;
                             property_value = web::json::value(modified_string_value);
@@ -371,7 +373,7 @@ namespace azure { namespace storage { namespace protocol {
                     utility::string_t type_name;
                     type_name.reserve(property_name.size() + 11);
                     type_name.append(property_name);
-                    type_name.append(U("@odata.type"));
+                    type_name.append(_XPLATSTR("@odata.type"));
 
                     web::json::value type_value(get_property_type_name(entity_property.property_type()));
 
@@ -387,7 +389,7 @@ namespace azure { namespace storage { namespace protocol {
         return web::json::value::null();
     }
 
-    web::http::http_request table_base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request table_base_request(web::http::method method, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = base_request(method, uri_builder, timeout, context);
 
@@ -397,7 +399,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::method method = get_http_method(operation_type);
         web::http::http_request request = table_base_request(method, uri_builder, timeout, context);
@@ -413,7 +415,7 @@ namespace azure { namespace storage { namespace protocol {
 
             std::vector<std::pair<utility::string_t, web::json::value>> fields;
             fields.reserve(1U);
-            fields.push_back(std::make_pair(U("TableName"), std::move(property_value)));
+            fields.push_back(std::make_pair(_XPLATSTR("TableName"), std::move(property_value)));
 
             web::json::value document = web::json::value::object(fields);
             request.set_body(document);
@@ -422,7 +424,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::method method = get_http_method(operation.operation_type());
         web::http::http_request request = table_base_request(method, uri_builder, timeout, context);
@@ -439,10 +441,10 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        utility::string_t batch_boundary_name = core::generate_boundary_name(U("batch"));
-        utility::string_t changeset_boundary_name = core::generate_boundary_name(U("changeset"));
+        utility::string_t batch_boundary_name = core::generate_boundary_name(_XPLATSTR("batch"));
+        utility::string_t changeset_boundary_name = core::generate_boundary_name(_XPLATSTR("changeset"));
         
         web::http::http_request request = table_base_request(web::http::methods::POST, uri_builder, timeout, context);
         request.set_response_stream(Concurrency::streams::ostream(response_buffer));
@@ -511,7 +513,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_query(table_payload_format payload_format, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_query(table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request = table_base_request(web::http::methods::GET, uri_builder, timeout, context);
 
@@ -521,14 +523,14 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = base_request(web::http::methods::GET, uri_builder, timeout, context);
         return request;
     }
 
-    web::http::http_request set_table_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_acl, /* do_encoding */ false));
         web::http::http_request request = base_request(web::http::methods::PUT, uri_builder, timeout, context);
@@ -540,28 +542,28 @@ namespace azure { namespace storage { namespace protocol {
         switch (property_type)
         {
         case edm_type::binary:
-            return U("Edm.Binary");
+            return _XPLATSTR("Edm.Binary");
 
         case edm_type::boolean:
-            return U("Edm.Boolean");
+            return _XPLATSTR("Edm.Boolean");
 
         case edm_type::datetime:
-            return U("Edm.DateTime");
+            return _XPLATSTR("Edm.DateTime");
 
         case edm_type::double_floating_point:
-            return U("Edm.Double");
+            return _XPLATSTR("Edm.Double");
 
         case edm_type::guid:
-            return U("Edm.Guid");
+            return _XPLATSTR("Edm.Guid");
 
         case edm_type::int32:
-            return U("Edm.Int32");
+            return _XPLATSTR("Edm.Int32");
 
         case edm_type::int64:
-            return U("Edm.Int64");
+            return _XPLATSTR("Edm.Int64");
 
         default: // edm_type::string
-            return U("Edm.String");
+            return _XPLATSTR("Edm.String");
         }
     }
 

@@ -178,7 +178,7 @@ namespace azure { namespace storage { namespace core {
             m_calculate_response_body_md5 = value;
         }
 
-        void set_build_request(std::function<web::http::http_request(web::http::uri_builder, const std::chrono::seconds&, operation_context)> value)
+        void set_build_request(std::function<web::http::http_request(web::http::uri_builder&, const std::chrono::seconds&, operation_context)> value)
         {
             m_build_request = value;
         }
@@ -237,7 +237,7 @@ namespace azure { namespace storage { namespace core {
         bool m_calculate_response_body_md5;
         command_location_mode m_location_mode;
 
-        std::function<web::http::http_request(web::http::uri_builder, const std::chrono::seconds&, operation_context)> m_build_request;
+        std::function<web::http::http_request(web::http::uri_builder&, const std::chrono::seconds&, operation_context)> m_build_request;
         std::function<void(web::http::http_request&, operation_context)> m_sign_request;
         std::function<bool(utility::size64_t, operation_context)> m_recover_request;
 
@@ -375,9 +375,10 @@ namespace azure { namespace storage { namespace core {
 
                 if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                 {
-                    utility::ostringstream_t str;
-                    str << U("Starting ") << instance->m_request.method() << U(" request to ") << instance->m_request.request_uri().to_string();
-                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                    utility::string_t str;
+                    str.reserve(256);
+                    str.append(_XPLATSTR("Starting ")).append(instance->m_request.method()).append(_XPLATSTR(" request to ")).append(instance->m_request.request_uri().to_string());
+                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                 }
 
                 // 2. Set Headers
@@ -439,7 +440,8 @@ namespace azure { namespace storage { namespace core {
                     config.set_proxy(instance->m_context.proxy());
                 }
 
-                config.set_timeout(instance->remaining_time());
+                instance->remaining_time();
+                config.set_timeout(instance->m_request_options.noactivity_timeout());
 
                 size_t http_buffer_size = instance->m_request_options.http_buffer_size();
                 if (http_buffer_size > 0)
@@ -457,9 +459,10 @@ namespace azure { namespace storage { namespace core {
 
                     if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                     {
-                        utility::ostringstream_t str;
-                        str << U("Response received. Status code = ") << response.status_code() << U(". Reason = ") << response.reason_phrase();
-                        logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                        utility::string_t str;
+                        str.reserve(128);
+                        str.append(_XPLATSTR("Response received. Status code = ")).append(utility::conversions::print_string(response.status_code())).append(_XPLATSTR(". Reason = ")).append(response.reason_phrase());
+                        logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                     }
 
                     try
@@ -479,7 +482,7 @@ namespace azure { namespace storage { namespace core {
 
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                         {
-                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Successful request ID = ") + instance->m_request_result.service_request_id());
+                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, _XPLATSTR("Successful request ID = ") + instance->m_request_result.service_request_id());
                         }
 
                         // 8. Potentially download data
@@ -516,7 +519,7 @@ namespace azure { namespace storage { namespace core {
 
                             if (logger::instance().should_log(instance->m_context, client_log_level::log_level_warning))
                             {
-                                logger::instance().log(instance->m_context, client_log_level::log_level_warning, U("Failed request ID = ") + instance->m_request_result.service_request_id());
+                                logger::instance().log(instance->m_context, client_log_level::log_level_warning, _XPLATSTR("Failed request ID = ") + instance->m_request_result.service_request_id());
                             }
 
                             throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
@@ -593,14 +596,14 @@ namespace azure { namespace storage { namespace core {
 
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_warning))
                         {
-                            logger::instance().log(instance->m_context, client_log_level::log_level_warning, U("Exception thrown while processing response: ") + utility::conversions::to_string_t(e.what()));
+                            logger::instance().log(instance->m_context, client_log_level::log_level_warning, _XPLATSTR("Exception thrown while processing response: ") + utility::conversions::to_string_t(e.what()));
                         }
 
                         if (!retryable_exception)
                         {
                             if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
                             {
-                                logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Exception was not retryable: ") + utility::conversions::to_string_t(e.what()));
+                                logger::instance().log(instance->m_context, client_log_level::log_level_error, _XPLATSTR("Exception was not retryable: ") + utility::conversions::to_string_t(e.what()));
                             }
 
                             throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
@@ -613,7 +616,7 @@ namespace azure { namespace storage { namespace core {
                         {
                             if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
                             {
-                                logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Retry policy did not allow for a retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
+                                logger::instance().log(instance->m_context, client_log_level::log_level_error, _XPLATSTR("Retry policy did not allow for a retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
                             }
 
                             throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
@@ -634,7 +637,7 @@ namespace azure { namespace storage { namespace core {
                         {
                             if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
                             {
-                                logger::instance().log(instance->m_context, client_log_level::log_level_error, U("Cannot recover request for retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
+                                logger::instance().log(instance->m_context, client_log_level::log_level_error, _XPLATSTR("Cannot recover request for retry, so throwing exception: ") + utility::conversions::to_string_t(e.what()));
                             }
 
                             throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
@@ -642,9 +645,10 @@ namespace azure { namespace storage { namespace core {
 
                         if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                         {
-                            utility::ostringstream_t str;
-                            str << U("Retrying failed operation, number of retries: ") << instance->m_retry_count;
-                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, str.str());
+                            utility::string_t str;
+                            str.reserve(128);
+                            str.append(_XPLATSTR("Retrying failed operation, number of retries: ")).append(utility::conversions::print_string(instance->m_retry_count));
+                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                         }
 
                         return complete_after(retry.retry_interval()).then([]() -> bool
@@ -664,7 +668,7 @@ namespace azure { namespace storage { namespace core {
 
                 if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                 {
-                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, U("Operation completed successfully"));
+                    logger::instance().log(instance->m_context, client_log_level::log_level_informational, _XPLATSTR("Operation completed successfully"));
                 }
             });
         }

@@ -32,7 +32,7 @@ namespace azure { namespace storage { namespace samples {
 
             // Create a table
             azure::storage::cloud_table_client table_client = storage_account.create_cloud_table_client();
-            azure::storage::cloud_table table = table_client.get_table_reference(U("MySampleTable"));
+            azure::storage::cloud_table table = table_client.get_table_reference(_XPLATSTR("MySampleTable"));
 
             // Return value is true if the table did not exist and was successfully created.
             table.create_if_not_exists();
@@ -41,18 +41,18 @@ namespace azure { namespace storage { namespace samples {
             azure::storage::table_batch_operation batch_operation;
             for (int i = 0; i < 10; ++i)
             {
-                utility::string_t row_key = U("MyRowKey") + utility::conversions::print_string(i);
-                azure::storage::table_entity entity(U("MyPartitionKey"), row_key);
+                utility::string_t row_key = _XPLATSTR("MyRowKey") + utility::conversions::print_string(i);
+                azure::storage::table_entity entity(_XPLATSTR("MyPartitionKey"), row_key);
                 azure::storage::table_entity::properties_type& properties = entity.properties();
                 properties.reserve(8);
-                properties[U("StringProperty")] = azure::storage::entity_property(utility::string_t(U("some string")));
-                properties[U("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
-                properties[U("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
-                properties[U("Int32Property")] = azure::storage::entity_property(1234567890);
-                properties[U("Int64Property")] = azure::storage::entity_property((int64_t) 1234567890123456789LL);
-                properties[U("DoubleProperty")] = azure::storage::entity_property(9.1234567890123456789);
-                properties[U("BooleanProperty")] = azure::storage::entity_property(true);
-                properties[U("BinaryProperty")] = azure::storage::entity_property(std::vector<uint8_t>(10, 'X'));
+                properties[_XPLATSTR("StringProperty")] = azure::storage::entity_property(utility::string_t(_XPLATSTR("some string")));
+                properties[_XPLATSTR("DateTimeProperty")] = azure::storage::entity_property(utility::datetime::utc_now());
+                properties[_XPLATSTR("GuidProperty")] = azure::storage::entity_property(utility::new_uuid());
+                properties[_XPLATSTR("Int32Property")] = azure::storage::entity_property(1234567890);
+                properties[_XPLATSTR("Int64Property")] = azure::storage::entity_property((int64_t) 1234567890123456789LL);
+                properties[_XPLATSTR("DoubleProperty")] = azure::storage::entity_property(9.1234567890123456789);
+                properties[_XPLATSTR("BooleanProperty")] = azure::storage::entity_property(true);
+                properties[_XPLATSTR("BinaryProperty")] = azure::storage::entity_property(std::vector<uint8_t>(10, 'X'));
                 batch_operation.insert_or_replace_entity(entity);
             }
             std::vector<azure::storage::table_result> results = table.execute_batch(batch_operation);
@@ -74,21 +74,21 @@ namespace azure { namespace storage { namespace samples {
                     azure::storage::table_entity::properties_type properties = it->properties();
 
                     // Explictly set the property types for datetime, guid, int64, and binary properties because these cannot be automatically inferred when the "no metadata" option is used
-                    properties.at(U("DateTimeProperty")).set_property_type(azure::storage::edm_type::datetime);
-                    properties.at(U("GuidProperty")).set_property_type(azure::storage::edm_type::guid);
-                    properties.at(U("Int64Property")).set_property_type(azure::storage::edm_type::int64);
-                    properties.at(U("BinaryProperty")).set_property_type(azure::storage::edm_type::binary);
+                    properties.at(_XPLATSTR("DateTimeProperty")).set_property_type(azure::storage::edm_type::datetime);
+                    properties.at(_XPLATSTR("GuidProperty")).set_property_type(azure::storage::edm_type::guid);
+                    properties.at(_XPLATSTR("Int64Property")).set_property_type(azure::storage::edm_type::int64);
+                    properties.at(_XPLATSTR("BinaryProperty")).set_property_type(azure::storage::edm_type::binary);
 
                     // Print all property values
-                    ucout << U("PK: ") << it->partition_key() << U(", RK: ") << it->row_key() << U(", TS: ") << it->timestamp().to_string(utility::datetime::ISO_8601) << std::endl;
-                    ucout << U("StringProperty:   ") << properties.at(U("StringProperty")).string_value() << std::endl;
-                    ucout << U("DateTimeProperty: ") << properties.at(U("DateTimeProperty")).datetime_value().to_string(utility::datetime::ISO_8601) << std::endl;
-                    ucout << U("GuidProperty:     ") << utility::uuid_to_string(properties.at(U("GuidProperty")).guid_value()) << std::endl;
-                    ucout << U("Int32Property:    ") << properties.at(U("Int32Property")).int32_value() << std::endl;
-                    ucout << U("Int64Property:    ") << properties.at(U("Int64Property")).int64_value() << std::endl;
-                    ucout << U("DoubleProperty:   ") << properties.at(U("DoubleProperty")).double_value() << std::endl;
-                    ucout << U("BooleanProperty:  ") << properties.at(U("BooleanProperty")).boolean_value() << std::endl;
-                    ucout << U("BinaryProperty:   ") << utility::conversions::to_base64(properties.at(U("BinaryProperty")).binary_value()) << std::endl;
+                    ucout << _XPLATSTR("PK: ") << it->partition_key() << _XPLATSTR(", RK: ") << it->row_key() << _XPLATSTR(", TS: ") << it->timestamp().to_string(utility::datetime::ISO_8601) << std::endl;
+                    ucout << _XPLATSTR("StringProperty:   ") << properties.at(_XPLATSTR("StringProperty")).string_value() << std::endl;
+                    ucout << _XPLATSTR("DateTimeProperty: ") << properties.at(_XPLATSTR("DateTimeProperty")).datetime_value().to_string(utility::datetime::ISO_8601) << std::endl;
+                    ucout << _XPLATSTR("GuidProperty:     ") << utility::uuid_to_string(properties.at(_XPLATSTR("GuidProperty")).guid_value()) << std::endl;
+                    ucout << _XPLATSTR("Int32Property:    ") << properties.at(_XPLATSTR("Int32Property")).int32_value() << std::endl;
+                    ucout << _XPLATSTR("Int64Property:    ") << properties.at(_XPLATSTR("Int64Property")).int64_value() << std::endl;
+                    ucout << _XPLATSTR("DoubleProperty:   ") << properties.at(_XPLATSTR("DoubleProperty")).double_value() << std::endl;
+                    ucout << _XPLATSTR("BooleanProperty:  ") << properties.at(_XPLATSTR("BooleanProperty")).boolean_value() << std::endl;
+                    ucout << _XPLATSTR("BinaryProperty:   ") << utility::conversions::to_base64(properties.at(_XPLATSTR("BinaryProperty")).binary_value()) << std::endl;
                 }
 
                 token = segment.continuation_token();
@@ -100,7 +100,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const azure::storage::storage_exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
 
             azure::storage::request_result result = e.result();
             azure::storage::storage_extended_error extended_error = result.extended_error();
@@ -111,7 +111,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const std::exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
         }
     }
 

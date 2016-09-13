@@ -75,7 +75,7 @@ namespace azure { namespace storage { namespace protocol {
 
         if (headers.match(web::http::header_names::content_range, value))
         {
-            auto slash = value.find(U('/'));
+            auto slash = value.find(_XPLATSTR('/'));
             value = value.substr(slash + 1);
             return utility::conversions::scan_string<utility::size64_t>(value);
         }
@@ -111,76 +111,6 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_type = parse_blob_type(get_header_value(headers, ms_header_blob_type));
 
         return properties;
-    }
-
-    copy_state blob_response_parsers::parse_copy_state(const web::http::http_response& response)
-    {
-        copy_state state;
-
-        auto& headers = response.headers();
-        auto status = get_header_value(headers, ms_header_copy_status);
-        if (!status.empty())
-        {
-            state.m_status = parse_copy_status(status);
-            state.m_copy_id = get_header_value(headers, ms_header_copy_id);
-            state.m_source = get_header_value(headers, ms_header_copy_source);
-            state.m_completion_time = parse_copy_completion_time(get_header_value(headers, ms_header_copy_completion_time));
-            state.m_status_description = get_header_value(headers, ms_header_copy_status_description);
-            parse_copy_progress(get_header_value(headers, ms_header_copy_progress), state.m_bytes_copied, state.m_total_bytes);
-        }
-
-        return state;
-    }
-
-    utility::datetime blob_response_parsers::parse_copy_completion_time(const utility::string_t& value)
-    {
-        if (!value.empty())
-        {
-            return utility::datetime::from_string(value, utility::datetime::date_format::RFC_1123);
-        }
-        else
-        {
-            return utility::datetime();
-        }
-    }
-
-    bool blob_response_parsers::parse_copy_progress(const utility::string_t& value, int64_t& bytes_copied, int64_t& bytes_total)
-    {
-        if (!value.empty())
-        {
-            utility::istringstream_t str(value);
-            utility::char_t slash;
-            str >> bytes_copied >> slash >> bytes_total;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    copy_status blob_response_parsers::parse_copy_status(const utility::string_t& value)
-    {
-        if (value == header_value_copy_pending)
-        {
-            return copy_status::pending;
-        }
-        else if (value == header_value_copy_success)
-        {
-            return copy_status::success;
-        }
-        else if (value == header_value_copy_aborted)
-        {
-            return copy_status::aborted;
-        }
-        else if (value == header_value_copy_failed)
-        {
-            return copy_status::failed;
-        }
-        else
-        {
-            return copy_status::invalid;
-        }
     }
 
 }}} // namespace azure::storage::protocol

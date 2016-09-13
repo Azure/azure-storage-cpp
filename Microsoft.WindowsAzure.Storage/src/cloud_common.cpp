@@ -30,7 +30,8 @@ namespace azure { namespace storage {
 
     WASTORAGE_API request_options::request_options()
         : m_location_mode(azure::storage::location_mode::primary_only), m_http_buffer_size(protocol::default_buffer_size),\
-          m_maximum_execution_time(protocol::default_maximum_execution_time), m_server_timeout(protocol::default_server_timeout)
+          m_maximum_execution_time(protocol::default_maximum_execution_time), m_server_timeout(protocol::default_server_timeout),\
+          m_noactivity_timeout(protocol::default_noactivity_timeout)
     {
     }
 

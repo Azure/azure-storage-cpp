@@ -20,7 +20,7 @@
 #include "check_macros.h"
 #include "wascore/streams.h"
 
-utility::string_t queue_service_test_base::queue_type_name = utility::string_t(U("queue"));
+utility::string_t queue_service_test_base::queue_type_name = utility::string_t(_XPLATSTR("queue"));
 
 azure::storage::cloud_queue_client queue_service_test_base::get_queue_client()
 {

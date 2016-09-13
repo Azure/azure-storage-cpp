@@ -21,48 +21,67 @@
 #include "was/blob.h"
 #include "was/queue.h"
 #include "was/table.h"
+#include "was/file.h"
 #include "was/storage_account.h"
 #include "wascore/resources.h"
 
 namespace azure { namespace storage {
 
-    const utility::string_t use_development_storage_setting_string(U("UseDevelopmentStorage"));
-    const utility::string_t use_development_storage_setting_value(U("true"));
-    const utility::string_t development_storage_proxy_uri_setting_string(U("DevelopmentStorageProxyUri"));
-    const utility::string_t default_endpoints_protocol_setting_string(U("DefaultEndpointsProtocol"));
-    const utility::string_t account_name_setting_string(U("AccountName"));
-    const utility::string_t account_key_setting_string(U("AccountKey"));
-    const utility::string_t blob_endpoint_setting_string(U("BlobEndpoint"));
-    const utility::string_t queue_endpoint_setting_string(U("QueueEndpoint"));
-    const utility::string_t table_endpoint_setting_string(U("TableEndpoint"));
-    const utility::string_t endpoint_suffix_setting_string(U("EndpointSuffix"));
-    const utility::string_t shared_access_signature_setting_string(U("SharedAccessSignature"));
-    const utility::string_t devstore_account_name(U("devstoreaccount1"));
-    const utility::string_t devstore_account_key(U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
-    const utility::string_t secondary_location_account_suffix(U("-secondary"));
-    const utility::string_t default_endpoint_suffix(U("core.windows.net"));
-    const utility::string_t default_blob_hostname_prefix(U("blob"));
-    const utility::string_t default_queue_hostname_prefix(U("queue"));
-    const utility::string_t default_table_hostname_prefix(U("table"));
+    const utility::char_t *use_development_storage_setting_string(_XPLATSTR("UseDevelopmentStorage"));
+    const utility::char_t *use_development_storage_setting_value(_XPLATSTR("true"));
+    const utility::char_t *development_storage_proxy_uri_setting_string(_XPLATSTR("DevelopmentStorageProxyUri"));
+    const utility::char_t *default_endpoints_protocol_setting_string(_XPLATSTR("DefaultEndpointsProtocol"));
+    const utility::char_t *account_name_setting_string(_XPLATSTR("AccountName"));
+    const utility::char_t *account_key_setting_string(_XPLATSTR("AccountKey"));
+    const utility::char_t *blob_endpoint_setting_string(_XPLATSTR("BlobEndpoint"));
+    const utility::char_t *queue_endpoint_setting_string(_XPLATSTR("QueueEndpoint"));
+    const utility::char_t *table_endpoint_setting_string(_XPLATSTR("TableEndpoint"));
+    const utility::char_t *file_endpoint_setting_string(_XPLATSTR("FileEndpoint"));
+    const utility::char_t *endpoint_suffix_setting_string(_XPLATSTR("EndpointSuffix"));
+    const utility::char_t *shared_access_signature_setting_string(_XPLATSTR("SharedAccessSignature"));
+    const utility::char_t *devstore_account_name(_XPLATSTR("devstoreaccount1"));
+    const utility::char_t *devstore_account_key(_XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+    const utility::char_t *secondary_location_account_suffix(_XPLATSTR("-secondary"));
+    const utility::char_t *default_endpoint_suffix(_XPLATSTR("core.windows.net"));
+    const utility::char_t *default_blob_hostname_prefix(_XPLATSTR("blob"));
+    const utility::char_t *default_queue_hostname_prefix(_XPLATSTR("queue"));
+    const utility::char_t *default_table_hostname_prefix(_XPLATSTR("table"));
+    const utility::char_t *default_file_hostname_prefix(_XPLATSTR("file"));
 
     storage_uri construct_default_endpoint(const utility::string_t& scheme, const utility::string_t& account_name, const utility::string_t& hostname_prefix, const utility::string_t& endpoint_suffix)
     {
-        utility::ostringstream_t primary;
-        primary << scheme << U("://") << account_name << U('.') << hostname_prefix << U('.') << endpoint_suffix;
+        utility::string_t primary;
+        primary.reserve(scheme.size() + account_name.size() + hostname_prefix.size() + endpoint_suffix.size() + 5);
+        primary.append(scheme);
+        primary.append(_XPLATSTR("://"));
+        primary.append(account_name);
+        primary.append(_XPLATSTR("."));
+        primary.append(hostname_prefix);
+        primary.append(_XPLATSTR("."));
+        primary.append(endpoint_suffix);
 
-        utility::ostringstream_t secondary;
-        secondary << scheme << U("://") << account_name << secondary_location_account_suffix << U('.') << hostname_prefix << U('.') << endpoint_suffix;
+        utility::string_t secondary;
+        secondary.reserve(scheme.size() + account_name.size() + hostname_prefix.size() + endpoint_suffix.size() + 10);
+        secondary.append(scheme);
+        secondary.append(_XPLATSTR("://"));
+        secondary.append(account_name);
+        secondary.append(secondary_location_account_suffix);
+        secondary.append(_XPLATSTR("."));
+        secondary.append(hostname_prefix);
+        secondary.append(_XPLATSTR("."));
+        secondary.append(endpoint_suffix);
 
-        return storage_uri(web::http::uri(primary.str()), web::http::uri(secondary.str()));
+        return storage_uri(web::http::uri(primary), web::http::uri(secondary));
     }
 
     void cloud_storage_account::initialize_default_endpoints(bool use_https)
     {
         auto endpoint_suffix = m_endpoint_suffix.empty() ? default_endpoint_suffix : m_endpoint_suffix;
-        const utility::string_t scheme(use_https ? U("https") : U("http"));
+        const utility::string_t scheme(use_https ? _XPLATSTR("https") : _XPLATSTR("http"));
         m_blob_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_blob_hostname_prefix, endpoint_suffix);
         m_queue_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_queue_hostname_prefix, endpoint_suffix);
         m_table_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_table_hostname_prefix, endpoint_suffix);
+        m_file_endpoint = construct_default_endpoint(scheme, m_credentials.account_name(), default_file_hostname_prefix, endpoint_suffix);
     }
 
     cloud_storage_account cloud_storage_account::get_development_storage_account(const web::http::uri& proxy_uri)
@@ -70,8 +89,8 @@ namespace azure { namespace storage {
         web::http::uri_builder builder;
         if (proxy_uri.is_empty())
         {
-            builder.set_scheme(U("http"));
-            builder.set_host(U("127.0.0.1"));
+            builder.set_scheme(_XPLATSTR("http"));
+            builder.set_host(_XPLATSTR("127.0.0.1"));
         }
         else
         {
@@ -87,8 +106,10 @@ namespace azure { namespace storage {
         web::uri queue_endpoint_primary = builder.to_uri();
         builder.set_port(10002);
         web::uri table_endpoint_primary = builder.to_uri();
+        builder.set_port(10003);
+        web::uri file_endpoint_primary = builder.to_uri();
 
-        builder.set_path(devstore_account_name + secondary_location_account_suffix);
+        builder.set_path(utility::string_t(devstore_account_name).append(secondary_location_account_suffix));
 
         builder.set_port(10000);
         web::uri blob_endpoint_secondary = builder.to_uri();
@@ -96,11 +117,14 @@ namespace azure { namespace storage {
         web::uri queue_endpoint_secondary = builder.to_uri();
         builder.set_port(10002);
         web::uri table_endpoint_secondary = builder.to_uri();
+        builder.set_port(10003);
+        web::uri file_endpoint_secondary = builder.to_uri();
 
         cloud_storage_account account(storage_credentials(devstore_account_name, devstore_account_key),
             storage_uri(std::move(blob_endpoint_primary), std::move(blob_endpoint_secondary)),
             storage_uri(std::move(queue_endpoint_primary), std::move(queue_endpoint_secondary)),
-            storage_uri(std::move(table_endpoint_primary), std::move(table_endpoint_secondary)));
+            storage_uri(std::move(table_endpoint_primary), std::move(table_endpoint_secondary)),
+            storage_uri(std::move(file_endpoint_primary), std::move(file_endpoint_secondary)));
         
         account.m_is_development_storage_account = true;
         account.m_settings.insert(std::make_pair(use_development_storage_setting_string, use_development_storage_setting_value));
@@ -120,13 +144,13 @@ namespace azure { namespace storage {
     std::map<utility::string_t, utility::string_t> parse_string_into_settings(const utility::string_t& connection_string)
     {
         std::map<utility::string_t, utility::string_t> settings;
-        auto splitted_string = core::string_split(connection_string, U(";"));
+        auto splitted_string = core::string_split(connection_string, _XPLATSTR(";"));
         
         for (auto iter = splitted_string.cbegin(); iter != splitted_string.cend(); ++iter)
         {
             if (!iter->empty())
             {
-                auto equals = iter->find(U('='));
+                auto equals = iter->find(_XPLATSTR('='));
 
                 utility::string_t key = iter->substr(0, equals);
                 if (!key.empty())
@@ -230,16 +254,19 @@ namespace azure { namespace storage {
             utility::string_t blob_endpoint;
             utility::string_t queue_endpoint;
             utility::string_t table_endpoint;
+            utility::string_t file_endpoint;
             get_setting(settings, blob_endpoint_setting_string, blob_endpoint);
             get_setting(settings, queue_endpoint_setting_string, queue_endpoint);
             get_setting(settings, table_endpoint_setting_string, table_endpoint);
+            get_setting(settings, file_endpoint_setting_string, file_endpoint);
 
             if (settings.empty())
             {
                 cloud_storage_account account(storage_credentials(account_name, account_key),
                     blob_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_blob_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(blob_endpoint)),
                     queue_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_queue_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(queue_endpoint)),
-                    table_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_table_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(table_endpoint)));
+                    table_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_table_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(table_endpoint)),
+                    file_endpoint.empty() ? construct_default_endpoint(scheme, account_name, default_file_hostname_prefix, endpoint_suffix) : storage_uri(web::http::uri(file_endpoint)));
 
                 account.m_endpoint_suffix = endpoint_suffix;
                 return account;
@@ -254,17 +281,20 @@ namespace azure { namespace storage {
         utility::string_t blob_endpoint;
         utility::string_t queue_endpoint;
         utility::string_t table_endpoint;
+        utility::string_t file_endpoint;
         get_setting(settings, blob_endpoint_setting_string, blob_endpoint);
         get_setting(settings, queue_endpoint_setting_string, queue_endpoint);
         get_setting(settings, table_endpoint_setting_string, table_endpoint);
+        get_setting(settings, file_endpoint_setting_string, file_endpoint);
         storage_credentials credentials(get_credentials(settings));
         
-        if (settings.empty() && (!blob_endpoint.empty() || !queue_endpoint.empty() || !table_endpoint.empty()))
+        if (settings.empty() && (!blob_endpoint.empty() || !queue_endpoint.empty() || !table_endpoint.empty() || !file_endpoint.empty()))
         {
             return cloud_storage_account(credentials,
                 blob_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(blob_endpoint)),
                 queue_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(queue_endpoint)),
-                table_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(table_endpoint)));
+                table_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(table_endpoint)),
+                file_endpoint.empty() ? storage_uri() : storage_uri(web::http::uri(file_endpoint)));
         }
 
         return cloud_storage_account();
@@ -332,6 +362,16 @@ namespace azure { namespace storage {
         return cloud_table_client(m_table_endpoint, m_credentials, default_request_options);
     }
 
+    cloud_file_client cloud_storage_account::create_cloud_file_client() const
+    {
+        return cloud_file_client(m_file_endpoint, m_credentials);
+    }
+
+    cloud_file_client cloud_storage_account::create_cloud_file_client(const file_request_options& default_request_options) const
+    {
+        return cloud_file_client(m_file_endpoint, m_credentials, default_request_options);
+    }
+
     utility::string_t cloud_storage_account::to_string(bool export_secrets)
     {
         if (m_settings.empty())
@@ -361,19 +401,27 @@ namespace azure { namespace storage {
                 {
                     m_settings.insert(std::make_pair(table_endpoint_setting_string, m_table_endpoint.primary_uri().to_string()));
                 }
+
+                if (!m_file_endpoint.primary_uri().is_empty())
+                {
+                    m_settings.insert(std::make_pair(file_endpoint_setting_string, m_file_endpoint.primary_uri().to_string()));
+                }
             }
         }
 
         bool semicolon = false;
-        utility::ostringstream_t result;
+        utility::string_t result;
+        result.reserve(256);
         for (auto iter = m_settings.cbegin(); iter != m_settings.cend(); ++iter)
         {
             if (semicolon)
             {
-                result << U(';');
+                result.append(_XPLATSTR(";"));
             }
 
-            result << iter->first << U('=') << iter->second;
+            result.append(iter->first);
+            result.append(_XPLATSTR("="));
+            result.append(iter->second);
             semicolon = true;
         }
 
@@ -381,17 +429,27 @@ namespace azure { namespace storage {
         {
             if (m_credentials.is_shared_key())
             {
-                result << U(';') << account_name_setting_string << U('=') << m_credentials.account_name();
-                result << U(';') << account_key_setting_string << U('=') << (export_secrets ? utility::conversions::to_base64(m_credentials.account_key()) : U("[key hidden]"));
+                result.append(_XPLATSTR(";"));
+                result.append(account_name_setting_string);
+                result.append(_XPLATSTR("="));
+                result.append(m_credentials.account_name());
+
+                result.append(_XPLATSTR(";"));
+                result.append(account_key_setting_string);
+                result.append(_XPLATSTR("="));
+                result.append((export_secrets ? utility::conversions::to_base64(m_credentials.account_key()) : _XPLATSTR("[key hidden]")));
             }
 
             if (m_credentials.is_sas())
             {
-                result << U(';') << shared_access_signature_setting_string << U('=') << (export_secrets ? m_credentials.sas_token() : U("[key hidden]"));
+                result.append(_XPLATSTR(";"));
+                result.append(shared_access_signature_setting_string);
+                result.append(_XPLATSTR("="));
+                result.append((export_secrets ? m_credentials.sas_token() : _XPLATSTR("[key hidden]")));
             }
         }
 
-        return result.str();
+        return result;
     }
 
     utility::string_t cloud_storage_account::get_shared_access_signature(const account_shared_access_policy& policy) const

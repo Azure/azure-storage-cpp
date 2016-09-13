@@ -34,9 +34,9 @@ namespace azure { namespace storage {
         utility::string_t string_value;
         string_value.reserve(string_data_value.size() + 3U);
 
-        string_value.append(U("X'"));
+        string_value.append(_XPLATSTR("X'"));
         string_value.append(string_data_value);
-        string_value.push_back(U('\''));
+        string_value.push_back(_XPLATSTR('\''));
 
         return generate_filter_condition_impl(property_name, comparison_operator, string_value);
     }
@@ -59,9 +59,9 @@ namespace azure { namespace storage {
         result.reserve(property_name.size() + comparison_operator.size() + value.size() + 2U);
 
         result.append(property_name);
-        result.push_back(U(' '));
+        result.push_back(_XPLATSTR(' '));
         result.append(comparison_operator);
-        result.push_back(U(' '));
+        result.push_back(_XPLATSTR(' '));
         result.append(value);
 
         return result;

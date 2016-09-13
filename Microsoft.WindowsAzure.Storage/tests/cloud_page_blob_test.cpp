@@ -41,6 +41,7 @@ SUITE(Blob)
         auto same_blob = m_container.get_page_blob_reference(m_blob.name());
         CHECK(!same_blob.exists(azure::storage::blob_request_options(), m_context));
         m_blob.create(1024, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(1024, m_blob.properties().size());
         CHECK_EQUAL(0, same_blob.properties().size());
         CHECK(same_blob.exists(azure::storage::blob_request_options(), m_context));
@@ -49,6 +50,7 @@ SUITE(Blob)
         CHECK(!same_blob.exists(azure::storage::blob_request_options(), m_context));
         CHECK_EQUAL(1024, same_blob.properties().size());
         m_blob.create(2048, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(2048, m_blob.properties().size());
         CHECK_EQUAL(1024, same_blob.properties().size());
         CHECK(same_blob.exists(azure::storage::blob_request_options(), m_context));
@@ -57,27 +59,29 @@ SUITE(Blob)
 
     TEST_FIXTURE(page_blob_test_base, page_blob_resize)
     {
-        m_blob.properties().set_content_language(U("tr,en"));
+        m_blob.properties().set_content_language(_XPLATSTR("tr,en"));
         m_blob.create(1024, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(1024, m_blob.properties().size());
 
-        m_blob.properties().set_content_language(U("en"));
+        m_blob.properties().set_content_language(_XPLATSTR("en"));
         m_blob.resize(2048, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(2048, m_blob.properties().size());
 
-        CHECK_UTF8_EQUAL(U("en"), m_blob.properties().content_language());
+        CHECK_UTF8_EQUAL(_XPLATSTR("en"), m_blob.properties().content_language());
         m_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_UTF8_EQUAL(U("tr,en"), m_blob.properties().content_language());
+        CHECK_UTF8_EQUAL(_XPLATSTR("tr,en"), m_blob.properties().content_language());
     }
 
     TEST_FIXTURE(page_blob_test_base, page_blob_sequence_number)
     {
-        m_blob.properties().set_content_language(U("tr,en"));
+        m_blob.properties().set_content_language(_XPLATSTR("tr,en"));
         m_blob.create(512, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK_EQUAL(512, m_blob.properties().size());
         CHECK_EQUAL(0, m_blob.properties().page_blob_sequence_number());
         
-        m_blob.properties().set_content_language(U("en"));
+        m_blob.properties().set_content_language(_XPLATSTR("en"));
         m_blob.set_sequence_number(azure::storage::sequence_number::update(5), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(5, m_blob.properties().page_blob_sequence_number());
 
@@ -90,9 +94,9 @@ SUITE(Blob)
         m_blob.set_sequence_number(azure::storage::sequence_number::increment(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(8, m_blob.properties().page_blob_sequence_number());
 
-        CHECK_UTF8_EQUAL(U("en"), m_blob.properties().content_language());
+        CHECK_UTF8_EQUAL(_XPLATSTR("en"), m_blob.properties().content_language());
         m_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_UTF8_EQUAL(U("tr,en"), m_blob.properties().content_language());
+        CHECK_UTF8_EQUAL(_XPLATSTR("tr,en"), m_blob.properties().content_language());
         CHECK_EQUAL(8, m_blob.properties().page_blob_sequence_number());
 
         m_blob.clear_pages(0, 512, azure::storage::access_condition::generate_if_sequence_number_equal_condition(8), azure::storage::blob_request_options(), m_context);
@@ -110,6 +114,7 @@ SUITE(Blob)
     {
         int64_t seq = get_random_int64() & 0x7FFFFFFFFFFFFFFFllu;
         m_blob.create(512, seq, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         m_blob.set_sequence_number(azure::storage::sequence_number::increment(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(seq + 1, m_blob.properties().page_blob_sequence_number());
     }
@@ -131,6 +136,7 @@ SUITE(Blob)
         });
 
         m_blob.create(12 * 1024 * 1024, 0, azure::storage::access_condition(), options, m_context);
+        check_blob_no_stale_property(m_blob);
 
         options.set_use_transactional_md5(false);
         for (int i = 0; i < 3; ++i)
@@ -365,7 +371,7 @@ SUITE(Blob)
         utility::string_t md5_header;
         m_context.set_sending_request([&md5_header] (web::http::http_request& request, azure::storage::operation_context)
         {
-            if (!request.headers().match(U("x-ms-blob-content-md5"), md5_header))
+            if (!request.headers().match(_XPLATSTR("x-ms-blob-content-md5"), md5_header))
             {
                 md5_header.clear();
             }
@@ -405,6 +411,7 @@ SUITE(Blob)
     TEST_FIXTURE(page_blob_test_base, page_blob_constructor)
     {
         m_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
         CHECK(!m_blob.properties().etag().empty());
 
         azure::storage::cloud_page_blob blob1(m_blob.uri());
@@ -428,50 +435,52 @@ SUITE(Blob)
 
     TEST_FIXTURE(page_blob_test_base, page_blob_create_with_metadata)
     {
-        m_blob.metadata()[U("key1")] = U("value1");
-        m_blob.metadata()[U("key2")] = U("value2");
+        m_blob.metadata()[_XPLATSTR("key1")] = _XPLATSTR("value1");
+        m_blob.metadata()[_XPLATSTR("key2")] = _XPLATSTR("value2");
         m_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
 
         auto same_blob = m_container.get_page_blob_reference(m_blob.name());
         CHECK(same_blob.metadata().empty());
         same_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(2U, same_blob.metadata().size());
-        CHECK_UTF8_EQUAL(U("value1"), same_blob.metadata()[U("key1")]);
-        CHECK_UTF8_EQUAL(U("value2"), same_blob.metadata()[U("key2")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value1"), same_blob.metadata()[_XPLATSTR("key1")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value2"), same_blob.metadata()[_XPLATSTR("key2")]);
     }
 
     TEST_FIXTURE(page_blob_test_base, page_blob_snapshot_metadata)
     {
-        m_blob.metadata()[U("key1")] = U("value1");
-        m_blob.metadata()[U("key2")] = U("value2");
+        m_blob.metadata()[_XPLATSTR("key1")] = _XPLATSTR("value1");
+        m_blob.metadata()[_XPLATSTR("key2")] = _XPLATSTR("value2");
         m_blob.create(0, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        check_blob_no_stale_property(m_blob);
 
         auto snapshot1 = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(2U, snapshot1.metadata().size());
-        CHECK_UTF8_EQUAL(U("value1"), snapshot1.metadata()[U("key1")]);
-        CHECK_UTF8_EQUAL(U("value2"), snapshot1.metadata()[U("key2")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value1"), snapshot1.metadata()[_XPLATSTR("key1")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value2"), snapshot1.metadata()[_XPLATSTR("key2")]);
 
         azure::storage::cloud_page_blob snapshot1_clone(snapshot1.uri(), snapshot1.snapshot_time(), snapshot1.service_client().credentials());
         CHECK(snapshot1_clone.metadata().empty());
         snapshot1_clone.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(2U, snapshot1_clone.metadata().size());
-        CHECK_UTF8_EQUAL(U("value1"), snapshot1_clone.metadata()[U("key1")]);
-        CHECK_UTF8_EQUAL(U("value2"), snapshot1_clone.metadata()[U("key2")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value1"), snapshot1_clone.metadata()[_XPLATSTR("key1")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value2"), snapshot1_clone.metadata()[_XPLATSTR("key2")]);
 
         azure::storage::cloud_metadata snapshot_metadata;
-        snapshot_metadata[U("key3")] = U("value1");
-        snapshot_metadata[U("key4")] = U("value2");
+        snapshot_metadata[_XPLATSTR("key3")] = _XPLATSTR("value1");
+        snapshot_metadata[_XPLATSTR("key4")] = _XPLATSTR("value2");
         auto snapshot2 = m_blob.create_snapshot(snapshot_metadata, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(2U, snapshot1.metadata().size());
-        CHECK_UTF8_EQUAL(U("value1"), snapshot2.metadata()[U("key3")]);
-        CHECK_UTF8_EQUAL(U("value2"), snapshot2.metadata()[U("key4")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value1"), snapshot2.metadata()[_XPLATSTR("key3")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value2"), snapshot2.metadata()[_XPLATSTR("key4")]);
 
         azure::storage::cloud_page_blob snapshot2_clone(snapshot2.uri(), snapshot2.snapshot_time(), snapshot2.service_client().credentials());
         CHECK(snapshot2_clone.metadata().empty());
         snapshot2_clone.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_EQUAL(2U, snapshot2_clone.metadata().size());
-        CHECK_UTF8_EQUAL(U("value1"), snapshot2_clone.metadata()[U("key3")]);
-        CHECK_UTF8_EQUAL(U("value2"), snapshot2_clone.metadata()[U("key4")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value1"), snapshot2_clone.metadata()[_XPLATSTR("key3")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value2"), snapshot2_clone.metadata()[_XPLATSTR("key4")]);
     }
 
     TEST_FIXTURE(page_blob_test_base, page_blob_upload_maximum_execution_time)

@@ -54,23 +54,23 @@ SUITE(Table)
 
     TEST_FIXTURE(table_service_test_base, Table_Uri)
     {
-        azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable")));
+        azure::storage::storage_uri uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net/mytable")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net/mytable")));
 
         azure::storage::cloud_table table1(uri);
 
-        web::http::uri expected_primary_uri(U("https://myaccount.table.core.windows.net"));
-        web::http::uri expected_secondary_uri(U("https://myaccount-secondary.table.core.windows.net"));
+        web::http::uri expected_primary_uri(_XPLATSTR("https://myaccount.table.core.windows.net"));
+        web::http::uri expected_secondary_uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net"));
 
         CHECK(table1.service_client().base_uri().primary_uri() == expected_primary_uri);
         CHECK(table1.service_client().base_uri().secondary_uri() == expected_secondary_uri);
         CHECK(table1.service_client().credentials().is_anonymous());
-        CHECK(table1.name().compare(U("mytable")) == 0);
+        CHECK(table1.name().compare(_XPLATSTR("mytable")) == 0);
         CHECK(table1.uri().primary_uri() == uri.primary_uri());
         CHECK(table1.uri().secondary_uri() == uri.secondary_uri());
 
-        utility::string_t sas_token(U("se=2013-05-15T17%3A20%3A36Z&sig=mysignature&sp=raud&st=2013-05-15T16%3A20%3A36Z&sv=2012-02-12&tn=people"));
+        utility::string_t sas_token(_XPLATSTR("se=2013-05-15T17%3A20%3A36Z&sig=mysignature&sp=raud&st=2013-05-15T16%3A20%3A36Z&sv=2012-02-12&tn=people"));
 
-        azure::storage::storage_uri sas_uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")));
+        azure::storage::storage_uri sas_uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")));
 
         azure::storage::cloud_table table2(sas_uri);
 
@@ -78,32 +78,32 @@ SUITE(Table)
         CHECK(table2.service_client().base_uri().secondary_uri() == expected_secondary_uri);
         CHECK(table2.service_client().credentials().is_sas());
         CHECK(table2.service_client().credentials().sas_token() == sas_token);
-        CHECK(table2.name().compare(U("mytable")) == 0);
+        CHECK(table2.name().compare(_XPLATSTR("mytable")) == 0);
         CHECK(table2.uri().primary_uri() == uri.primary_uri());
         CHECK(table2.uri().secondary_uri() == uri.secondary_uri());
     }
 
     TEST_FIXTURE(table_service_test_base, Table_UriAndCredentials)
     {
-        azure::storage::storage_uri uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable")));
-        azure::storage::storage_credentials credentials(U("devstoreaccount1"), U("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
+        azure::storage::storage_uri uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net/mytable")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net/mytable")));
+        azure::storage::storage_credentials credentials(_XPLATSTR("devstoreaccount1"), _XPLATSTR("Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="));
 
         azure::storage::cloud_table table(uri, credentials);
 
-        web::http::uri expected_primary_uri(U("https://myaccount.table.core.windows.net"));
-        web::http::uri expected_secondary_uri(U("https://myaccount-secondary.table.core.windows.net"));
+        web::http::uri expected_primary_uri(_XPLATSTR("https://myaccount.table.core.windows.net"));
+        web::http::uri expected_secondary_uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net"));
 
         CHECK(table.service_client().base_uri().primary_uri() == expected_primary_uri);
         CHECK(table.service_client().base_uri().secondary_uri() == expected_secondary_uri);
         CHECK(table.service_client().credentials().is_shared_key());
-        CHECK(table.name().compare(U("mytable")) == 0);
+        CHECK(table.name().compare(_XPLATSTR("mytable")) == 0);
         CHECK(table.uri().primary_uri() == uri.primary_uri());
         CHECK(table.uri().secondary_uri() == uri.secondary_uri());
 
-        utility::string_t sas_token(U("sv=2012-02-12&tn=people&st=2013-05-15T16%3A20%3A36Z&se=2013-05-15T17%3A20%3A36Z&sp=raud&sig=mysignature"));
-        utility::string_t invalid_sas_token(U("sv=2012-02-12&tn=people&st=2013-05-15T16%3A20%3A36Z&se=2013-05-15T17%3A20%3A36Z&sp=raud&sig=invalid"));
+        utility::string_t sas_token(_XPLATSTR("sv=2012-02-12&tn=people&st=2013-05-15T16%3A20%3A36Z&se=2013-05-15T17%3A20%3A36Z&sp=raud&sig=mysignature"));
+        utility::string_t invalid_sas_token(_XPLATSTR("sv=2012-02-12&tn=people&st=2013-05-15T16%3A20%3A36Z&se=2013-05-15T17%3A20%3A36Z&sp=raud&sig=invalid"));
 
-        azure::storage::storage_uri sas_uri(web::http::uri(U("https://myaccount.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")), web::http::uri(U("https://myaccount-secondary.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")));
+        azure::storage::storage_uri sas_uri(web::http::uri(_XPLATSTR("https://myaccount.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")), web::http::uri(_XPLATSTR("https://myaccount-secondary.table.core.windows.net/mytable?tn=people&sp=raud&sv=2012-02-12&se=2013-05-15T17%3A20%3A36Z&st=2013-05-15T16%3A20%3A36Z&sig=mysignature")));
         azure::storage::storage_credentials sas_credentials(sas_token);
 
         CHECK_THROW(azure::storage::cloud_table(sas_uri, sas_credentials), std::invalid_argument);
@@ -151,7 +151,7 @@ SUITE(Table)
 
         CHECK(property.str().size() > 0);
 
-        utility::string_t invalid_value(U("ABCDEFG"));
+        utility::string_t invalid_value(_XPLATSTR("ABCDEFG"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::binary);
 
@@ -160,7 +160,7 @@ SUITE(Table)
         CHECK_THROW(property.binary_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("ABCDEFG-"));
+        invalid_value = utility::string_t(_XPLATSTR("ABCDEFG-"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::binary);
 
@@ -169,7 +169,7 @@ SUITE(Table)
         CHECK_THROW(property.binary_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("ABCDEFG:"));
+        invalid_value = utility::string_t(_XPLATSTR("ABCDEFG:"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::binary);
 
@@ -215,7 +215,7 @@ SUITE(Table)
 
         CHECK(property.str().size() > 0);
 
-        utility::string_t invalid_value(U("ABCD"));
+        utility::string_t invalid_value(_XPLATSTR("ABCD"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::boolean);
 
@@ -224,7 +224,7 @@ SUITE(Table)
         CHECK_THROW(property.boolean_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("yes"));
+        invalid_value = utility::string_t(_XPLATSTR("yes"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::boolean);
 
@@ -233,7 +233,7 @@ SUITE(Table)
         CHECK_THROW(property.boolean_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("0"));
+        invalid_value = utility::string_t(_XPLATSTR("0"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::boolean);
 
@@ -242,7 +242,7 @@ SUITE(Table)
         CHECK_THROW(property.boolean_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U(""));
+        invalid_value = utility::string_t(_XPLATSTR(""));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::boolean);
 
@@ -349,7 +349,7 @@ SUITE(Table)
         CHECK(property.double_value() == value);
         CHECK(property.str().size() > 0);
 
-        utility::string_t invalid_value(U("ABCD"));
+        utility::string_t invalid_value(_XPLATSTR("ABCD"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::double_floating_point);
 
@@ -358,7 +358,7 @@ SUITE(Table)
         CHECK_THROW(property.double_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("123.450ABCD"));
+        invalid_value = utility::string_t(_XPLATSTR("123.450ABCD"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::double_floating_point);
 
@@ -404,7 +404,7 @@ SUITE(Table)
 
         CHECK(property.str().size() > 0);
 
-        utility::string_t invalid_value(U("abcd"));
+        utility::string_t invalid_value(_XPLATSTR("abcd"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::guid);
 
@@ -413,7 +413,7 @@ SUITE(Table)
         CHECK_THROW(property.guid_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("01234567-89ab-cdef-gggg-012345abcdef"));
+        invalid_value = utility::string_t(_XPLATSTR("01234567-89ab-cdef-gggg-012345abcdef"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::guid);
 
@@ -422,7 +422,7 @@ SUITE(Table)
         CHECK_THROW(property.guid_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("01234567-89ab-cdef------012345abcdef"));
+        invalid_value = utility::string_t(_XPLATSTR("01234567-89ab-cdef------012345abcdef"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::guid);
 
@@ -468,7 +468,7 @@ SUITE(Table)
 
         CHECK(property.str().size() > 0);
 
-        utility::string_t invalid_value(U("abcd"));
+        utility::string_t invalid_value(_XPLATSTR("abcd"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::int32);
 
@@ -477,7 +477,7 @@ SUITE(Table)
         CHECK_THROW(property.int32_value(), std::runtime_error);
         CHECK(property.str().size() > 0);
 
-        invalid_value = utility::string_t(U("01234567-89ab-cdef-gggg-012345abcdef"));
+        invalid_value = utility::string_t(_XPLATSTR("01234567-89ab-cdef-gggg-012345abcdef"));
         property.set_value(invalid_value);
         property.set_property_type(azure::storage::edm_type::int32);
 
@@ -701,8 +701,8 @@ SUITE(Table)
 
         CHECK(entity.etag().compare(etag) == 0);
 
-        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(get_random_boolean())));
-        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
+        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(get_random_boolean())));
+        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
 
         CHECK(entity.properties().size() == 2U);
     }
@@ -715,9 +715,9 @@ SUITE(Table)
         azure::storage::table_entity::properties_type properties;
 
         properties.reserve(3);
-        properties.insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(get_random_double())));
-        properties.insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(get_random_string())));
-        properties.insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(get_random_guid())));
+        properties.insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(get_random_double())));
+        properties.insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(get_random_string())));
+        properties.insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(get_random_guid())));
 
         azure::storage::table_entity entity(partition_key, row_key, etag, properties);
 
@@ -742,8 +742,8 @@ SUITE(Table)
 
         CHECK(entity.etag().compare(etag) == 0);
 
-        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(get_random_boolean())));
-        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
+        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(get_random_boolean())));
+        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
 
         CHECK(entity.properties().size() == 5U);
     }
@@ -865,22 +865,22 @@ SUITE(Table)
 
         CHECK_EQUAL(take_count, query.take_count());
 
-        utility::string_t filter_string(U("PartitionKey eq 'AAA' and RowKey lt 'BBB' and Timestamp ge datetime'2013-09-01T00:00:00Z'"));
+        utility::string_t filter_string(_XPLATSTR("PartitionKey eq 'AAA' and RowKey lt 'BBB' and Timestamp ge datetime'2013-09-01T00:00:00Z'"));
         query.set_filter_string(filter_string);
 
         CHECK(query.filter_string().compare(filter_string) == 0);
 
         std::vector<utility::string_t> select_columns;
         select_columns.reserve(3);
-        select_columns.push_back(U("PropertyA"));
-        select_columns.push_back(U("PropertyB"));
-        select_columns.push_back(U("PropertyC"));
+        select_columns.push_back(_XPLATSTR("PropertyA"));
+        select_columns.push_back(_XPLATSTR("PropertyB"));
+        select_columns.push_back(_XPLATSTR("PropertyC"));
         query.set_select_columns(select_columns);
 
         CHECK_EQUAL(select_columns.size(), query.select_columns().size());
-        CHECK(query.select_columns()[0].compare(U("PropertyA")) == 0);
-        CHECK(query.select_columns()[1].compare(U("PropertyB")) == 0);
-        CHECK(query.select_columns()[2].compare(U("PropertyC")) == 0);
+        CHECK(query.select_columns()[0].compare(_XPLATSTR("PropertyA")) == 0);
+        CHECK(query.select_columns()[1].compare(_XPLATSTR("PropertyB")) == 0);
+        CHECK(query.select_columns()[2].compare(_XPLATSTR("PropertyC")) == 0);
     }
 
     TEST_FIXTURE(table_service_test_base, TableRequestOptions_Normal)
@@ -964,7 +964,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::Conflict, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("TableAlreadyExists")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("TableAlreadyExists")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -981,7 +981,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("TableAlreadyExists")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("TableAlreadyExists")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -1047,7 +1047,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -1064,7 +1064,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
     }
@@ -1273,8 +1273,8 @@ SUITE(Table)
         azure::storage::table_entity entity(partition_key, row_key);
 
         entity.properties().reserve(2);
-        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(int32_value)));
-        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(string_value)));
+        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(int32_value)));
+        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(string_value)));
 
         azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
         azure::storage::table_request_options options;
@@ -1288,7 +1288,7 @@ SUITE(Table)
         catch (const azure::storage::storage_exception& e)
         {
             CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
-            CHECK(e.result().extended_error().code().compare(U("TableNotFound")) == 0);
+            CHECK(e.result().extended_error().code().compare(_XPLATSTR("TableNotFound")) == 0);
             CHECK(!e.result().extended_error().message().empty());
         }
 
@@ -1305,7 +1305,7 @@ SUITE(Table)
         CHECK(context.request_results()[0].request_date().is_initialized());
         CHECK(context.request_results()[0].content_md5().empty());
         CHECK(context.request_results()[0].etag().empty());
-        CHECK(context.request_results()[0].extended_error().code().compare(U("TableNotFound")) == 0);
+        CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("TableNotFound")) == 0);
         CHECK(!context.request_results()[0].extended_error().message().empty());
     }
 
@@ -1329,14 +1329,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(boolean_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(int32_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(boolean_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(int32_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
@@ -1384,22 +1384,22 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(8U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
-            CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value, result.entity().properties().find(U("PropertyB"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK_EQUAL(boolean_value, result.entity().properties().find(_XPLATSTR("PropertyA"))->second.boolean_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value, result.entity().properties().find(_XPLATSTR("PropertyB"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1423,14 +1423,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(boolean_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(int32_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(boolean_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(int32_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
@@ -1444,7 +1444,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::Conflict, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("EntityAlreadyExists")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("EntityAlreadyExists")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -1461,12 +1461,12 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("EntityAlreadyExists")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("EntityAlreadyExists")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
         {
-            //utility::string_t etag(U("*"));
+            //utility::string_t etag(_XPLATSTR("*"));
 
             azure::storage::table_entity entity(partition_key, row_key);
             //entity.set_etag(etag);
@@ -1549,7 +1549,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -1566,7 +1566,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -1593,14 +1593,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(boolean_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(int32_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(boolean_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(int32_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_merge_entity(entity);
             azure::storage::table_request_options options;
@@ -1648,22 +1648,22 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(8U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
-            CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value, result.entity().properties().find(U("PropertyB"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK_EQUAL(boolean_value, result.entity().properties().find(_XPLATSTR("PropertyA"))->second.boolean_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value, result.entity().properties().find(_XPLATSTR("PropertyB"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1697,14 +1697,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyI"), azure::storage::entity_property(int32_value2)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyJ"), azure::storage::entity_property(int32_value3)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyI"), azure::storage::entity_property(int32_value2)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyJ"), azure::storage::entity_property(int32_value3)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_merge_entity(entity);
             azure::storage::table_request_options options;
@@ -1752,26 +1752,26 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(10U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
-            CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value, result.entity().properties().find(U("PropertyB"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
-            CHECK(result.entity().properties().find(U("PropertyI")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value2, result.entity().properties().find(U("PropertyI"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyJ")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value3, result.entity().properties().find(U("PropertyJ"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK_EQUAL(boolean_value, result.entity().properties().find(_XPLATSTR("PropertyA"))->second.boolean_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value, result.entity().properties().find(_XPLATSTR("PropertyB"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyI")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value2, result.entity().properties().find(_XPLATSTR("PropertyI"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyJ")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value3, result.entity().properties().find(_XPLATSTR("PropertyJ"))->second.int32_value());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1805,14 +1805,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyK"), azure::storage::entity_property(int32_value4)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyL"), azure::storage::entity_property(int32_value5)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyK"), azure::storage::entity_property(int32_value4)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyL"), azure::storage::entity_property(int32_value5)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::merge_entity(entity);
             azure::storage::table_request_options options;
@@ -1860,30 +1860,30 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(12U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
-            CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value, result.entity().properties().find(U("PropertyB"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
-            CHECK(result.entity().properties().find(U("PropertyI")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value2, result.entity().properties().find(U("PropertyI"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyJ")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value3, result.entity().properties().find(U("PropertyJ"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyK")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value4, result.entity().properties().find(U("PropertyK"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyL")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value5, result.entity().properties().find(U("PropertyL"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK_EQUAL(boolean_value, result.entity().properties().find(_XPLATSTR("PropertyA"))->second.boolean_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value, result.entity().properties().find(_XPLATSTR("PropertyB"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyI")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value2, result.entity().properties().find(_XPLATSTR("PropertyI"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyJ")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value3, result.entity().properties().find(_XPLATSTR("PropertyJ"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyK")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value4, result.entity().properties().find(_XPLATSTR("PropertyK"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyL")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value5, result.entity().properties().find(_XPLATSTR("PropertyL"))->second.int32_value());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1951,14 +1951,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyM"), azure::storage::entity_property(int32_value6)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyN"), azure::storage::entity_property(int32_value7)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyM"), azure::storage::entity_property(int32_value6)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyN"), azure::storage::entity_property(int32_value7)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::merge_entity(entity);
             azure::storage::table_request_options options;
@@ -1972,7 +1972,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -1989,7 +1989,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -2016,14 +2016,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(boolean_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(int32_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(boolean_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(int32_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_replace_entity(entity);
             azure::storage::table_request_options options;
@@ -2071,22 +2071,22 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(8U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
-            CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value, result.entity().properties().find(U("PropertyB"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK_EQUAL(boolean_value, result.entity().properties().find(_XPLATSTR("PropertyA"))->second.boolean_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value, result.entity().properties().find(_XPLATSTR("PropertyB"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -2120,14 +2120,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyI"), azure::storage::entity_property(int32_value2)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyJ"), azure::storage::entity_property(int32_value3)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyI"), azure::storage::entity_property(int32_value2)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyJ"), azure::storage::entity_property(int32_value3)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_replace_entity(entity);
             azure::storage::table_request_options options;
@@ -2175,22 +2175,22 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(8U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
-            CHECK(result.entity().properties().find(U("PropertyI")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value2, result.entity().properties().find(U("PropertyI"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyJ")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value3, result.entity().properties().find(U("PropertyJ"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyI")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value2, result.entity().properties().find(_XPLATSTR("PropertyI"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyJ")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value3, result.entity().properties().find(_XPLATSTR("PropertyJ"))->second.int32_value());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -2224,14 +2224,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyK"), azure::storage::entity_property(int32_value4)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyL"), azure::storage::entity_property(int32_value5)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyK"), azure::storage::entity_property(int32_value4)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyL"), azure::storage::entity_property(int32_value5)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::replace_entity(entity);
             azure::storage::table_request_options options;
@@ -2279,22 +2279,22 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(8U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
-            CHECK(result.entity().properties().find(U("PropertyK")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value4, result.entity().properties().find(U("PropertyK"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyL")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value5, result.entity().properties().find(U("PropertyL"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyK")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value4, result.entity().properties().find(_XPLATSTR("PropertyK"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyL")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value5, result.entity().properties().find(_XPLATSTR("PropertyL"))->second.int32_value());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -2362,14 +2362,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyM"), azure::storage::entity_property(int32_value6)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyN"), azure::storage::entity_property(int32_value7)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyM"), azure::storage::entity_property(int32_value6)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyN"), azure::storage::entity_property(int32_value7)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::replace_entity(entity);
             azure::storage::table_request_options options;
@@ -2383,7 +2383,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::NotFound, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("ResourceNotFound")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -2400,7 +2400,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("ResourceNotFound")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("ResourceNotFound")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -2427,14 +2427,14 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(8);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(boolean_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(int32_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(int64_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(double_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(string_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(datetime_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(binary_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(guid_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(boolean_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(int32_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(int64_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(double_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(string_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(datetime_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(binary_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(guid_value)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
@@ -2486,22 +2486,22 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(8U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK_EQUAL(boolean_value, result.entity().properties().find(U("PropertyA"))->second.boolean_value());
-            CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
-            CHECK_EQUAL(int32_value, result.entity().properties().find(U("PropertyB"))->second.int32_value());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK_EQUAL(int64_value, result.entity().properties().find(U("PropertyC"))->second.int64_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK_EQUAL(double_value, result.entity().properties().find(U("PropertyD"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.string_value().compare(string_value) == 0);
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.datetime_value() == datetime_value);
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(U("PropertyG"))->second.binary_value(), (int)binary_value.size());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(utility::uuid_equal(result.entity().properties().find(U("PropertyH"))->second.guid_value(), guid_value));
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK_EQUAL(boolean_value, result.entity().properties().find(_XPLATSTR("PropertyA"))->second.boolean_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB")) != result.entity().properties().cend());
+            CHECK_EQUAL(int32_value, result.entity().properties().find(_XPLATSTR("PropertyB"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK_EQUAL(int64_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.int64_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK_EQUAL(double_value, result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.string_value().compare(string_value) == 0);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.datetime_value() == datetime_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK_ARRAY_EQUAL(binary_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.binary_value(), (int)binary_value.size());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(utility::uuid_equal(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.guid_value(), guid_value));
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -2538,7 +2538,7 @@ SUITE(Table)
             bad_property.set_property_type(azure::storage::edm_type::datetime);
 
             entity.properties().reserve(1);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("BadProperty"), bad_property));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("BadProperty"), bad_property));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
@@ -2552,7 +2552,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -2569,7 +2569,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -2598,16 +2598,16 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(10);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(nan_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(infinity_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(negative_infinity_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(negative_zero)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(whole_number)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(positive_exponent_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(negative_exponent_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(denormalized_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyI"), azure::storage::entity_property(zero_value)));
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyJ"), azure::storage::entity_property(one_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(nan_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(infinity_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(negative_infinity_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(negative_zero)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(whole_number)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(positive_exponent_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(negative_exponent_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(denormalized_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyI"), azure::storage::entity_property(zero_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyJ"), azure::storage::entity_property(one_value)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
@@ -2638,37 +2638,37 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(10U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyA"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK(result.entity().properties().find(U("PropertyA"))->second.double_value() != result.entity().properties().find(U("PropertyA"))->second.double_value()); // Only NaN is defined to not equal itself
-            CHECK(result.entity().properties().find(U("PropertyB")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyB"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(infinity_value, result.entity().properties().find(U("PropertyB"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyC")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyC"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(negative_infinity_value, result.entity().properties().find(U("PropertyC"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyD")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyD"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA"))->second.double_value() != result.entity().properties().find(_XPLATSTR("PropertyA"))->second.double_value()); // Only NaN is defined to not equal itself
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyB"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(infinity_value, result.entity().properties().find(_XPLATSTR("PropertyB"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyC"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(negative_infinity_value, result.entity().properties().find(_XPLATSTR("PropertyC"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyD"))->second.property_type() == azure::storage::edm_type::double_floating_point);
             // TODO: Investigate why the service doesn't handle -0.0 correctly (also investigate if other client libraries can handle -0.0)
-            //CHECK_EQUAL(negative_infinity_value, 1.0 / result.entity().properties().find(U("PropertyD"))->second.double_value()); // 1.0 / -0.0 == -Infinity
-            CHECK(result.entity().properties().find(U("PropertyE")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyE"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(whole_number, result.entity().properties().find(U("PropertyE"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyF")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyF"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(positive_exponent_value, result.entity().properties().find(U("PropertyF"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyG")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyG"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(negative_exponent_value, result.entity().properties().find(U("PropertyG"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyH")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyH"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(denormalized_value, result.entity().properties().find(U("PropertyH"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyI")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyI"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(zero_value, result.entity().properties().find(U("PropertyI"))->second.double_value());
-            CHECK(result.entity().properties().find(U("PropertyJ")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyJ"))->second.property_type() == azure::storage::edm_type::double_floating_point);
-            CHECK_EQUAL(one_value, result.entity().properties().find(U("PropertyJ"))->second.double_value());
+            //CHECK_EQUAL(negative_infinity_value, 1.0 / result.entity().properties().find(_XPLATSTR("PropertyD"))->second.double_value()); // 1.0 / -0.0 == -Infinity
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyE"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(whole_number, result.entity().properties().find(_XPLATSTR("PropertyE"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyF"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(positive_exponent_value, result.entity().properties().find(_XPLATSTR("PropertyF"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyG"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(negative_exponent_value, result.entity().properties().find(_XPLATSTR("PropertyG"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyH"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(denormalized_value, result.entity().properties().find(_XPLATSTR("PropertyH"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyI")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyI"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(zero_value, result.entity().properties().find(_XPLATSTR("PropertyI"))->second.double_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyJ")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyJ"))->second.property_type() == azure::storage::edm_type::double_floating_point);
+            CHECK_EQUAL(one_value, result.entity().properties().find(_XPLATSTR("PropertyJ"))->second.double_value());
         }
 
         table.delete_table();
@@ -2683,7 +2683,7 @@ SUITE(Table)
 
             double double_value = get_random_double();
             web::json::value property_value = web::json::value(double_value);
-            fields.push_back(std::make_pair(U("DoubleProperty"), std::move(property_value)));
+            fields.push_back(std::make_pair(_XPLATSTR("DoubleProperty"), std::move(property_value)));
 
             // Test if the Casablanca JSON serialization and parsing can round-trip a double value
             web::json::value input_document = web::json::value::object(fields);
@@ -2691,10 +2691,10 @@ SUITE(Table)
             web::json::value output_document = web::json::value::parse(message);
             
             CHECK(output_document.is_object());
-            CHECK(output_document.as_object().find(U("DoubleProperty")) != output_document.as_object().cend());
-            CHECK_EQUAL(web::json::value::value_type::Number, output_document.as_object().find(U("DoubleProperty"))->second.type());
-            CHECK(output_document.as_object().find(U("DoubleProperty"))->second.is_double());
-            CHECK_EQUAL(double_value, output_document.as_object().find(U("DoubleProperty"))->second.as_double());
+            CHECK(output_document.as_object().find(_XPLATSTR("DoubleProperty")) != output_document.as_object().cend());
+            CHECK_EQUAL(web::json::value::value_type::Number, output_document.as_object().find(_XPLATSTR("DoubleProperty"))->second.type());
+            CHECK(output_document.as_object().find(_XPLATSTR("DoubleProperty"))->second.is_double());
+            CHECK_EQUAL(double_value, output_document.as_object().find(_XPLATSTR("DoubleProperty"))->second.as_double());
         }
     }
 
@@ -2725,8 +2725,8 @@ SUITE(Table)
                 azure::storage::table_entity entity(partition_key, row_keys[i]);
 
                 entity.properties().reserve(2);
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(int32_value)));
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(string_value)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(int32_value)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(string_value)));
 
                 operation.insert_entity(entity);
             }
@@ -2769,7 +2769,7 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
+            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
@@ -2779,8 +2779,8 @@ SUITE(Table)
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
                 CHECK_EQUAL(2U, results[i].properties().size());
-                CHECK_EQUAL(int32_value, results[i].properties()[U("PropertyA")].int32_value());
-                CHECK(string_value.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
+                CHECK_EQUAL(int32_value, results[i].properties()[_XPLATSTR("PropertyA")].int32_value());
+                CHECK(string_value.compare(results[i].properties()[_XPLATSTR("PropertyB")].string_value()) == 0);
             }
 
             CHECK(!context.client_request_id().empty());
@@ -2814,9 +2814,9 @@ SUITE(Table)
                 azure::storage::table_entity entity(partition_key, row_keys[i]);
 
                 entity.properties().reserve(3);
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(int32_value2)));
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(string_value)));
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(string_value2)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(int32_value2)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(string_value)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(string_value2)));
 
                 operation.insert_or_merge_entity(entity);
             }
@@ -2859,7 +2859,7 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
+            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
@@ -2869,9 +2869,9 @@ SUITE(Table)
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
                 CHECK_EQUAL(3U, results[i].properties().size());
-                CHECK_EQUAL(int32_value2, results[i].properties()[U("PropertyA")].int32_value());
-                CHECK(string_value.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
-                CHECK(string_value2.compare(results[i].properties()[U("PropertyC")].string_value()) == 0);
+                CHECK_EQUAL(int32_value2, results[i].properties()[_XPLATSTR("PropertyA")].int32_value());
+                CHECK(string_value.compare(results[i].properties()[_XPLATSTR("PropertyB")].string_value()) == 0);
+                CHECK(string_value2.compare(results[i].properties()[_XPLATSTR("PropertyC")].string_value()) == 0);
             }
 
             CHECK(!context.client_request_id().empty());
@@ -2905,9 +2905,9 @@ SUITE(Table)
                 azure::storage::table_entity entity(partition_key, row_keys[i]);
 
                 entity.properties().reserve(3);
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(int32_value3)));
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(string_value)));
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(string_value3)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(int32_value3)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(string_value)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(string_value3)));
 
                 operation.insert_or_replace_entity(entity);
             }
@@ -2950,7 +2950,7 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
+            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
@@ -2960,9 +2960,9 @@ SUITE(Table)
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
                 CHECK_EQUAL(3U, results[i].properties().size());
-                CHECK_EQUAL(int32_value3, results[i].properties()[U("PropertyA")].int32_value());
-                CHECK(string_value.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
-                CHECK(string_value3.compare(results[i].properties()[U("PropertyD")].string_value()) == 0);
+                CHECK_EQUAL(int32_value3, results[i].properties()[_XPLATSTR("PropertyA")].int32_value());
+                CHECK(string_value.compare(results[i].properties()[_XPLATSTR("PropertyB")].string_value()) == 0);
+                CHECK(string_value3.compare(results[i].properties()[_XPLATSTR("PropertyD")].string_value()) == 0);
             }
 
             CHECK(!context.client_request_id().empty());
@@ -2996,8 +2996,8 @@ SUITE(Table)
                 azure::storage::table_entity entity(partition_key, row_keys[i]);
 
                 entity.properties().reserve(2);
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(string_value4)));
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(int32_value4)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(string_value4)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(int32_value4)));
 
                 operation.replace_entity(entity);
             }
@@ -3040,7 +3040,7 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
+            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
@@ -3050,8 +3050,8 @@ SUITE(Table)
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
                 CHECK_EQUAL(2U, results[i].properties().size());
-                CHECK(string_value4.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
-                CHECK_EQUAL(int32_value4, results[i].properties()[U("PropertyE")].int32_value());
+                CHECK(string_value4.compare(results[i].properties()[_XPLATSTR("PropertyB")].string_value()) == 0);
+                CHECK_EQUAL(int32_value4, results[i].properties()[_XPLATSTR("PropertyE")].int32_value());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -3085,8 +3085,8 @@ SUITE(Table)
                 azure::storage::table_entity entity(partition_key, row_keys[i]);
 
                 entity.properties().reserve(2);
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(int32_value5)));
-                entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(string_value5)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(int32_value5)));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(string_value5)));
 
                 operation.merge_entity(entity);
             }
@@ -3129,7 +3129,7 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
+            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
 
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
@@ -3139,9 +3139,9 @@ SUITE(Table)
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
                 CHECK_EQUAL(3U, results[i].properties().size());
-                CHECK(string_value4.compare(results[i].properties()[U("PropertyB")].string_value()) == 0);
-                CHECK_EQUAL(int32_value5, results[i].properties()[U("PropertyE")].int32_value());
-                CHECK(string_value5.compare(results[i].properties()[U("PropertyF")].string_value()) == 0);
+                CHECK(string_value4.compare(results[i].properties()[_XPLATSTR("PropertyB")].string_value()) == 0);
+                CHECK_EQUAL(int32_value5, results[i].properties()[_XPLATSTR("PropertyE")].int32_value());
+                CHECK(string_value5.compare(results[i].properties()[_XPLATSTR("PropertyF")].string_value()) == 0);
             }
 
             CHECK(!context.client_request_id().empty());
@@ -3311,7 +3311,7 @@ SUITE(Table)
                 azure::storage::table_entity entity(partition_key, get_random_string());
 
                 entity.properties().reserve(1);
-                entity.properties().insert(azure::storage::table_entity::property_type(U("BadProperty"), bad_property));
+                entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("BadProperty"), bad_property));
 
                 operation.insert_entity(entity);
             }
@@ -3324,7 +3324,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -3341,7 +3341,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -3350,7 +3350,7 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t bad_row_key = U("bad//key");
+            utility::string_t bad_row_key = _XPLATSTR("bad//key");
 
             operation.retrieve_entity(partition_key, bad_row_key);
 
@@ -3362,7 +3362,7 @@ SUITE(Table)
             catch (const azure::storage::storage_exception& e)
             {
                 CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
-                CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
+                CHECK(e.result().extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
                 CHECK(!e.result().extended_error().message().empty());
             }
 
@@ -3379,7 +3379,7 @@ SUITE(Table)
             CHECK(context.request_results()[0].request_date().is_initialized());
             CHECK(context.request_results()[0].content_md5().empty());
             CHECK(context.request_results()[0].etag().empty());
-            CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
+            CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
             CHECK(!context.request_results()[0].extended_error().message().empty());
         }
 
@@ -3453,7 +3453,7 @@ SUITE(Table)
         utility::string_t partition_key1 = get_random_string();
         utility::string_t partition_key2 = get_random_string();
 
-        utility::datetime datetime_value = utility::datetime::from_string(U("2013-01-02T03:04:05.1234567Z"), utility::datetime::ISO_8601);
+        utility::datetime datetime_value = utility::datetime::from_string(_XPLATSTR("2013-01-02T03:04:05.1234567Z"), utility::datetime::ISO_8601);
 
         {
             for (int partition = 1; partition <= 2; ++partition)
@@ -3471,14 +3471,14 @@ SUITE(Table)
                         azure::storage::table_entity entity(partition_key, row_key);
 
                         entity.properties().reserve(8);
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(get_random_boolean())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(get_random_int32())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(get_random_int64())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(get_random_double())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(get_random_string())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(get_random_datetime())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(get_random_guid())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(get_random_boolean())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(get_random_int32())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(get_random_int64())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(get_random_double())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(get_random_string())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(get_random_datetime())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(get_random_guid())));
 
                         operation.insert_entity(entity);
                     }
@@ -3500,7 +3500,7 @@ SUITE(Table)
             }
         }
 
-        utility::string_t uuid_string = U("12345678-abcd-efab-cdef-1234567890ab");
+        utility::string_t uuid_string = _XPLATSTR("12345678-abcd-efab-cdef-1234567890ab");
         utility::uuid uuid_to_use = utility::string_to_uuid(uuid_string);
         utility::string_t converted_uuid_string = utility::uuid_to_string(uuid_to_use);
 
@@ -3509,7 +3509,7 @@ SUITE(Table)
 #ifdef WIN32
         CHECK(uuid_string.compare(converted_uuid_string) == 0);
 #else
-        utility::string_t capital_uuid_string = U("12345678-ABCD-EFAB-CDEF-1234567890AB");
+        utility::string_t capital_uuid_string = _XPLATSTR("12345678-ABCD-EFAB-CDEF-1234567890AB");
         CHECK((capital_uuid_string).compare(converted_uuid_string) == 0);
 #endif // WIN32
 
@@ -3534,45 +3534,45 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
-                azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, _XPLATSTR("k"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::less_than, _XPLATSTR("n"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(_XPLATSTR("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyE"), azure::storage::query_comparison_operator::not_equal, _XPLATSTR("ABCDE12345"))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
+            utility::string_t expected_filter_string = utility::string_t(_XPLATSTR("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(_XPLATSTR("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + _XPLATSTR("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
             select_columns.reserve(9);
-            select_columns.push_back(U("PropertyA"));
-            select_columns.push_back(U("PropertyB"));
-            select_columns.push_back(U("PropertyC"));
-            select_columns.push_back(U("PropertyD"));
-            select_columns.push_back(U("PropertyE"));
-            select_columns.push_back(U("PropertyF"));
-            select_columns.push_back(U("PropertyG"));
-            select_columns.push_back(U("PropertyH"));
-            select_columns.push_back(U("PropertyX"));
+            select_columns.push_back(_XPLATSTR("PropertyA"));
+            select_columns.push_back(_XPLATSTR("PropertyB"));
+            select_columns.push_back(_XPLATSTR("PropertyC"));
+            select_columns.push_back(_XPLATSTR("PropertyD"));
+            select_columns.push_back(_XPLATSTR("PropertyE"));
+            select_columns.push_back(_XPLATSTR("PropertyF"));
+            select_columns.push_back(_XPLATSTR("PropertyG"));
+            select_columns.push_back(_XPLATSTR("PropertyH"));
+            select_columns.push_back(_XPLATSTR("PropertyX"));
             query.set_select_columns(select_columns);
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
@@ -3647,45 +3647,45 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
-                azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, _XPLATSTR("k"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::less_than, _XPLATSTR("n"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(_XPLATSTR("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyE"), azure::storage::query_comparison_operator::not_equal, _XPLATSTR("ABCDE12345"))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
+            utility::string_t expected_filter_string = utility::string_t(_XPLATSTR("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(_XPLATSTR("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + _XPLATSTR("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
             select_columns.reserve(9);
-            select_columns.push_back(U("PropertyA"));
-            select_columns.push_back(U("PropertyB"));
-            select_columns.push_back(U("PropertyC"));
-            select_columns.push_back(U("PropertyD"));
-            select_columns.push_back(U("PropertyE"));
-            select_columns.push_back(U("PropertyF"));
-            select_columns.push_back(U("PropertyG"));
-            select_columns.push_back(U("PropertyH"));
-            select_columns.push_back(U("PropertyX"));
+            select_columns.push_back(_XPLATSTR("PropertyA"));
+            select_columns.push_back(_XPLATSTR("PropertyB"));
+            select_columns.push_back(_XPLATSTR("PropertyC"));
+            select_columns.push_back(_XPLATSTR("PropertyD"));
+            select_columns.push_back(_XPLATSTR("PropertyE"));
+            select_columns.push_back(_XPLATSTR("PropertyF"));
+            select_columns.push_back(_XPLATSTR("PropertyG"));
+            select_columns.push_back(_XPLATSTR("PropertyH"));
+            select_columns.push_back(_XPLATSTR("PropertyX"));
             query.set_select_columns(select_columns);
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
@@ -3767,14 +3767,14 @@ SUITE(Table)
                         azure::storage::table_entity entity(partition_key, row_key);
 
                         entity.properties().reserve(8);
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(get_random_boolean())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyB"), azure::storage::entity_property(get_random_int32())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyC"), azure::storage::entity_property(get_random_int64())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyD"), azure::storage::entity_property(get_random_double())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyE"), azure::storage::entity_property(get_random_string())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyF"), azure::storage::entity_property(get_random_datetime())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
-                        entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyH"), azure::storage::entity_property(get_random_guid())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(get_random_boolean())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyB"), azure::storage::entity_property(get_random_int32())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyC"), azure::storage::entity_property(get_random_int64())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyD"), azure::storage::entity_property(get_random_double())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyE"), azure::storage::entity_property(get_random_string())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyF"), azure::storage::entity_property(get_random_datetime())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyG"), azure::storage::entity_property(get_random_binary_data())));
+                        entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyH"), azure::storage::entity_property(get_random_guid())));
 
                         operation.insert_entity(entity);
                     }
@@ -3796,7 +3796,7 @@ SUITE(Table)
             }
         }
 
-        utility::string_t uuid_string = U("12345678-abcd-efab-cdef-1234567890ab");
+        utility::string_t uuid_string = _XPLATSTR("12345678-abcd-efab-cdef-1234567890ab");
         utility::uuid uuid_to_use = utility::string_to_uuid(uuid_string);
         utility::string_t converted_uuid_string = utility::uuid_to_string(uuid_to_use);
 
@@ -3821,45 +3821,45 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
-                azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, _XPLATSTR("k"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::less_than, _XPLATSTR("n"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(_XPLATSTR("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyE"), azure::storage::query_comparison_operator::not_equal, _XPLATSTR("ABCDE12345"))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
+            utility::string_t expected_filter_string = utility::string_t(_XPLATSTR("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(_XPLATSTR("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + _XPLATSTR("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
             select_columns.reserve(9);
-            select_columns.push_back(U("PropertyA"));
-            select_columns.push_back(U("PropertyB"));
-            select_columns.push_back(U("PropertyC"));
-            select_columns.push_back(U("PropertyD"));
-            select_columns.push_back(U("PropertyE"));
-            select_columns.push_back(U("PropertyF"));
-            select_columns.push_back(U("PropertyG"));
-            select_columns.push_back(U("PropertyH"));
-            select_columns.push_back(U("PropertyX"));
+            select_columns.push_back(_XPLATSTR("PropertyA"));
+            select_columns.push_back(_XPLATSTR("PropertyB"));
+            select_columns.push_back(_XPLATSTR("PropertyC"));
+            select_columns.push_back(_XPLATSTR("PropertyD"));
+            select_columns.push_back(_XPLATSTR("PropertyE"));
+            select_columns.push_back(_XPLATSTR("PropertyF"));
+            select_columns.push_back(_XPLATSTR("PropertyG"));
+            select_columns.push_back(_XPLATSTR("PropertyH"));
+            select_columns.push_back(_XPLATSTR("PropertyX"));
             query.set_select_columns(select_columns);
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
@@ -3935,45 +3935,45 @@ SUITE(Table)
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
                 azure::storage::table_query::combine_filter_conditions(
-                azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key1), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, U("k"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::greater_than_or_equal, _XPLATSTR("k"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("RowKey"), azure::storage::query_comparison_operator::less_than, U("n"))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("RowKey"), azure::storage::query_comparison_operator::less_than, _XPLATSTR("n"))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(U("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("Timestamp"), azure::storage::query_comparison_operator::greater_than_or_equal, utility::datetime::from_string(_XPLATSTR("2013-09-01T00:00:00Z"), utility::datetime::ISO_8601))), 
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyA"), azure::storage::query_comparison_operator::not_equal, false)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyB"), azure::storage::query_comparison_operator::not_equal, 1234567890)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyC"), azure::storage::query_comparison_operator::not_equal, (int64_t)1234567890123456789LL)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyD"), azure::storage::query_comparison_operator::not_equal, 9.1234567890123456789)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyE"), azure::storage::query_comparison_operator::not_equal, U("ABCDE12345"))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyE"), azure::storage::query_comparison_operator::not_equal, _XPLATSTR("ABCDE12345"))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyF"), azure::storage::query_comparison_operator::not_equal, datetime_value)),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyG"), azure::storage::query_comparison_operator::not_equal, std::vector<uint8_t>(10, 'X'))),
                 azure::storage::query_logical_operator::op_and, 
-                azure::storage::table_query::generate_filter_condition(U("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
+                azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyH"), azure::storage::query_comparison_operator::not_equal, uuid_to_use));
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string = utility::string_t(U("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(U("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + U("')"));
+            utility::string_t expected_filter_string = utility::string_t(_XPLATSTR("(((((((((((PartitionKey eq '")) + partition_key1 + utility::string_t(_XPLATSTR("') and (RowKey ge 'k')) and (RowKey lt 'n')) and (Timestamp ge datetime'2013-09-01T00:00:00Z')) and (PropertyA ne false)) and (PropertyB ne 1234567890)) and (PropertyC ne 1234567890123456789L)) and (PropertyD ne 9.1234567890123461)) and (PropertyE ne 'ABCDE12345')) and (PropertyF ne datetime'2013-01-02T03:04:05.1234567Z')) and (PropertyG ne X'58585858585858585858')) and (PropertyH ne guid'") + converted_uuid_string + _XPLATSTR("')"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             std::vector<utility::string_t> select_columns;
             select_columns.reserve(9);
-            select_columns.push_back(U("PropertyA"));
-            select_columns.push_back(U("PropertyB"));
-            select_columns.push_back(U("PropertyC"));
-            select_columns.push_back(U("PropertyD"));
-            select_columns.push_back(U("PropertyE"));
-            select_columns.push_back(U("PropertyF"));
-            select_columns.push_back(U("PropertyG"));
-            select_columns.push_back(U("PropertyH"));
-            select_columns.push_back(U("PropertyX"));
+            select_columns.push_back(_XPLATSTR("PropertyA"));
+            select_columns.push_back(_XPLATSTR("PropertyB"));
+            select_columns.push_back(_XPLATSTR("PropertyC"));
+            select_columns.push_back(_XPLATSTR("PropertyD"));
+            select_columns.push_back(_XPLATSTR("PropertyE"));
+            select_columns.push_back(_XPLATSTR("PropertyF"));
+            select_columns.push_back(_XPLATSTR("PropertyG"));
+            select_columns.push_back(_XPLATSTR("PropertyH"));
+            select_columns.push_back(_XPLATSTR("PropertyX"));
             query.set_select_columns(select_columns);
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
@@ -4048,7 +4048,7 @@ SUITE(Table)
         azure::storage::table_request_options options;
         azure::storage::operation_context context;
 
-        utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
+        utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
         query.set_filter_string(filter_string);
 
         std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
@@ -4091,7 +4091,7 @@ SUITE(Table)
         azure::storage::operation_context context;
 
         // An invalid filter string because PartitionKey is not a numeric type
-        utility::string_t filter_string = (U("PartitionKey eq 12345"));
+        utility::string_t filter_string = (_XPLATSTR("PartitionKey eq 12345"));
         query.set_filter_string(filter_string);
 
         try
@@ -4102,7 +4102,7 @@ SUITE(Table)
         catch (const azure::storage::storage_exception& e)
         {
             CHECK_EQUAL(web::http::status_codes::BadRequest, e.result().http_status_code());
-            CHECK(e.result().extended_error().code().compare(U("InvalidInput")) == 0);
+            CHECK(e.result().extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
             CHECK(!e.result().extended_error().message().empty());
         }
 
@@ -4119,7 +4119,7 @@ SUITE(Table)
         CHECK(context.request_results()[0].request_date().is_initialized());
         CHECK(context.request_results()[0].content_md5().empty());
         CHECK(context.request_results()[0].etag().empty());
-        CHECK(context.request_results()[0].extended_error().code().compare(U("InvalidInput")) == 0);
+        CHECK(context.request_results()[0].extended_error().code().compare(_XPLATSTR("InvalidInput")) == 0);
         CHECK(!context.request_results()[0].extended_error().message().empty());
 
         table.delete_table();
@@ -4133,19 +4133,19 @@ SUITE(Table)
         utility::string_t row_key1 = get_random_string();
         utility::string_t row_key2 = get_random_string();
 
-        utility::string_t property_value(U("@$%^, +\"' /?:=&#"));
+        utility::string_t property_value(_XPLATSTR("@$%^, +\"' /?:=&#"));
 
         {
             azure::storage::table_batch_operation operation;
 
             azure::storage::table_entity entity1(partition_key, row_key1);
             entity1.properties().reserve(1);
-            entity1.properties().insert(azure::storage::table_entity::property_type(U("TextProperty"), azure::storage::entity_property(U("Normal text"))));
+            entity1.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("TextProperty"), azure::storage::entity_property(_XPLATSTR("Normal text"))));
             operation.insert_entity(entity1);
 
             azure::storage::table_entity entity2(partition_key, row_key2);
             entity2.properties().reserve(1);
-            entity2.properties().insert(azure::storage::table_entity::property_type(U("TextProperty"), azure::storage::entity_property(property_value)));
+            entity2.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("TextProperty"), azure::storage::entity_property(property_value)));
             operation.insert_entity(entity2);
 
             std::vector<azure::storage::table_result> results = table.execute_batch(operation);
@@ -4168,10 +4168,10 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("TextProperty"), azure::storage::query_comparison_operator::equal, property_value);
+            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("TextProperty"), azure::storage::query_comparison_operator::equal, property_value);
             query.set_filter_string(filter_string);
 
-            utility::string_t expected_filter_string(U("TextProperty eq '@$%^, +\"'' /?:=&#'"));
+            utility::string_t expected_filter_string(_XPLATSTR("TextProperty eq '@$%^, +\"'' /?:=&#'"));
             CHECK(filter_string.compare(expected_filter_string) == 0);
 
             options.set_payload_format(azure::storage::table_payload_format::json_full_metadata);
@@ -4198,7 +4198,7 @@ SUITE(Table)
                     const utility::string_t& property_name = property_it->first;
                     const azure::storage::entity_property& property = property_it->second;
 
-                    CHECK(property_name.compare(U("TextProperty")) == 0);
+                    CHECK(property_name.compare(_XPLATSTR("TextProperty")) == 0);
                     CHECK(property.property_type() == azure::storage::edm_type::string);
                     CHECK(!property.is_null());
                     CHECK(property.string_value().compare(property_value) == 0);
@@ -4230,8 +4230,8 @@ SUITE(Table)
     {
         azure::storage::cloud_table table = get_table();
 
-        utility::string_t policy_name1 = U("policy1");
-        utility::string_t policy_name2 = U("policy2");
+        utility::string_t policy_name1 = _XPLATSTR("policy1");
+        utility::string_t policy_name2 = _XPLATSTR("policy2");
 
         utility::datetime start = utility::datetime::utc_now() - utility::datetime::from_minutes(5U);
         utility::datetime expiry = start + utility::datetime::from_hours(2U);
@@ -4385,7 +4385,7 @@ SUITE(Table)
         }
 
         {
-            utility::string_t policy_name = U("policy3");
+            utility::string_t policy_name = _XPLATSTR("policy3");
 
             utility::datetime truncated_start;
             truncated_start = truncated_start + start.to_interval() / 1000ULL * 1000ULL;
@@ -4415,7 +4415,7 @@ SUITE(Table)
 
         {
             azure::storage::table_entity entity(partition_key, row_key);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("MyProperty"), azure::storage::entity_property(property_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("MyProperty"), azure::storage::entity_property(property_value)));
             azure::storage::table_operation insert_operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_result result = table1.execute(insert_operation);
         }
@@ -4439,8 +4439,8 @@ SUITE(Table)
 
             CHECK_EQUAL(200, result.http_status_code());
             CHECK_EQUAL(1U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("MyProperty")) != result.entity().properties().cend());
-            CHECK_EQUAL(property_value, result.entity().properties().find(U("MyProperty"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("MyProperty")) != result.entity().properties().cend());
+            CHECK_EQUAL(property_value, result.entity().properties().find(_XPLATSTR("MyProperty"))->second.int32_value());
 
             azure::storage::table_entity entity(partition_key, row_key);
             azure::storage::table_operation delete_operation = azure::storage::table_operation::delete_entity(entity);
@@ -4469,8 +4469,8 @@ SUITE(Table)
 
             CHECK_EQUAL(200, result.http_status_code());
             CHECK_EQUAL(1U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("MyProperty")) != result.entity().properties().cend());
-            CHECK_EQUAL(property_value, result.entity().properties().find(U("MyProperty"))->second.int32_value());
+            CHECK(result.entity().properties().find(_XPLATSTR("MyProperty")) != result.entity().properties().cend());
+            CHECK_EQUAL(property_value, result.entity().properties().find(_XPLATSTR("MyProperty"))->second.int32_value());
         }
     }
 
@@ -4488,7 +4488,7 @@ SUITE(Table)
             azure::storage::table_entity entity(partition_key, row_key);
 
             entity.properties().reserve(1);
-            entity.properties().insert(azure::storage::table_entity::property_type(U("PropertyA"), azure::storage::entity_property(truncated_value)));
+            entity.properties().insert(azure::storage::table_entity::property_type(_XPLATSTR("PropertyA"), azure::storage::entity_property(truncated_value)));
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
@@ -4536,9 +4536,9 @@ SUITE(Table)
             CHECK(!result.etag().empty());
 
             CHECK_EQUAL(1U, result.entity().properties().size());
-            CHECK(result.entity().properties().find(U("PropertyA")) != result.entity().properties().cend());
-            CHECK(result.entity().properties().find(U("PropertyA"))->second.property_type() == azure::storage::edm_type::datetime);
-            CHECK(result.entity().properties().find(U("PropertyA"))->second.datetime_value() == truncated_value);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA")) != result.entity().properties().cend());
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA"))->second.property_type() == azure::storage::edm_type::datetime);
+            CHECK(result.entity().properties().find(_XPLATSTR("PropertyA"))->second.datetime_value() == truncated_value);
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -4563,7 +4563,7 @@ SUITE(Table)
             azure::storage::table_request_options options;
             azure::storage::operation_context context;
 
-            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(U("PropertyA"), azure::storage::query_comparison_operator::equal, truncated_value);
+            utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyA"), azure::storage::query_comparison_operator::equal, truncated_value);
             query.set_filter_string(filter_string);
 
             std::vector<azure::storage::table_entity> results = execute_table_query(table, query, options, context);
@@ -4576,9 +4576,9 @@ SUITE(Table)
             CHECK(!results[0].etag().empty());
 
             CHECK_EQUAL(1U, results[0].properties().size());
-            CHECK(results[0].properties().find(U("PropertyA")) != results[0].properties().cend());
-            CHECK(results[0].properties().find(U("PropertyA"))->second.property_type() == azure::storage::edm_type::datetime);
-            CHECK(results[0].properties().find(U("PropertyA"))->second.datetime_value() == truncated_value);
+            CHECK(results[0].properties().find(_XPLATSTR("PropertyA")) != results[0].properties().cend());
+            CHECK(results[0].properties().find(_XPLATSTR("PropertyA"))->second.property_type() == azure::storage::edm_type::datetime);
+            CHECK(results[0].properties().find(_XPLATSTR("PropertyA"))->second.datetime_value() == truncated_value);
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());

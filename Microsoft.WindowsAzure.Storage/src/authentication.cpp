@@ -52,37 +52,44 @@ namespace azure { namespace storage { namespace protocol {
             if (core::logger::instance().should_log(context, client_log_level::log_level_verbose))
             {
                 utility::string_t with_dots(string_to_sign);
-                std::replace(with_dots.begin(), with_dots.end(), U('\n'), U('.'));
-                core::logger::instance().log(context, client_log_level::log_level_verbose, U("StringToSign: ") + with_dots);
+                std::replace(with_dots.begin(), with_dots.end(), _XPLATSTR('\n'), _XPLATSTR('.'));
+                core::logger::instance().log(context, client_log_level::log_level_verbose, _XPLATSTR("StringToSign: ") + with_dots);
             }
 
-            utility::ostringstream_t header_value;
-            header_value << m_canonicalizer->authentication_scheme() << U(" ") << m_credentials.account_name() << U(":") << calculate_hmac_sha256_hash(string_to_sign, m_credentials);
+            utility::string_t header_value;
+            header_value.reserve(256);
+            header_value.append(m_canonicalizer->authentication_scheme());
+            header_value.append(_XPLATSTR(" "));
+            header_value.append(m_credentials.account_name());
+            header_value.append(_XPLATSTR(":"));
+            header_value.append(calculate_hmac_sha256_hash(string_to_sign, m_credentials));
 
-            headers.add(web::http::header_names::authorization, header_value.str());
+            headers.add(web::http::header_names::authorization, header_value);
         }
     }
 
     void canonicalizer_helper::append_resource(bool query_only_comp)
     {
-        m_result << U("/") << m_account_name;
+        m_result.append(_XPLATSTR("/"));
+        m_result.append(m_account_name);
 
         web::http::uri uri = m_request.request_uri();
         const utility::string_t& resource = uri.path();
-        if (resource.front() != U('/'))
+        if (resource.front() != _XPLATSTR('/'))
         {
-            m_result << U("/");
+            m_result.append(_XPLATSTR("/"));
         }
 
-        m_result << resource;
+        m_result.append(resource);
 
-        std::map<utility::string_t, utility::string_t> query_map = web::http::uri::split_query(web::http::uri::decode(uri.query()));
+        std::map<utility::string_t, utility::string_t> query_map = web::http::uri::split_query(uri.query());
         if (query_only_comp)
         {
-            std::map<utility::string_t, utility::string_t>::iterator it = query_map.find(U("comp"));
+            std::map<utility::string_t, utility::string_t>::iterator it = query_map.find(_XPLATSTR("comp"));
             if (it != query_map.end())
             {
-                m_result << U("?comp=") << it->second;
+                m_result.append(_XPLATSTR("?comp="));
+                m_result.append(web::http::uri::decode(it->second));
             }
         }
         else
@@ -93,7 +100,10 @@ namespace azure { namespace storage { namespace protocol {
                 utility::string_t parameter_name = it->first;
                 std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), core::utility_char_tolower);
 
-                m_result << U("\n") << parameter_name << U(":") << it->second;
+                m_result.append(_XPLATSTR("\n"));
+                m_result.append(parameter_name);
+                m_result.append(_XPLATSTR(":"));
+                m_result.append(web::http::uri::decode(it->second));
             }
         }
     }
@@ -109,7 +119,7 @@ namespace azure { namespace storage { namespace protocol {
     {
         utility::string_t value;
         m_request.headers().match(web::http::header_names::content_length, value);
-        if (value == U("0"))
+        if (value == _XPLATSTR("0"))
         {
             value.clear();
         }
@@ -138,15 +148,20 @@ namespace azure { namespace storage { namespace protocol {
         const web::http::http_headers& headers = m_request.headers();
         for (web::http::http_headers::const_iterator it = headers.begin(); it != headers.end(); ++it)
         {
-            const utility::string_t& key = it->first;
-            if ((key.size() > ms_header_prefix.size()) &&
-                std::equal(ms_header_prefix.cbegin(), ms_header_prefix.cend(), key.cbegin()))
+            const utility::char_t *key = it->first.c_str();
+            size_t key_size = it->first.size();
+            // disables warning 4996 to bypass the usage of std::equal;
+            // a more secure usage of std::equal with 5 parameters is supported by c++14.
+            // to be compatible with c++11, warning 4996 is disabled.
+            if ((key_size > ms_header_prefix_size) &&
+                std::equal(ms_header_prefix, ms_header_prefix + ms_header_prefix_size, key, [](const utility::char_t &c1, const utility::char_t &c2) {return c1 == c2;}))
             {
                 if (!it->second.empty())
                 {
                     utility::string_t transformed_key(key);
                     std::transform(transformed_key.begin(), transformed_key.end(), transformed_key.begin(), core::utility_char_tolower);
-                    m_result << transformed_key << U(":");
+                    m_result.append(transformed_key);
+                    m_result.append(_XPLATSTR(":"));
                     append(it->second);
                 }
             }

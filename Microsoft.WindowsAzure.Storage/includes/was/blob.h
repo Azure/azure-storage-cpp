@@ -30,6 +30,9 @@ namespace azure { namespace storage {
     class cloud_blob_container;
     class cloud_blob_client;
 
+    class cloud_file;
+    class file_access_condition;
+
     namespace protocol
     {
         class blob_response_parsers;
@@ -291,161 +294,6 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
-    /// Represents the status of a blob copy operation.
-    /// </summary>
-    enum class copy_status
-    {
-        /// <summary>
-        /// The copy status is invalid.
-        /// </summary>
-        invalid,
-
-        /// <summary>
-        /// The copy operation is pending.
-        /// </summary>
-        pending,
-
-        /// <summary>
-        /// The copy operation succeeded.
-        /// </summary>
-        success,
-
-        /// <summary>
-        /// The copy operation has been aborted.
-        /// </summary>
-        aborted,
-
-        /// <summary>
-        /// The copy operation encountered an error.
-        /// </summary>
-        failed
-    };
-
-    /// <summary>
-    /// Represents the attributes of a copy blob operation.
-    /// </summary>
-    class copy_state
-    {
-    public:
-        
-        copy_state()
-            : m_bytes_copied(0), m_total_bytes(0), m_status(copy_status::invalid)
-        {
-        }
-
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
-        // have implicitly-declared move constructor and move assignment operator.
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="azure::storage::copy_state" /> class based on an existing instance.
-        /// </summary>
-        /// <param name="other">An existing <see cref="azure::storage::copy_state" /> object.</param>
-        copy_state(copy_state&& other)
-        {
-            *this = std::move(other);
-        }
-
-        /// <summary>
-        /// Returns a reference to an <see cref="azure::storage::copy_state" /> object.
-        /// </summary>
-        /// <param name="other">An existing <see cref="azure::storage::copy_state" /> object to use to set properties.</param>
-        /// <returns>An <see cref="azure::storage::copy_state" /> object with properties set.</returns>
-        copy_state& operator=(copy_state&& other)
-        {
-            if (this != &other)
-            {
-                m_copy_id = std::move(other.m_copy_id);
-                m_completion_time = std::move(other.m_completion_time);
-                m_status_description = std::move(other.m_status_description);
-                m_bytes_copied = std::move(other.m_bytes_copied);
-                m_total_bytes = std::move(other.m_total_bytes);
-                m_status = std::move(other.m_status);
-                m_source = std::move(other.m_source);
-            }
-            return *this;
-        }
-#endif
-
-        /// <summary>
-        /// Gets the ID of the copy blob operation.
-        /// </summary>
-        /// <returns>An ID string for the copy operation.</returns>
-        const utility::string_t& copy_id() const
-        {
-            return m_copy_id;
-        }
-
-        /// <summary>
-        /// Gets the time that the copy blob operation completed, and indicates whether completion was due 
-        /// to a successful copy, whether the operation was cancelled, or whether the operation failed.
-        /// </summary>
-        /// <returns>A <see cref="utility::datetime" /> containing the completion time.</returns>
-        utility::datetime completion_time() const
-        {
-            return m_completion_time;
-        }
-
-        /// <summary>
-        /// Gets the status of the copy blob operation.
-        /// </summary>
-        /// <returns>An <see cref="azure::storage::copy_status" /> enumeration indicating the status of the copy operation.</returns>
-        copy_status status() const
-        {
-            return m_status;
-        }
-
-        /// <summary>
-        /// Gets the URI of the source blob for a copy operation.
-        /// </summary>
-        /// <returns>A <see cref="web::http::uri" /> indicating the source of a copy operation.</returns>
-        const web::http::uri& source() const
-        {
-            return m_source;
-        }
-
-        /// <summary>
-        /// Gets the number of bytes copied in the operation so far.
-        /// </summary>
-        /// <returns>The number of bytes copied in the operation so far.</returns>
-        int64_t bytes_copied() const
-        {
-            return m_bytes_copied;
-        }
-
-        /// <summary>
-        /// Gets the total number of bytes in the source blob for the copy operation.
-        /// </summary>
-        /// <returns>The number of bytes in the source blob.</returns>
-        int64_t total_bytes() const
-        {
-            return m_total_bytes;
-        }
-
-        /// <summary>
-        /// Gets the description of the current status of the copy blob operation, if status is available.
-        /// </summary>
-        /// <returns>A status description string.</returns>
-        const utility::string_t& status_description() const
-        {
-            return m_status_description;
-        }
-
-    private:
-
-        utility::string_t m_copy_id;
-        utility::datetime m_completion_time;
-        utility::string_t m_status_description;
-        int64_t m_bytes_copied;
-        int64_t m_total_bytes;
-        copy_status m_status;
-        web::http::uri m_source;
-
-        friend class protocol::blob_response_parsers;
-        friend class protocol::list_blobs_reader;
-    };
-
-    /// <summary>
     /// Represents a set of access conditions to be used for operations against the Blob service. 
     /// </summary>
     class access_condition
@@ -540,7 +388,7 @@ namespace azure { namespace storage {
         static access_condition generate_if_not_exists_condition()
         {
             access_condition condition;
-            condition.set_if_none_match_etag(U("*"));
+            condition.set_if_none_match_etag(_XPLATSTR("*"));
             return condition;
         }
 
@@ -552,7 +400,7 @@ namespace azure { namespace storage {
         static access_condition generate_if_exists_condition()
         {
             access_condition condition;
-            condition.set_if_match_etag(U("*"));
+            condition.set_if_match_etag(_XPLATSTR("*"));
             return condition;
         }
 
@@ -768,7 +616,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_less_than_or_equal(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_sequence_number = value;
             m_sequence_number_operator = sequence_number_operators::le;
         }
@@ -781,7 +629,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_less_than(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_sequence_number = value;
             m_sequence_number_operator = sequence_number_operators::lt;
         }
@@ -794,7 +642,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to page blobs.</remarks>
         void set_if_sequence_number_equal(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_sequence_number = value;
             m_sequence_number_operator = sequence_number_operators::eq;
         }
@@ -836,7 +684,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to append blobs.</remarks>
         void set_max_size(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 1);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 1);
             m_max_size = value;
         }
 
@@ -859,7 +707,7 @@ namespace azure { namespace storage {
         /// <remarks>This condition only applies to append blobs.</remarks>
         void set_append_position(int64_t value)
         {
-            utility::assert_in_bounds<int64_t>(U("value"), value, 0);
+            utility::assert_in_bounds<int64_t>(_XPLATSTR("value"), value, 0);
             m_append_position = value;
         }
 
@@ -989,7 +837,7 @@ namespace azure { namespace storage {
         {
             if (seconds != std::chrono::seconds::max())
             {
-                utility::assert_in_bounds(U("seconds"), seconds, protocol::minimum_lease_break_period, protocol::maximum_lease_break_period);
+                utility::assert_in_bounds(_XPLATSTR("seconds"), seconds, protocol::minimum_lease_break_period, protocol::maximum_lease_break_period);
             }
         }
 
@@ -1090,7 +938,7 @@ namespace azure { namespace storage {
         {
             if (seconds.count() != -1)
             {
-                utility::assert_in_bounds(U("seconds"), seconds, protocol::minimum_fixed_lease_duration, protocol::maximum_fixed_lease_duration);
+                utility::assert_in_bounds(_XPLATSTR("seconds"), seconds, protocol::minimum_fixed_lease_duration, protocol::maximum_fixed_lease_duration);
             }
         }
 
@@ -1220,9 +1068,10 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_properties" /> class.
         /// </summary>
         cloud_blob_properties()
-            : m_type(blob_type::unspecified), m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0),
-            m_lease_state(azure::storage::lease_state::unspecified), m_lease_status(azure::storage::lease_status::unspecified),
-            m_lease_duration(azure::storage::lease_duration::unspecified), m_size(0)
+            :  m_size(0), m_type(blob_type::unspecified), m_lease_status(azure::storage::lease_status::unspecified),
+            m_lease_state(azure::storage::lease_state::unspecified),
+            m_lease_duration(azure::storage::lease_duration::unspecified),
+            m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0)
         {
         }
 
@@ -1459,6 +1308,16 @@ namespace azure { namespace storage {
 
     private:
 
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
+
         void set_type(blob_type value)
         {
             m_type = value;
@@ -1653,10 +1512,10 @@ namespace azure { namespace storage {
             m_use_transactional_md5(false),
             m_store_blob_content_md5(false),
             m_disable_content_md5_validation(false),
-            m_single_blob_upload_threshold(protocol::default_single_blob_upload_threshold),
-            m_stream_read_size(protocol::max_block_size),
-            m_stream_write_size(protocol::max_block_size),
             m_parallelism_factor(1),
+            m_single_blob_upload_threshold(protocol::default_single_blob_upload_threshold),
+            m_stream_write_size(protocol::max_block_size),
+            m_stream_read_size(protocol::max_block_size),
             m_absorb_conditional_errors_on_retry(false)
         {
         }
@@ -1799,7 +1658,7 @@ namespace azure { namespace storage {
         /// ranging from between 1 and 64 MB inclusive.</param>
         void set_single_blob_upload_threshold_in_bytes(utility::size64_t value)
         {
-            utility::assert_in_bounds<utility::size64_t>(U("value"), value, 1 * 1024 * 1024, 64 * 1024 * 1024);
+            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, 64 * 1024 * 1024);
             m_single_blob_upload_threshold = value;
         }
 
@@ -1820,7 +1679,7 @@ namespace azure { namespace storage {
         /// <param name="value">The number of parallel block or page upload operations that may proceed.</param>
         void set_parallelism_factor(int value)
         {
-            utility::assert_in_bounds(U("value"), value, 0);
+            utility::assert_in_bounds(_XPLATSTR("value"), value, 0);
             m_parallelism_factor = value;
         }
 
@@ -1839,7 +1698,7 @@ namespace azure { namespace storage {
         /// <param name="value">The minimum number of bytes to buffer, being at least 16KB.</param>
         void set_stream_read_size_in_bytes(size_t value)
         {
-            utility::assert_in_bounds<size_t>(U("value"), value, 16 * 1024);
+            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024);
             m_stream_read_size = value;
         }
 
@@ -1858,7 +1717,7 @@ namespace azure { namespace storage {
         /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</param>
         void set_stream_write_size_in_bytes(size_t value)
         {
-            utility::assert_in_bounds<size_t>(U("value"), value, 16 * 1024, 4 * 1024 * 1024);
+            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, 4 * 1024 * 1024);
             m_stream_write_size = value;
         }
 
@@ -2075,7 +1934,7 @@ namespace azure { namespace storage {
         utility::string_t to_string() const
         {
             utility::ostringstream_t value;
-            value << protocol::header_value_range_prefix << m_start_offset << U('-') << m_end_offset;
+            value << protocol::header_value_range_prefix << m_start_offset << _XPLATSTR('-') << m_end_offset;
             return value.str();
         }
 
@@ -2281,6 +2140,16 @@ namespace azure { namespace storage {
         }
 
     private:
+
+        /// <summary>
+        /// Initializes an existing instance of the <see cref="azure::storage::cloud_blob_container_properties" /> class.
+        /// </summary>
+        void initialization()
+        {
+            m_lease_state = azure::storage::lease_state::unspecified;
+            m_lease_status = azure::storage::lease_status::unspecified;
+            m_lease_duration = azure::storage::lease_duration::unspecified;
+        }
 
         utility::string_t m_etag;
         utility::datetime m_last_modified;
@@ -2765,7 +2634,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="name">The name of the container.</param>
         /// <param name="client">The Blob service client.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
@@ -2774,7 +2643,7 @@ namespace azure { namespace storage {
         /// <param name="client">The Blob service client.</param>
         /// <param name="properties">The properties for the container.</param>
         /// <param name="metadata">The metadata for the container.</param>
-        cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
+        WASTORAGE_API cloud_blob_container(utility::string_t name, cloud_blob_client client, cloud_blob_container_properties properties, cloud_metadata metadata);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
         // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
@@ -3887,7 +3756,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob" /> class.
         /// </summary>
         cloud_blob()
-            : m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_blob_properties>()), m_copy_state(std::make_shared<azure::storage::copy_state>())
+            : m_properties(std::make_shared<cloud_blob_properties>()), m_metadata(std::make_shared<cloud_metadata>()), m_copy_state(std::make_shared<azure::storage::copy_state>())
         {
             set_type(blob_type::unspecified);
         }
@@ -4810,6 +4679,38 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Begins an operation to copy a file's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source file.</param>
+        /// <returns>The copy ID associated with the copy operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_copy(const cloud_file& source)
+        {
+            return start_copy_async(source).get();
+        }
+
+        /// <summary>
+        /// Begins an operation to copy a file's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source file.</param>
+        /// <param name="source_condition">An object that represents the <see cref="access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the copy operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_copy(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async(source, source_condition, destination_condition, options, context).get();
+        }
+
+        /// <summary>
         /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
@@ -4836,6 +4737,17 @@ namespace azure { namespace storage {
         {
             return start_copy_async(source, access_condition(), access_condition(), blob_request_options(), operation_context());
         }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source file.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_file& source);
 
         /// <summary>
         /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
@@ -4866,6 +4778,21 @@ namespace azure { namespace storage {
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
         WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source file.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Aborts an ongoing blob copy operation.
@@ -6982,8 +6909,9 @@ namespace azure { namespace storage {
         /// <param name="metadata">User-defined metadata for the blob.</param>
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
         explicit list_blob_item(utility::string_t blob_name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state)
-            : m_is_blob(true), m_name(std::move(blob_name)), m_snapshot_time(std::move(snapshot_time)), m_container(std::move(container)),
-            m_properties(std::move(properties)), m_metadata(std::move(metadata)), m_copy_state(std::move(copy_state))
+            : m_is_blob(true), m_name(std::move(blob_name)), m_container(std::move(container)),
+            m_snapshot_time(std::move(snapshot_time)), m_properties(std::move(properties)),
+            m_metadata(std::move(metadata)), m_copy_state(std::move(copy_state))
         {
         }
 

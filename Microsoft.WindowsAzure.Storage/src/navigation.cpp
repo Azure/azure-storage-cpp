@@ -30,7 +30,7 @@ namespace azure { namespace storage { namespace core {
         for (utility::string_t::const_iterator it = host.cbegin(); it != host.cend(); ++it)
         {
             utility::char_t c = *it;
-            if ((c < U('0') || c > U('9')) && c != U('.'))
+            if ((c < _XPLATSTR('0') || c > _XPLATSTR('9')) && c != _XPLATSTR('.'))
             {
                 return true;
             }
@@ -57,7 +57,7 @@ namespace azure { namespace storage { namespace core {
             if (path.size() > 0)
             {
                 // The path should always start with "/", but this code would still handle the case where it does not.
-                utility::string_t::size_type start_pos = path.find(U('/'), 1);
+                utility::string_t::size_type start_pos = path.find(_XPLATSTR('/'), 1);
                 if (start_pos == utility::string_t::npos)
                 {
                     start_pos = path.size();
@@ -130,14 +130,16 @@ namespace azure { namespace storage { namespace core {
         }
         else
         {
-            utility::ostringstream_t blob_name_str;
-            blob_name_str << *iter;
+            utility::string_t blob_name_str;
+            blob_name_str.reserve(256);
+            blob_name_str.append(*iter);
             for (iter++; iter != segments.cend(); iter++)
             {
-                blob_name_str << U('/') << *iter;
+                blob_name_str.append(_XPLATSTR("/"));
+                blob_name_str.append(*iter);
             }
 
-            blob_name = blob_name_str.str();
+            blob_name.swap(blob_name_str);
         }
 
         return true;
@@ -146,6 +148,101 @@ namespace azure { namespace storage { namespace core {
     bool parse_blob_uri(const storage_uri& uri, utility::string_t& container_name, utility::string_t& blob_name)
     {
         return parse_blob_uri(uri.primary_uri(), container_name, blob_name);
+    }
+
+    bool parse_file_directory_uri(const web::http::uri& uri, utility::string_t& share_name, utility::string_t& directory_name)
+    {
+        auto segments = web::http::uri::split_path(uri.path());
+        auto iter = segments.cbegin();
+
+        if (use_path_style(uri))
+        {
+            if (iter == segments.cend())
+            {
+                return false;
+            }
+
+            iter++;
+        }
+
+        if (iter == segments.cend())
+        {
+            return false;
+        }
+
+        share_name = *(iter++);
+        if (iter == segments.cend())
+        {
+            directory_name = utility::string_t();
+            return false;
+        }
+        else
+        {
+            directory_name = *(segments.crbegin());
+        }
+
+        return true;
+    }
+
+    bool parse_file_directory_uri(const storage_uri& uri, utility::string_t& share_name, utility::string_t& directory_name)
+    {
+        return parse_blob_uri(uri.primary_uri(), share_name, directory_name);
+    }
+
+    bool parse_file_uri(const web::http::uri& uri, utility::string_t& share_name, utility::string_t& directory_name, utility::string_t& file_name)
+    {
+        auto segments = web::http::uri::split_path(uri.path());
+        auto iter = segments.cbegin();
+
+        if (use_path_style(uri))
+        {
+            if (iter == segments.cend())
+            {
+                return false;
+            }
+
+            iter++;
+        }
+
+        if (iter == segments.cend())
+        {
+            return false;
+        }
+
+        share_name = *(iter++);
+        auto iter_end = segments.cend();
+        --iter_end;
+        if (iter == segments.cend())
+        {
+            directory_name = utility::string_t();
+            file_name = utility::string_t();
+            return false;
+        }
+        else if (iter == iter_end)
+        {
+            directory_name = utility::string_t();
+            file_name = *(iter);
+            return true;
+        }
+        else
+        {
+            utility::ostringstream_t directory_name_str;
+            directory_name_str << *iter;
+            for (iter++; iter != iter_end; iter++)
+            {
+                directory_name_str << _XPLATSTR('/') << *iter;
+            }
+
+            directory_name = directory_name_str.str();
+            file_name = *iter_end;
+        }
+
+        return true;
+    }
+
+    bool parse_file_uri(const storage_uri& uri, utility::string_t& share_name, utility::string_t& directory_name, utility::string_t& file_name)
+    {
+        return parse_file_uri(uri.primary_uri(), share_name, directory_name, file_name);
     }
 
     web::http::uri create_stripped_uri(const web::http::uri& uri)

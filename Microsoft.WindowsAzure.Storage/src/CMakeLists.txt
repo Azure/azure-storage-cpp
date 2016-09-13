@@ -1,3 +1,4 @@
+include_directories(${Boost_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR})
 include_directories(${AZURESTORAGE_INCLUDE_DIRS})
 
 # THE ORDER OF FILES IS VERY /VERY/ IMPORTANT
@@ -17,12 +18,22 @@ if(UNIX)
      entity_property.cpp
      shared_access_signature.cpp
      retry_policies.cpp
+     resources.cpp
      queue_request_factory.cpp
+     file_request_factory.cpp
+     file_response_parsers.cpp
      protocol_json.cpp
      operation_context.cpp
      mime_multipart_helper.cpp
      logging.cpp
      hashing.cpp
+     constants.cpp
+     streams.cpp
+     cloud_file_ostreambuf.cpp
+     cloud_file.cpp
+     cloud_file_directory.cpp
+     cloud_file_share.cpp
+     cloud_file_client.cpp
      cloud_table_client.cpp
      cloud_table.cpp
      cloud_storage_account.cpp
@@ -52,14 +63,25 @@ endif()
 if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
+if (APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS}")
+else()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
 
 add_library(${AZURESTORAGE_LIBRARY} ${SOURCES})
 
 target_link_libraries(${AZURESTORAGE_LIBRARIES})
 
-# Portions specific to cpprest binary versioning.
+# Portions specific to azure storage binary versioning and installation.
 if(UNIX)
   set_target_properties(${AZURESTORAGE_LIBRARY} PROPERTIES
-    SOVERSION ${AZURESTORAGE_VERSION_MAJOR}.${AZURESTORAGE_VERSION_MINOR})
-endif()
+    SOVERSION ${AZURESTORAGE_VERSION_MAJOR}
+    VERSION ${AZURESTORAGE_VERSION_MAJOR}.${AZURESTORAGE_VERSION_MINOR})
 
+  install(
+    TARGETS ${AZURESTORAGE_LIBRARY}
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
+endif()

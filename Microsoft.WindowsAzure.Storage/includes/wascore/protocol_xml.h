@@ -20,6 +20,7 @@
 #include "wascore/basic_types.h"
 #include "was/blob.h"
 #include "was/queue.h"
+#include "was/file.h"
 #include "wascore/xmlhelpers.h"
 
 namespace azure { namespace storage { namespace protocol {
@@ -578,6 +579,168 @@ namespace azure { namespace storage { namespace protocol {
         }
 
         std::string write(const cloud_queue_message& message);
+    };
+
+    class cloud_file_share_list_item
+    {
+    public:
+
+        cloud_file_share_list_item(web::http::uri uri, utility::string_t name, cloud_metadata metadata, cloud_file_share_properties properties)
+            : m_uri(std::move(uri)), m_name(std::move(name)), m_metadata(std::move(metadata)), m_properties(std::move(properties))
+        {
+        }
+
+        web::http::uri move_uri()
+        {
+            return std::move(m_uri);
+        }
+
+        utility::string_t move_name()
+        {
+            return std::move(m_name);
+        }
+
+        cloud_metadata move_metadata()
+        {
+            return std::move(m_metadata);
+        }
+
+        cloud_file_share_properties move_properties()
+        {
+            return std::move(m_properties);
+        }
+
+    private:
+
+        web::http::uri m_uri;
+        utility::string_t m_name;
+        cloud_metadata m_metadata;
+        cloud_file_share_properties m_properties;
+    };
+
+    class get_share_stats_reader : public core::xml::xml_reader
+    {
+    public:
+
+        explicit get_share_stats_reader(concurrency::streams::istream stream)
+            : xml_reader(stream), m_quota(maximum_share_quota)
+        {
+        }
+
+        int32_t get()
+        {
+            parse();
+            return m_quota;
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        int32_t m_quota;
+    };
+
+    class list_shares_reader : public core::xml::xml_reader
+    {
+    public:
+
+        explicit list_shares_reader(concurrency::streams::istream stream)
+            : xml_reader(stream)
+        {
+        }
+
+        std::vector<cloud_file_share_list_item> move_items()
+        {
+            parse();
+            return std::move(m_items);
+        }
+
+        utility::string_t move_next_marker()
+        {
+            parse();
+            return std::move(m_next_marker);
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<cloud_file_share_list_item> m_items;
+        utility::string_t m_next_marker;
+        web::http::uri m_service_uri;
+
+        utility::string_t m_name;
+        web::http::uri m_uri;
+        cloud_metadata m_metadata;
+        cloud_file_share_properties m_properties;
+    };
+
+    class list_files_and_directories_reader : public core::xml::xml_reader
+    {
+    public:
+
+        explicit list_files_and_directories_reader(concurrency::streams::istream stream)
+            : xml_reader(stream), m_is_file(false), m_size(0)
+        {
+        }
+
+        std::vector<list_file_and_directory_item> move_items()
+        {
+            parse();
+            return std::move(m_items);
+        }
+
+        utility::string_t move_next_marker()
+        {
+            parse();
+            return std::move(m_next_marker);
+        }
+
+    protected:
+
+        virtual void handle_begin_element(const utility::string_t& element_name);
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<list_file_and_directory_item> m_items;
+        utility::string_t m_next_marker;
+        utility::string_t m_share_name;
+        utility::string_t m_directory_path;
+        web::http::uri m_service_uri;
+
+        bool m_is_file;
+        utility::string_t m_name;
+        int64_t m_size;
+    };
+
+    class list_file_ranges_reader : public core::xml::xml_reader
+    {
+    public:
+
+        explicit list_file_ranges_reader(concurrency::streams::istream stream)
+            : xml_reader(stream), m_start(-1), m_end(-1)
+        {
+        }
+
+        // Extracts the result. This method can only be called once on this reader
+        std::vector<file_range> move_result()
+        {
+            parse();
+            return std::move(m_range_list);
+        }
+
+    protected:
+
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<file_range> m_range_list;
+        int64_t m_start;
+        int64_t m_end;
     };
 
     class service_properties_reader : public core::xml::xml_reader

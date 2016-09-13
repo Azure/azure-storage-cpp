@@ -240,7 +240,7 @@ SUITE(Core)
         for (int i = 0; i < 2; i++)
         {
             auto index = utility::conversions::print_string(i);
-            auto blob = m_container.get_block_blob_reference(U("blockblob") + index);
+            auto blob = m_container.get_block_blob_reference(_XPLATSTR("blockblob") + index);
 
             blob.upload_text(blob.name(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         }
@@ -257,7 +257,7 @@ SUITE(Core)
         CHECK_THROW(m_container.list_blobs_segmented(utility::string_t(), true, azure::storage::blob_listing_details::none, 1, token, options, m_context), azure::storage::storage_exception);
         CHECK_EQUAL(4U, m_context.request_results().size());
 
-        auto container = m_client.get_container_reference(m_container.name() + U("-missing"));
+        auto container = m_client.get_container_reference(m_container.name() + _XPLATSTR("-missing"));
 
         token.set_target_location(azure::storage::storage_location::secondary);
         CHECK_THROW(container.list_blobs_segmented(utility::string_t(), true, azure::storage::blob_listing_details::none, 1, token, options, m_context), azure::storage::storage_exception);

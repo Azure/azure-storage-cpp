@@ -21,7 +21,7 @@
 
 namespace azure { namespace storage { namespace protocol {
 
-    web::http::http_request base_request(web::http::method method, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request base_request(web::http::method method, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         UNREFERENCED_PARAMETER(context);
         if (timeout.count() > 0)
@@ -44,7 +44,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_service_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_service, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
@@ -52,7 +52,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request set_service_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request set_service_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_service, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
@@ -60,7 +60,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_service_stats(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_service_stats(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(uri_query_resource_type, resource_service);
         uri_builder.append_query(uri_query_component, component_stats);

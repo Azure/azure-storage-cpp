@@ -23,31 +23,31 @@ namespace azure { namespace storage { namespace protocol {
 
     edm_type get_property_type(const utility::string_t& type_name)
     {
-        if (type_name.compare(U("Edm.Binary")) == 0)
+        if (type_name.compare(_XPLATSTR("Edm.Binary")) == 0)
         {
             return edm_type::binary;
         }
-        else if (type_name.compare(U("Edm.Boolean")) == 0)
+        else if (type_name.compare(_XPLATSTR("Edm.Boolean")) == 0)
         {
             return edm_type::boolean;
         }
-        else if (type_name.compare(U("Edm.DateTime")) == 0)
+        else if (type_name.compare(_XPLATSTR("Edm.DateTime")) == 0)
         {
             return edm_type::datetime;
         }
-        else if (type_name.compare(U("Edm.Double")) == 0)
+        else if (type_name.compare(_XPLATSTR("Edm.Double")) == 0)
         {
             return edm_type::double_floating_point;
         }
-        else if (type_name.compare(U("Edm.Guid")) == 0)
+        else if (type_name.compare(_XPLATSTR("Edm.Guid")) == 0)
         {
             return edm_type::guid;
         }
-        else if (type_name.compare(U("Edm.Int32")) == 0)
+        else if (type_name.compare(_XPLATSTR("Edm.Int32")) == 0)
         {
             return edm_type::int32;
         }
-        else if (type_name.compare(U("Edm.Int64")) == 0)
+        else if (type_name.compare(_XPLATSTR("Edm.Int64")) == 0)
         {
             return edm_type::int64;
         }
@@ -59,9 +59,11 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t get_etag_from_timestamp(const utility::string_t& timestampStr)
     {
-        utility::ostringstream_t value;
-        value << U("W/\"datetime'") << web::http::uri::encode_data_string(timestampStr) << U("'\"");
-        return value.str();
+        utility::string_t value;
+        value.append(_XPLATSTR("W/\"datetime'"));
+        value.append(web::http::uri::encode_data_string(timestampStr));
+        value.append(_XPLATSTR("'\""));
+        return value;
     }
 
     table_entity parse_table_entity(const web::json::value& document)
@@ -79,13 +81,13 @@ namespace azure { namespace storage { namespace protocol {
                 const web::json::value& property_obj = it->second;
 
                 // The property name must be at least 6 characters long in order to have the "odata." prefix and have a non-empty suffix
-                if (property_name.size() >= 6 && property_name.compare(0, 6, U("odata.")) == 0)
+                if (property_name.size() >= 6 && property_name.compare(0, 6, _XPLATSTR("odata.")) == 0)
                 {
                     // The object is a special OData value
 
                     // TODO: if needed use: odata.type, odata.id, odata.editlink
 
-                    if (property_name.compare(6, property_name.size() - 6, U("etag")) == 0)
+                    if (property_name.compare(6, property_name.size() - 6, _XPLATSTR("etag")) == 0)
                     {
                         // The object is the ETag
                         if (property_obj.is_string() && entity.etag().empty())
@@ -95,11 +97,11 @@ namespace azure { namespace storage { namespace protocol {
                     }
                 }
                 // The property name must be at least 11 characters long in order to have the "@odata.type" suffix
-                else if (property_name.size() < 11 || property_name.compare(property_name.size() - 11, 11, U("@odata.type")) != 0)
+                else if (property_name.size() < 11 || property_name.compare(property_name.size() - 11, 11, _XPLATSTR("@odata.type")) != 0)
                 {
                     // The object is not the type of a property
 
-                    if (property_name.compare(U("PartitionKey")) == 0)
+                    if (property_name.compare(_XPLATSTR("PartitionKey")) == 0)
                     {
                         // The object is the Partition Key
 
@@ -108,7 +110,7 @@ namespace azure { namespace storage { namespace protocol {
                             entity.set_partition_key(property_obj.as_string());
                         }
                     }
-                    else if (property_name.compare(U("RowKey")) == 0)
+                    else if (property_name.compare(_XPLATSTR("RowKey")) == 0)
                     {
                         // The object is the Row Key
 
@@ -117,7 +119,7 @@ namespace azure { namespace storage { namespace protocol {
                             entity.set_row_key(property_obj.as_string());
                         }
                     }
-                    else if (property_name.compare(U("Timestamp")) == 0)
+                    else if (property_name.compare(_XPLATSTR("Timestamp")) == 0)
                     {
                         // The object is the Timestamp
 
@@ -158,7 +160,7 @@ namespace azure { namespace storage { namespace protocol {
                             utility::string_t property_type_key;
                             property_type_key.reserve(property_name.size() + 11);
                             property_type_key.append(property_name);
-                            property_type_key.append(U("@odata.type"));
+                            property_type_key.append(_XPLATSTR("@odata.type"));
 
                             web::json::object::const_iterator property_type_it = entity_obj.find(property_type_key);
                             if (property_type_it != entity_obj.cend())
@@ -198,28 +200,28 @@ namespace azure { namespace storage { namespace protocol {
         {
             const web::json::object& result_obj = document.as_object();
 
-            web::json::object::const_iterator error_it = result_obj.find(U("odata.error"));
+            web::json::object::const_iterator error_it = result_obj.find(_XPLATSTR("odata.error"));
             if (error_it != result_obj.cend() && error_it->second.is_object())
             {
                 const web::json::object& error_obj = error_it->second.as_object();
                 for (auto prop_it = error_obj.cbegin(); prop_it != error_obj.cend(); ++prop_it)
                 {
                     auto prop_name = prop_it->first;
-                    if (prop_name == U("code") && prop_it->second.is_string())
+                    if (prop_name == _XPLATSTR("code") && prop_it->second.is_string())
                     {
                         error_code = prop_it->second.as_string();
                     }
-                    else if (prop_name == U("message") && prop_it->second.is_object())
+                    else if (prop_name == _XPLATSTR("message") && prop_it->second.is_object())
                     {
                         const web::json::object& message_obj = prop_it->second.as_object();
 
-                        web::json::object::const_iterator message_text_it = message_obj.find(U("value"));
+                        web::json::object::const_iterator message_text_it = message_obj.find(_XPLATSTR("value"));
                         if (message_text_it != message_obj.cend() && message_text_it->second.is_string())
                         {
                             error_message = message_text_it->second.as_string();
                         }
                     }
-                    else if (prop_name == U("innererror"))
+                    else if (prop_name == _XPLATSTR("innererror"))
                     {
                         const web::json::object& inner_error_obj = prop_it->second.as_object();
                         for (auto details_it = inner_error_obj.cbegin(); details_it != inner_error_obj.cend(); ++details_it)
@@ -230,7 +232,7 @@ namespace azure { namespace storage { namespace protocol {
                             }
                         }
                     }
-                    else if (prop_name.find_first_of(U('.')) != utility::string_t::npos)
+                    else if (prop_name.find_first_of(_XPLATSTR('.')) != utility::string_t::npos)
                     {
                         // annotation property
                         // TODO: parse annotation property and add it to details

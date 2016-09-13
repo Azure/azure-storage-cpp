@@ -20,7 +20,7 @@
 #include "test_base.h"
 #include "cpprest/json.h"
 
-utility::string_t test_base::object_name_prefix = utility::string_t(U("nativeclientlibraryunittest"));
+utility::string_t test_base::object_name_prefix = utility::string_t(_XPLATSTR("nativeclientlibraryunittest"));
 bool test_base::is_random_initialized = false;
 
 test_config::test_config()
@@ -31,25 +31,25 @@ test_config::test_config()
     web::json::value config;
     config_file >> config;
 
-    auto target_name = config[U("target")].as_string();
-    web::json::value& tenants = config[U("tenants")];
+    auto target_name = config[_XPLATSTR("target")].as_string();
+    web::json::value& tenants = config[_XPLATSTR("tenants")];
 
     for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
     {
-        const web::json::value& name_obj = it->at(U("name"));
+        const web::json::value& name_obj = it->at(_XPLATSTR("name"));
         if (name_obj.as_string() == target_name)
         {
-            if (!it->has_field(U("connection_string")))
+            if (!it->has_field(_XPLATSTR("connection_string")))
             {
-                azure::storage::storage_credentials credentials(it->at(U("account_name")).as_string(), it->at(U("account_key")).as_string());
-                azure::storage::storage_uri blob_uri(it->at(U("blob_primary_endpoint")).as_string(), it->at(U("blob_secondary_endpoint")).as_string());
-                azure::storage::storage_uri queue_uri(it->at(U("queue_primary_endpoint")).as_string(), it->at(U("queue_secondary_endpoint")).as_string());
-                azure::storage::storage_uri table_uri(it->at(U("table_primary_endpoint")).as_string(), it->at(U("table_secondary_endpoint")).as_string());
+                azure::storage::storage_credentials credentials(it->at(_XPLATSTR("account_name")).as_string(), it->at(_XPLATSTR("account_key")).as_string());
+                azure::storage::storage_uri blob_uri(it->at(_XPLATSTR("blob_primary_endpoint")).as_string(), it->at(_XPLATSTR("blob_secondary_endpoint")).as_string());
+                azure::storage::storage_uri queue_uri(it->at(_XPLATSTR("queue_primary_endpoint")).as_string(), it->at(_XPLATSTR("queue_secondary_endpoint")).as_string());
+                azure::storage::storage_uri table_uri(it->at(_XPLATSTR("table_primary_endpoint")).as_string(), it->at(_XPLATSTR("table_secondary_endpoint")).as_string());
                 m_account = azure::storage::cloud_storage_account(credentials, blob_uri, queue_uri, table_uri);
             }
             else
             {
-                const web::json::value& connection_string_obj = it->at(U("connection_string"));
+                const web::json::value& connection_string_obj = it->at(_XPLATSTR("connection_string"));
                 m_account = azure::storage::cloud_storage_account::parse(connection_string_obj.as_string());
             }
 
@@ -62,7 +62,7 @@ void test_base::print_client_request_id(const azure::storage::operation_context&
 {
     std::string suite_name(UnitTest::CurrentTest::Details()->suiteName);
     std::string test_name(UnitTest::CurrentTest::Details()->testName);
-    ucout << utility::conversions::to_string_t(suite_name) << U(":") << utility::conversions::to_string_t(test_name) << U(": ") << purpose << U(" client request ID: ") << context.client_request_id() << std::endl;
+    ucout << utility::conversions::to_string_t(suite_name) << _XPLATSTR(":") << utility::conversions::to_string_t(test_name) << _XPLATSTR(": ") << purpose << _XPLATSTR(" client request ID: ") << context.client_request_id() << std::endl;
 }
 
 utility::string_t test_base::get_string(utility::char_t value1, utility::char_t value2)
@@ -125,7 +125,7 @@ utility::string_t test_base::get_random_string(size_t size)
     result.reserve(size);
     for (size_t i = 0; i < size; ++i)
     {
-        result.push_back((utility::char_t) (U('0') + rand() % 10));
+        result.push_back((utility::char_t) (_XPLATSTR('0') + rand() % 10));
     }
     return result;
 }

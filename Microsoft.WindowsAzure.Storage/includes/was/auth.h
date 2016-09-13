@@ -24,6 +24,7 @@
 namespace azure { namespace storage {
 
     class cloud_blob_shared_access_headers;
+    class cloud_file_shared_access_headers;
     class account_shared_access_policy;
 
 }} // namespace azure::storage
@@ -32,8 +33,8 @@ namespace azure { namespace storage { namespace protocol {
 
     utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials);
 
-    const utility::string_t auth_name_shared_key(U("SharedKey"));
-    const utility::string_t auth_name_shared_key_lite(U("SharedKeyLite"));
+    const utility::string_t auth_name_shared_key(_XPLATSTR("SharedKey"));
+    const utility::string_t auth_name_shared_key_lite(_XPLATSTR("SharedKeyLite"));
 
 #pragma region Canonicalization
 
@@ -54,13 +55,19 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        
+        // Prevents the compiler from generating default assignment operator.
+        canonicalizer_helper& operator=(canonicalizer_helper& other) = delete;
+
+#endif
         /// <summary>
         /// Returns the canonicalized string.
         /// </summary>
         /// <returns>The canonicalized string.</returns>
         utility::string_t str() const
         {
-            return m_result.str();
+            return m_result;
         }
 
         /// <summary>
@@ -69,7 +76,8 @@ namespace azure { namespace storage { namespace protocol {
         /// <param name="value">The value.</param>
         void append(const utility::string_t& value)
         {
-            m_result << value << U('\n');
+            m_result.append(value);
+            m_result.append(_XPLATSTR("\n"));
         }
 
         /// <summary>
@@ -107,7 +115,7 @@ namespace azure { namespace storage { namespace protocol {
         
         const web::http::http_request& m_request;
         const utility::string_t& m_account_name;
-        utility::ostringstream_t m_result;
+        utility::string_t m_result;
     };
 
     /// <summary>
@@ -437,6 +445,7 @@ namespace azure { namespace storage { namespace protocol {
     utility::string_t get_blob_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials);
     utility::string_t get_queue_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials);
     utility::string_t get_table_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& table_name, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials);
+    utility::string_t get_file_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_file_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials);
     storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource);
 
 #pragma endregion

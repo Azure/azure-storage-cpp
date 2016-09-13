@@ -32,31 +32,31 @@ namespace azure { namespace storage { namespace samples {
 
             // Create a queue
             azure::storage::cloud_queue_client queue_client = storage_account.create_cloud_queue_client();
-            azure::storage::cloud_queue queue = queue_client.get_queue_reference(U("my-sample-queue"));
+            azure::storage::cloud_queue queue = queue_client.get_queue_reference(_XPLATSTR("my-sample-queue"));
             
             // Return value is true if the queue did not exist and was successfully created.
             queue.create_if_not_exists();
 
             // Insert some queue messages
-            azure::storage::cloud_queue_message message1(U("some message"));
+            azure::storage::cloud_queue_message message1(_XPLATSTR("some message"));
             queue.add_message(message1);
-            azure::storage::cloud_queue_message message2(U("different message"));
+            azure::storage::cloud_queue_message message2(_XPLATSTR("different message"));
             queue.add_message(message2);
-            azure::storage::cloud_queue_message message3(U("another message"));
+            azure::storage::cloud_queue_message message3(_XPLATSTR("another message"));
             queue.add_message(message3);
 
             // Peek the next queue message
             azure::storage::cloud_queue_message peeked_message = queue.peek_message();
-            ucout << U("Peek: ") << peeked_message.content_as_string() << std::endl;
+            ucout << _XPLATSTR("Peek: ") << peeked_message.content_as_string() << std::endl;
 
             // Dequeue the next queue message
             azure::storage::cloud_queue_message dequeued_message = queue.get_message();
-            ucout << U("Get: ") << dequeued_message.content_as_string() << std::endl;
+            ucout << _XPLATSTR("Get: ") << dequeued_message.content_as_string() << std::endl;
 
             // Update a queue message (content and visibility timeout)
-            dequeued_message.set_content(U("changed message"));
+            dequeued_message.set_content(_XPLATSTR("changed message"));
             queue.update_message(dequeued_message, std::chrono::seconds(30), true);
-            ucout << U("Update: ") << dequeued_message.content_as_string() << std::endl;
+            ucout << _XPLATSTR("Update: ") << dequeued_message.content_as_string() << std::endl;
 
             // Delete the queue message
             queue.delete_message(dequeued_message);
@@ -67,7 +67,7 @@ namespace azure { namespace storage { namespace samples {
             std::vector<azure::storage::cloud_queue_message> messages = queue.get_messages(32, std::chrono::seconds(300), options, context);
             for (std::vector<azure::storage::cloud_queue_message>::const_iterator it = messages.cbegin(); it != messages.cend(); ++it)
             {
-                ucout << U("Get: ") << it->content_as_string() << std::endl;
+                ucout << _XPLATSTR("Get: ") << it->content_as_string() << std::endl;
             }
 
             // Delete the queue messages
@@ -78,7 +78,7 @@ namespace azure { namespace storage { namespace samples {
 
             // Get the approximate queue size
             queue.download_attributes();
-            ucout << U("Approximate message count: ") << queue.approximate_message_count() << std::endl;
+            ucout << _XPLATSTR("Approximate message count: ") << queue.approximate_message_count() << std::endl;
 
             // Delete the queue
             // Return value is true if the queue did exist and was succesfully deleted.
@@ -86,7 +86,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const azure::storage::storage_exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
 
             azure::storage::request_result result = e.result();
             azure::storage::storage_extended_error extended_error = result.extended_error();
@@ -97,7 +97,7 @@ namespace azure { namespace storage { namespace samples {
         }
         catch (const std::exception& e)
         {
-            ucout << U("Error: ") << e.what() << std::endl;
+            ucout << _XPLATSTR("Error: ") << e.what() << std::endl;
         }
     }
 

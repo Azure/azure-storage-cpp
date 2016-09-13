@@ -112,7 +112,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_TURN_OFF_PLATFORM_STRING;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
     </Link>
@@ -121,7 +121,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;_DEBUG;_TURN_OFF_PLATFORM_STRING;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
     </Link>
@@ -132,7 +132,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;NDEBUG;_TURN_OFF_PLATFORM_STRING;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -146,7 +146,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;NDEBUG;_TURN_OFF_PLATFORM_STRING;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
@@ -155,12 +155,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="includes\wascore\filestream.h" />
     <ClInclude Include="includes\wascore\protocol_json.h" />
     <ClInclude Include="includes\was\auth.h" />
     <ClInclude Include="includes\was\blob.h" />
     <ClInclude Include="includes\was\common.h" />
     <ClInclude Include="includes\was\core.h" />
     <ClInclude Include="includes\was\error_code_strings.h" />
+    <ClInclude Include="includes\was\file.h" />
     <ClInclude Include="includes\was\queue.h" />
     <ClInclude Include="includes\was\service_client.h" />
     <ClInclude Include="includes\was\storage_account.h" />
@@ -202,6 +204,11 @@
     <ClCompile Include="src\cloud_client.cpp" />
     <ClCompile Include="src\cloud_common.cpp" />
     <ClCompile Include="src\cloud_core.cpp" />
+    <ClCompile Include="src\cloud_file.cpp" />
+    <ClCompile Include="src\cloud_file_client.cpp" />
+    <ClCompile Include="src\cloud_file_directory.cpp" />
+    <ClCompile Include="src\cloud_file_ostreambuf.cpp" />
+    <ClCompile Include="src\cloud_file_share.cpp" />
     <ClCompile Include="src\cloud_page_blob.cpp" />
     <ClCompile Include="src\cloud_queue.cpp" />
     <ClCompile Include="src\cloud_queue_client.cpp" />
@@ -209,15 +216,20 @@
     <ClCompile Include="src\cloud_storage_account.cpp" />
     <ClCompile Include="src\cloud_table.cpp" />
     <ClCompile Include="src\cloud_table_client.cpp" />
+    <ClCompile Include="src\constants.cpp" />
+    <ClCompile Include="src\file_request_factory.cpp" />
+    <ClCompile Include="src\file_response_parsers.cpp" />
     <ClCompile Include="src\hashing.cpp" />
     <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\mime_multipart_helper.cpp" />
     <ClCompile Include="src\operation_context.cpp" />
     <ClCompile Include="src\protocol_json.cpp" />
     <ClCompile Include="src\queue_request_factory.cpp" />
+    <ClCompile Include="src\resources.cpp" />
     <ClCompile Include="src\retry_policies.cpp" />
     <ClCompile Include="src\shared_access_signature.cpp" />
     <ClCompile Include="src\entity_property.cpp" />
+    <ClCompile Include="src\streams.cpp" />
     <ClCompile Include="src\table_query.cpp" />
     <ClCompile Include="src\table_response_parsers.cpp" />
     <ClCompile Include="src\table_request_factory.cpp" />
@@ -240,6 +252,7 @@
     <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="includes\wascore\constants.dat" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

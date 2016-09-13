@@ -2,17 +2,17 @@
 <package >
   <metadata>
     <id>wastorage.v120</id>
-    <version>2.3.0</version>
+    <version>2.4.0</version>
     <title>Microsoft Azure Storage Client Library for C++</title>
     <authors>Microsoft Corporation</authors>
     <owners>Microsoft Corporation</owners>
     <licenseUrl>http://go.microsoft.com/fwlink/?LinkId=235170</licenseUrl>
     <projectUrl>http://go.microsoft.com/fwlink/?LinkId=235168</projectUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</iconUrl>
-    <summary>A client library for working with Microsoft Azure storage services including blobs, tables, and queues.</summary>
-    <description>This client library enables working with the Microsoft Azure storage services which include the blob service for storing binary and text data, the table service for storing structured non-relational data, and the queue service for storing messages that may be accessed by a client. Microsoft Azure Storage team's blog - http://blogs.msdn.com/b/windowsazurestorage/</description>
+    <summary>A client library for working with Microsoft Azure storage services including blobs, files, tables, and queues.</summary>
+    <description>This client library enables working with the Microsoft Azure storage services which include the blob service for storing binary and text data, the file service for storing binary and text data, the table service for storing structured non-relational data, and the queue service for storing messages that may be accessed by a client. Microsoft Azure Storage team's blog - http://blogs.msdn.com/b/windowsazurestorage/</description>
     <releaseNotes>Public release</releaseNotes>
-    <tags>Microsoft Azure Storage Table Blob Queue Scalable windowsazureofficial</tags>
+    <tags>Microsoft Azure Storage Table Blob Queue File Scalable windowsazureofficial</tags>
     <dependencies>
       <dependency id="cpprestsdk.v120.windesktop.msvcstl.dyn.rt-dyn" version="2.8.0" />
     </dependencies>
@@ -22,6 +22,7 @@
     <file src="Microsoft.WindowsAzure.Storage\includes\was\*.h" target="build\native\include\was" />
     <file src="Microsoft.WindowsAzure.Storage\includes\wascore\basic_types.h" target="build\native\include\wascore" />
     <file src="Microsoft.WindowsAzure.Storage\includes\wascore\constants.h" target="build\native\include\wascore" />
+    <file src="Microsoft.WindowsAzure.Storage\includes\wascore\constants.dat" target="build\native\include\wascore" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.lib" target="lib\native\v120\Win32\Debug" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.dll" target="lib\native\v120\Win32\Debug" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.pdb" target="lib\native\v120\Win32\Debug" />

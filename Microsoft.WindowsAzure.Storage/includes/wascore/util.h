@@ -29,6 +29,8 @@ namespace azure { namespace storage { namespace core {
     utility::string_t::size_type find_path_start(const web::http::uri& uri);
     bool parse_container_uri(const storage_uri& uri, utility::string_t& container_name);
     bool parse_blob_uri(const storage_uri& uri, utility::string_t& container_name, utility::string_t& blob_name);
+    bool parse_file_directory_uri(const storage_uri& uri, utility::string_t& share_name, utility::string_t& directory_name);
+    bool parse_file_uri(const storage_uri& uri, utility::string_t& share_name, utility::string_t& directory_name, utility::string_t& file_name);
     storage_uri create_stripped_uri(const storage_uri& uri);
     void parse_query_and_verify(const storage_uri& uri, storage_credentials& credentials, bool require_signed_resource);
     storage_uri verify_blob_uri(const storage_uri& uri, storage_credentials& credentials, utility::string_t& snapshot);

@@ -39,6 +39,8 @@ namespace azure { namespace storage {
         class list_blobs_reader;
     }
 
+    template<typename result_type> class result_iterator;
+
     /// <summary>
     /// Represents the user meta-data for queues, containers and blobs.
     /// </summary>
@@ -225,8 +227,17 @@ namespace azure { namespace storage {
 
     private:
 
+        result_type& results(size_t index)
+        {
+            if(index < m_results.size())
+                return m_results[index];
+            throw std::runtime_error("index is out of the results range");
+        }
+
         std::vector<result_type> m_results;
         azure::storage::continuation_token m_continuation_token;
+
+        friend class result_iterator<result_type>;
     };
 
     /// <summary>
@@ -313,9 +324,24 @@ namespace azure { namespace storage {
             return m_result_segment.results()[m_segment_index];
         }
 
+        result_type& operator*()
+        {
+            if (passed_the_end())
+            {
+                throw std::runtime_error("cannot dereference past-the-end iterator");
+            }
+
+            return m_result_segment.results(m_segment_index);
+        }
+
         const result_type* operator->() const
         {
             return (std::pointer_traits<const result_type*>::pointer_to(**this));
+        }
+
+        result_type* operator->()
+        {
+            return (std::pointer_traits<result_type*>::pointer_to(**this));
         }
 
         result_iterator& operator++()

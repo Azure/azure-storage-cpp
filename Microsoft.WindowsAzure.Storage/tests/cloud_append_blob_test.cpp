@@ -256,7 +256,7 @@ SUITE(Blob)
         const size_t buffer_offsets[2] = { 0, 1024 };
         for (auto buffer_offset : buffer_offsets)
         {
-            upload_and_download(m_blob, buffer_size, buffer_offset, 0, true, options, 3, false);
+            upload_and_download(m_blob, buffer_size, buffer_offset, 0, true, options, 3, false, m_context);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
         }
@@ -271,7 +271,7 @@ SUITE(Blob)
         const size_t buffer_offsets[2] = { 0, 1024 };
         for (auto buffer_offset : buffer_offsets)
         {
-            upload_and_download(m_blob, buffer_size, buffer_offset, 0, false, options, 3, false);
+            upload_and_download(m_blob, buffer_size, buffer_offset, 0, false, options, 3, false, m_context);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
         }
@@ -511,7 +511,7 @@ SUITE(Blob)
     TEST_FIXTURE(append_blob_test_base, append_block_stale_properties)
     {
         azure::storage::blob_request_options options;
-        azure::storage::operation_context op;
+        azure::storage::operation_context op = m_context;
 
         m_blob.create_or_replace(azure::storage::access_condition(), options, m_context);
         check_blob_no_stale_property(m_blob);

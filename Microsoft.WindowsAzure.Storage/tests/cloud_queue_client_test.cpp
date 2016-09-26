@@ -128,7 +128,7 @@ SUITE(QueueClient)
             utility::string_t prefix;
             bool get_metadata;
             azure::storage::queue_request_options options;
-            azure::storage::operation_context context;
+            azure::storage::operation_context context = m_context;
 
             prefix = object_name_prefix;
             get_metadata = false;
@@ -183,7 +183,7 @@ SUITE(QueueClient)
             utility::string_t prefix;
             bool get_metadata;
             azure::storage::queue_request_options options;
-            azure::storage::operation_context context;
+            azure::storage::operation_context context = m_context;
 
             prefix = object_name_prefix;
             get_metadata = true;
@@ -257,7 +257,7 @@ SUITE(QueueClient)
         int max_results;
         azure::storage::continuation_token token;
         azure::storage::queue_request_options options;
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
 
         prefix = object_name_prefix;
         get_metadata = false;
@@ -335,7 +335,7 @@ SUITE(QueueClient)
         {
             utility::string_t prefix = object_name_prefix;
             azure::storage::queue_request_options options;
-            azure::storage::operation_context context;
+            azure::storage::operation_context context = m_context;
             std::vector<azure::storage::cloud_queue> results = list_all_queues(client, prefix, false, options, context);
             CHECK(results.size() >= QUEUE_COUNT);
         }

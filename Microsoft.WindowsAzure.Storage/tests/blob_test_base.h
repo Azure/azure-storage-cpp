@@ -184,7 +184,7 @@ public:
 protected:
 
     bool wait_for_copy(azure::storage::cloud_blob& blob);
-    static azure::storage::operation_context upload_and_download(azure::storage::cloud_blob& blob, size_t buffer_size, size_t buffer_offset, size_t blob_size, bool use_seekable_stream, const azure::storage::blob_request_options& options, size_t expected_request_count, bool expect_md5_header);
+    static azure::storage::operation_context upload_and_download(azure::storage::cloud_blob& blob, size_t buffer_size, size_t buffer_offset, size_t blob_size, bool use_seekable_stream, const azure::storage::blob_request_options& options, size_t expected_request_count, bool expect_md5_header, azure::storage::operation_context context);
     void check_access(const utility::string_t& sas_token, uint8_t permissions, const azure::storage::cloud_blob_shared_access_headers& headers, const azure::storage::cloud_blob& original_blob);
     void check_lease_access(azure::storage::cloud_blob& blob, azure::storage::lease_state state, const utility::string_t& lease_id, bool fake);
     static void check_blob_no_stale_property(azure::storage::cloud_blob& blob);

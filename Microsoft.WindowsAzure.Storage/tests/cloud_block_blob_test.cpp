@@ -194,46 +194,46 @@ SUITE(Blob)
         azure::storage::blob_request_options options;
 
         options.set_store_blob_content_md5(false);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_use_transactional_md5(true);
         options.set_store_blob_content_md5(true);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_single_blob_upload_threshold_in_bytes(4 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_store_blob_content_md5(false);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_stream_write_size_in_bytes(1 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 7, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 7, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_use_transactional_md5(false);
         options.set_single_blob_upload_threshold_in_bytes(6 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_parallelism_factor(4);
         options.set_use_transactional_md5(true);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 7, false), 4);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 7, false, m_context), 4);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_parallelism_factor(8);
         options.set_store_blob_content_md5(true);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 7, true), 6);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 7, true, m_context), 6);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
@@ -241,23 +241,23 @@ SUITE(Blob)
         options.set_use_transactional_md5(false);
         options.set_parallelism_factor(1);
         options.set_http_buffer_size(512 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_stream_write_size_in_bytes(4 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_store_blob_content_md5(true);
         options.set_single_blob_upload_threshold_in_bytes(32 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_parallelism_factor(4);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true), 2);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true, m_context), 2);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
@@ -266,23 +266,23 @@ SUITE(Blob)
         options.set_stream_write_size_in_bytes(1 * 1024 * 1024);
         options.set_single_blob_upload_threshold_in_bytes(6 * 1024 * 1024);
         options.set_http_buffer_size(0);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_stream_write_size_in_bytes(4 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_store_blob_content_md5(true);
         options.set_single_blob_upload_threshold_in_bytes(32 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 1, true, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_parallelism_factor(4);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true), 2);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, true, options, 3, true, m_context), 2);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
     }
@@ -294,43 +294,43 @@ SUITE(Blob)
         options.set_use_transactional_md5(true);
 
         options.set_store_blob_content_md5(false);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_store_blob_content_md5(true);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, true), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, true, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_single_blob_upload_threshold_in_bytes(4 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, true), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, true, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_store_blob_content_md5(false);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 3, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_stream_write_size_in_bytes(1 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_single_blob_upload_threshold_in_bytes(6 * 1024 * 1024);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, false), 1);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, false, m_context), 1);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_parallelism_factor(4);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, false), 4);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, false, m_context), 4);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
 
         options.set_parallelism_factor(8);
         options.set_store_blob_content_md5(true);
-        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, true), 6);
+        check_parallelism(upload_and_download(m_blob, size, 0, 0, false, options, 7, true, m_context), 6);
         m_blob.delete_blob();
         m_blob.properties().set_content_md5(utility::string_t());
     }
@@ -348,26 +348,26 @@ SUITE(Blob)
             options.set_use_transactional_md5(false);
             options.set_store_blob_content_md5(false);
             options.set_parallelism_factor(1);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 1, false), 1);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 1, false, m_context), 1);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
 
             options.set_use_transactional_md5(true);
             options.set_store_blob_content_md5(true);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 1, true), 1);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 1, true, m_context), 1);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
 
             options.set_stream_write_size_in_bytes(1 * 1024 * 1024);
             options.set_store_blob_content_md5(false);
             options.set_parallelism_factor(4);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 5, false), 4);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 5, false, m_context), 4);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
 
             options.set_parallelism_factor(8);
             options.set_store_blob_content_md5(true);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 5, true), 4);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, true, options, 5, true, m_context), 4);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
         }
@@ -386,26 +386,26 @@ SUITE(Blob)
             options.set_use_transactional_md5(false);
             options.set_store_blob_content_md5(false);
             options.set_parallelism_factor(1);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 1, false), 1);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 1, false, m_context), 1);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
 
             options.set_use_transactional_md5(true);
             options.set_store_blob_content_md5(true);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 1, true), 1);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 1, true, m_context), 1);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
 
             options.set_stream_write_size_in_bytes(1 * 1024 * 1024);
             options.set_store_blob_content_md5(false);
             options.set_parallelism_factor(4);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 5, false), 4);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 5, false, m_context), 4);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
 
             options.set_parallelism_factor(8);
             options.set_store_blob_content_md5(true);
-            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 5, true), 4);
+            check_parallelism(upload_and_download(m_blob, buffer_size, buffer_offset, blob_size, false, options, 5, true, m_context), 4);
             m_blob.delete_blob();
             m_blob.properties().set_content_md5(utility::string_t());
         }
@@ -416,10 +416,10 @@ SUITE(Blob)
         const size_t buffer_size = 2 * 1024 * 1024;
         azure::storage::blob_request_options options;
         options.set_store_blob_content_md5(false);
-        CHECK_THROW(upload_and_download(m_blob, buffer_size, 0, buffer_size + 1, true, options, 0, false), std::invalid_argument);
-        CHECK_THROW(upload_and_download(m_blob, buffer_size, 0, buffer_size + 1, false, options, 0, false), std::invalid_argument);
-        CHECK_THROW(upload_and_download(m_blob, buffer_size, 1024, buffer_size - 1023, true, options, 0, false), std::invalid_argument);
-        CHECK_THROW(upload_and_download(m_blob, buffer_size, 1024, buffer_size - 1023, false, options, 0, false), std::invalid_argument);
+        CHECK_THROW(upload_and_download(m_blob, buffer_size, 0, buffer_size + 1, true, options, 0, false, m_context), std::invalid_argument);
+        CHECK_THROW(upload_and_download(m_blob, buffer_size, 0, buffer_size + 1, false, options, 0, false, m_context), std::invalid_argument);
+        CHECK_THROW(upload_and_download(m_blob, buffer_size, 1024, buffer_size - 1023, true, options, 0, false, m_context), std::invalid_argument);
+        CHECK_THROW(upload_and_download(m_blob, buffer_size, 1024, buffer_size - 1023, false, options, 0, false, m_context), std::invalid_argument);
     }
 
     TEST_FIXTURE(block_blob_test_base, block_blob_text_upload)

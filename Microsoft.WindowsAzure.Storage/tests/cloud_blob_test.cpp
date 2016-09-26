@@ -35,9 +35,8 @@ bool blob_test_base::wait_for_copy(azure::storage::cloud_blob& blob)
     return blob.copy_state().status() == azure::storage::copy_status::success;
 }
 
-azure::storage::operation_context blob_test_base::upload_and_download(azure::storage::cloud_blob& blob, size_t buffer_size, size_t buffer_offset, size_t blob_size, bool use_seekable_stream, const azure::storage::blob_request_options& options, size_t expected_request_count, bool expect_md5_header)
+azure::storage::operation_context blob_test_base::upload_and_download(azure::storage::cloud_blob& blob, size_t buffer_size, size_t buffer_offset, size_t blob_size, bool use_seekable_stream, const azure::storage::blob_request_options& options, size_t expected_request_count, bool expect_md5_header, azure::storage::operation_context context)
 {
-    azure::storage::operation_context context;
     print_client_request_id(context, _XPLATSTR("upload/download"));
 
     utility::string_t md5_header;

@@ -904,7 +904,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             table.create(options, context);
 
@@ -928,7 +929,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = table.exists(options, context);
 
@@ -954,7 +956,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -987,7 +990,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             table.delete_table(options, context);
 
@@ -1011,7 +1015,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = table.exists(options, context);
 
@@ -1037,7 +1042,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -1078,7 +1084,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool created = table.create_if_not_exists(options, context);
 
@@ -1116,7 +1123,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = table.exists(options, context);
 
@@ -1142,7 +1150,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool created = table.create_if_not_exists(options, context);
 
@@ -1168,7 +1177,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool deleted = table.delete_table_if_exists(options, context);
 
@@ -1206,7 +1216,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = table.exists(options, context);
 
@@ -1232,7 +1243,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool deleted = table.delete_table_if_exists(options, context);
 
@@ -1278,7 +1290,8 @@ SUITE(Table)
 
         azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
         azure::storage::table_request_options options;
-        azure::storage::operation_context context = m_context;
+        azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         try
         {
@@ -1340,7 +1353,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1372,7 +1386,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1434,7 +1449,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -1473,7 +1489,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::delete_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1505,7 +1522,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1539,7 +1557,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::delete_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -1604,7 +1623,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_merge_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1636,7 +1656,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1708,7 +1729,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_merge_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1740,7 +1762,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1816,7 +1839,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::merge_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1848,7 +1872,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1908,7 +1933,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::delete_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -1962,7 +1988,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::merge_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -2027,7 +2054,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_replace_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2059,7 +2087,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2131,7 +2160,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_or_replace_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2163,7 +2193,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2235,7 +2266,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::replace_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2267,7 +2299,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2319,7 +2352,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::delete_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2373,7 +2407,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::replace_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -2438,7 +2473,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             options.set_server_timeout(std::chrono::seconds(20));
 
@@ -2472,7 +2508,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             options.set_server_timeout(std::chrono::seconds(20));
 
@@ -2542,7 +2579,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -2611,7 +2649,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2626,7 +2665,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -2718,7 +2758,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -2767,7 +2808,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
@@ -2807,7 +2849,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -2857,7 +2900,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
@@ -2898,7 +2942,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -2948,7 +2993,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
@@ -2989,7 +3035,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -3038,7 +3085,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
@@ -3078,7 +3126,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -3127,7 +3176,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
             query.set_filter_string(filter_string);
@@ -3167,7 +3217,8 @@ SUITE(Table)
             {
                 azure::storage::table_batch_operation operation;
                 azure::storage::table_request_options options;
-                azure::storage::operation_context context = m_context;
+                azure::storage::operation_context context;
+                print_client_request_id(context, _XPLATSTR(""));
 
                 operation.retrieve_entity(partition_key, row_keys[i]);
 
@@ -3205,7 +3256,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             for (int i = 0; i < BATCH_SIZE; ++i)
             {
@@ -3252,7 +3304,8 @@ SUITE(Table)
             {
                 azure::storage::table_batch_operation operation;
                 azure::storage::table_request_options options;
-                azure::storage::operation_context context = m_context;
+                azure::storage::operation_context context;
+                print_client_request_id(context, _XPLATSTR(""));
 
                 operation.retrieve_entity(partition_key, row_keys[i]);
 
@@ -3301,7 +3354,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::entity_property bad_property = azure::storage::entity_property(get_random_int32());
             bad_property.set_property_type(azure::storage::edm_type::datetime);
@@ -3348,7 +3402,8 @@ SUITE(Table)
         {
             azure::storage::table_batch_operation operation;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t bad_row_key = _XPLATSTR("bad//key");
 
@@ -3397,7 +3452,8 @@ SUITE(Table)
 
         azure::storage::table_batch_operation operation;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context = m_context;
+        azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         azure::storage::table_entity entity1(partition_key1, row_key1);
         operation.insert_entity(entity1);
@@ -3418,7 +3474,8 @@ SUITE(Table)
 
         azure::storage::table_batch_operation operation;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context = m_context;
+        azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         operation.retrieve_entity(partition_key, row_key1);
         operation.retrieve_entity(partition_key, row_key2);
@@ -3436,7 +3493,8 @@ SUITE(Table)
 
         azure::storage::table_batch_operation operation;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context = m_context;
+        azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         operation.retrieve_entity(partition_key, row_key1);
 
@@ -3516,7 +3574,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             int take_count = 10;
             query.set_take_count(take_count);
@@ -3629,7 +3688,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             int take_count = 10;
             query.set_take_count(take_count);
@@ -3803,7 +3863,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             int take_count = 10;
             query.set_take_count(take_count);
@@ -3917,7 +3978,8 @@ SUITE(Table)
             azure::storage::table_query query;
             azure::storage::continuation_token token;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             int take_count = 10;
             query.set_take_count(take_count);
@@ -4046,7 +4108,8 @@ SUITE(Table)
 
         azure::storage::table_query query;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context = m_context;
+        azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PartitionKey"), azure::storage::query_comparison_operator::equal, partition_key);
         query.set_filter_string(filter_string);
@@ -4088,7 +4151,8 @@ SUITE(Table)
 
         azure::storage::table_query query;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context = m_context;
+        azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         // An invalid filter string because PartitionKey is not a numeric type
         utility::string_t filter_string = (_XPLATSTR("PartitionKey eq 12345"));
@@ -4166,7 +4230,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("TextProperty"), azure::storage::query_comparison_operator::equal, property_value);
             query.set_filter_string(filter_string);
@@ -4244,7 +4309,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_permissions permissions = table.download_permissions(options, context);
 
@@ -4271,7 +4337,8 @@ SUITE(Table)
         {
             azure::storage::table_permissions permissions;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::shared_access_policies<azure::storage::table_shared_access_policy> policies;
             policies.insert(std::make_pair(policy_name1, policy1));
@@ -4300,7 +4367,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_permissions permissions = table.download_permissions(options, context);
 
@@ -4333,7 +4401,8 @@ SUITE(Table)
         {
             azure::storage::table_permissions permissions;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::shared_access_policies<azure::storage::table_shared_access_policy> policies;
 
@@ -4360,7 +4429,8 @@ SUITE(Table)
 
         {
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_permissions permissions = table.download_permissions(options, context);
 
@@ -4492,7 +4562,8 @@ SUITE(Table)
 
             azure::storage::table_operation operation = azure::storage::table_operation::insert_entity(entity);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -4524,7 +4595,8 @@ SUITE(Table)
         {
             azure::storage::table_operation operation = azure::storage::table_operation::retrieve_entity(partition_key, row_key);
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::table_result result = table.execute(operation, options, context);
 
@@ -4561,7 +4633,8 @@ SUITE(Table)
         {
             azure::storage::table_query query;
             azure::storage::table_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             utility::string_t filter_string = azure::storage::table_query::generate_filter_condition(_XPLATSTR("PropertyA"), azure::storage::query_comparison_operator::equal, truncated_value);
             query.set_filter_string(filter_string);

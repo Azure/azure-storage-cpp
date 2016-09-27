@@ -128,7 +128,8 @@ SUITE(QueueClient)
             utility::string_t prefix;
             bool get_metadata;
             azure::storage::queue_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             prefix = object_name_prefix;
             get_metadata = false;
@@ -183,7 +184,8 @@ SUITE(QueueClient)
             utility::string_t prefix;
             bool get_metadata;
             azure::storage::queue_request_options options;
-            azure::storage::operation_context context = m_context;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             prefix = object_name_prefix;
             get_metadata = true;

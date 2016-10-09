@@ -447,4 +447,61 @@ namespace azure { namespace storage {  namespace core {
 
     }
 
+#ifndef _WIN32
+    const boost::asio::io_service& http_client_reusable::s_service = crossplat::threadpool::shared_instance().service();
+    std::map<utility::string_t, std::shared_ptr<web::http::client::http_client>> http_client_reusable::s_http_clients;
+    std::mutex http_client_reusable::s_mutex;
+
+    std::shared_ptr<web::http::client::http_client> http_client_reusable::get_http_client(const web::uri& uri)
+    {
+        utility::string_t key(uri.to_string());
+
+        std::lock_guard<std::mutex> guard(s_mutex);
+        auto iter = s_http_clients.find(key);
+        if (iter == s_http_clients.end())
+        {
+            auto http_client = std::make_shared<web::http::client::http_client>(uri);
+            s_http_clients[key] = http_client;
+            return http_client;
+        }
+        else
+        {
+            return iter->second;
+        }
+    }
+
+    std::shared_ptr<web::http::client::http_client> http_client_reusable::get_http_client(const web::uri& uri, const web::http::client::http_client_config& config)
+    {
+        utility::string_t key(uri.to_string());
+        key.append(_XPLATSTR("#"));
+        if (config.proxy().is_specified())
+        {
+            key.append(_XPLATSTR("0#"));
+            key.append(config.proxy().address().to_string());
+            key.append(_XPLATSTR("#"));
+        }
+        else
+        {
+            key.append(_XPLATSTR("1#"));
+        }
+        key.append(utility::conversions::print_string(config.timeout().count()));
+        key.append(_XPLATSTR("#"));
+        key.append(utility::conversions::print_string(config.chunksize()));
+        key.append(_XPLATSTR("#"));
+
+        std::lock_guard<std::mutex> guard(s_mutex);
+        auto iter = s_http_clients.find(key);
+        if (iter == s_http_clients.end())
+        {
+            auto http_client = std::make_shared<web::http::client::http_client>(uri, config);
+            s_http_clients[key] = http_client;
+            return http_client;
+        }
+        else
+        {
+            return iter->second;
+        }
+    }
+#endif
+
 }}} // namespace azure::storage::core

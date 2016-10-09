@@ -52,7 +52,7 @@ utility::string_t blob_service_test_base::get_random_container_name(size_t lengt
     return utility::conversions::print_string(utility::datetime::utc_now().to_interval()) + name;
 }
 
-void blob_service_test_base::check_parallelism(const azure::storage::operation_context& context, int expected_parallelism)
+void test_base::check_parallelism(const azure::storage::operation_context& context, int expected_parallelism)
 {
     typedef std::pair<utility::datetime, bool> request;
     

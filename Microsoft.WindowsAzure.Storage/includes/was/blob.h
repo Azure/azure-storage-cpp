@@ -5074,6 +5074,7 @@ namespace azure { namespace storage {
 
         void init(utility::string_t snapshot_time, storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, bool update_properties = false);
 
         utility::string_t m_name;
         utility::string_t m_snapshot_time;

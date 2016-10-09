@@ -394,7 +394,7 @@ SUITE(File)
         ranges_clear = m_file.list_ranges(0, 2048, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         CHECK(ranges_clear.size() == 0);
 
-        // verify write range with start offset not zero.
+        // verify write range with start start_offset not zero.
         m_file.create(1024, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         ranges0 = m_file.list_ranges(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         CHECK(ranges0.size() == 0);

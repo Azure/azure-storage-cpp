@@ -58,7 +58,8 @@ public:
 protected:
 
     static void print_client_request_id(const azure::storage::operation_context& context, const utility::string_t& purpose);
-  
+    static void check_parallelism(const azure::storage::operation_context& context, int expected_parallelism);
+
     azure::storage::operation_context m_context;
     
     static utility::string_t object_name_prefix;

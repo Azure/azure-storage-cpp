@@ -110,6 +110,8 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_content_type = get_header_value(headers, web::http::header_names::content_type);
         properties.m_type = parse_blob_type(get_header_value(headers, ms_header_blob_type));
 
+        properties.m_server_encrypted = (get_header_value(headers, ms_header_server_encrypted) == _XPLATSTR("true"));
+
         return properties;
     }
 

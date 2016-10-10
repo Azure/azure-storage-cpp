@@ -1071,7 +1071,8 @@ namespace azure { namespace storage {
             :  m_size(0), m_type(blob_type::unspecified), m_lease_status(azure::storage::lease_status::unspecified),
             m_lease_state(azure::storage::lease_state::unspecified),
             m_lease_duration(azure::storage::lease_duration::unspecified),
-            m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0)
+            m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0),
+            m_server_encrypted(false)
         {
         }
 
@@ -1112,6 +1113,7 @@ namespace azure { namespace storage {
                 m_lease_duration = std::move(other.m_lease_duration);
                 m_page_blob_sequence_number = std::move(other.m_page_blob_sequence_number);
                 m_append_blob_committed_block_count = std::move(other.m_append_blob_committed_block_count);
+                m_server_encrypted = std::move(other.m_server_encrypted);
             }
             return *this;
         }
@@ -1306,6 +1308,15 @@ namespace azure { namespace storage {
             return m_append_blob_committed_block_count;
         }
 
+        /// <summary>
+        /// Gets server encryption states.
+        /// </summary>
+        /// <returns><c>true</c> if the blob is encrypted on server side; otherwise, <c>false</c>.</returns>
+        bool server_encrypted() const
+        {
+            return m_server_encrypted;
+        }
+
     private:
 
         /// <summary>
@@ -1338,6 +1349,7 @@ namespace azure { namespace storage {
         azure::storage::lease_duration m_lease_duration;
         int64_t m_page_blob_sequence_number;
         int m_append_blob_committed_block_count;
+        bool m_server_encrypted;
 
         void copy_from_root(const cloud_blob_properties& root_blob_properties);
         void update_etag_and_last_modified(const cloud_blob_properties& parsed_properties);
@@ -1345,6 +1357,11 @@ namespace azure { namespace storage {
         void update_page_blob_sequence_number(const cloud_blob_properties& parsed_properties);
         void update_append_blob_committed_block_count(const cloud_blob_properties& parsed_properties);
         void update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5);
+        
+        void set_server_encrypted(bool server_encrypted)
+        {
+            m_server_encrypted = server_encrypted;
+        }
 
         friend class cloud_blob;
         friend class cloud_block_blob;

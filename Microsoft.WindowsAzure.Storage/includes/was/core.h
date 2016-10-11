@@ -1166,6 +1166,6 @@ namespace azure { namespace storage {
 
 }} // namespace azure::storage
 
-#ifndef WIN32
+#ifndef _WIN32
 #define UNREFERENCED_PARAMETER(P) (P)
 #endif

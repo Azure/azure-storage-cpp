@@ -30,13 +30,13 @@
     #endif
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
     #define DEPRECATED(message) __declspec(deprecated(message))
 #else
     #define DEPRECATED(message) __attribute__((deprecated(message)))
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -57,7 +57,7 @@ namespace utility {
 
     //typedef struct { uint8_t data[16]; } uuid;
 
-#ifdef WIN32
+#ifdef _WIN32
     typedef UUID uuid;
 #else
     typedef struct

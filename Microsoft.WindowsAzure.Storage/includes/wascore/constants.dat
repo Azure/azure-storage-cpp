@@ -306,7 +306,7 @@ DAT(xml_shares, _XPLATSTR("Shares"))
 
 #define STR(x) #x
 #define VER(x) _XPLATSTR("Azure-Storage/2.4.0 (Native; Windows; MSC_VER " STR(x) ")")
-#if defined(WIN32)
+#if defined(_WIN32)
 #if defined(_MSC_VER)
     #if _MSC_VER == 1800
         DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.4.0 (Native; Windows; MSC_VER 1800 )"))

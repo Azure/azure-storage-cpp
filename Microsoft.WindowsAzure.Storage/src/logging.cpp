@@ -18,7 +18,7 @@
 #include "stdafx.h"
 #include "wascore/logging.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <evntprov.h>
 #include <evntrace.h>
 #else
@@ -36,7 +36,7 @@
 
 namespace azure { namespace storage { namespace core {
 
-#ifdef WIN32
+#ifdef _WIN32
     const std::wstring wconnector(L" : ");
 
     // {EE5D17C5-1B3E-4792-B0F9-F8C5FC6AC22A}
@@ -156,7 +156,7 @@ namespace azure { namespace storage { namespace core {
         return (level != client_log_level::log_level_off) && (level <= context.log_level());
     }
 
-#endif // WIN32
+#endif // _WIN32
 
     logger logger::m_instance;
 

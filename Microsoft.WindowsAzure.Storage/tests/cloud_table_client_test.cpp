@@ -124,7 +124,7 @@ SUITE(TableClient)
 
         utility::string_t prefix;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
 
         prefix = object_name_prefix;
 
@@ -195,7 +195,7 @@ SUITE(TableClient)
         int max_results;
         azure::storage::continuation_token token;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
 
         prefix = object_name_prefix;
         max_results = 3;
@@ -275,7 +275,7 @@ SUITE(TableClient)
 
         utility::string_t prefix = object_name_prefix;
         azure::storage::table_request_options options;
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
         std::vector<azure::storage::cloud_table> results = list_all_tables(client, prefix, options, context);
         CHECK(results.size() >= TABLE_COUNT);
 

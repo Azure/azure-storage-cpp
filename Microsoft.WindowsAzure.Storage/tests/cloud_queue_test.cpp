@@ -230,6 +230,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = queue1.exists(options, context);
 
@@ -256,6 +257,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             // It is allowed to create a queue that already exists with the same metadata
             queue1.create(options, context);
@@ -281,6 +283,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::cloud_metadata metadata;
             metadata[_XPLATSTR("MyMetadata1")] = _XPLATSTR("AAA");
@@ -322,6 +325,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             queue1.delete_queue(options, context);
 
@@ -346,6 +350,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = queue1.exists(options, context);
 
@@ -372,6 +377,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             try
             {
@@ -413,6 +419,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool created = queue.create_if_not_exists(options, context);
 
@@ -451,6 +458,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = queue.exists(options, context);
 
@@ -477,6 +485,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool created = queue.create_if_not_exists(options, context);
 
@@ -503,6 +512,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool deleted = queue.delete_queue_if_exists(options, context);
 
@@ -541,6 +551,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool exists = queue.exists(options, context);
 
@@ -567,6 +578,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             bool deleted = queue.delete_queue_if_exists(options, context);
 
@@ -599,6 +611,7 @@ SUITE(Queue)
 
         azure::storage::queue_request_options options;
         azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         CHECK_EQUAL(-1, queue.approximate_message_count());
 
@@ -639,6 +652,7 @@ SUITE(Queue)
 
         azure::storage::queue_request_options options;
         azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         CHECK(queue1.metadata().empty());
 
@@ -702,6 +716,7 @@ SUITE(Queue)
         queue1.metadata().erase(_XPLATSTR("ddd"));
 
         azure::storage::operation_context whitespace_metadata_context;
+        print_client_request_id(context, _XPLATSTR(""));
         whitespace_metadata_context.set_sending_request([](web::http::http_request& request, azure::storage::operation_context)
         {
             request.headers().add(_XPLATSTR("x-ms-meta-mywhitespacekey"), _XPLATSTR(""));
@@ -728,6 +743,7 @@ SUITE(Queue)
         std::chrono::seconds visibility_timeout;
         azure::storage::queue_request_options options;
         azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         message_count = 2U;
         visibility_timeout = std::chrono::seconds(1);
@@ -779,6 +795,7 @@ SUITE(Queue)
             std::chrono::seconds initial_visibility_timeout;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             message1.set_content(content1);
             time_to_live = std::chrono::seconds(15 * 60);
@@ -855,6 +872,7 @@ SUITE(Queue)
             std::chrono::seconds visibility_timeout;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             message_count = 2U;
             visibility_timeout = std::chrono::seconds(1);
@@ -906,6 +924,7 @@ SUITE(Queue)
             bool update_content;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             visibility_timeout = std::chrono::seconds(15 * 60);
             update_content = false;
@@ -944,6 +963,7 @@ SUITE(Queue)
             size_t message_count;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             message_count = 5U;
 
@@ -984,6 +1004,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             queue.delete_message(message2, options, context);
 
@@ -1015,6 +1036,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::cloud_queue_message message = queue.peek_message(options, context);
 
@@ -1047,6 +1069,7 @@ SUITE(Queue)
             std::chrono::seconds visibility_timeout;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             visibility_timeout = std::chrono::seconds(15 * 60);
 
@@ -1080,6 +1103,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::cloud_queue_message message = queue.peek_message(options, context);
 
@@ -1112,6 +1136,7 @@ SUITE(Queue)
             std::chrono::seconds visibility_timeout;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             visibility_timeout = std::chrono::seconds(1);
 
@@ -1153,6 +1178,7 @@ SUITE(Queue)
             bool update_content;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             message3.set_content(new_content);
             visibility_timeout = std::chrono::seconds(0);
@@ -1191,6 +1217,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::cloud_queue_message message = queue.peek_message(options, context);
 
@@ -1226,6 +1253,7 @@ SUITE(Queue)
             bool update_content;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             message3.set_content(new_content);
             visibility_timeout = std::chrono::seconds(0);
@@ -1261,6 +1289,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::cloud_queue_message message = queue.peek_message(options, context);
 
@@ -1292,6 +1321,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             queue.clear(options, context);
 
@@ -1316,6 +1346,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::cloud_queue_message message = queue.peek_message(options, context);
 
@@ -1355,6 +1386,7 @@ SUITE(Queue)
 
         azure::storage::queue_request_options options;
         azure::storage::operation_context context;
+        print_client_request_id(context, _XPLATSTR(""));
 
         {
             azure::storage::cloud_queue_message message;
@@ -1539,6 +1571,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::queue_permissions permissions = queue.download_permissions(options, context);
 
@@ -1566,6 +1599,7 @@ SUITE(Queue)
             azure::storage::queue_permissions permissions;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::shared_access_policies<azure::storage::queue_shared_access_policy> policies;
             policies.insert(std::make_pair(policy_name1, policy1));
@@ -1595,6 +1629,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::queue_permissions permissions = queue.download_permissions(options, context);
 
@@ -1628,6 +1663,7 @@ SUITE(Queue)
             azure::storage::queue_permissions permissions;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::shared_access_policies<azure::storage::queue_shared_access_policy> policies;
 
@@ -1655,6 +1691,7 @@ SUITE(Queue)
         {
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             azure::storage::queue_permissions permissions = queue.download_permissions(options, context);
 
@@ -1739,6 +1776,7 @@ SUITE(Queue)
             bool update_content;
             azure::storage::queue_request_options options;
             azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
 
             visibility_timeout = std::chrono::seconds(3600);
             update_content = true;

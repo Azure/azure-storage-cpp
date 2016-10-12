@@ -21,11 +21,11 @@
 #include "wascore/constants.h"
 #include "wascore/resources.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #include "pplx/threadpool.h"
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <float.h>
 #include <windows.h>
@@ -194,7 +194,7 @@ namespace azure { namespace storage {  namespace core {
 
     bool is_nan(double value)
     {
-#ifdef WIN32
+#ifdef _WIN32
         return _isnan(value) != 0;
 #else
         return std::isnan(value);
@@ -203,7 +203,7 @@ namespace azure { namespace storage {  namespace core {
 
     bool is_finite(double value)
     {
-#ifdef WIN32
+#ifdef _WIN32
         return _finite(value) != 0;
 #else
         return std::isfinite(value);
@@ -279,7 +279,7 @@ namespace azure { namespace storage {  namespace core {
     {
         // TODO: Remove this function if Casablanca changes their datetime serialization to not trim trailing zeros in the fractional seconds component of a time
 
-#ifdef WIN32
+#ifdef _WIN32
         int status;
 
         ULARGE_INTEGER largeInt;
@@ -368,14 +368,14 @@ namespace azure { namespace storage {  namespace core {
 #endif
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     class delay_event
 #else
     class delay_event : public std::enable_shared_from_this<delay_event>
 #endif
     {
     public:
-#ifdef WIN32
+#ifdef _WIN32
         delay_event(std::chrono::milliseconds timeout)
             : m_callback(new concurrency::call<int>(std::function<void(int)>(std::bind(&delay_event::timer_fired, this, std::placeholders::_1)))), m_timer(static_cast<unsigned int>(timeout.count()), 0, m_callback, false)
         {
@@ -408,14 +408,14 @@ namespace azure { namespace storage {  namespace core {
 
     private:
         pplx::task_completion_event<void> m_completion_event;
-#ifdef WIN32
+#ifdef _WIN32
         concurrency::call<int>* m_callback;
         concurrency::timer<int> m_timer;
 #else
         boost::asio::deadline_timer m_timer;
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
         void timer_fired(const int& dummy)
 #else
         void timer_fired(const boost::system::error_code& dummy)
@@ -429,14 +429,14 @@ namespace azure { namespace storage {  namespace core {
 
     pplx::task<void> complete_after(std::chrono::milliseconds timeout)
     {
-#ifdef WIN32
+#ifdef _WIN32
         delay_event* event = new delay_event(timeout);
 #else
         auto event = std::make_shared<delay_event>(timeout);
 #endif
         event->start();
 
-#ifdef WIN32
+#ifdef _WIN32
         return event->create_task().then([event]()
         {
             delete event;

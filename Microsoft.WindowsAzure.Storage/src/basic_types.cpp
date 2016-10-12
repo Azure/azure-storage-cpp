@@ -25,7 +25,7 @@ namespace utility {
     {
         uuid result;
 
-#ifdef WIN32
+#ifdef _WIN32
         RPC_STATUS status;
 
         status = UuidCreate(&result);
@@ -42,7 +42,7 @@ namespace utility {
 
     utility::string_t __cdecl uuid_to_string(const utility::uuid& value)
     {
-#ifdef WIN32
+#ifdef _WIN32
         RPC_STATUS status;
 
         RPC_WSTR rpc_string;
@@ -73,7 +73,7 @@ namespace utility {
     {
         uuid result;
 
-#ifdef WIN32
+#ifdef _WIN32
         RPC_STATUS status;
 
         RPC_WSTR rpc_string = reinterpret_cast<RPC_WSTR>(const_cast<wchar_t*>(value.c_str()));
@@ -96,7 +96,7 @@ namespace utility {
 
     bool __cdecl uuid_equal(const utility::uuid& value1, const utility::uuid& value2)
     {
-#ifdef WIN32
+#ifdef _WIN32
         return value1 == value2;
 #else
         return uuid_compare(value1.data, value2.data) == 0;

@@ -3564,12 +3564,12 @@ SUITE(Table)
 
         // Explicit checks to ensure that UUIDs behave as we would expect per platform
         // After this check, we can jsut use converted_uuid_string.
-#ifdef WIN32
+#ifdef _WIN32
         CHECK(uuid_string.compare(converted_uuid_string) == 0);
 #else
         utility::string_t capital_uuid_string = _XPLATSTR("12345678-ABCD-EFAB-CDEF-1234567890AB");
         CHECK((capital_uuid_string).compare(converted_uuid_string) == 0);
-#endif // WIN32
+#endif // _WIN32
 
         {
             azure::storage::table_query query;

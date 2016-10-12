@@ -22,7 +22,7 @@
 #include "wascore/basic_types.h"
 #include "was/core.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #endif
@@ -51,7 +51,7 @@ namespace azure { namespace storage { namespace core {
         virtual utility::string_t hash() const = 0;
     };
 
-#ifdef WIN32
+#ifdef _WIN32
 
     class cryptography_hash_algorithm
     {

@@ -35,7 +35,7 @@ namespace azure { namespace storage { namespace core {
 
         void log(azure::storage::operation_context context, client_log_level level, const std::string& message) const;
 
-#ifdef WIN32
+#ifdef _WIN32
         void log(azure::storage::operation_context context, client_log_level level, const std::wstring& message) const;
 #endif
         bool should_log(azure::storage::operation_context context, client_log_level level) const;

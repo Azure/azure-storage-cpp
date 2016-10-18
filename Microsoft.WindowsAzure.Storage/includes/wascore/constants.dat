@@ -170,7 +170,7 @@ DAT(ms_header_time_next_visible, _XPLATSTR("x-ms-time-next-visible"))
 DAT(ms_header_share_quota, _XPLATSTR("x-ms-share-quota"))
 
 // header values
-DAT(header_value_storage_version, _XPLATSTR("2015-04-05"))
+DAT(header_value_storage_version, _XPLATSTR("2015-12-11"))
 DAT(header_value_true, _XPLATSTR("true"))
 DAT(header_value_false, _XPLATSTR("false"))
 DAT(header_value_locked, _XPLATSTR("locked"))

@@ -360,6 +360,44 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
+    void page_diff_list_reader::handle_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_start && m_start == -1)
+        {
+            extract_current_element(m_start);
+        }
+        else if (element_name == xml_end && m_end == -1)
+        {
+            extract_current_element(m_end);
+        }
+    }
+
+    void page_diff_list_reader::handle_end_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_page_range)
+        {
+            if (m_start != -1 && m_end != -1)
+            {
+                page_diff_range range(m_start, m_end);
+                m_page_list.push_back(range);
+            }
+
+            m_start = -1;
+            m_end = -1;
+        }
+        else if (element_name == xml_clear_range)
+        {
+            if (m_start != -1 && m_end != -1)
+            {
+                page_diff_range range(m_start, m_end, true);
+                m_page_list.push_back(range);
+            }
+
+            m_start = -1;
+            m_end = -1;
+        }
+    }
+
     void block_list_reader::handle_begin_element(const utility::string_t& element_name)
     {
         if (element_name == xml_committed_blocks)

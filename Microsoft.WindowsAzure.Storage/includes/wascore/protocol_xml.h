@@ -281,6 +281,32 @@ namespace azure { namespace storage { namespace protocol {
         int64_t m_end;
     };
 
+    class page_diff_list_reader : public core::xml::xml_reader
+    {
+    public:
+
+        explicit page_diff_list_reader(concurrency::streams::istream stream)
+            : xml_reader(stream), m_start(-1), m_end(-1)
+        {
+        }
+
+        // Extracts the result. This method can only be called once on this reader
+        std::vector<page_diff_range> move_result()
+        {
+            parse();
+            return std::move(m_page_list);
+        }
+
+    protected:
+
+        virtual void handle_element(const utility::string_t& element_name);
+        virtual void handle_end_element(const utility::string_t& element_name);
+
+        std::vector<page_diff_range> m_page_list;
+        int64_t m_start;
+        int64_t m_end;
+    };
+
     class block_list_reader : public core::xml::xml_reader
     {
     public:

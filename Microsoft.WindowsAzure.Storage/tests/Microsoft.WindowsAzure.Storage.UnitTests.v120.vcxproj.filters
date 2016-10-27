@@ -36,6 +36,9 @@
     <ClInclude Include="table_test_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="file_test_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -120,6 +123,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="unicode_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="file_test_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cloud_file_client_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cloud_file_directory_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cloud_file_share_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cloud_file_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

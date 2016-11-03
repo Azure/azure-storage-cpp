@@ -14,7 +14,7 @@
     <releaseNotes>Public release</releaseNotes>
     <tags>Microsoft Azure Storage Table Blob Queue File Scalable windowsazureofficial</tags>
     <dependencies>
-      <dependency id="cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn" version="2.8.0" />
+      <dependency id="cpprestsdk.v140.windesktop.msvcstl.dyn.rt-dyn" version="2.9.1" />
     </dependencies>
   </metadata>
     <files>

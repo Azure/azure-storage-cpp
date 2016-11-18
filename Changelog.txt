@@ -8,6 +8,8 @@ Changes in v2.5:
 - Fixed the bug that enumeration iterator couldn't use non-const methods, such as create/delete.
 - Fixed the bug that request id used but wasn't logged correctly in unit tests.
 - Changed predefinition for Windows platform from WIN32 to _WIN32.
+- Fixed the bug that queue message operations throws exception "Error: The Uri for the target storage location is not specified. Please consider changing the request's location mode." on VS 2013 and Linux platform.
+- Fixed the bug that xml constructor throws exception "The namespace () has not been declared." on Linux platform.
 
 Changes in v2.4:
 - Added support for file service: file client, file share, file directory and file.

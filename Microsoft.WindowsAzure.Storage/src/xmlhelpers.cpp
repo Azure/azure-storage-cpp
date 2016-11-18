@@ -362,7 +362,10 @@ namespace azure { namespace storage { namespace core { namespace xml {
         else
         {
             m_elementStack.push(m_elementStack.top()->add_child(elementName, elementPrefix));
-            m_elementStack.top()->set_namespace_declaration(namespaceName, elementPrefix);
+            if (!namespaceName.empty())
+            {
+                m_elementStack.top()->set_namespace_declaration(namespaceName, elementPrefix);
+            }
         }
 #endif
     }

@@ -43,7 +43,7 @@
 #pragma once
 #ifndef _XMLHELPERS_H
 #define _XMLHELPERS_H
-#ifdef WIN32
+#ifdef _WIN32
 #include <atlbase.h>
 #include <xmllite.h>
 #else
@@ -165,7 +165,7 @@ protected:
     /// </summary>
     void pause() { m_continueParsing = false; }
 
-#ifdef WIN32
+#ifdef _WIN32
     CComPtr<IXmlReader> m_reader;
 #else
     std::shared_ptr<xmlpp::TextReader> m_reader;
@@ -267,7 +267,7 @@ protected:
         UNREFERENCED_PARAMETER(error);
     }
 private:
-#ifdef WIN32
+#ifdef _WIN32
     CComPtr<IXmlWriter> m_writer;
 #else // LINUX
     std::shared_ptr<xmlpp::Document> m_document;

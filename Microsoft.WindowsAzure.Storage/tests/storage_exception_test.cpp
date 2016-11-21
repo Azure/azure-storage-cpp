@@ -53,7 +53,7 @@ SUITE(Core)
         azure::storage::cloud_table table = client.get_table_reference(table_name);
 
         azure::storage::table_request_options options;
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
         try
         {
             table.delete_table(options, context);
@@ -73,7 +73,7 @@ SUITE(Core)
         azure::storage::cloud_table table = client.get_table_reference(table_name);
 
         azure::storage::table_request_options options;
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
         context.set_sending_request([](web::http::http_request &r, azure::storage::operation_context) {
             r.headers()[_XPLATSTR("Accept")] = _XPLATSTR("application/xml");
         });

@@ -978,7 +978,7 @@ SUITE(Core)
         auto sas_token = account.get_shared_access_signature(policy);
         azure::storage::storage_credentials sas_cred(sas_token);
         azure::storage::cloud_blob_client sas_blob_client(account.blob_endpoint(), sas_cred);
-        azure::storage::operation_context op;
+        azure::storage::operation_context op = m_context;
         CHECK_THROW(sas_blob_client.list_containers(_XPLATSTR("prefix"), azure::storage::container_listing_details::none, 0, azure::storage::blob_request_options(), op), azure::storage::storage_exception);
         auto error_details = op.request_results().back().extended_error().details();
         auto source_ip = error_details[_XPLATSTR("SourceIP")];

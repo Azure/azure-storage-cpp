@@ -42,7 +42,7 @@
 #include "stdafx.h"
 #include "wascore/xmlhelpers.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "wascore/xmlstream.h"
 #else
 typedef int XmlNodeType;
@@ -59,7 +59,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_reader::initialize(streams::istream stream)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         CComPtr<IStream> pInputStream;
         pInputStream.Attach(xmlstring_istream::create(stream));
@@ -112,7 +112,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         m_continueParsing = true;
 
         // read until there are no more nodes
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         XmlNodeType nodeType;
         while (m_continueParsing && S_OK == (hr = m_reader->Read(&nodeType)))
@@ -134,7 +134,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
                 m_elementStack.push_back(name);
                 handle_begin_element(name);
 
-#ifdef WIN32
+#ifdef _WIN32
                 if (m_reader->IsEmptyElement())
 #else
                 if (m_reader->is_empty_element())
@@ -187,7 +187,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     utility::string_t xml_reader::get_current_element_name()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         const wchar_t * pwszLocalName = NULL;
 
@@ -205,7 +205,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     utility::string_t xml_reader::get_current_element_name_with_prefix()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         const wchar_t * pwszName = NULL;
 
@@ -223,7 +223,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     utility::string_t xml_reader::get_current_element_text()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         const wchar_t * pwszValue;
 
@@ -242,7 +242,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     bool xml_reader::move_to_first_attribute()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         if (FAILED(hr = m_reader->MoveToFirstAttribute()))
         {
@@ -258,7 +258,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     bool xml_reader::move_to_next_attribute()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         if (FAILED(hr = m_reader->MoveToNextAttribute()))
         {
@@ -274,7 +274,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::initialize(std::ostream& stream)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         CComPtr<IStream> pStream;
         pStream.Attach(xmlstring_ostream::create(stream));
@@ -322,7 +322,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::finalize()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteEndDocument()))
@@ -346,7 +346,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::write_start_element_with_prefix(const utility::string_t& elementPrefix, const utility::string_t& elementName, const utility::string_t& namespaceName)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
         if (FAILED(hr = m_writer->WriteStartElement(elementPrefix.c_str(), elementName.c_str(), namespaceName.empty() ? NULL : namespaceName.c_str())))
         {
@@ -362,14 +362,17 @@ namespace azure { namespace storage { namespace core { namespace xml {
         else
         {
             m_elementStack.push(m_elementStack.top()->add_child(elementName, elementPrefix));
-            m_elementStack.top()->set_namespace_declaration(namespaceName, elementPrefix);
+            if (!namespaceName.empty())
+            {
+                m_elementStack.top()->set_namespace_declaration(namespaceName, elementPrefix);
+            }
         }
 #endif
     }
 
     void xml_writer::write_start_element(const utility::string_t& elementName, const utility::string_t& namespaceName)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteStartElement(NULL, elementName.c_str(), namespaceName.empty() ? NULL : namespaceName.c_str())))
@@ -385,7 +388,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::write_end_element()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteEndElement()))
@@ -401,7 +404,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::write_full_end_element()
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteFullEndElement()))
@@ -417,7 +420,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::write_string(const utility::string_t& str)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteString(str.c_str())))
@@ -435,7 +438,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::write_attribute_string(const utility::string_t& prefix, const utility::string_t& name, const utility::string_t& namespaceUri, const utility::string_t& value)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteAttributeString(prefix.empty() ? NULL : prefix.c_str(),
@@ -467,7 +470,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::write_element(const utility::string_t& elementName, const utility::string_t& value)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteElementString(NULL, elementName.c_str(), NULL, value.c_str())))
@@ -483,7 +486,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
     void xml_writer::write_element_with_prefix(const utility::string_t& prefix, const utility::string_t& elementName, const utility::string_t& value)
     {
-#ifdef WIN32
+#ifdef _WIN32
         HRESULT hr;
 
         if (FAILED(hr = m_writer->WriteElementString(prefix.c_str(), elementName.c_str(), NULL, value.c_str())))

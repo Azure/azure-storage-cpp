@@ -1071,7 +1071,8 @@ namespace azure { namespace storage {
             :  m_size(0), m_type(blob_type::unspecified), m_lease_status(azure::storage::lease_status::unspecified),
             m_lease_state(azure::storage::lease_state::unspecified),
             m_lease_duration(azure::storage::lease_duration::unspecified),
-            m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0)
+            m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0),
+            m_server_encrypted(false)
         {
         }
 
@@ -1112,6 +1113,7 @@ namespace azure { namespace storage {
                 m_lease_duration = std::move(other.m_lease_duration);
                 m_page_blob_sequence_number = std::move(other.m_page_blob_sequence_number);
                 m_append_blob_committed_block_count = std::move(other.m_append_blob_committed_block_count);
+                m_server_encrypted = std::move(other.m_server_encrypted);
             }
             return *this;
         }
@@ -1306,6 +1308,15 @@ namespace azure { namespace storage {
             return m_append_blob_committed_block_count;
         }
 
+        /// <summary>
+        /// Gets server encryption states.
+        /// </summary>
+        /// <returns><c>true</c> if the blob is encrypted on server side; otherwise, <c>false</c>.</returns>
+        bool server_encrypted() const
+        {
+            return m_server_encrypted;
+        }
+
     private:
 
         /// <summary>
@@ -1338,6 +1349,7 @@ namespace azure { namespace storage {
         azure::storage::lease_duration m_lease_duration;
         int64_t m_page_blob_sequence_number;
         int m_append_blob_committed_block_count;
+        bool m_server_encrypted;
 
         void copy_from_root(const cloud_blob_properties& root_blob_properties);
         void update_etag_and_last_modified(const cloud_blob_properties& parsed_properties);
@@ -1345,6 +1357,11 @@ namespace azure { namespace storage {
         void update_page_blob_sequence_number(const cloud_blob_properties& parsed_properties);
         void update_append_blob_committed_block_count(const cloud_blob_properties& parsed_properties);
         void update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5);
+        
+        void set_server_encrypted(bool server_encrypted)
+        {
+            m_server_encrypted = server_encrypted;
+        }
 
         friend class cloud_blob;
         friend class cloud_block_blob;
@@ -1960,6 +1977,34 @@ namespace azure { namespace storage {
 
         int64_t m_start_offset;
         int64_t m_end_offset;
+    };
+
+    class page_diff_range : public page_range
+    {
+    public:
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::page_diff_range" /> class.
+        /// </summary>
+        /// <param name="start_offset">The starting offset.</param>
+        /// <param name="end_offset">The ending offset.</param>
+        /// <param name="is_cleared"><c>true</c> if the range was cleared range; otherwise <c>false</c>. It was set as non-cleared range at default.</param>
+        page_diff_range(int64_t start_offset, int64_t end_offset, bool is_cleared = false)
+            : page_range(start_offset, end_offset),
+            m_cleared_range(is_cleared)
+        {
+        }
+
+        /// <summary>
+        /// Checks the range type as cleared range or not.
+        /// </summary>
+        /// <returns><c>true</c> if the range was cleared range; otherwise <c>false</c>.</returns>
+        bool is_cleared_rage() const
+        {
+            return m_cleared_range;
+        }
+
+    private:
+        bool m_cleared_range;
     };
 
     /// <summary>
@@ -5841,6 +5886,104 @@ namespace azure { namespace storage {
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_range" />, that represents the current operation.</returns>
         WASTORAGE_API pplx::task<std::vector<page_range>> download_page_ranges_async(utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+
+        /// <summary>
+        /// Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <returns>An enumerable collection of page diff ranges.</returns>
+        std::vector<page_diff_range> download_page_ranges_diff(utility::string_t previous_snapshot_time) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time).get();
+        }
+
+        /// <summary>
+        /// Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>An enumerable collection of page diff ranges.</returns>
+        std::vector<page_diff_range> download_page_ranges_diff(utility::string_t previous_snapshot_time, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <returns>An enumerable collection of page diff ranges.</returns>
+        std::vector<page_diff_range> download_page_ranges_diff(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time, offset, length).get();
+        }
+
+        /// <summary>
+        /// Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>An enumerable collection of page diff ranges.</returns>
+        std::vector<page_diff_range> download_page_ranges_diff(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time, offset, length, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_diff_range" />, that represents the current operation.</returns>
+        pplx::task<std::vector<page_diff_range>> download_page_ranges_diff_async(utility::string_t previous_snapshot_time) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_diff_range" />, that represents the current operation.</returns>
+        pplx::task<std::vector<page_diff_range>> download_page_ranges_diff_async(utility::string_t previous_snapshot_time, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time, std::numeric_limits<utility::size64_t>::max(), 0, condition, options, context);
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_diff_range" />, that represents the current operation.</returns>
+        pplx::task<std::vector<page_diff_range>> download_page_ranges_diff_async(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time, offset, length, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_diff_range" />, that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<std::vector<page_diff_range>> download_page_ranges_diff_async(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+
 
         /// <summary>
         /// Writes pages to a page blob.

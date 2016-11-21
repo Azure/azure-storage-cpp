@@ -786,6 +786,7 @@ namespace azure { namespace storage {
                 m_client = std::move(other.m_client);
                 m_name = std::move(other.m_name);
                 m_uri = std::move(other.m_uri);
+                m_queue_message_uri = std::move(other.m_queue_message_uri);
                 m_approximate_message_count = std::move(other.m_approximate_message_count);
                 m_metadata = std::move(other.m_metadata);
             }

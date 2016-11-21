@@ -20,7 +20,7 @@
 #include "was/common.h"
 #include "wascore/resources.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "Ws2tcpip.h"
 #else
 #include "boost/asio/ip/address.hpp"
@@ -38,7 +38,7 @@ namespace azure { namespace storage {
     shared_access_policy::ip_address_or_range::ip_address shared_access_policy::ip_address_or_range::try_parse(const utility::string_t &address)
     {
         shared_access_policy::ip_address_or_range::ip_address ip;
-#ifdef WIN32
+#ifdef _WIN32
         IN_ADDR addr;
         int ret = InetPton(AF_INET, address.data(), &addr);
         if (ret == 1)
@@ -90,7 +90,7 @@ namespace azure { namespace storage {
     {
         auto min_addr = try_parse(m_minimum_address);
         auto max_addr = try_parse(m_maximum_address);
-#ifdef WIN32
+#ifdef _WIN32
         if (min_addr.addr > max_addr.addr)
 #else
         if (min_addr > max_addr)

@@ -1,6 +1,9 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
 
+Breaking Changes in v2.5:
+- Upgraded Casablanca dependency to 2.9.1
+
 Breaking Changes in v2.3:
 - Upgraded Casablanca dependency to 2.8.0
 

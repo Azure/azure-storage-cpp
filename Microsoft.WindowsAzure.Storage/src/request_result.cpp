@@ -57,6 +57,12 @@ namespace azure { namespace storage {
         headers.match(web::http::header_names::content_md5, m_content_md5);
         headers.match(web::http::header_names::etag, m_etag);
 
+        utility::string_t request_server_encrypted;
+        if (headers.match(protocol::ms_header_request_server_encrypted, request_server_encrypted))
+        {
+            m_request_server_encrypted = (request_server_encrypted == _XPLATSTR("true"));
+        }
+
         utility::string_t request_date;
         if (headers.match(web::http::header_names::date, request_date))
         {

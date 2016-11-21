@@ -504,4 +504,83 @@ SUITE(Blob)
 
         m_context.set_response_received(std::function<void(web::http::http_request &, const web::http::http_response&, azure::storage::operation_context)>());
     }
+
+    TEST_FIXTURE(page_blob_test_base, page_blob_prevsnapshot)
+    {
+        m_blob.create(2048, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+
+        azure::storage::cloud_page_blob snapshot1 = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        auto diff = m_blob.download_page_ranges_diff(snapshot1.snapshot_time(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK(0 == diff.size());
+
+        {
+            utility::string_t content(2048, _XPLATSTR('A'));
+            auto utf8_body = utility::conversions::to_utf8string(content);
+            auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
+            m_blob.upload_pages(stream, 0, _XPLATSTR(""));
+            diff = m_blob.download_page_ranges_diff(snapshot1.snapshot_time(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            CHECK(1 == diff.size());
+            CHECK_EQUAL(false, diff[0].is_cleared_rage());
+            CHECK(0 == diff[0].start_offset());
+            CHECK(2047 == diff[0].end_offset());
+        }
+
+        azure::storage::cloud_page_blob snapshot2 = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        auto diff2 = snapshot2.download_page_ranges_diff(snapshot1.snapshot_time(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK_EQUAL(false, diff[0].is_cleared_rage());
+        CHECK(0 == diff[0].start_offset());
+        CHECK(2047 == diff[0].end_offset());
+
+        {
+            utility::string_t content(512, _XPLATSTR('B'));
+            auto utf8_body = utility::conversions::to_utf8string(content);
+            auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
+            m_blob.upload_pages(stream, 0, _XPLATSTR(""));
+            m_blob.clear_pages(512, 512);
+            diff = m_blob.download_page_ranges_diff(snapshot2.snapshot_time(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            CHECK(2 == diff.size());
+            if (diff[0].is_cleared_rage() == true)
+            {
+                auto temp = diff[0];
+                diff[0] = diff[1];
+                diff[1] = temp;
+            }
+            CHECK_EQUAL(false, diff[0].is_cleared_rage());
+            CHECK(0 == diff[0].start_offset());
+            CHECK(511 == diff[0].end_offset());
+
+            CHECK_EQUAL(true, diff[1].is_cleared_rage());
+            CHECK(512 == diff[1].start_offset());
+            CHECK(1023 == diff[1].end_offset());
+        }
+
+        azure::storage::cloud_page_blob snapshot3 = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        auto diff3 = snapshot3.download_page_ranges_diff(snapshot2.snapshot_time(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK(2 == diff.size());
+        if (diff[0].is_cleared_rage() == true)
+        {
+            auto temp = diff[0];
+            diff[0] = diff[1];
+            diff[1] = temp;
+        }
+        CHECK_EQUAL(false, diff[0].is_cleared_rage());
+        CHECK(0 == diff[0].start_offset());
+        CHECK(511 == diff[0].end_offset());
+
+        CHECK_EQUAL(true, diff[1].is_cleared_rage());
+        CHECK(512 == diff[1].start_offset());
+        CHECK(1023 == diff[1].end_offset());
+
+        {
+            utility::string_t content(2048, _XPLATSTR('A'));
+            auto utf8_body = utility::conversions::to_utf8string(content);
+            auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
+            m_blob.upload_pages(stream, 0, _XPLATSTR(""));
+            diff = m_blob.download_page_ranges_diff(snapshot1.snapshot_time(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            CHECK(1 == diff.size());
+            CHECK_EQUAL(false, diff[0].is_cleared_rage());
+            CHECK(0 == diff[0].start_offset());
+            CHECK(2047 == diff[0].end_offset());
+        }
+    }
 }

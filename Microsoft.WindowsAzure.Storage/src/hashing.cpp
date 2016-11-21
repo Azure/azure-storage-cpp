@@ -20,7 +20,7 @@
 
 namespace azure { namespace storage { namespace core {
 
-#ifdef WIN32
+#ifdef _WIN32
 
     cryptography_hash_algorithm::cryptography_hash_algorithm(LPCWSTR algorithm_id, ULONG flags)
     {

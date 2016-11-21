@@ -19,7 +19,7 @@
 
 #include "was/blob.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
@@ -44,7 +44,7 @@ int main(int argc, const char* argv[])
 {
     azure::storage::operation_context::set_default_log_level(azure::storage::client_log_level::log_level_verbose);
 
-#ifndef WIN32
+#ifndef _WIN32
     boost::log::add_common_attributes();
     boost::log::add_file_log
     (

@@ -28,7 +28,7 @@ SUITE(Core)
 
         utility::string_t timeout;
 
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
         context.set_sending_request([&timeout] (web::http::http_request& request, azure::storage::operation_context context) mutable
         {
             std::map<utility::string_t, utility::string_t> query_parameters = web::http::uri::split_query(request.request_uri().query());
@@ -72,7 +72,7 @@ SUITE(Core)
         auto start_time = utility::datetime::utc_now();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-        azure::storage::operation_context context;
+        azure::storage::operation_context context = m_context;
         context.set_client_request_id(_XPLATSTR("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"));
         context.user_headers().add(_XPLATSTR("x-ms-test-key"), _XPLATSTR("test-value"));
         context.set_sending_request([&client_request_id, &test_key] (web::http::http_request& request, azure::storage::operation_context context) mutable

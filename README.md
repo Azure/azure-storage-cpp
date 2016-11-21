@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (2.4.0)
+# Azure Storage Client Library for C++ (2.5.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -65,7 +65,7 @@ Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visua
 
 ### C++ REST SDK
 
-The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.8.0. It can be installed through [NuGet](https://www.nuget.org/packages/cpprestsdk/2.8.0) or downloaded directly from [GitHub](https://github.com/Microsoft/cpprestsdk/releases/tag/v2.8.0).
+The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.9.1. It can be installed through [NuGet](https://www.nuget.org/packages/cpprestsdk/2.9.1) or downloaded directly from [GitHub](https://github.com/Microsoft/cpprestsdk/releases/tag/v2.9.1).
 
 ## Code Samples
 
@@ -77,7 +77,7 @@ To get started with the coding, please visit the following articles:
 To accomplish specific tasks, please find the code samples at [samples folder](Microsoft.WindowsAzure.Storage/samples).
 
 ## Getting Started on Linux
-As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux) to compile it. Current version of the library depends on Casablanca version 2.8.0.
+As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux) to compile it. Current version of the library depends on Casablanca version 2.9.1.
 
 Once this is complete, then:
 
@@ -154,7 +154,7 @@ If you are using homebrew you can install it from there:
 brew install cpprestsdk
 ```
 
-Otherwise, you may need to build it. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X) to compile it. Current version of the library depends on Casablanca version 2.8.0.
+Otherwise, you may need to build it. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X) to compile it. Current version of the library depends on Casablanca version 2.9.1.
 
 Once this is complete, then:
 

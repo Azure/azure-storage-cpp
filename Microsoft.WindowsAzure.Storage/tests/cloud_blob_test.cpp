@@ -300,6 +300,7 @@ SUITE(Blob)
         CHECK(same_blob.properties().content_md5().empty());
         CHECK_UTF8_EQUAL(_XPLATSTR("application/octet-stream"), same_blob.properties().content_type());
         CHECK(azure::storage::lease_status::unlocked == same_blob.properties().lease_status());
+        CHECK(blob.properties().server_encrypted() == same_blob.properties().server_encrypted());
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
 

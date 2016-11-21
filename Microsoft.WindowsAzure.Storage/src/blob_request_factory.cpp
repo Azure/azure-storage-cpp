@@ -44,6 +44,14 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
+    void add_previous_snapshot_time(web::http::uri_builder& uri_builder, const utility::string_t& snapshot_time)
+    {
+        if (!snapshot_time.empty())
+        {
+            uri_builder.append_query(core::make_query_parameter(uri_query_prevsnapshot, snapshot_time));
+        }
+    }
+
     web::http::http_request create_blob_container(blob_container_public_access_type access_type, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_container, /* do_encoding */ false));
@@ -301,6 +309,17 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request get_page_ranges(utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page_list, /* do_encoding */ false));
+        web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
+        add_range(request, offset, length);
+        add_access_condition(request, condition);
+        return request;
+    }
+
+    web::http::http_request get_page_ranges_diff(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        add_snapshot_time(uri_builder, snapshot_time);
+        add_previous_snapshot_time(uri_builder, previous_snapshot_time);
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         add_range(request, offset, length);

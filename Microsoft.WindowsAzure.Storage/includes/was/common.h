@@ -23,7 +23,7 @@
 #include "core.h"
 #include "retry_policies.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/sources/severity_logger.hpp>
@@ -38,6 +38,8 @@ namespace azure { namespace storage {
         class response_parsers;
         class list_blobs_reader;
     }
+
+    template<typename result_type> class result_iterator;
 
     /// <summary>
     /// Represents the user meta-data for queues, containers and blobs.
@@ -225,8 +227,17 @@ namespace azure { namespace storage {
 
     private:
 
+        result_type& results(size_t index)
+        {
+            if(index < m_results.size())
+                return m_results[index];
+            throw std::runtime_error("index is out of the results range");
+        }
+
         std::vector<result_type> m_results;
         azure::storage::continuation_token m_continuation_token;
+
+        friend class result_iterator<result_type>;
     };
 
     /// <summary>
@@ -313,9 +324,24 @@ namespace azure { namespace storage {
             return m_result_segment.results()[m_segment_index];
         }
 
+        result_type& operator*()
+        {
+            if (passed_the_end())
+            {
+                throw std::runtime_error("cannot dereference past-the-end iterator");
+            }
+
+            return m_result_segment.results(m_segment_index);
+        }
+
         const result_type* operator->() const
         {
             return (std::pointer_traits<const result_type*>::pointer_to(**this));
+        }
+
+        result_type* operator->()
+        {
+            return (std::pointer_traits<result_type*>::pointer_to(**this));
         }
 
         result_iterator& operator++()
@@ -1653,7 +1679,7 @@ namespace azure { namespace storage {
             m_response_received = value;
         }
 
-#ifndef WIN32
+#ifndef _WIN32
         /// <summary>
         /// Gets the logger object on this operation context.
         /// </summary>
@@ -1694,7 +1720,7 @@ namespace azure { namespace storage {
         web::web_proxy m_proxy;
         std::vector<request_result> m_request_results;
         pplx::extensibility::critical_section_t m_request_results_lock;
-#ifndef WIN32
+#ifndef _WIN32
         boost::log::sources::severity_logger<boost::log::trivial::severity_level> m_logger;
 #endif
     };
@@ -1898,7 +1924,7 @@ namespace azure { namespace storage {
             m_impl->set_proxy(std::move(proxy));
         }
 
-#ifndef WIN32
+#ifndef _WIN32
         /// <summary>
         /// Gets the logger object on this operation context.
         /// </summary>
@@ -2104,7 +2130,7 @@ namespace azure { namespace storage {
             utility::string_t m_minimum_address;
             utility::string_t m_maximum_address;
             bool m_single_address;
-#ifdef WIN32
+#ifdef _WIN32
             struct ip_address
             {
                 bool ipv4;

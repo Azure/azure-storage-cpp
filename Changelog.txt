@@ -1,6 +1,16 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v2.5:
+- Upgraded Casablanca dependency to 2.9.1
+- Default Rest API version is 2015-12-11
+- Supported server-side encryption for blobs
+- Fixed the bug that enumeration iterator couldn't use non-const methods, such as create/delete.
+- Fixed the bug that request id used but wasn't logged correctly in unit tests.
+- Changed predefinition for Windows platform from WIN32 to _WIN32.
+- Fixed the bug that queue message operations throws exception "Error: The Uri for the target storage location is not specified. Please consider changing the request's location mode." on VS 2013 and Linux platform.
+- Fixed the bug that xml constructor throws exception "The namespace () has not been declared." on Linux platform.
+
 Changes in v2.4:
 - Added support for file service: file client, file share, file directory and file.
 - Performance improvements with URI cache, string concat, uri builder parameters.
@@ -9,9 +19,9 @@ Changes in v2.4:
 - Fixed the bug that copying blob from other accounts doesn't use source credentials.
 - Fixed the bug that network took too long time to close while network error happened.
 - Fixed the bug that blob name with reserved characters didn't split with right order.
-- Fixed the but that blob properties didn't clear after delettion.
+- Fixed the but that blob properties didn't clear after deletion.
 - Fixed the coding style for static string to prevent ODR issue.
-- Fixed the build issue on OS X, but not offically suporting OS X.
+- Fixed the build issue on OS X, but not officially supporting OS X.
 
 Changes in v2.3:
 - Added the following interfaces to support programmatically configurable HTTP/HTTPS proxy

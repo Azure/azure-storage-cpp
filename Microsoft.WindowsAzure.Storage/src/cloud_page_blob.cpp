@@ -240,5 +240,33 @@ namespace azure { namespace storage {
         });
         return core::executor<std::vector<page_range>>::execute_async(command, modified_options, context);
     }
+    
+    pplx::task<std::vector<page_diff_range>> cloud_page_blob::download_page_ranges_diff_async(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options(), type());
 
+        auto properties = m_properties;
+
+        auto command = std::make_shared<core::storage_command<std::vector<page_diff_range>>>(uri());
+        command->set_build_request(std::bind(protocol::get_page_ranges_diff, previous_snapshot_time, offset, length, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary);
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> std::vector<page_diff_range>
+        {
+            protocol::preprocess_response_void(response, result, context);
+
+            auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
+            properties->update_etag_and_last_modified(parsed_properties);
+            properties->update_size(parsed_properties);
+            return std::vector<page_diff_range>();
+        });
+        command->set_postprocess_response([](const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<std::vector<page_diff_range>>
+        {
+            UNREFERENCED_PARAMETER(context);
+            protocol::page_diff_list_reader reader(response.body());
+            return pplx::task_from_result(reader.move_result());
+        });
+        return core::executor<std::vector<page_diff_range>>::execute_async(command, modified_options, context);
+    }
 }} // namespace azure::storage

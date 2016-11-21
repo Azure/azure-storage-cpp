@@ -138,4 +138,5 @@ void blob_service_test_base::check_blob_properties_equal(const azure::storage::c
     CHECK_UTF8_EQUAL(expected.content_language(), actual.content_language());
     CHECK_UTF8_EQUAL(expected.content_md5(), actual.content_md5());
     CHECK_UTF8_EQUAL(expected.content_type(), actual.content_type());
+    CHECK(expected.server_encrypted() == actual.server_encrypted());
 }

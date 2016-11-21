@@ -1,6 +1,7 @@
 var searchData=
 [
   ['page_5fblob_5fsequence_5fnumber',['page_blob_sequence_number',['../classazure_1_1storage_1_1cloud__blob__properties.html#a45a0faf3aac40d10c6b328fdbacb4ab1',1,'azure::storage::cloud_blob_properties']]],
+  ['page_5fdiff_5frange',['page_diff_range',['../classazure_1_1storage_1_1page__diff__range.html#a7d57e88b9cc0c116227a93ef82dd5357',1,'azure::storage::page_diff_range']]],
   ['page_5frange',['page_range',['../classazure_1_1storage_1_1page__range.html#a883f636501a371e831d712f1531a92e0',1,'azure::storage::page_range']]],
   ['parallelism_5ffactor',['parallelism_factor',['../classazure_1_1storage_1_1blob__request__options.html#afd2ee25ba6889827155e1feaf468f8e5',1,'azure::storage::blob_request_options::parallelism_factor()'],['../classazure_1_1storage_1_1file__request__options.html#a7e157b955d163b67081a73e8ed58f481',1,'azure::storage::file_request_options::parallelism_factor()']]],
   ['parse',['parse',['../classazure_1_1storage_1_1cloud__storage__account.html#ab34b15fe3390a9bea06cfc896b46bc8e',1,'azure::storage::cloud_storage_account::parse()'],['../classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a5e01180ff52d892737a89e8d73b1acdb',1,'azure::storage::core::xml::xml_reader::parse()']]],

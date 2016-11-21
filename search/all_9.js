@@ -18,6 +18,7 @@ var searchData=
   ['ip_5faddress_5for_5frange',['ip_address_or_range',['../classazure_1_1storage_1_1shared__access__policy_1_1ip__address__or__range.html',1,'azure::storage::shared_access_policy']]],
   ['is_5fanonymous',['is_anonymous',['../classazure_1_1storage_1_1storage__credentials.html#a12138bd79cfa2aff2b1231b761ade31a',1,'azure::storage::storage_credentials']]],
   ['is_5fblob',['is_blob',['../classazure_1_1storage_1_1list__blob__item.html#a2d3113d92e4dc3af26d4bd80546fd238',1,'azure::storage::list_blob_item']]],
+  ['is_5fcleared_5frage',['is_cleared_rage',['../classazure_1_1storage_1_1page__diff__range.html#a4f60e0bd121049646e9cf2745f119bd8',1,'azure::storage::page_diff_range']]],
   ['is_5fconditional',['is_conditional',['../classazure_1_1storage_1_1access__condition.html#af9b2e2fa97b3b258641ce0af4a92139f',1,'azure::storage::access_condition']]],
   ['is_5fdirectory',['is_directory',['../classazure_1_1storage_1_1list__file__and__directory__item.html#a2ef648bc7c494ebb51d4319f1751efa5',1,'azure::storage::list_file_and_directory_item']]],
   ['is_5ffile',['is_file',['../classazure_1_1storage_1_1list__file__and__directory__item.html#a3dbbfcbadfb072547a73b13afd6c007b',1,'azure::storage::list_file_and_directory_item']]],

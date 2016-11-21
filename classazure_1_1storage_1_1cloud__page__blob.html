@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.4.0</span>
+   &#160;<span id="projectnumber">2.5.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -183,6 +183,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aed64e6d44a015cd2a5710a79f614297b"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__range.html">page_range</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#aed64e6d44a015cd2a5710a79f614297b">download_page_ranges_async</a> (utility::size64_t offset, utility::size64_t length, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
 <tr class="memdesc:aed64e6d44a015cd2a5710a79f614297b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.  <a href="#aed64e6d44a015cd2a5710a79f614297b">More...</a><br /></td></tr>
 <tr class="separator:aed64e6d44a015cd2a5710a79f614297b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01f38d4f9891aafc2c30eed41c29b32f"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a01f38d4f9891aafc2c30eed41c29b32f">download_page_ranges_diff</a> (utility::string_t previous_snapshot_time) const </td></tr>
+<tr class="memdesc:a01f38d4f9891aafc2c30eed41c29b32f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#a01f38d4f9891aafc2c30eed41c29b32f">More...</a><br /></td></tr>
+<tr class="separator:a01f38d4f9891aafc2c30eed41c29b32f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a189d711957181f934b7327f4a9fef668"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a189d711957181f934b7327f4a9fef668">download_page_ranges_diff</a> (utility::string_t previous_snapshot_time, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
+<tr class="memdesc:a189d711957181f934b7327f4a9fef668"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#a189d711957181f934b7327f4a9fef668">More...</a><br /></td></tr>
+<tr class="separator:a189d711957181f934b7327f4a9fef668"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4afc1e50adc58308b1bd1a6b289bc54f"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a4afc1e50adc58308b1bd1a6b289bc54f">download_page_ranges_diff</a> (utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length) const </td></tr>
+<tr class="memdesc:a4afc1e50adc58308b1bd1a6b289bc54f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#a4afc1e50adc58308b1bd1a6b289bc54f">More...</a><br /></td></tr>
+<tr class="separator:a4afc1e50adc58308b1bd1a6b289bc54f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a235e914eb0cc1fcd987351157c38d63e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a235e914eb0cc1fcd987351157c38d63e">download_page_ranges_diff</a> (utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
+<tr class="memdesc:a235e914eb0cc1fcd987351157c38d63e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#a235e914eb0cc1fcd987351157c38d63e">More...</a><br /></td></tr>
+<tr class="separator:a235e914eb0cc1fcd987351157c38d63e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7130fd7d3311fcd12af66628047633ee"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a7130fd7d3311fcd12af66628047633ee">download_page_ranges_diff_async</a> (utility::string_t previous_snapshot_time) const </td></tr>
+<tr class="memdesc:a7130fd7d3311fcd12af66628047633ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#a7130fd7d3311fcd12af66628047633ee">More...</a><br /></td></tr>
+<tr class="separator:a7130fd7d3311fcd12af66628047633ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47e52b42f3a217d5b600f4e978a6d417"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a47e52b42f3a217d5b600f4e978a6d417">download_page_ranges_diff_async</a> (utility::string_t previous_snapshot_time, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
+<tr class="memdesc:a47e52b42f3a217d5b600f4e978a6d417"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#a47e52b42f3a217d5b600f4e978a6d417">More...</a><br /></td></tr>
+<tr class="separator:a47e52b42f3a217d5b600f4e978a6d417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad761333191dbd320f9beb1bba2a3284f"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ad761333191dbd320f9beb1bba2a3284f">download_page_ranges_diff_async</a> (utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length) const </td></tr>
+<tr class="memdesc:ad761333191dbd320f9beb1bba2a3284f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#ad761333191dbd320f9beb1bba2a3284f">More...</a><br /></td></tr>
+<tr class="separator:ad761333191dbd320f9beb1bba2a3284f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a637653960b6d9665fe210c2cf86f9919"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; std::vector&lt; <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a637653960b6d9665fe210c2cf86f9919">download_page_ranges_diff_async</a> (utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context) const </td></tr>
+<tr class="memdesc:a637653960b6d9665fe210c2cf86f9919"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.  <a href="#a637653960b6d9665fe210c2cf86f9919">More...</a><br /></td></tr>
+<tr class="separator:a637653960b6d9665fe210c2cf86f9919"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6b1221e1564ecc7d91a9971bc74ed75"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ae6b1221e1564ecc7d91a9971bc74ed75">upload_pages</a> (concurrency::streams::istream page_data, int64_t start_offset, const utility::string_t &amp;content_md5)</td></tr>
 <tr class="memdesc:ae6b1221e1564ecc7d91a9971bc74ed75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes pages to a page blob.  <a href="#ae6b1221e1564ecc7d91a9971bc74ed75">More...</a><br /></td></tr>
 <tr class="separator:ae6b1221e1564ecc7d91a9971bc74ed75"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1540,6 +1564,426 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__range.html" title="Represents a range of pages in a page blob. ">azure::storage::page_range</a>, that represents the current operation.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a01f38d4f9891aafc2c30eed41c29b32f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; azure::storage::cloud_page_blob::download_page_ranges_diff </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An enumerable collection of page diff ranges.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a189d711957181f934b7327f4a9fef668"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; azure::storage::cloud_page_blob::download_page_ranges_diff </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+    <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An enumerable collection of page diff ranges.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4afc1e50adc58308b1bd1a6b289bc54f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; azure::storage::cloud_page_blob::download_page_ranges_diff </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+    <tr><td class="paramname">offset</td><td>The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+    <tr><td class="paramname">length</td><td>The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An enumerable collection of page diff ranges.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a235e914eb0cc1fcd987351157c38d63e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; azure::storage::cloud_page_blob::download_page_ranges_diff </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+    <tr><td class="paramname">offset</td><td>The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+    <tr><td class="paramname">length</td><td>The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+    <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An enumerable collection of page diff ranges.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7130fd7d3311fcd12af66628047633ee"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pplx::task&lt;std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; &gt; azure::storage::cloud_page_blob::download_page_ranges_diff_async </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">azure::storage::page_diff_range</a>, that represents the current operation.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a47e52b42f3a217d5b600f4e978a6d417"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pplx::task&lt;std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; &gt; azure::storage::cloud_page_blob::download_page_ranges_diff_async </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+    <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">azure::storage::page_diff_range</a>, that represents the current operation.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad761333191dbd320f9beb1bba2a3284f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pplx::task&lt;std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; &gt; azure::storage::cloud_page_blob::download_page_ranges_diff_async </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+    <tr><td class="paramname">offset</td><td>The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+    <tr><td class="paramname">length</td><td>The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">azure::storage::page_diff_range</a>, that represents the current operation.</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a637653960b6d9665fe210c2cf86f9919"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">WASTORAGE_API pplx::task&lt;std::vector&lt;<a class="el" href="classazure_1_1storage_1_1page__diff__range.html">page_diff_range</a>&gt; &gt; azure::storage::cloud_page_blob::download_page_ranges_diff_async </td>
+          <td>(</td>
+          <td class="paramtype">utility::string_t&#160;</td>
+          <td class="paramname"><em>previous_snapshot_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">utility::size64_t&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">previous_snapshot_time</td><td>An snapshot time that represents previous snapshot.</td></tr>
+    <tr><td class="paramname">offset</td><td>The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+    <tr><td class="paramname">length</td><td>The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</td></tr>
+    <tr><td class="paramname">condition</td><td>An <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> object that represents the access condition for the operation.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type std::vector, of type <a class="el" href="classazure_1_1storage_1_1page__diff__range.html">azure::storage::page_diff_range</a>, that represents the current operation.</dd></dl>
 
 </div>
 </div>
@@ -3062,7 +3506,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 13 2016 14:26:15 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 21 2016 10:40:57 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

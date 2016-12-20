@@ -559,7 +559,6 @@ namespace azure { namespace storage {
                 single_blob_download_threshold = protocol::default_single_block_download_threshold;
             }
 
-
             // download first range.
             // if 416 thrown, it's an empty blob. need to download attributes.
             // otherwise, properties must be updated for further parallel download.

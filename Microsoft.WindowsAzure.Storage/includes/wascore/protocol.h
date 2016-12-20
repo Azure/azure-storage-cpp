@@ -216,6 +216,8 @@ namespace azure { namespace storage { namespace protocol {
     class file_response_parsers
     {
     public:
+        static utility::size64_t parse_file_size(const web::http::http_response& response);
+
         static cloud_file_share_properties parse_file_share_properties(const web::http::http_response& response);
         static cloud_file_directory_properties parse_file_directory_properties(const web::http::http_response& response);
         static cloud_file_properties parse_file_properties(const web::http::http_response& response);

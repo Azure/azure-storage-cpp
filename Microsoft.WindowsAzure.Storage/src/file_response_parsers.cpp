@@ -37,12 +37,27 @@ namespace azure { namespace storage { namespace protocol {
         return properties;
     }
 
+    utility::size64_t file_response_parsers::parse_file_size(const web::http::http_response& response)
+    {
+        auto& headers = response.headers();
+        utility::string_t value;
+
+        if (headers.match(web::http::header_names::content_range, value))
+        {
+            auto slash = value.find(_XPLATSTR('/'));
+            value = value.substr(slash + 1);
+            return utility::conversions::scan_string<utility::size64_t>(value);
+        }
+
+        return headers.content_length();
+    }
+
     cloud_file_properties file_response_parsers::parse_file_properties(const web::http::http_response& response)
     {
         cloud_file_properties properties;
         properties.m_etag = parse_etag(response);
         properties.m_last_modified = parse_last_modified(response);
-        properties.m_length = response.headers().content_length();
+        properties.m_length = parse_file_size(response);
 
         auto& headers = response.headers();
         properties.m_cache_control = get_header_value(headers, web::http::header_names::cache_control);

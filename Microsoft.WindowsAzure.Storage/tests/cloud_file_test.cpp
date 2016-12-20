@@ -474,4 +474,132 @@ SUITE(File)
             CHECK(!file.properties().content_md5().empty());
         }
     }
+
+    /// <summary>
+    /// Test parallel download
+    /// </summary>
+    TEST_FIXTURE(file_test_base, parallel_download)
+    {
+        // download file smaller than 32MB.
+        {
+            auto file_name = get_random_string(20);
+            auto file = m_share.get_root_directory_reference().get_file_reference(file_name);
+            size_t target_length = 31 * 1024 * 1024;
+            azure::storage::file_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(false);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
+
+            // download target file in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            file.download_to_stream(download_buffer.create_ostream(), azure::storage::file_access_condition(), option, context);
+
+            check_parallelism(context, 1);
+            CHECK(file.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+
+        // file with size larger than 32MB.
+        {
+            auto file_name = get_random_string(20);
+            auto file = m_share.get_root_directory_reference().get_file_reference(file_name);
+            size_t target_length = 100 * 1024 * 1024;
+            azure::storage::file_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(false);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
+
+            // download target file in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            file.download_to_stream(download_buffer.create_ostream(), azure::storage::file_access_condition(), option, context);
+
+            check_parallelism(context, 2);
+            CHECK(file.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+    }
+
+    TEST_FIXTURE(file_test_base, parallel_download_with_md5)
+    {
+        // transactional md5 enabled.
+        // download file smaller than 4MB.
+        {
+            auto file_name = get_random_string(20);
+            auto file = m_share.get_root_directory_reference().get_file_reference(file_name);
+            size_t target_length = 1 * 1024 * 1024;
+            azure::storage::file_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(true);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
+
+            // download target file in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            file.download_to_stream(download_buffer.create_ostream(), azure::storage::file_access_condition(), option, context);
+
+            check_parallelism(context, 1);
+            CHECK(file.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+
+        // download file larger than 4MB.
+        {
+            auto file_name = get_random_string(20);
+            auto file = m_share.get_root_directory_reference().get_file_reference(file_name);
+            size_t target_length = 21 * 1024 * 1024;
+            azure::storage::file_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(true);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
+
+            // download target file in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            file.download_to_stream(download_buffer.create_ostream(), azure::storage::file_access_condition(), option, context);
+
+            check_parallelism(context, 2);
+            CHECK(file.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+    }
+
+    TEST_FIXTURE(file_test_base, parallel_download_empty_file)
+    {
+        auto file_name = get_random_string(20);
+        auto file = m_share.get_root_directory_reference().get_file_reference(file_name);
+        size_t target_length = 0;
+        azure::storage::file_request_options option;
+        option.set_parallelism_factor(2);
+        option.set_use_transactional_md5(true);
+        std::vector<uint8_t> data;
+        data.resize(target_length);
+        concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+        file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
+
+        // download target file in parallel.
+        azure::storage::operation_context context;
+        concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+        file.download_to_stream(download_buffer.create_ostream(), azure::storage::file_access_condition(), option, context);
+
+        check_parallelism(context, 1);
+        CHECK(file.properties().size() == target_length);
+    }
 }

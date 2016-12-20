@@ -2212,6 +2212,15 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the size of the file, in bytes.
+        /// </summary>
+        /// <returns>The file's size in bytes.</returns>
+        utility::size64_t size() const
+        {
+            return m_length;
+        }
+
+        /// <summary>
         /// Gets the file's ETag value.
         /// </summary>
         /// <returns>The file's ETag value.</returns>
@@ -3913,6 +3922,7 @@ namespace azure { namespace storage {
 
         void init(storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const file_access_condition& condition, const file_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<void> download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const file_access_condition& condition, const file_request_options& options, operation_context context, bool update_properties = false, bool validate_last_modify = false) const;
 
         utility::string_t m_name;
         cloud_file_directory m_directory;

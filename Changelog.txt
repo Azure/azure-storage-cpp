@@ -1,6 +1,10 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in vNext:
+- Default Rest API version is 2016-05-31.
+- Supported large block size to 100MB, single blob upload threshold to 256MB.
+
 Changes in v2.6:
 - Supported parallel download for blobs and files
 - Supported installation from Vcpkg

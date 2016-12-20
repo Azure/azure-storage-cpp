@@ -177,12 +177,12 @@ SUITE(Blob)
 
         options.set_use_transactional_md5(false);
         {
-            // upload a page range of max_block_size
+            // upload a page range of max_page_size
             std::vector<uint8_t> big_buffer;
-            big_buffer.resize(azure::storage::protocol::max_block_size);
+            big_buffer.resize(azure::storage::protocol::max_page_size);
             auto md5 = fill_buffer_and_get_md5(big_buffer);
             auto stream = concurrency::streams::bytestream::open_istream(big_buffer);
-            azure::storage::page_range range(4 * 1024 * 1024, 4 * 1024 * 1024 + azure::storage::protocol::max_block_size - 1);
+            azure::storage::page_range range(4 * 1024 * 1024, 4 * 1024 * 1024 + azure::storage::protocol::max_page_size - 1);
             pages.push_back(range);
             m_blob.upload_pages(stream, range.start_offset(), md5, azure::storage::access_condition(), options, m_context);
             CHECK_UTF8_EQUAL(md5, md5_header);
@@ -198,12 +198,12 @@ SUITE(Blob)
             CHECK_UTF8_EQUAL(dummy_md5, md5_header);
         }
 
-        // trying upload page ranges bigger than max_block_size
+        // trying upload page ranges bigger than max_page_size
         {
-            buffer.resize(azure::storage::protocol::max_block_size + 1);
+            buffer.resize(azure::storage::protocol::max_page_size + 1);
             fill_buffer_and_get_md5(buffer);
 
-            azure::storage::page_range range(8 * 1024 * 1024, 8 * 1024 * 1024 + azure::storage::protocol::max_block_size -1);
+            azure::storage::page_range range(8 * 1024 * 1024, 8 * 1024 * 1024 + azure::storage::protocol::max_page_size -1);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
             CHECK_THROW(m_blob.upload_pages(stream, range.start_offset(), utility::string_t(), azure::storage::access_condition(), options, m_context), std::invalid_argument);
         }

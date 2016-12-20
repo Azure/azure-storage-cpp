@@ -156,14 +156,11 @@ namespace azure { namespace storage { namespace protocol {
             if ((key_size > ms_header_prefix_size) &&
                 std::equal(ms_header_prefix, ms_header_prefix + ms_header_prefix_size, key, [](const utility::char_t &c1, const utility::char_t &c2) {return c1 == c2;}))
             {
-                if (!it->second.empty())
-                {
-                    utility::string_t transformed_key(key);
-                    std::transform(transformed_key.begin(), transformed_key.end(), transformed_key.begin(), core::utility_char_tolower);
-                    m_result.append(transformed_key);
-                    m_result.append(_XPLATSTR(":"));
-                    append(it->second);
-                }
+                utility::string_t transformed_key(key);
+                std::transform(transformed_key.begin(), transformed_key.end(), transformed_key.begin(), core::utility_char_tolower);
+                m_result.append(transformed_key);
+                m_result.append(_XPLATSTR(":"));
+                append(it->second);
             }
         }
     }

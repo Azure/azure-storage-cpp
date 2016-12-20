@@ -32,8 +32,8 @@ namespace azure { namespace storage { namespace core {
             : m_file(file), m_file_length(length), m_condition(access_condition), m_options(options), m_context(context),
             m_semaphore(options.parallelism_factor()),m_current_file_offset(0)
         {
-            m_buffer_size = protocol::max_block_size;
-            m_next_buffer_size = protocol::max_block_size;
+            m_buffer_size = protocol::max_range_size;
+            m_next_buffer_size = protocol::max_range_size;
 
             if (m_options.use_transactional_md5())
             {

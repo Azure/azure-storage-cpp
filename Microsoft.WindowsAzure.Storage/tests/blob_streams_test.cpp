@@ -433,7 +433,7 @@ SUITE(Blob)
         missing_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
         missing_blob = m_container.get_block_blob_reference(_XPLATSTR("missing_blob3"));
-        missing_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(_XPLATSTR("*")), azure::storage::blob_request_options(), m_context).close().wait();
+        CHECK_THROW(missing_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(_XPLATSTR("*")), azure::storage::blob_request_options(), m_context).close().wait(), azure::storage::storage_exception);
 
         missing_blob = m_container.get_block_blob_reference(_XPLATSTR("missing_blob4"));
         missing_blob.open_write(azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
@@ -448,10 +448,7 @@ SUITE(Blob)
         m_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(missing_blob.properties().etag()), azure::storage::blob_request_options(), m_context).close().wait();
 
         CHECK_THROW(m_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
-
-        auto stream = m_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(_XPLATSTR("*")), azure::storage::blob_request_options(), m_context);
-        CHECK_THROW(stream.close().wait(), azure::storage::storage_exception);
-
+        
         m_blob.open_write(azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context).close().wait();
 
         CHECK_THROW(m_blob.open_write(azure::storage::access_condition::generate_if_modified_since_condition(m_blob.properties().last_modified() + utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
@@ -460,15 +457,10 @@ SUITE(Blob)
 
         CHECK_THROW(m_blob.open_write(azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified() - utility::datetime::from_minutes(1)), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
 
-        stream = m_blob.open_write(azure::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context);
+        auto stream = m_blob.open_write(azure::storage::access_condition::generate_if_match_condition(m_blob.properties().etag()), azure::storage::blob_request_options(), m_context);
         m_blob.upload_properties(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_THROW(stream.close().wait(), azure::storage::storage_exception);
-
-        missing_blob = m_container.get_block_blob_reference(_XPLATSTR("missing_blob6"));
-        stream = missing_blob.open_write(azure::storage::access_condition::generate_if_none_match_condition(_XPLATSTR("*")), azure::storage::blob_request_options(), m_context);
-        missing_blob.upload_block_list(std::vector<azure::storage::block_list_item>(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        CHECK_THROW(stream.close().wait(), azure::storage::storage_exception);
-
+        
         stream = m_blob.open_write(azure::storage::access_condition::generate_if_not_modified_since_condition(m_blob.properties().last_modified()), azure::storage::blob_request_options(), m_context);
         std::this_thread::sleep_for(std::chrono::seconds(1));
         m_blob.upload_properties(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);

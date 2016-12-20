@@ -66,7 +66,7 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(parsed_properties);
             properties->update_page_blob_sequence_number(parsed_properties);
         });
-        return core::istream_descriptor::create(page_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_block_size).then([command, context, start_offset, content_md5, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(page_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_page_size).then([command, context, start_offset, content_md5, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             auto end_offset = start_offset + request_body.length() - 1;

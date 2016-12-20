@@ -927,9 +927,11 @@ SUITE(Core)
     {
         auto account = test_config::instance().account();
         auto blob_host = account.blob_endpoint().primary_uri().host();
+        auto blob_port = account.blob_endpoint().primary_uri().port();
         web::uri_builder blob_endpoint;
         blob_endpoint.set_scheme(_XPLATSTR("http"));
         blob_endpoint.set_host(blob_host);
+        blob_endpoint.set_port(blob_port);
         
         azure::storage::account_shared_access_policy policy;
         policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_seconds(120));

@@ -460,6 +460,15 @@ namespace azure { namespace storage {
             merge(value.m_has_value ? (const T&)value : fallback_value);
         }
 
+        /// <summary>
+        /// Indicates whether a specified value is set.
+        /// </summary>
+        /// <returns>A boolean indicating whether a specified value is set.</retruns>
+        bool has_value() const
+        {
+            return m_has_value;
+        }
+
     private:
 
         T m_value;

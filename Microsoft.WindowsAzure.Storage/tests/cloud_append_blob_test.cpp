@@ -106,8 +106,8 @@ SUITE(Blob)
         m_blob.create_or_replace(azure::storage::access_condition(), options, m_context);
         check_blob_no_stale_property(m_blob);
 
-        size_t sizes[] = { 1, 2, 1023, 1024, 4 * 1024, 1024 * 1024, azure::storage::protocol::max_block_size - 1, azure::storage::protocol::max_block_size };
-        size_t invalid_sizes[] = { azure::storage::protocol::max_block_size + 1, 6 * 1024 * 1024, 8 * 1024 * 1024 };
+        size_t sizes[] = { 1, 2, 1023, 1024, 4 * 1024, 1024 * 1024, azure::storage::protocol::max_append_block_size - 1, azure::storage::protocol::max_append_block_size };
+        size_t invalid_sizes[] = { azure::storage::protocol::max_append_block_size + 1, 6 * 1024 * 1024, 8 * 1024 * 1024 };
         int64_t bytes_appended = 0;
 
         options.set_use_transactional_md5(true);
@@ -128,7 +128,7 @@ SUITE(Blob)
             buffer.resize(size);
             fill_buffer_and_get_md5(buffer, 0, size);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
-            CHECK_THROW(m_blob.append_block(stream, utility::string_t(), azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
+            CHECK_THROW(m_blob.append_block(stream, utility::string_t(), azure::storage::access_condition(), options, m_context), std::invalid_argument);
         }
     }
 

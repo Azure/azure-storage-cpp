@@ -388,7 +388,7 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(modified_properties);
             properties->m_content_md5 = modified_properties.content_md5();
         });
-        return core::istream_descriptor::create(stream, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_block_size).then([command, context, start_offset, content_md5, modified_options](core::istream_descriptor request_body)->pplx::task<void>
+        return core::istream_descriptor::create(stream, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_range_size).then([command, context, start_offset, content_md5, modified_options](core::istream_descriptor request_body)->pplx::task<void>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             auto end_offset = start_offset + request_body.length() - 1;
@@ -630,9 +630,9 @@ namespace azure { namespace storage {
                     auto smallest_offset = std::make_shared<utility::size64_t>(target_offset);
                     auto condition_variable = std::make_shared<std::condition_variable>();
                     std::mutex  condition_variable_mutex;
-                    for (utility::size64_t current_offset = target_offset; current_offset < target_offset + target_length; current_offset += protocol::single_block_size)
+                    for (utility::size64_t current_offset = target_offset; current_offset < target_offset + target_length; current_offset += protocol::transactional_md5_block_size)
                     {
-                        utility::size64_t current_length = protocol::single_block_size;
+                        utility::size64_t current_length = protocol::transactional_md5_block_size;
                         if (current_offset + current_length > target_offset + target_length)
                         {
                             current_length = target_offset + target_length - current_offset;
@@ -658,7 +658,7 @@ namespace azure { namespace storage {
                                     pplx::extensibility::scoped_rw_lock_t guard(mutex);
                                     target.streambuf().seekpos(current_offset, std::ios_base::out);
                                     target.streambuf().putn_nocopy(buffer.collection().data(), buffer.collection().size()).wait();
-                                    *smallest_offset += protocol::single_block_size;
+                                    *smallest_offset += protocol::transactional_md5_block_size;
                                     released = true;
                                     semaphore->unlock();
                                 }
@@ -669,7 +669,7 @@ namespace azure { namespace storage {
                                         if (*smallest_offset == current_offset)
                                         {
                                             target.streambuf().putn_nocopy(buffer.collection().data(), buffer.collection().size()).wait();
-                                            *smallest_offset += protocol::single_block_size;
+                                            *smallest_offset += protocol::transactional_md5_block_size;
                                             condition_variable->notify_all();
                                             released = true;
                                             semaphore->unlock();
@@ -695,7 +695,7 @@ namespace azure { namespace storage {
                                             if (*smallest_offset == current_offset)
                                             {
                                                 target.streambuf().putn_nocopy(buffer.collection().data(), buffer.collection().size()).wait();
-                                                *smallest_offset += protocol::single_block_size;
+                                                *smallest_offset += protocol::transactional_md5_block_size;
                                             }
                                             else if (*smallest_offset > current_offset)
                                             {

@@ -1531,8 +1531,8 @@ namespace azure { namespace storage {
             m_disable_content_md5_validation(false),
             m_parallelism_factor(1),
             m_single_blob_upload_threshold(protocol::default_single_blob_upload_threshold),
-            m_stream_write_size(protocol::max_block_size),
-            m_stream_read_size(protocol::max_block_size),
+            m_stream_write_size(protocol::default_stream_write_size),
+            m_stream_read_size(protocol::default_stream_read_size),
             m_absorb_conditional_errors_on_retry(false)
         {
         }
@@ -1662,7 +1662,7 @@ namespace azure { namespace storage {
         /// Gets the maximum size of a blob in bytes that may be uploaded as a single blob.
         /// </summary>
         /// <returns>The maximum size of a blob, in bytes, that may be uploaded as a single blob,
-        /// ranging from between 1 and 64 MB inclusive.</returns>
+        /// ranging from between 1 and 256 MB inclusive.</returns>
         utility::size64_t single_blob_upload_threshold_in_bytes() const
         {
             return m_single_blob_upload_threshold;
@@ -1672,10 +1672,10 @@ namespace azure { namespace storage {
         /// Sets the maximum size of a blob in bytes that may be uploaded as a single blob.
         /// </summary>
         /// <param name="value">The maximum size of a blob, in bytes, that may be uploaded as a single blob,
-        /// ranging from between 1 and 64 MB inclusive.</param>
+        /// ranging from between 1 and 256 MB inclusive.</param>
         void set_single_blob_upload_threshold_in_bytes(utility::size64_t value)
         {
-            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, 64 * 1024 * 1024);
+            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, 256 * 1024 * 1024);
             m_single_blob_upload_threshold = value;
         }
 
@@ -1704,7 +1704,7 @@ namespace azure { namespace storage {
         /// Gets the minimum number of bytes to buffer when reading from a blob stream.
         /// </summary>
         /// <returns>The minimum number of bytes to buffer, being at least 16KB.</returns>
-        size_t stream_read_size_in_bytes() const
+        option_with_default<size_t> stream_read_size_in_bytes() const
         {
             return m_stream_read_size;
         }
@@ -1722,8 +1722,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <returns>The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</returns>
-        size_t stream_write_size_in_bytes() const
+        /// <returns>The minimum number of bytes to buffer, ranging from between 16 KB and 100 MB inclusive.</returns>
+        option_with_default<size_t> stream_write_size_in_bytes() const
         {
             return m_stream_write_size;
         }
@@ -1731,10 +1731,10 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</param>
+        /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 100 MB inclusive.</param>
         void set_stream_write_size_in_bytes(size_t value)
         {
-            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, 4 * 1024 * 1024);
+            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, 100 * 1024 * 1024);
             m_stream_write_size = value;
         }
 

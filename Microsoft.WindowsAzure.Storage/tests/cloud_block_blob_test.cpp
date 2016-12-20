@@ -695,4 +695,25 @@ SUITE(Blob)
 
         m_context.set_response_received(std::function<void(web::http::http_request &, const web::http::http_response&, azure::storage::operation_context)>());
     }
+ 
+    TEST_FIXTURE(block_blob_test_base, large_block_blob)
+    {
+        std::vector<uint8_t> buffer;
+        buffer.resize(12 * 1024 * 1024);
+
+        azure::storage::blob_request_options options;
+        CHECK_THROW(options.set_single_blob_upload_threshold_in_bytes(257 * 1024 * 1024), std::invalid_argument);
+        CHECK_THROW(options.set_stream_write_size_in_bytes(101 * 1024 * 1024), std::invalid_argument);
+
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
+        CHECK_EQUAL(2U, m_context.request_results().size()); // CreateContainer + PutBlob
+
+        options.set_single_blob_upload_threshold_in_bytes(buffer.size() / 2);
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
+        CHECK_EQUAL(6U, m_context.request_results().size()); // PutBlock * 3 + PutBlockList
+        
+        options.set_stream_write_size_in_bytes(6 * 1024 * 1024);
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
+        CHECK_EQUAL(9U, m_context.request_results().size()); // PutBlock * 2 + PutBlockList
+    }
 }

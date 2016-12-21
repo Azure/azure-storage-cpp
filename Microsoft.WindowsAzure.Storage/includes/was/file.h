@@ -527,20 +527,20 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than
+        /// Gets the number of ranges that may be simultaneously uploaded or downloaded when uploading or downloading a file that is greater than
         /// the value specified by the <see cref="single_blob_upload_threshold_in_bytes" /> property in size.
         /// </summary>
-        /// <returns>The number of parallel block or page upload operations that may proceed.</returns>
+        /// <returns>The number of parallel range upload or download operations that may proceed.</returns>
         int parallelism_factor() const
         {
             return m_parallelism_factor;
         }
 
         /// <summary>
-        /// Sets the number of ranges that may be simultaneously uploaded when uploading a file that is greater than
+        /// Sets the number of ranges that may be simultaneously uploaded or downloaded when uploading or downloading a file that is greater than
         /// the value specified by the <see cref="single_blob_upload_threshold_in_bytes" /> property in size.
         /// </summary>
-        /// <param name="value">The number of parallel range upload operations that may proceed.</param>
+        /// <param name="value">The number of parallel range upload or download operations that may proceed.</param>
         void set_parallelism_factor(int value)
         {
             m_parallelism_factor = value;

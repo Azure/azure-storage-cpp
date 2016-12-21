@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.5.0</span>
+   &#160;<span id="projectnumber">2.6.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -139,10 +139,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a70edd2d728fdf472fdd810f79b89aaee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the maximum size of a blob in bytes that may be uploaded as a single blob.  <a href="#a70edd2d728fdf472fdd810f79b89aaee">More...</a><br /></td></tr>
 <tr class="separator:a70edd2d728fdf472fdd810f79b89aaee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd2ee25ba6889827155e1feaf468f8e5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1blob__request__options.html#afd2ee25ba6889827155e1feaf468f8e5">parallelism_factor</a> () const </td></tr>
-<tr class="memdesc:afd2ee25ba6889827155e1feaf468f8e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size.  <a href="#afd2ee25ba6889827155e1feaf468f8e5">More...</a><br /></td></tr>
+<tr class="memdesc:afd2ee25ba6889827155e1feaf468f8e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of blocks or pages that may be simultaneously uploaded or downloaded when uploading or downloading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size.  <a href="#afd2ee25ba6889827155e1feaf468f8e5">More...</a><br /></td></tr>
 <tr class="separator:afd2ee25ba6889827155e1feaf468f8e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3c8004d6068984df17fc8fb668cb410"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1blob__request__options.html#ad3c8004d6068984df17fc8fb668cb410">set_parallelism_factor</a> (int value)</td></tr>
-<tr class="memdesc:ad3c8004d6068984df17fc8fb668cb410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size.  <a href="#ad3c8004d6068984df17fc8fb668cb410">More...</a><br /></td></tr>
+<tr class="memdesc:ad3c8004d6068984df17fc8fb668cb410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the number of blocks or pages that may be simultaneously uploaded or downloaded when uploading or downloading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size.  <a href="#ad3c8004d6068984df17fc8fb668cb410">More...</a><br /></td></tr>
 <tr class="separator:ad3c8004d6068984df17fc8fb668cb410"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a75d9a57440b4d613a84db43d8eced6"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a7a75d9a57440b4d613a84db43d8eced6">stream_read_size_in_bytes</a> () const </td></tr>
 <tr class="memdesc:a7a75d9a57440b4d613a84db43d8eced6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the minimum number of bytes to buffer when reading from a blob stream.  <a href="#a7a75d9a57440b4d613a84db43d8eced6">More...</a><br /></td></tr>
@@ -355,8 +355,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>set_noactivity_timeou
 </table>
 </div><div class="memdoc">
 
-<p>Gets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size. </p>
-<dl class="section return"><dt>Returns</dt><dd>The number of parallel block or page upload operations that may proceed.</dd></dl>
+<p>Gets the number of blocks or pages that may be simultaneously uploaded or downloaded when uploading or downloading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of parallel block or page upload or download operations that may proceed.</dd></dl>
 
 </div>
 </div>
@@ -446,10 +446,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>set_noactivity_timeou
 </table>
 </div><div class="memdoc">
 
-<p>Sets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size. </p>
+<p>Sets the number of blocks or pages that may be simultaneously uploaded or downloaded when uploading or downloading a blob that is greater than the value specified by the <a class="el" href="classazure_1_1storage_1_1blob__request__options.html#a388c6457e8ada55ad1915ab8e0298d4f" title="Gets the maximum size of a blob in bytes that may be uploaded as a single blob. ">single_blob_upload_threshold_in_bytes</a> property in size. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">value</td><td>The number of parallel block or page upload operations that may proceed.</td></tr>
+    <tr><td class="paramname">value</td><td>The number of parallel block or page upload or download operations that may proceed.</td></tr>
   </table>
   </dd>
 </dl>
@@ -749,7 +749,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>set_noactivity_timeou
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 21 2016 10:40:56 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Dec 21 2016 11:29:41 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.5.0</span>
+   &#160;<span id="projectnumber">2.6.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -106,6 +106,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </ul>
 <h1>Getting started</h1>
 <p>For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes. Download the <a href="http://www.nuget.org/packages/wastorage">NuGet Package</a>.</p>
+<p>Azure Storage Client Library for C++ is also avaiable on Vcpkg since v2.5.0. To get know more about Vcpkg, please visit <a href="https://github.com/Microsoft/vcpkg">https://github.com/Microsoft/vcpkg</a>.</p>
 <h2>Requirements</h2>
 <p>To call Azure services, you must first have an Azure subscription. Sign up for a <a href="https://azure.microsoft.com/en-us/pricing/free-trial/">free trial</a> or use your <a href="https://azure.microsoft.com/en-us/pricing/member-offers/msdn-benefits-details/">MSDN subscriber benefits</a>.</p>
 <h2>Need Help?</h2>
@@ -126,7 +127,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --><h3>Via NuGet</h3>
 <p>To install the binaries for the Azure Storage Client Library for C++, type the following into the <a href="http://docs.nuget.org/docs/start-here/using-the-package-manager-console">NuGet Package Manager console</a>:</p>
 <p><code>Install-Package wastorage</code></p>
-<h4>Visual Studio Version</h4>
+<h3>Via Vcpkg</h3>
+<p>To install the Azure Storage Client Library for C++ through Vcpkg, you need Vcpkg installed first. Please follow the instructions(<a href="https://github.com/Microsoft/vcpkg#quick-start">https://github.com/Microsoft/vcpkg#quick-start</a>) to install Vcpkg.</p>
+<p>install package with: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;C:\src\vcpkg&gt; .\vcpkg install azure-storage-cpp</div>
+</div><!-- fragment --><h4>Visual Studio Version</h4>
 <p>Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visual Studio 2013 and Visual Studio 2015. In case you have the need to use Visual Studio 2012, please get <a href="http://www.nuget.org/packages/wastorage/2.0.0">version 2.0.0</a>.</p>
 <h2>Dependencies</h2>
 <h3>C++ REST SDK</h3>
@@ -227,7 +231,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Nov 21 2016 10:41:02 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Dec 21 2016 11:29:49 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

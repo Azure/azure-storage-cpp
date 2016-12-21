@@ -23,6 +23,8 @@ The Azure Storage Client Library for C++ allows you to build applications agains
 For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes.
 Download the [NuGet Package](http://www.nuget.org/packages/wastorage).
 
+Azure Storage Client Library for C++ is also avaiable on Vcpkg since v2.5.0. To get know more about Vcpkg, please visit https://github.com/Microsoft/vcpkg.
+
 ## Requirements
 
 To call Azure services, you must first have an Azure subscription. Sign up for a [free trial](https://azure.microsoft.com/en-us/pricing/free-trial/) or use your [MSDN subscriber benefits](https://azure.microsoft.com/en-us/pricing/member-offers/msdn-benefits-details/).
@@ -57,6 +59,15 @@ cd azure-storage-cpp
 To install the binaries for the Azure Storage Client Library for C++, type the following into the [NuGet Package Manager console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console):
 
 `Install-Package wastorage`
+
+### Via Vcpkg
+
+To install the Azure Storage Client Library for C++ through Vcpkg, you need Vcpkg installed first. Please follow the instructions(https://github.com/Microsoft/vcpkg#quick-start) to install Vcpkg.
+
+install package with:
+```
+C:\src\vcpkg> .\vcpkg install azure-storage-cpp
+```
 
 #### Visual Studio Version
 Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visual Studio 2013 and Visual Studio 2015. In case you have the need to use Visual Studio 2012, please get [version 2.0.0](http://www.nuget.org/packages/wastorage/2.0.0).

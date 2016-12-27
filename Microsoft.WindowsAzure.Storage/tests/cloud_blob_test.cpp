@@ -537,7 +537,7 @@ SUITE(Blob)
         CHECK(m_blob.snapshot_qualified_uri().secondary_uri() != snapshot1.snapshot_qualified_uri().secondary_uri());
         CHECK(snapshot1.snapshot_qualified_uri().primary_uri().query().find(_XPLATSTR("snapshot")) != utility::string_t::npos);
         CHECK(snapshot1.snapshot_qualified_uri().secondary_uri().query().find(_XPLATSTR("snapshot")) != utility::string_t::npos);
-        
+
         CHECK_THROW(snapshot1.upload_properties(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::logic_error);
         CHECK_THROW(snapshot1.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::logic_error);
         CHECK_THROW(snapshot1.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::logic_error);
@@ -699,5 +699,131 @@ SUITE(Blob)
             CHECK_THROW(dest.abort_copy(copy_id, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
             CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
         }
+    }
+
+    /// <summary>
+    /// Test parallel download
+    /// </summary>
+    TEST_FIXTURE(blob_test_base, parallel_download)
+    {
+        // download blob smaller than 32MB.
+        {
+            auto blob_name = get_random_string(20);
+            auto blob = m_container.get_block_blob_reference(blob_name);
+            size_t target_length = 31 * 1024 * 1024;
+            azure::storage::blob_request_options option;
+            option.set_parallelism_factor(2);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
+
+            // download target blob in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            blob.download_to_stream(download_buffer.create_ostream(), azure::storage::access_condition(), option, context);
+
+            check_parallelism(context, 1);
+            CHECK(blob.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+
+        // blob with size larger than 32MB.
+        {
+            auto blob_name = get_random_string(20);
+            auto blob = m_container.get_block_blob_reference(blob_name);
+            size_t target_length = 100 * 1024 * 1024;
+            azure::storage::blob_request_options option;
+            option.set_parallelism_factor(2);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
+
+            // download target blob in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            blob.download_to_stream(download_buffer.create_ostream(), azure::storage::access_condition(), option, context);
+
+            check_parallelism(context, 2);
+            CHECK(blob.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+    }
+
+    TEST_FIXTURE(blob_test_base, parallel_download_with_md5)
+    {
+        // transactional md5 enabled.
+        // download blob smaller than 4MB.
+        {
+            auto blob_name = get_random_string(20);
+            auto blob = m_container.get_block_blob_reference(blob_name);
+            size_t target_length = 1 * 1024 * 1024;
+            azure::storage::blob_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(true);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
+
+            // download target blob in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            blob.download_to_stream(download_buffer.create_ostream(), azure::storage::access_condition(), option, context);
+
+            check_parallelism(context, 1);
+            CHECK(blob.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+
+        // download blob larger than 4MB.
+        {
+            auto blob_name = get_random_string(20);
+            auto blob = m_container.get_block_blob_reference(blob_name);
+            size_t target_length = 21 * 1024 * 1024;
+            azure::storage::blob_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(true);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
+
+            // download target blob in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            blob.download_to_stream(download_buffer.create_ostream(), azure::storage::access_condition(), option, context);
+
+            check_parallelism(context, 2);
+            CHECK(blob.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
+        }
+    }
+
+    TEST_FIXTURE(blob_test_base, parallel_download_empty_blob)
+    {
+        auto blob_name = get_random_string(20);
+        auto blob = m_container.get_block_blob_reference(blob_name);
+        size_t target_length = 0;
+        azure::storage::blob_request_options option;
+        option.set_parallelism_factor(2);
+        option.set_use_transactional_md5(true);
+        std::vector<uint8_t> data;
+        data.resize(target_length);
+        concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+        blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
+
+        // download target blob in parallel.
+        azure::storage::operation_context context;
+        concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+        blob.download_to_stream(download_buffer.create_ostream(), azure::storage::access_condition(), option, context);
+
+        check_parallelism(context, 1);
+        CHECK(blob.properties().size() == target_length);
     }
 }

@@ -46,7 +46,6 @@ protected:
     static utility::string_t fill_buffer_and_get_md5(std::vector<uint8_t>& buffer);
     static utility::string_t fill_buffer_and_get_md5(std::vector<uint8_t>& buffer, size_t offset, size_t count);
     static utility::string_t get_random_container_name(size_t length = 10);
-    static void check_parallelism(const azure::storage::operation_context& context, int expected_parallelism);
     static void check_blob_equal(const azure::storage::cloud_blob& expected, const azure::storage::cloud_blob& actual);
     static void check_blob_copy_state_equal(const azure::storage::copy_state& expected, const azure::storage::copy_state& actual);
     static void check_blob_properties_equal(const azure::storage::cloud_blob_properties& expected, const azure::storage::cloud_blob_properties& actual);

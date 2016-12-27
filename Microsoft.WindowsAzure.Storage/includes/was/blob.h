@@ -1680,20 +1680,20 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than
+        /// Gets the number of blocks or pages that may be simultaneously uploaded or downloaded when uploading or downloading a blob that is greater than
         /// the value specified by the <see cref="single_blob_upload_threshold_in_bytes" /> property in size.
         /// </summary>
-        /// <returns>The number of parallel block or page upload operations that may proceed.</returns>
+        /// <returns>The number of parallel block or page upload or download operations that may proceed.</returns>
         int parallelism_factor() const
         {
             return m_parallelism_factor;
         }
 
         /// <summary>
-        /// Sets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than
+        /// Sets the number of blocks or pages that may be simultaneously uploaded or downloaded when uploading or downloading a blob that is greater than
         /// the value specified by the <see cref="single_blob_upload_threshold_in_bytes" /> property in size.
         /// </summary>
-        /// <param name="value">The number of parallel block or page upload operations that may proceed.</param>
+        /// <param name="value">The number of parallel block or page upload or download operations that may proceed.</param>
         void set_parallelism_factor(int value)
         {
             utility::assert_in_bounds(_XPLATSTR("value"), value, 0);
@@ -5074,6 +5074,7 @@ namespace azure { namespace storage {
 
         void init(utility::string_t snapshot_time, storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, bool update_properties = false);
 
         utility::string_t m_name;
         utility::string_t m_snapshot_time;

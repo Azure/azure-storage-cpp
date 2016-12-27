@@ -527,20 +527,20 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the number of blocks or pages that may be simultaneously uploaded when uploading a blob that is greater than
+        /// Gets the number of ranges that may be simultaneously uploaded or downloaded when uploading or downloading a file that is greater than
         /// the value specified by the <see cref="single_blob_upload_threshold_in_bytes" /> property in size.
         /// </summary>
-        /// <returns>The number of parallel block or page upload operations that may proceed.</returns>
+        /// <returns>The number of parallel range upload or download operations that may proceed.</returns>
         int parallelism_factor() const
         {
             return m_parallelism_factor;
         }
 
         /// <summary>
-        /// Sets the number of ranges that may be simultaneously uploaded when uploading a file that is greater than
+        /// Sets the number of ranges that may be simultaneously uploaded or downloaded when uploading or downloading a file that is greater than
         /// the value specified by the <see cref="single_blob_upload_threshold_in_bytes" /> property in size.
         /// </summary>
-        /// <param name="value">The number of parallel range upload operations that may proceed.</param>
+        /// <param name="value">The number of parallel range upload or download operations that may proceed.</param>
         void set_parallelism_factor(int value)
         {
             m_parallelism_factor = value;
@@ -2207,6 +2207,15 @@ namespace azure { namespace storage {
         /// </summary>
         /// <returns>The file's size in bytes.</returns>
         utility::size64_t length() const
+        {
+            return m_length;
+        }
+
+        /// <summary>
+        /// Gets the size of the file, in bytes.
+        /// </summary>
+        /// <returns>The file's size in bytes.</returns>
+        utility::size64_t size() const
         {
             return m_length;
         }
@@ -3913,6 +3922,7 @@ namespace azure { namespace storage {
 
         void init(storage_credentials credentials);
         WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const file_access_condition& condition, const file_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<void> download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const file_access_condition& condition, const file_request_options& options, operation_context context, bool update_properties = false, bool validate_last_modify = false) const;
 
         utility::string_t m_name;
         cloud_file_directory m_directory;

@@ -24,6 +24,7 @@
 #include "util.h"
 #include "streams.h"
 #include "was/auth.h"
+#include "wascore/constants.h"
 #include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace core {

@@ -16,12 +16,13 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
+#include "wascore/constants.h"
 #include "wascore/basic_types.h"
 
 namespace azure { namespace storage { namespace protocol {
     
 #define _CONSTANTS
-#define DAT(a, b) WASTORAGE_API const utility::char_t* a = b;
+#define DAT(a, b) WASTORAGE_API const utility::char_t a[] = b;
 #include "wascore/constants.dat"
 #undef DAT
 #undef _CONSTANTS

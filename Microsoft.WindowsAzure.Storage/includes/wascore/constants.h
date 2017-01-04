@@ -62,7 +62,7 @@ namespace azure { namespace storage { namespace protocol {
     const int maximum_share_quota(5120);
 
 #define _CONSTANTS
-#define DAT(a, b) extern WASTORAGE_API const utility::char_t* a; const size_t a ## _size = sizeof(b) / sizeof(utility::char_t) - 1;
+#define DAT(a, b) WASTORAGE_API extern const utility::char_t a[]; const size_t a ## _size = sizeof(b) / sizeof(utility::char_t) - 1;
 #include "constants.dat"
 #undef DAT
 #undef _CONSTANTS

@@ -16,6 +16,7 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
+#include "wascore/resources.h"
 #include "wascore/basic_types.h"
 
 namespace azure { namespace storage { namespace protocol {

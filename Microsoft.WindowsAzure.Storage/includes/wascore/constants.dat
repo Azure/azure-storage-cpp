@@ -319,10 +319,12 @@ DAT(xml_shares, _XPLATSTR("Shares"))
 #define VER(x) _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows; MSC_VER " STR(x) ")")
 #if defined(_WIN32)
 #if defined(_MSC_VER)
-    #if _MSC_VER == 1800
-        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows; MSC_VER 1800 )"))
-    #else
+    #if _MSC_VER >= 1900
         DAT(header_value_user_agent, VER(_MSC_VER))
+    #elif _MSC_VER >= 1800
+        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows; MSC_VER 18XX )"))
+    #else
+        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows; MSC_VER < 1800 )"))
     #endif
 #else
     DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows)"))

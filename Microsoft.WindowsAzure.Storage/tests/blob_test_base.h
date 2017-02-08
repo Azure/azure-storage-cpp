@@ -128,7 +128,7 @@ public:
     }
 
 protected:
-    void create_containers(const utility::string_t& prefix, std::size_t num);
+    void create_containers(const utility::string_t& prefix, std::size_t num, azure::storage::blob_container_public_access_type public_access_type = azure::storage::blob_container_public_access_type::off);
     void create_blobs(const azure::storage::cloud_blob_container& container, const utility::string_t& prefix, std::size_t num);
     void check_container_list(const std::vector<azure::storage::cloud_blob_container>& list, const utility::string_t& prefix, bool check_found);
     void check_blob_list(const std::vector<azure::storage::cloud_blob>& list);

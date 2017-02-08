@@ -28,24 +28,8 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_lease_status = parse_lease_status(response);
         properties.m_lease_state = parse_lease_state(response);
         properties.m_lease_duration = parse_lease_duration(response);
+        properties.m_public_access = parse_public_access_type(response);
         return properties;
-    }
-
-    blob_container_public_access_type blob_response_parsers::parse_public_access_type(const web::http::http_response& response)
-    {
-        auto value = get_header_value(response.headers(), ms_header_blob_public_access);
-        if (value == resource_blob)
-        {
-            return blob_container_public_access_type::blob;
-        }
-        else if (value == resource_container)
-        {
-            return blob_container_public_access_type::container;
-        }
-        else
-        {
-            return blob_container_public_access_type::off;
-        }
     }
 
     blob_type blob_response_parsers::parse_blob_type(const utility::string_t& value)

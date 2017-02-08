@@ -169,6 +169,7 @@ namespace azure { namespace storage { namespace protocol {
     int parse_approximate_messages_count(const web::http::http_response& response);
     utility::string_t parse_pop_receipt(const web::http::http_response& response);
     utility::datetime parse_next_visible_time(const web::http::http_response& response);
+    blob_container_public_access_type parse_public_access_type(const utility::string_t& value);
 
     utility::string_t get_header_value(const web::http::http_response& response, const utility::string_t& header);
     utility::string_t get_header_value(const web::http::http_headers& headers, const utility::string_t& header);
@@ -183,6 +184,7 @@ namespace azure { namespace storage { namespace protocol {
     std::chrono::seconds parse_lease_time(const web::http::http_response& response);
     cloud_metadata parse_metadata(const web::http::http_response& response);
     storage_extended_error parse_extended_error(const web::http::http_response& response);
+    blob_container_public_access_type parse_public_access_type(const web::http::http_response& response);
 
     class response_parsers
     {
@@ -198,7 +200,6 @@ namespace azure { namespace storage { namespace protocol {
     public:
         static blob_type parse_blob_type(const utility::string_t& value);
         static utility::size64_t parse_blob_size(const web::http::http_response& response);
-        static blob_container_public_access_type parse_public_access_type(const web::http::http_response& response);
 
         static cloud_blob_container_properties parse_blob_container_properties(const web::http::http_response& response);
         static cloud_blob_properties parse_blob_properties(const web::http::http_response& response);

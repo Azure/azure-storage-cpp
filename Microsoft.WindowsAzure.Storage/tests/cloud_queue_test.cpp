@@ -777,6 +777,85 @@ SUITE(Queue)
         CHECK(!context.request_results()[0].extended_error().message().empty());
     }
 
+    TEST_FIXTURE(queue_service_test_base, Queue_UpdateAndDelQueuedMessage)
+    {
+        azure::storage::cloud_queue queue = get_queue();
+        utility::string_t content = get_random_string();
+
+        {
+            azure::storage::queue_request_options options;
+            azure::storage::cloud_queue_message message;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
+
+            message.set_content(content);
+
+            queue.add_message(message, std::chrono::seconds(15 * 60), std::chrono::seconds(0), options, context);
+
+            CHECK(!message.id().empty());
+            CHECK(!message.pop_receipt().empty());
+            CHECK(message.insertion_time().is_initialized());
+            CHECK(message.expiration_time().is_initialized());
+            CHECK(message.next_visibile_time().is_initialized());
+
+            utility::string_t old_pop_recepit = message.pop_receipt();
+            utility::datetime old_next_visible_time = message.next_visibile_time();
+            message.set_content(get_random_string());
+            queue.update_message(message, std::chrono::seconds(15 * 60), true, options, context);
+
+            CHECK(old_pop_recepit.compare(message.pop_receipt()) != 0);
+            CHECK(old_next_visible_time != message.next_visibile_time());
+
+            CHECK(!context.client_request_id().empty());
+            CHECK(context.start_time().is_initialized());
+            CHECK(context.end_time().is_initialized());
+            CHECK_EQUAL(2U, context.request_results().size());
+            CHECK(context.request_results()[1].is_response_available());
+            CHECK(context.request_results()[1].start_time().is_initialized());
+            CHECK(context.request_results()[1].end_time().is_initialized());
+            CHECK(context.request_results()[1].target_location() != azure::storage::storage_location::unspecified);
+            CHECK_EQUAL(web::http::status_codes::NoContent, context.request_results()[1].http_status_code());
+            CHECK(!context.request_results()[1].service_request_id().empty());
+            CHECK(context.request_results()[1].request_date().is_initialized());
+            CHECK(context.request_results()[1].content_md5().empty());
+            CHECK(context.request_results()[1].etag().empty());
+            CHECK(context.request_results()[1].extended_error().code().empty());
+            CHECK(context.request_results()[1].extended_error().message().empty());
+            CHECK(context.request_results()[1].extended_error().details().empty());
+        }
+
+        {
+            azure::storage::queue_request_options options;
+            azure::storage::cloud_queue_message message;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
+
+            message.set_content(content);
+
+            queue.add_message(message, std::chrono::seconds(15 * 60), std::chrono::seconds(0), options, context);
+            queue.delete_message(message, options, context);
+
+            CHECK(!context.client_request_id().empty());
+            CHECK(context.start_time().is_initialized());
+            CHECK(context.end_time().is_initialized());
+            CHECK_EQUAL(2U, context.request_results().size());
+            CHECK(context.request_results()[1].is_response_available());
+            CHECK(context.request_results()[1].start_time().is_initialized());
+            CHECK(context.request_results()[1].end_time().is_initialized());
+            CHECK(context.request_results()[1].target_location() != azure::storage::storage_location::unspecified);
+            CHECK_EQUAL(web::http::status_codes::NoContent, context.request_results()[1].http_status_code());
+            CHECK(!context.request_results()[1].service_request_id().empty());
+            CHECK(context.request_results()[1].request_date().is_initialized());
+            CHECK(context.request_results()[1].content_md5().empty());
+            CHECK(context.request_results()[1].etag().empty());
+            CHECK(context.request_results()[1].extended_error().code().empty());
+            CHECK(context.request_results()[1].extended_error().message().empty());
+            CHECK(context.request_results()[1].extended_error().details().empty());
+        }
+
+        queue.delete_queue();
+    }
+
     TEST_FIXTURE(queue_service_test_base, Queue_Messages)
     {
         azure::storage::cloud_queue queue = get_queue();

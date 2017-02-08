@@ -2103,7 +2103,8 @@ namespace azure { namespace storage {
         /// </summary>
         cloud_blob_container_properties()
             : m_lease_status(azure::storage::lease_status::unspecified), m_lease_state(azure::storage::lease_state::unspecified),
-            m_lease_duration(azure::storage::lease_duration::unspecified)
+            m_lease_duration(azure::storage::lease_duration::unspecified),
+            m_public_access(azure::storage::blob_container_public_access_type::off)
         {
         }
 
@@ -2134,6 +2135,7 @@ namespace azure { namespace storage {
                 m_lease_status = std::move(other.m_lease_status);
                 m_lease_state = std::move(other.m_lease_state);
                 m_lease_duration = std::move(other.m_lease_duration);
+                m_public_access = std::move(other.m_public_access);
             }
             return *this;
         }
@@ -2184,6 +2186,15 @@ namespace azure { namespace storage {
             return m_lease_duration;
         }
 
+        /// <summary>
+        /// Gets the public access setting for the container.
+        /// </summary>
+        /// <returns>The public access setting for the container.</returns>
+        azure::storage::blob_container_public_access_type public_access() const
+        {
+            return m_public_access;
+        }
+
     private:
 
         /// <summary>
@@ -2201,6 +2212,7 @@ namespace azure { namespace storage {
         azure::storage::lease_status m_lease_status;
         azure::storage::lease_state m_lease_state;
         azure::storage::lease_duration m_lease_duration;
+        azure::storage::blob_container_public_access_type m_public_access;
 
         void update_etag_and_last_modified(const cloud_blob_container_properties& parsed_properties);
 

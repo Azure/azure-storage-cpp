@@ -101,6 +101,11 @@ namespace azure { namespace storage { namespace protocol {
                 m_properties.m_lease_duration = parse_lease_duration(get_current_element_text());
                 return;
             }
+
+            if (element_name == xml_public_access)
+            {
+                m_properties.m_public_access = parse_public_access_type(get_current_element_text());
+            }
         }
 
         if (element_name == xml_name)

@@ -328,4 +328,25 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
+    blob_container_public_access_type parse_public_access_type(const utility::string_t& value)
+    {
+        if (value == resource_blob)
+        {
+            return blob_container_public_access_type::blob;
+        }
+        else if (value == resource_container)
+        {
+            return blob_container_public_access_type::container;
+        }
+        else
+        {
+            return blob_container_public_access_type::off;
+        }
+    }
+    
+    blob_container_public_access_type parse_public_access_type(const web::http::http_response& response)
+    {
+        return parse_public_access_type(get_header_value(response.headers(), ms_header_blob_public_access));
+    }
+
 }}} // namespace azure::storage::protocol

@@ -79,4 +79,9 @@ public:
     static std::vector<uint8_t> get_random_binary_data();
     static utility::uuid get_random_guid();
     static utility::string_t get_object_name(const utility::string_t& object_type_name);
+    template <typename TEnum> static TEnum get_random_enum(TEnum max_enum_value)
+    {
+        initialize_random();
+        return static_cast<TEnum>(rand() % (static_cast<int>(max_enum_value)+1));
+    }
 };

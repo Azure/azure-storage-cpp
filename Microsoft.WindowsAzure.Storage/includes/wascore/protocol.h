@@ -118,7 +118,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request get_file_share_stats(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request list_files_and_directories(int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_files_and_directories(const utility::string_t& prefix, int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request create_file_directory(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request delete_file_directory(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_directory_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);

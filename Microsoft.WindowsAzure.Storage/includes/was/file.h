@@ -1703,14 +1703,36 @@ namespace azure { namespace storage {
         /// <summary>
         /// Returns an <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items.
         /// </summary>
+        /// <param name="prefix">The file/directory name prefix.</param>
+        /// <returns>An <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items in the the directory.</returns>
+        list_file_and_diretory_result_iterator list_files_and_directories(const utility::string_t& prefix) const
+        {
+            return list_files_and_directories(prefix, 0);
+        }
+
+        /// <summary>
+        /// Returns an <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items.
+        /// </summary>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
         /// If this value is zero, the maximum possible number of results will be returned.</param>
         /// <returns>An <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items in the the directory.</returns>
         list_file_and_diretory_result_iterator list_files_and_directories(int64_t max_results) const
         {
-            return list_files_and_directories(max_results, file_request_options(), operation_context());
+            return list_files_and_directories(utility::string_t(), max_results);
         }
-        
+
+        /// <summary>
+        /// Returns an <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items.
+        /// </summary>
+        /// <param name="prefix">The file/directory name prefix.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <returns>An <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items in the the directory.</returns>
+        list_file_and_diretory_result_iterator list_files_and_directories(const utility::string_t& prefix, int64_t max_results) const
+        {
+            return list_files_and_directories(prefix, max_results, file_request_options(), operation_context());
+        }
+
         /// <summary>
         /// Returns an <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items.
         /// </summary>
@@ -1719,7 +1741,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>An <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items in the the directory.</returns>
-        WASTORAGE_API list_file_and_diretory_result_iterator list_files_and_directories(int64_t max_results, const file_request_options& options, operation_context context) const;
+        list_file_and_diretory_result_iterator list_files_and_directories(int64_t max_results, const file_request_options& options, operation_context context) const
+        {
+            return list_files_and_directories(utility::string_t(), max_results, options, context);
+        }
+        
+        /// <summary>
+        /// Returns an <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items.
+        /// </summary>
+        /// <param name="prefix">The file/directory name prefix.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// If this value is zero, the maximum possible number of results will be returned.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>An <see cref="azure::storage::list_file_and_diretory_result_iterator" /> that can be used to to lazily enumerate a collection of file or directory items in the the directory.</returns>
+        WASTORAGE_API list_file_and_diretory_result_iterator list_files_and_directories(const utility::string_t& prefix, int64_t max_results, const file_request_options& options, operation_context context) const;
         
         /// <summary>
         /// Returns a result segment <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items.
@@ -1729,6 +1765,17 @@ namespace azure { namespace storage {
         list_file_and_directory_result_segment list_files_and_directories_segmented(const continuation_token& token) const
         {
             return list_files_and_directories_segmented_async(token).get();
+        }
+
+        /// <summary>
+        /// Returns a result segment <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items.
+        /// </summary>
+        /// <param name="prefix">The file/directory name prefix.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <returns>An <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items in the the directory.</returns>
+        list_file_and_directory_result_segment list_files_and_directories_segmented(const utility::string_t& prefix, const continuation_token& token) const
+        {
+            return list_files_and_directories_segmented_async(prefix, token).get();
         }
 
         /// <summary>
@@ -1745,6 +1792,20 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Returns a result segment <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items.
+        /// </summary>
+        /// <param name="prefix">The file/directory name prefix.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>An <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items in the the directory.</returns>
+        list_file_and_directory_result_segment list_files_and_directories_segmented(const utility::string_t& prefix, int64_t max_results, const continuation_token& token, const file_request_options& options, operation_context context) const
+        {
+            return list_files_and_directories_segmented_async(prefix, max_results, token, options, context).get();
+        }
+
+        /// <summary>
         /// Intitiates an asynchronous operation to return a result segment <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
@@ -1757,12 +1818,37 @@ namespace azure { namespace storage {
         /// <summary>
         /// Intitiates an asynchronous operation to return a result segment <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items.
         /// </summary>
+        /// <param name="prefix">The file/directory name prefix.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_file_and_directory_result_segment" /> that represents the current operation.</returns>
+        pplx::task<list_file_and_directory_result_segment> list_files_and_directories_segmented_async(const utility::string_t& prefix, const continuation_token& token) const
+        {
+            return list_files_and_directories_segmented_async(prefix, 0, token, file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to return a result segment <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items.
+        /// </summary>
         /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
         /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_file_and_directory_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<list_file_and_directory_result_segment> list_files_and_directories_segmented_async(int64_t max_results, const continuation_token& token, const file_request_options& options, operation_context context) const;
+        pplx::task<list_file_and_directory_result_segment> list_files_and_directories_segmented_async(int64_t max_results, const continuation_token& token, const file_request_options& options, operation_context context) const
+        {
+            return list_files_and_directories_segmented_async(utility::string_t(), max_results, token, options, context);
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to return a result segment <see cref="azure::storage::list_file_and_directory_result_segment" /> that can be used to to lazily enumerate a collection of file or directory items.
+        /// </summary>
+        /// <param name="prefix">The file/directory name prefix.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned.
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_file_and_directory_result_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<list_file_and_directory_result_segment> list_files_and_directories_segmented_async(const utility::string_t& prefix, int64_t max_results, const continuation_token& token, const file_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Creates the directory.

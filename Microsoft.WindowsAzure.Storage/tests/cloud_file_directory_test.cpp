@@ -294,6 +294,72 @@ SUITE(File)
         CHECK(files_one.empty());
     }
 
+    TEST_FIXTURE(file_directory_test_base, directory_list_files_and_directories_with_prefix)
+    {
+        m_directory.create_if_not_exists(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+
+        auto prefix = _XPLATSTR("t") + get_random_string(3);
+        auto dir_prefix = prefix + _XPLATSTR("dir");
+        auto file_prefix = prefix + _XPLATSTR("file");
+        auto exclude_prefix = _XPLATSTR("exclude");
+
+        std::vector<azure::storage::cloud_file_directory> directories;
+        std::vector<azure::storage::cloud_file> files;
+        for (int i = 0; i < get_random_int32() % 3 + 1; ++i)
+        {
+            auto subdirectory = m_directory.get_subdirectory_reference(dir_prefix + utility::conversions::print_string(i));
+            subdirectory.create();
+            directories.push_back(subdirectory);
+
+            auto file = m_directory.get_file_reference(file_prefix + utility::conversions::print_string(i));
+            file.create(1);
+            files.push_back(file);
+
+            m_directory.get_subdirectory_reference(exclude_prefix + utility::conversions::print_string(i)).create();
+        }
+
+        int num_items_expected = directories.size() + files.size();
+        int num_items_actual = 0;
+        for (auto&& item : m_directory.list_files_and_directories(prefix))
+        {
+            ++num_items_actual;
+            if (item.is_directory())
+            {
+                auto actual = item.as_directory();
+                CHECK(actual.get_parent_share_reference().is_valid());
+                check_equal(m_share, actual.get_parent_share_reference());
+                
+                directories.erase(std::remove_if(directories.begin(), directories.end(), [&actual, this](const azure::storage::cloud_file_directory& expect) {
+                    bool is_name_matched = actual.name() == expect.name();
+                    if (is_name_matched)
+                    {
+                        check_equal(expect, actual);
+                    }
+                    return is_name_matched;
+                }), directories.end());
+            }
+            else if (item.is_file())
+            {
+                auto actual = item.as_file();
+                CHECK(actual.get_parent_share_reference().is_valid());
+                check_equal(m_share, actual.get_parent_share_reference());
+
+                files.erase(std::remove_if(files.begin(), files.end(), [&actual, this](const azure::storage::cloud_file& expect) {
+                    bool is_name_matched = actual.name() == expect.name();
+                    if (is_name_matched)
+                    {
+                        check_equal(expect, actual);
+                    }
+                    return is_name_matched;
+                }), files.end());
+            }
+        }
+
+        CHECK_EQUAL(num_items_expected, num_items_actual);
+        CHECK(directories.empty());
+        CHECK(files.empty());
+    }
+
     TEST_FIXTURE(file_directory_test_base, directory_get_directory_ref)
     {
         m_directory.create_if_not_exists(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);

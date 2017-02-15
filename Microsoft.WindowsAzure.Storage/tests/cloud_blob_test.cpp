@@ -826,4 +826,17 @@ SUITE(Blob)
         check_parallelism(context, 1);
         CHECK(blob.properties().size() == target_length);
     }
+
+    TEST_FIXTURE(blob_test_base, read_blob_with_invalid_if_none_match)
+    {
+        auto blob_name = get_random_string(20);
+        auto blob = m_container.get_block_blob_reference(blob_name);
+        blob.upload_text(_XPLATSTR("test"));
+
+        azure::storage::operation_context context;
+        azure::storage::access_condition condition;
+        condition.set_if_none_match_etag(_XPLATSTR("*"));
+        CHECK_THROW(blob.download_text(condition, azure::storage::blob_request_options(), context), azure::storage::storage_exception);
+        CHECK_EQUAL(web::http::status_codes::BadRequest, context.request_results().back().http_status_code());
+    }
 }

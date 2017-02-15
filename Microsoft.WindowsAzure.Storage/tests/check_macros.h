@@ -42,3 +42,13 @@
             } \
         } \
    } while(0)
+
+#define CHECK_NOTHROW(expression) \
+    do \
+    { \
+        bool exception_thrown = false; \
+        try { expression; } \
+        catch (...) { exception_thrown = true; } \
+        if (exception_thrown) \
+            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), "Expected no exception thrown: \"" #expression "\"."); \
+    } while(0)

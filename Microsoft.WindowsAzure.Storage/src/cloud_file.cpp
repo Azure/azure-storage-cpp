@@ -483,7 +483,7 @@ namespace azure { namespace storage {
                 download_info->m_total_written_to_destination_stream = total_written_to_destination_stream;
             }
 
-            return true;
+            return target.is_open();
         });
         command->set_preprocess_response([weak_command, offset, modified_options, properties, metadata, copy_state, download_info, update_properties, validate_last_modify](const web::http::http_response& response, const request_result& result, operation_context context)
         {

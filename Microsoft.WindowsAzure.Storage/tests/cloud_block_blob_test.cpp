@@ -20,7 +20,9 @@
 #include "check_macros.h"
 
 #include "cpprest/producerconsumerstream.h"
+#include "cpprest/rawptrstream.h"
 #include "wascore/constants.h"
+#include "wascore/util.h"
 
 #pragma region Fixture
 
@@ -67,6 +69,65 @@ void block_blob_test_base::check_block_list_equal(const std::vector<azure::stora
         }
     }
 }
+
+static std::string INTENDED_ERR_MSG = "Intended exception from currupted_ostreambuf.";
+
+template<typename _CharType>
+class currupted_ostreambuf : public Concurrency::streams::details::basic_rawptr_buffer<_CharType>
+{
+public:
+    currupted_ostreambuf(bool keep_writable, int recover_on_nretries)
+        : Concurrency::streams::details::basic_rawptr_buffer<_CharType>(), m_keepwritable(keep_writable), m_recover_on_nretries(recover_on_nretries)
+    { }
+
+    pplx::task<size_t> _putn(const _CharType* ptr, size_t count) override
+    {
+        UNREFERENCED_PARAMETER(ptr);
+        try
+        {
+            ++m_call_count;
+            if (m_call_count < m_recover_on_nretries + 1)
+            {
+                throw azure::storage::storage_exception(INTENDED_ERR_MSG);
+            }
+            return pplx::task_from_result(count);
+        }
+        catch (...)
+        {
+            return pplx::task_from_exception<size_t>(std::current_exception());
+        }
+    }
+
+    bool can_write() const override
+    {
+        return m_keepwritable
+            ? true
+            : Concurrency::streams::details::basic_rawptr_buffer<_CharType>::can_write();
+    }
+
+    int call_count() const
+    {
+        return m_call_count;
+    }
+
+private:
+    int m_call_count = 0;
+    int m_recover_on_nretries = 0;
+    bool m_keepwritable = false;
+};
+
+template <typename _CharType>
+class currupted_stream
+{
+public:
+    typedef _CharType char_type;
+    typedef currupted_ostreambuf<_CharType> buffer_type;
+
+    static concurrency::streams::basic_ostream<char_type> open_ostream(bool keep_writable, int recover_on_nretries)
+    {
+        return concurrency::streams::basic_ostream<char_type>(concurrency::streams::streambuf<char_type>(std::make_shared<buffer_type>(keep_writable, recover_on_nretries)));
+    }
+};
 
 #pragma endregion
 
@@ -715,5 +776,46 @@ SUITE(Blob)
         options.set_stream_write_size_in_bytes(6 * 1024 * 1024);
         m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
         CHECK_EQUAL(9U, m_context.request_results().size()); // PutBlock * 2 + PutBlockList
+    }
+
+    // Validate retry of download_range_to_stream_async.
+    TEST_FIXTURE(block_blob_test_base, block_blob_retry)
+    {
+        std::vector<uint8_t> buffer;
+        buffer.resize(1024);
+
+        azure::storage::blob_request_options options;
+        // attempt to retry one more time by default
+        options.set_retry_policy(azure::storage::linear_retry_policy(std::chrono::seconds(1), 1));
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
+
+        Concurrency::streams::basic_ostream<uint8_t> target;
+        pplx::task<void> task;
+
+        // Validate no retry when stream is closed by Casablanca.
+        {
+            std::exception actual;
+            target = currupted_stream<uint8_t>::open_ostream(false, 1);
+            task = m_blob.download_range_to_stream_async(target, 0, 100, azure::storage::access_condition(), options, azure::storage::operation_context());
+            CHECK_STORAGE_EXCEPTION(task.get(), INTENDED_ERR_MSG);
+            CHECK_EQUAL(1, static_cast<const currupted_ostreambuf<uint8_t>*>(target.streambuf().get_base().get())->call_count());
+        }
+
+        // Validate exception will be propagated correctly even retry failed.
+        {
+            std::exception actual;
+            target = currupted_stream<uint8_t>::open_ostream(true, 2);
+            task = m_blob.download_range_to_stream_async(target, 0, 100, azure::storage::access_condition(), options, azure::storage::operation_context());
+            CHECK_STORAGE_EXCEPTION(task.get(), INTENDED_ERR_MSG);
+            CHECK_EQUAL(2, static_cast<const currupted_ostreambuf<uint8_t>*>(target.streambuf().get_base().get())->call_count());
+        }
+
+        // Validate no exception thrown when retry success.
+        {
+            target = currupted_stream<uint8_t>::open_ostream(true, 1);
+            task = m_blob.download_range_to_stream_async(target, 0, 100, azure::storage::access_condition(), options, azure::storage::operation_context());
+            CHECK_NOTHROW(task.get());
+            CHECK_EQUAL(2, static_cast<const currupted_ostreambuf<uint8_t>*>(target.streambuf().get_base().get())->call_count());
+        }
     }
 }

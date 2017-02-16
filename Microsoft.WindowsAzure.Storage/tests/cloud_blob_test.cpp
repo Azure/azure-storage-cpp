@@ -288,42 +288,55 @@ SUITE(Blob)
         CHECK(blob.properties().content_type().empty());
         CHECK(azure::storage::lease_status::unspecified == blob.properties().lease_status());
 
-        auto same_blob = m_container.get_page_blob_reference(blob.name());
-        same_blob.download_attributes(azure::storage::access_condition(), options, m_context);
-        CHECK_EQUAL(1024, same_blob.properties().size());
-        CHECK_UTF8_EQUAL(blob.properties().etag(), same_blob.properties().etag());
-        CHECK(blob.properties().last_modified() == same_blob.properties().last_modified());
-        CHECK(same_blob.properties().cache_control().empty());
-        CHECK(same_blob.properties().content_disposition().empty());
-        CHECK(same_blob.properties().content_encoding().empty());
-        CHECK(same_blob.properties().content_language().empty());
-        CHECK(same_blob.properties().content_md5().empty());
-        CHECK_UTF8_EQUAL(_XPLATSTR("application/octet-stream"), same_blob.properties().content_type());
-        CHECK(azure::storage::lease_status::unlocked == same_blob.properties().lease_status());
-        CHECK(blob.properties().server_encrypted() == same_blob.properties().server_encrypted());
+        {
+            auto same_blob = m_container.get_page_blob_reference(blob.name());
+            same_blob.download_attributes(azure::storage::access_condition(), options, m_context);
+            CHECK_EQUAL(1024, same_blob.properties().size());
+            CHECK_UTF8_EQUAL(blob.properties().etag(), same_blob.properties().etag());
+            CHECK(blob.properties().last_modified() == same_blob.properties().last_modified());
+            CHECK(same_blob.properties().cache_control().empty());
+            CHECK(same_blob.properties().content_disposition().empty());
+            CHECK(same_blob.properties().content_encoding().empty());
+            CHECK(same_blob.properties().content_language().empty());
+            CHECK(same_blob.properties().content_md5().empty());
+            CHECK_UTF8_EQUAL(_XPLATSTR("application/octet-stream"), same_blob.properties().content_type());
+            CHECK(azure::storage::lease_status::unlocked == same_blob.properties().lease_status());
+            CHECK(blob.properties().server_encrypted() == same_blob.properties().server_encrypted());
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        blob.properties().set_cache_control(_XPLATSTR("no-transform"));
-        blob.properties().set_content_disposition(_XPLATSTR("attachment"));
-        blob.properties().set_content_encoding(_XPLATSTR("gzip"));
-        blob.properties().set_content_language(_XPLATSTR("tr,en"));
-        blob.properties().set_content_md5(dummy_md5);
-        blob.properties().set_content_type(_XPLATSTR("text/html"));
-        blob.upload_properties(azure::storage::access_condition(), options, m_context);
-        CHECK(blob.properties().etag() != same_blob.properties().etag());
-        CHECK(blob.properties().last_modified().to_interval() > same_blob.properties().last_modified().to_interval());
+            blob.properties().set_cache_control(_XPLATSTR("no-transform"));
+            blob.properties().set_content_disposition(_XPLATSTR("attachment"));
+            blob.properties().set_content_encoding(_XPLATSTR("gzip"));
+            blob.properties().set_content_language(_XPLATSTR("tr,en"));
+            blob.properties().set_content_md5(dummy_md5);
+            blob.properties().set_content_type(_XPLATSTR("text/html"));
+            blob.upload_properties(azure::storage::access_condition(), options, m_context);
+            CHECK(blob.properties().etag() != same_blob.properties().etag());
+            CHECK(blob.properties().last_modified().to_interval() > same_blob.properties().last_modified().to_interval());
 
-        same_blob.download_attributes(azure::storage::access_condition(), options, m_context);
-        check_blob_properties_equal(blob.properties(), same_blob.properties());
+            same_blob.download_attributes(azure::storage::access_condition(), options, m_context);
+            check_blob_properties_equal(blob.properties(), same_blob.properties());
+        }
 
-        auto still_same_blob = m_container.get_page_blob_reference(blob.name());
-        auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
-        still_same_blob.download_to_stream(stream, azure::storage::access_condition(), options, m_context);
-        check_blob_properties_equal(blob.properties(), still_same_blob.properties());
+        {
+            auto same_blob = m_container.get_page_blob_reference(blob.name());
+            auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
+            same_blob.download_to_stream(stream, azure::storage::access_condition(), options, m_context);
+            check_blob_properties_equal(blob.properties(), same_blob.properties());
+        }
 
-        auto listing = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, options);
-        check_blob_properties_equal(blob.properties(), listing.front().properties());
+        {
+            auto same_blob = m_container.get_page_blob_reference(blob.name());
+            auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
+            same_blob.download_range_to_stream(stream, 0, 128);
+            check_blob_properties_equal(blob.properties(), same_blob.properties());
+        }
+        
+        {
+            auto listing = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, options);
+            check_blob_properties_equal(blob.properties(), listing.front().properties());
+        }
     }
 
     TEST_FIXTURE(blob_test_base, blob_type)

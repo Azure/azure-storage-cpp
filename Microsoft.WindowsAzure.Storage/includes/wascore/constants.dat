@@ -171,6 +171,7 @@ DAT(ms_header_approximate_messages_count, _XPLATSTR("x-ms-approximate-messages-c
 DAT(ms_header_pop_receipt, _XPLATSTR("x-ms-popreceipt"))
 DAT(ms_header_time_next_visible, _XPLATSTR("x-ms-time-next-visible"))
 DAT(ms_header_share_quota, _XPLATSTR("x-ms-share-quota"))
+DAT(ms_header_content_md5, _XPLATSTR("x-ms-content-md5"))
 
 // header values
 DAT(header_value_storage_version, _XPLATSTR("2016-05-31"))

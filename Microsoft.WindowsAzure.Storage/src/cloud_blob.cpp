@@ -160,7 +160,7 @@ namespace azure { namespace storage {
         command->set_preprocess_response([properties, metadata, copy_state] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
-            properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), false);
+            properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response));
             *metadata = protocol::parse_metadata(response);
             *copy_state = protocol::response_parsers::parse_copy_state(response);
         });
@@ -505,7 +505,7 @@ namespace azure { namespace storage {
             {
                 if (update_properties == true)
                 {
-                    properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), offset != std::numeric_limits<utility::size64_t>::max());
+                    properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response));
                     *metadata = protocol::parse_metadata(response);
                     *copy_state = protocol::response_parsers::parse_copy_state(response);
                 }
@@ -756,7 +756,7 @@ namespace azure { namespace storage {
             }
 
             protocol::preprocess_response_void(response, result, context);
-            properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response), false);
+            properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response));
             *metadata = protocol::parse_metadata(response);
             *copy_state = protocol::response_parsers::parse_copy_state(response);
             return true;

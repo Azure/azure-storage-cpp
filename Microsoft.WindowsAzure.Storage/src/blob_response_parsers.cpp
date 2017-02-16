@@ -90,9 +90,13 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_content_disposition = get_header_value(headers, header_content_disposition);
         properties.m_content_encoding = get_header_value(headers, web::http::header_names::content_encoding);
         properties.m_content_language = get_header_value(headers, web::http::header_names::content_language);
-        properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
         properties.m_content_type = get_header_value(headers, web::http::header_names::content_type);
         properties.m_type = parse_blob_type(get_header_value(headers, ms_header_blob_type));
+        properties.m_content_md5 = get_header_value(headers, ms_header_blob_content_md5);
+        if (properties.m_content_md5.empty())
+        {
+            properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
+        }
 
         properties.m_server_encrypted = (get_header_value(headers, ms_header_server_encrypted) == _XPLATSTR("true"));
 

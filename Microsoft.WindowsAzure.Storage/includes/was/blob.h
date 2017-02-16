@@ -1356,7 +1356,7 @@ namespace azure { namespace storage {
         void update_size(const cloud_blob_properties& parsed_properties);
         void update_page_blob_sequence_number(const cloud_blob_properties& parsed_properties);
         void update_append_blob_committed_block_count(const cloud_blob_properties& parsed_properties);
-        void update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5);
+        void update_all(const cloud_blob_properties& parsed_properties);
         
         void set_server_encrypted(bool server_encrypted)
         {

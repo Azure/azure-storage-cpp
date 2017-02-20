@@ -525,6 +525,16 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
+    web::http::http_request incremental_copy_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_incrementalcopy, /* do_encoding */ false));
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        request.headers().add(ms_header_copy_source, source.to_string());
+        add_access_condition(request, condition);
+        add_metadata(request, metadata);
+        return request;
+    }
+
     void add_lease_id(web::http::http_request& request, const access_condition& condition)
     {
         add_optional_header(request.headers(), ms_header_lease_id, condition.lease_id());

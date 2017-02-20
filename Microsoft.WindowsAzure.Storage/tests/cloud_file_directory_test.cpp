@@ -329,14 +329,13 @@ SUITE(File)
                 CHECK(actual.get_parent_share_reference().is_valid());
                 check_equal(m_share, actual.get_parent_share_reference());
                 
-                directories.erase(std::remove_if(directories.begin(), directories.end(), [&actual, this](const azure::storage::cloud_file_directory& expect) {
-                    bool is_name_matched = actual.name() == expect.name();
-                    if (is_name_matched)
-                    {
-                        check_equal(expect, actual);
-                    }
-                    return is_name_matched;
-                }), directories.end());
+                auto it_found = std::find_if(directories.begin(), directories.end(), [&actual](const azure::storage::cloud_file_directory& expect)
+                {
+                    return actual.name() == expect.name();
+                });
+                CHECK(it_found != directories.end());
+                check_equal(*it_found, actual);
+                directories.erase(it_found);
             }
             else if (item.is_file())
             {
@@ -344,14 +343,13 @@ SUITE(File)
                 CHECK(actual.get_parent_share_reference().is_valid());
                 check_equal(m_share, actual.get_parent_share_reference());
 
-                files.erase(std::remove_if(files.begin(), files.end(), [&actual, this](const azure::storage::cloud_file& expect) {
-                    bool is_name_matched = actual.name() == expect.name();
-                    if (is_name_matched)
-                    {
-                        check_equal(expect, actual);
-                    }
-                    return is_name_matched;
-                }), files.end());
+                auto it_found = std::find_if(files.begin(), files.end(), [&actual](const azure::storage::cloud_file& expect)
+                {
+                    return actual.name() == expect.name();
+                });
+                CHECK(it_found != files.end());
+                check_equal(*it_found, actual);
+                files.erase(it_found);
             }
         }
 

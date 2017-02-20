@@ -269,4 +269,33 @@ namespace azure { namespace storage {
         });
         return core::executor<std::vector<page_diff_range>>::execute_async(command, modified_options, context);
     }
+
+    pplx::task<utility::string_t> cloud_page_blob::start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        assert_no_snapshot();
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options(), type());
+
+        auto copy_state = m_copy_state;
+
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
+        command->set_build_request(std::bind(protocol::incremental_copy_blob, source, condition, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([copy_state](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        {
+            protocol::preprocess_response_void(response, result, context);
+            auto new_state = protocol::response_parsers::parse_copy_state(response);
+            *copy_state = new_state;
+            return new_state.copy_id();
+        });
+        return core::executor<utility::string_t>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<utility::string_t> cloud_page_blob::start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        web::http::uri raw_source_uri = source.snapshot_qualified_uri().primary_uri();
+        web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
+
+        return start_incremental_copy_async(source_uri, condition, options, context);
+    }
 }} // namespace azure::storage

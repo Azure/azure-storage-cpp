@@ -2781,6 +2781,7 @@ namespace azure { namespace storage {
                 m_total_bytes = std::move(other.m_total_bytes);
                 m_status = std::move(other.m_status);
                 m_source = std::move(other.m_source);
+                m_destination_snapshot_time = std::move(other.m_destination_snapshot_time);
             }
             return *this;
         }
@@ -2850,6 +2851,15 @@ namespace azure { namespace storage {
             return m_status_description;
         }
 
+        /// <summary>
+        /// Gets the incremental destination snapshot time for the latest incremental copy, if the time is available.
+        /// </summary>
+        /// <returns>A <see cref="utility::datetime" /> containing the destination snapshot time for the latest incremental copy.</returns>
+        utility::datetime destination_snapshot_time() const
+        {
+            return m_destination_snapshot_time;
+        }
+
     private:
 
         utility::string_t m_copy_id;
@@ -2859,6 +2869,7 @@ namespace azure { namespace storage {
         int64_t m_total_bytes;
         copy_status m_status;
         web::http::uri m_source;
+        utility::datetime m_destination_snapshot_time;
 
         friend class protocol::response_parsers;
         friend class protocol::list_blobs_reader;

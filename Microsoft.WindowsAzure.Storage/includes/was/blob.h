@@ -1072,7 +1072,8 @@ namespace azure { namespace storage {
             m_lease_state(azure::storage::lease_state::unspecified),
             m_lease_duration(azure::storage::lease_duration::unspecified),
             m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0),
-            m_server_encrypted(false)
+            m_server_encrypted(false),
+            m_is_incremental_copy(false)
         {
         }
 
@@ -1114,6 +1115,7 @@ namespace azure { namespace storage {
                 m_page_blob_sequence_number = std::move(other.m_page_blob_sequence_number);
                 m_append_blob_committed_block_count = std::move(other.m_append_blob_committed_block_count);
                 m_server_encrypted = std::move(other.m_server_encrypted);
+                m_is_incremental_copy = std::move(other.m_is_incremental_copy);
             }
             return *this;
         }
@@ -1317,6 +1319,15 @@ namespace azure { namespace storage {
             return m_server_encrypted;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether or not this blob is an incremental copy.
+        /// </summary>
+        /// <returns><c>true</c> if the blob is an incremental copy; otherwise, <c>false</c>.</returns>
+        bool is_incremental_copy() const
+        {
+            return m_is_incremental_copy;
+        }
+
     private:
 
         /// <summary>
@@ -1350,6 +1361,7 @@ namespace azure { namespace storage {
         int64_t m_page_blob_sequence_number;
         int m_append_blob_committed_block_count;
         bool m_server_encrypted;
+        bool m_is_incremental_copy;
 
         void copy_from_root(const cloud_blob_properties& root_blob_properties);
         void update_etag_and_last_modified(const cloud_blob_properties& parsed_properties);
@@ -6311,6 +6323,124 @@ namespace azure { namespace storage {
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const cloud_page_blob& source)
+        {
+            return start_incremental_copy_async(source).get();
+        }
+
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const web::http::uri& source)
+        {
+            return start_incremental_copy_async(source).get();
+        }
+
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return start_incremental_copy_async(source, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return start_incremental_copy_async(source, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source)
+        {
+            return start_incremental_copy_async(source, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source)
+        {
+            return start_incremental_copy_async(source, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context);
 
     private:
 

@@ -58,6 +58,18 @@ test_config::test_config()
     }
 }
 
+utility::datetime test_base::parse_datetime(const utility::string_t& value, utility::datetime::date_format format)
+{
+    if (!value.empty())
+    {
+        return utility::datetime::from_string(value, format);
+    }
+    else
+    {
+        return utility::datetime();
+    }
+}
+
 void test_base::print_client_request_id(const azure::storage::operation_context& context, const utility::string_t& purpose)
 {
     std::string suite_name(UnitTest::CurrentTest::Details()->suiteName);

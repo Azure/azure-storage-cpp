@@ -329,7 +329,9 @@ SUITE(Blob)
         {
             auto same_blob = m_container.get_page_blob_reference(blob.name());
             auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
-            same_blob.download_range_to_stream(stream, 0, 128);
+            azure::storage::blob_request_options options;
+            options.set_use_transactional_md5(true);
+            same_blob.download_range_to_stream(stream, 0, 128, azure::storage::access_condition(), options, azure::storage::operation_context());
             check_blob_properties_equal(blob.properties(), same_blob.properties());
         }
         

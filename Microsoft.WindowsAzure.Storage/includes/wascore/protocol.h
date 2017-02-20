@@ -67,6 +67,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request delete_blob(delete_snapshots_option snapshots_option, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request incremental_copy_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     void add_lease_id(web::http::http_request& request, const access_condition& condition);
     void add_sequence_number_condition(web::http::http_request& request, const access_condition& condition);
     void add_access_condition(web::http::http_request& request, const access_condition& condition);
@@ -190,9 +191,10 @@ namespace azure { namespace storage { namespace protocol {
     {
     public:
         static copy_state parse_copy_state(const web::http::http_response& response);
-        static utility::datetime parse_copy_completion_time(const utility::string_t& value);
         static bool parse_copy_progress(const utility::string_t& value, int64_t& bytes_copied, int64_t& bytes_total);
         static copy_status parse_copy_status(const utility::string_t& value);
+        static bool parse_boolean(const utility::string_t& value);
+        static utility::datetime parse_datetime(const utility::string_t& value, utility::datetime::date_format format = utility::datetime::date_format::RFC_1123);
     };
 
     class blob_response_parsers

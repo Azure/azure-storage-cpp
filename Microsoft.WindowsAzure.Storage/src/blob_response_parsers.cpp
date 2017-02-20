@@ -98,7 +98,8 @@ namespace azure { namespace storage { namespace protocol {
             properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
         }
 
-        properties.m_server_encrypted = (get_header_value(headers, ms_header_server_encrypted) == _XPLATSTR("true"));
+        properties.m_server_encrypted = response_parsers::parse_boolean(get_header_value(headers, ms_header_server_encrypted));
+        properties.m_is_incremental_copy = response_parsers::parse_boolean(get_header_value(headers, ms_header_incremental_copy));
 
         return properties;
     }

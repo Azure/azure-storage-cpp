@@ -583,4 +583,137 @@ SUITE(Blob)
             CHECK(2047 == diff[0].end_offset());
         }
     }
+
+    TEST_FIXTURE(page_blob_test_base, page_blob_incremental_copy)
+    {
+        // get sas token for test
+        azure::storage::blob_shared_access_policy policy;
+        policy.set_permissions(azure::storage::blob_shared_access_policy::permissions::read);
+        policy.set_start(utility::datetime::utc_now() - utility::datetime::from_minutes(5));
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        auto sas_token = m_container.get_shared_access_signature(policy);
+
+        // prepare data
+        m_blob.metadata()[_XPLATSTR("key1")] = _XPLATSTR("value1");
+        m_blob.create(2048);
+        azure::storage::cloud_page_blob source_snapshot;
+        auto inc_copy = m_container.get_page_blob_reference(m_blob.name() + _XPLATSTR("_copy"));
+
+        // Scenario: incremental copy to create destination page blob
+        {
+            // perform actions
+            source_snapshot = m_blob.create_snapshot();
+            auto source_uri = azure::storage::storage_credentials(sas_token).transform_uri(source_snapshot.snapshot_qualified_uri().primary_uri());
+            auto copy_id = inc_copy.start_incremental_copy(source_uri);
+            auto inc_copy_ref = m_container.get_page_blob_reference(inc_copy.name());
+            wait_for_copy(inc_copy_ref);
+
+            // verify copy id is valid but abort copy operation is invalid.
+            azure::storage::operation_context context;
+            CHECK_THROW(inc_copy.abort_copy(copy_id, azure::storage::access_condition(), azure::storage::blob_request_options(), context), azure::storage::storage_exception);
+            CHECK_EQUAL(1u, context.request_results().size());
+            CHECK_EQUAL(web::http::status_codes::Conflict, context.request_results().back().http_status_code());
+
+            // verify incremental copy related properties and metadata.
+            CHECK_EQUAL(true, inc_copy_ref.properties().is_incremental_copy());
+            CHECK(inc_copy_ref.copy_state().destination_snapshot_time().is_initialized());
+            CHECK_EQUAL(1u, inc_copy_ref.metadata().size());
+            CHECK_UTF8_EQUAL(_XPLATSTR("value1"), inc_copy_ref.metadata()[_XPLATSTR("key1")]);
+
+            // verify destination blob properties retrieved with list blobs and snapshots of destination blobs
+            auto iter = m_container.list_blobs(inc_copy_ref.name(), true, azure::storage::blob_listing_details::snapshots, 10, azure::storage::blob_request_options(), azure::storage::operation_context());
+            auto dest_blobs = transform_if<azure::storage::list_blob_item_iterator, azure::storage::cloud_blob>(iter,
+                [](const azure::storage::list_blob_item& item)->bool { return item.is_blob(); },
+                [](const azure::storage::list_blob_item& item)->azure::storage::cloud_blob { return item.as_blob(); });
+            CHECK_EQUAL(2u, dest_blobs.size());
+
+            auto dest_blob_it = std::find_if(dest_blobs.cbegin(), dest_blobs.cend(), [](const azure::storage::cloud_blob& blob)->bool { return blob.snapshot_time().empty(); });
+            CHECK(dest_blob_it != dest_blobs.end());
+            CHECK_EQUAL(true, dest_blob_it->properties().is_incremental_copy());
+            CHECK(dest_blob_it->copy_state().destination_snapshot_time().is_initialized());
+
+            auto dest_snapshot_it = std::find_if(dest_blobs.begin(), dest_blobs.end(), [](const azure::storage::cloud_blob& blob)->bool { return !blob.snapshot_time().empty(); });
+            CHECK(dest_snapshot_it != dest_blobs.end());
+            CHECK_EQUAL(true, dest_snapshot_it->properties().is_incremental_copy());
+            CHECK(dest_snapshot_it->copy_state().destination_snapshot_time().is_initialized());
+            CHECK(dest_blob_it->copy_state().destination_snapshot_time() == parse_datetime(dest_snapshot_it->snapshot_time(), utility::datetime::date_format::ISO_8601));
+
+            // verify readability of destination snapshot
+            concurrency::streams::container_buffer<std::vector<uint8_t>> buff;
+            CHECK_NOTHROW(dest_snapshot_it->download_to_stream(buff.create_ostream()));
+        }
+
+        // Scenario: incremental copy new snapshot to destination blob
+        {
+            // make some changes on source
+            utility::string_t content(2048, _XPLATSTR('A'));
+            auto utf8_body = utility::conversions::to_utf8string(content);
+            auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
+            m_blob.upload_pages(stream, 0, _XPLATSTR(""));
+
+            // create new snapshot of source and incremental copy once again.
+            source_snapshot = m_blob.create_snapshot();
+            auto source_uri = azure::storage::storage_credentials(sas_token).transform_uri(source_snapshot.snapshot_qualified_uri().primary_uri());
+            inc_copy.start_incremental_copy(source_uri);
+            auto inc_copy_ref = m_container.get_page_blob_reference(inc_copy.name());
+            wait_for_copy(inc_copy_ref);
+
+            // verify incremental copy related properties and metadata.
+            CHECK_EQUAL(true, inc_copy_ref.properties().is_incremental_copy());
+            CHECK(inc_copy_ref.copy_state().destination_snapshot_time().is_initialized());
+            CHECK_EQUAL(1u, inc_copy_ref.metadata().size());
+            CHECK_UTF8_EQUAL(_XPLATSTR("value1"), inc_copy_ref.metadata()[_XPLATSTR("key1")]);
+
+            // verify snapshots of destination blobs
+            auto iter = m_container.list_blobs(inc_copy_ref.name(), true, azure::storage::blob_listing_details::snapshots, 10, azure::storage::blob_request_options(), azure::storage::operation_context());
+            auto dest_blobs = transform_if<azure::storage::list_blob_item_iterator, azure::storage::cloud_blob>(iter,
+                [](const azure::storage::list_blob_item& item)->bool { return item.is_blob(); },
+                [](const azure::storage::list_blob_item& item)->azure::storage::cloud_blob { return item.as_blob(); });
+            CHECK_EQUAL(3u, dest_blobs.size());
+            CHECK_EQUAL(2, std::count_if(dest_blobs.begin(), dest_blobs.end(), [](const azure::storage::cloud_blob& b) -> bool { return !b.snapshot_time().empty(); }));
+            std::sort(dest_blobs.begin(), dest_blobs.end(), [](const azure::storage::cloud_blob& l, const azure::storage::cloud_blob& r) -> bool
+            {
+                return parse_datetime(l.snapshot_time(), utility::datetime::date_format::ISO_8601).to_interval() < 
+                    parse_datetime(r.snapshot_time(), utility::datetime::date_format::ISO_8601).to_interval();
+            });
+            CHECK(inc_copy_ref.copy_state().destination_snapshot_time() == parse_datetime(dest_blobs.back().snapshot_time(), utility::datetime::date_format::ISO_8601));
+        }
+
+        // Scenario: delete destination snapshot and perform incremental copy again
+        {
+            // verify the scenario
+            CHECK_NOTHROW(inc_copy.delete_blob(azure::storage::delete_snapshots_option::delete_snapshots_only, azure::storage::access_condition(), azure::storage::blob_request_options(), azure::storage::operation_context()));
+            auto source_uri = azure::storage::storage_credentials(sas_token).transform_uri(source_snapshot.snapshot_qualified_uri().primary_uri());
+            CHECK_NOTHROW(inc_copy.start_incremental_copy(source_uri));
+            auto inc_copy_ref = m_container.get_page_blob_reference(inc_copy.name());
+            wait_for_copy(inc_copy_ref);
+
+            // verify snapshots of destination blob
+            auto iter = m_container.list_blobs(inc_copy_ref.name(), true, azure::storage::blob_listing_details::snapshots, 10, azure::storage::blob_request_options(), azure::storage::operation_context());
+            auto dest_blobs = transform_if<azure::storage::list_blob_item_iterator, azure::storage::cloud_blob>(iter,
+                [](const azure::storage::list_blob_item& item)->bool { return item.is_blob(); },
+                [](const azure::storage::list_blob_item& item)->azure::storage::cloud_blob { return item.as_blob(); });
+            CHECK_EQUAL(2u, dest_blobs.size());
+        }
+
+        // Misc. verifications
+        {
+            azure::storage::operation_context context;
+            
+            // verify incremental copy same snapshot
+            auto source_uri = azure::storage::storage_credentials(sas_token).transform_uri(source_snapshot.snapshot_qualified_uri().primary_uri());
+            CHECK_THROW(inc_copy.start_incremental_copy(source_uri, azure::storage::access_condition(), azure::storage::blob_request_options(), context), azure::storage::storage_exception);
+            CHECK_EQUAL(1u, context.request_results().size());
+            CHECK_EQUAL(web::http::status_codes::Conflict, context.request_results().back().http_status_code());
+
+            // verify readability of destination blob
+            concurrency::streams::container_buffer<std::vector<uint8_t>> buff;
+            CHECK_THROW(inc_copy.download_to_stream(buff.create_ostream(), azure::storage::access_condition(), azure::storage::blob_request_options(), context), azure::storage::storage_exception);
+            CHECK_EQUAL(2u, context.request_results().size());
+            CHECK_EQUAL(web::http::status_codes::Conflict, context.request_results().back().http_status_code());
+
+            // verify deletion of destination blob
+            CHECK_NOTHROW(inc_copy.delete_blob(azure::storage::delete_snapshots_option::include_snapshots, azure::storage::access_condition(), azure::storage::blob_request_options(), context));
+        }
+    }
 }

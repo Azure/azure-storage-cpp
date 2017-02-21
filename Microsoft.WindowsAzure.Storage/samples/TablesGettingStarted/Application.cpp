@@ -18,8 +18,8 @@
 #include "stdafx.h"
 #include "samples_common.h"
 
-#include "was/storage_account.h"
-#include "was/table.h"
+#include <was/storage_account.h>
+#include <was/table.h>
 
 namespace azure { namespace storage { namespace samples {
 

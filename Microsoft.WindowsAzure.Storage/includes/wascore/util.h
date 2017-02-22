@@ -26,6 +26,9 @@
 
 #include "was/core.h"
 
+#pragma push_macro("max")
+#undef max
+
 namespace azure { namespace storage { namespace core {
 
 #pragma region Navigation Helpers
@@ -125,3 +128,5 @@ namespace azure { namespace storage { namespace core {
 #endif
 
 }}} // namespace azure::storage::core
+
+#pragma pop_macro("max")

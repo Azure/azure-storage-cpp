@@ -27,6 +27,9 @@
 #include "wascore/constants.h"
 #include "wascore/resources.h"
 
+#pragma push_macro("max")
+#undef max
+
 namespace azure { namespace storage { namespace core {
 
     class istream_descriptor
@@ -862,3 +865,5 @@ namespace azure { namespace storage { namespace core {
     };
 
 }}} // namespace azure::storage::core
+
+#pragma pop_macro("max")

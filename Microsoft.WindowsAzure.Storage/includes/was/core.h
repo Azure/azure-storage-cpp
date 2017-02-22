@@ -22,6 +22,9 @@
 #include "wascore/basic_types.h"
 #include "wascore/constants.h"
 
+#pragma push_macro("max")
+#undef max
+
 namespace azure { namespace storage {
 
     class operation_context;
@@ -1180,3 +1183,5 @@ namespace azure { namespace storage {
 #ifndef _WIN32
 #define UNREFERENCED_PARAMETER(P) (P)
 #endif
+
+#pragma pop_macro("max")

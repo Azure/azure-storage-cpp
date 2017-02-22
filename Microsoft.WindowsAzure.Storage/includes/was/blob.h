@@ -20,6 +20,9 @@
 #include "limits"
 #include "service_client.h"
 
+#pragma push_macro("max")
+#undef max
+
 namespace azure { namespace storage {
 
     class cloud_blob;
@@ -7295,3 +7298,5 @@ namespace azure { namespace storage {
     };
 
 }} // namespace azure::storage
+
+#pragma pop_macro("max")

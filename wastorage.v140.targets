@@ -1,5 +1,5 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(Force-Enable-wastorage-v140)' == '' And ('$(PlatformToolset)' != 'v140' Or '$(ApplicationType)' != '')">
+  <PropertyGroup Condition="'$(Force-Enable-wastorage-v140)' == '' And (('$(PlatformToolset)' != 'v140' And '$(PlatformToolset)' != 'v141') Or '$(ApplicationType)' != '')">
     <Disable-wastorage-v140>true</Disable-wastorage-v140>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Force-Disable-wastorage-v140)' != ''">

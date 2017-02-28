@@ -316,21 +316,21 @@ DAT(xml_share, _XPLATSTR("Share"))
 DAT(xml_shares, _XPLATSTR("Shares"))
 
 #define STR(x) #x
-#define VER(x) _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows; MSC_VER " STR(x) ")")
+#define VER(x) _XPLATSTR("Azure-Storage/3.0.0 (Native; Windows; MSC_VER " STR(x) ")")
 #if defined(_WIN32)
 #if defined(_MSC_VER)
     #if _MSC_VER >= 1900
         DAT(header_value_user_agent, VER(_MSC_VER))
     #elif _MSC_VER >= 1800
-        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows; MSC_VER 18XX)"))
+        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/3.0.0 (Native; Windows; MSC_VER 18XX)"))
     #else
-        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows; MSC_VER < 1800)"))
+        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/3.0.0 (Native; Windows; MSC_VER < 1800)"))
     #endif
 #else
-    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native; Windows)"))
+    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/3.0.0 (Native; Windows)"))
 #endif
 #else
-    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/2.6.0 (Native)"))
+    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/3.0.0 (Native)"))
 #endif
 
 #endif // _CONSTANTS

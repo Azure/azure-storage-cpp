@@ -4,6 +4,7 @@ History of Breaking Changes
 Breaking Changes in v3.0:
 - Default Rest API version is 2016-05-31.
 - Using If-None-Match: * will now fail when reading a blob.
+- Rename TargetName for Debug configuration from wastorage to wastoraged.
 
 Breaking Changes in v2.5:
 - Upgraded Casablanca dependency to 2.9.1

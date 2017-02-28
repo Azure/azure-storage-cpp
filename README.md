@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (2.6.0)
+# Azure Storage Client Library for C++ (3.0.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -140,7 +140,7 @@ make
 To run the samples:
 ```bash
 cd Binaries
-vi ../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
+vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
 ./samplesblobs            # run the blobs sample
 ./samplesjson             # run the tables sample with JSON payload
 ./samplestables           # run the tables sample

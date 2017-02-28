@@ -17,6 +17,12 @@ Changes in v3.0:
 - Using If-None-Match: * will now fail when reading a blob.
 - Include empty headers when signing request.
 - Fixed the bug that might cause "invalid handle" exception during retry for download to stream APIs.
+- Fixed the issuse that does not work with v141 toolset.
+- Fixed the build issue for MFC/ATL projects caused by macro "max".
+- Changed constant strings' type from * to [].
+- Fixed compile error when _MSC_VER=1810.
+- Use <> instead of "" to include package headers.
+- Rename TargetName for Debug configuration from wastorage to wastoraged.
 
 Changes in v2.6:
 - Supported parallel download for blobs and files

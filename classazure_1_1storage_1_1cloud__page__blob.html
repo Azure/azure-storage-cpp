@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">2.6.0</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -291,6 +291,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac26206c9dcf90d56928ce23386073625"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ac26206c9dcf90d56928ce23386073625">set_sequence_number_async</a> (const <a class="el" href="classazure_1_1storage_1_1sequence__number.html">azure::storage::sequence_number</a> &amp;<a class="el" href="classazure_1_1storage_1_1sequence__number.html">sequence_number</a>, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
 <tr class="memdesc:ac26206c9dcf90d56928ce23386073625"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to set the page blob's sequence number.  <a href="#ac26206c9dcf90d56928ce23386073625">More...</a><br /></td></tr>
 <tr class="separator:ac26206c9dcf90d56928ce23386073625"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3012d81398db0ead5a724fb793d85cb7"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a3012d81398db0ead5a724fb793d85cb7">start_incremental_copy</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;source)</td></tr>
+<tr class="memdesc:a3012d81398db0ead5a724fb793d85cb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#a3012d81398db0ead5a724fb793d85cb7">More...</a><br /></td></tr>
+<tr class="separator:a3012d81398db0ead5a724fb793d85cb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd7cc3ff2de88378314fe603e17fc880"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#acd7cc3ff2de88378314fe603e17fc880">start_incremental_copy</a> (const web::http::uri &amp;source)</td></tr>
+<tr class="memdesc:acd7cc3ff2de88378314fe603e17fc880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#acd7cc3ff2de88378314fe603e17fc880">More...</a><br /></td></tr>
+<tr class="separator:acd7cc3ff2de88378314fe603e17fc880"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cc0dda6c3773b1887a47e830520fbae"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a1cc0dda6c3773b1887a47e830520fbae">start_incremental_copy</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:a1cc0dda6c3773b1887a47e830520fbae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#a1cc0dda6c3773b1887a47e830520fbae">More...</a><br /></td></tr>
+<tr class="separator:a1cc0dda6c3773b1887a47e830520fbae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbace04931deecb5b033126c1adac615"><td class="memItemLeft" align="right" valign="top">utility::string_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#adbace04931deecb5b033126c1adac615">start_incremental_copy</a> (const web::http::uri &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:adbace04931deecb5b033126c1adac615"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#adbace04931deecb5b033126c1adac615">More...</a><br /></td></tr>
+<tr class="separator:adbace04931deecb5b033126c1adac615"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54d5e72cbeec4cbae088ecc358d184ae"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a54d5e72cbeec4cbae088ecc358d184ae">start_incremental_copy_async</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;source)</td></tr>
+<tr class="memdesc:a54d5e72cbeec4cbae088ecc358d184ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#a54d5e72cbeec4cbae088ecc358d184ae">More...</a><br /></td></tr>
+<tr class="separator:a54d5e72cbeec4cbae088ecc358d184ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93bdd6d83d569cc014803be59e43d570"><td class="memItemLeft" align="right" valign="top">pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a93bdd6d83d569cc014803be59e43d570">start_incremental_copy_async</a> (const web::http::uri &amp;source)</td></tr>
+<tr class="memdesc:a93bdd6d83d569cc014803be59e43d570"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#a93bdd6d83d569cc014803be59e43d570">More...</a><br /></td></tr>
+<tr class="separator:a93bdd6d83d569cc014803be59e43d570"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cc75cae297917b099bc71ba706df8ec"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a5cc75cae297917b099bc71ba706df8ec">start_incremental_copy_async</a> (const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:a5cc75cae297917b099bc71ba706df8ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#a5cc75cae297917b099bc71ba706df8ec">More...</a><br /></td></tr>
+<tr class="separator:a5cc75cae297917b099bc71ba706df8ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fa40d87432d8f94d8b4455d880b34f1"><td class="memItemLeft" align="right" valign="top">WASTORAGE_API pplx::task&lt; utility::string_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a1fa40d87432d8f94d8b4455d880b34f1">start_incremental_copy_async</a> (const web::http::uri &amp;source, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
+<tr class="memdesc:a1fa40d87432d8f94d8b4455d880b34f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.  <a href="#a1fa40d87432d8f94d8b4455d880b34f1">More...</a><br /></td></tr>
+<tr class="separator:a1fa40d87432d8f94d8b4455d880b34f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classazure_1_1storage_1_1cloud__blob"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classazure_1_1storage_1_1cloud__blob')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classazure_1_1storage_1_1cloud__blob.html">azure::storage::cloud_blob</a></td></tr>
 <tr class="memitem:aa93b7f65c75ee69032a12c5deed609a1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1cloud__blob.html#aa93b7f65c75ee69032a12c5deed609a1">cloud_blob</a> ()</td></tr>
 <tr class="memdesc:aa93b7f65c75ee69032a12c5deed609a1 inherit pub_methods_classazure_1_1storage_1_1cloud__blob"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="classazure_1_1storage_1_1cloud__blob.html" title="A class for Windows Azure blob types. The azure::storage::cloud_block_blob and azure::storage::cloud_...">azure::storage::cloud_blob</a> class.  <a href="#aa93b7f65c75ee69032a12c5deed609a1">More...</a><br /></td></tr>
@@ -2665,6 +2689,362 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a3012d81398db0ead5a724fb793d85cb7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">utility::string_t azure::storage::cloud_page_blob::start_incremental_copy </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;&#160;</td>
+          <td class="paramname"><em>source</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The source page blob object specified a snapshot.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The copy ID associated with the incremental copy operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
+<a class="anchor" id="acd7cc3ff2de88378314fe603e17fc880"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">utility::string_t azure::storage::cloud_page_blob::start_incremental_copy </td>
+          <td>(</td>
+          <td class="paramtype">const web::http::uri &amp;&#160;</td>
+          <td class="paramname"><em>source</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The URI of a snapshot of source page blob.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The copy ID associated with the incremental copy operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
+<a class="anchor" id="a1cc0dda6c3773b1887a47e830520fbae"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">utility::string_t azure::storage::cloud_page_blob::start_incremental_copy </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The source page blob object specified a snapshot.</td></tr>
+    <tr><td class="paramname">condition</td><td>An object that represents the <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> for the destination blob.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The copy ID associated with the incremental copy operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
+<a class="anchor" id="adbace04931deecb5b033126c1adac615"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">utility::string_t azure::storage::cloud_page_blob::start_incremental_copy </td>
+          <td>(</td>
+          <td class="paramtype">const web::http::uri &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The URI of a snapshot of source page blob.</td></tr>
+    <tr><td class="paramname">condition</td><td>An object that represents the <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> for the destination blob.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The copy ID associated with the incremental copy operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
+<a class="anchor" id="a54d5e72cbeec4cbae088ecc358d184ae"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pplx::task&lt;utility::string_t&gt; azure::storage::cloud_page_blob::start_incremental_copy_async </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;&#160;</td>
+          <td class="paramname"><em>source</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The source page blob object specified a snapshot.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type utility::string_t that represents the current operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
+<a class="anchor" id="a93bdd6d83d569cc014803be59e43d570"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">pplx::task&lt;utility::string_t&gt; azure::storage::cloud_page_blob::start_incremental_copy_async </td>
+          <td>(</td>
+          <td class="paramtype">const web::http::uri &amp;&#160;</td>
+          <td class="paramname"><em>source</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The URI of a snapshot of source page blob.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type utility::string_t that represents the current operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5cc75cae297917b099bc71ba706df8ec"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">WASTORAGE_API pplx::task&lt;utility::string_t&gt; azure::storage::cloud_page_blob::start_incremental_copy_async </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The source page blob object specified a snapshot.</td></tr>
+    <tr><td class="paramname">condition</td><td>An object that represents the <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> for the destination blob.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type utility::string_t that represents the current operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
+<a class="anchor" id="a1fa40d87432d8f94d8b4455d880b34f1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">WASTORAGE_API pplx::task&lt;utility::string_t&gt; azure::storage::cloud_page_blob::start_incremental_copy_async </td>
+          <td>(</td>
+          <td class="paramtype">const web::http::uri &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;&#160;</td>
+          <td class="paramname"><em>condition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;&#160;</td>
+          <td class="paramname"><em>options</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The URI of a snapshot of source page blob.</td></tr>
+    <tr><td class="paramname">condition</td><td>An object that represents the <a class="el" href="classazure_1_1storage_1_1access__condition.html" title="Represents a set of access conditions to be used for operations against the Blob service. ">azure::storage::access_condition</a> for the destination blob.</td></tr>
+    <tr><td class="paramname">options</td><td>An <a class="el" href="classazure_1_1storage_1_1blob__request__options.html" title="Represents a set of timeout and retry policy options that may be specified on a request against the B...">azure::storage::blob_request_options</a> object that specifies additional options for the request.</td></tr>
+    <tr><td class="paramname">context</td><td>An <a class="el" href="classazure_1_1storage_1_1operation__context.html" title="Represents the context for a request to the Windows Azure storage services, and provides additional r...">azure::storage::operation_context</a> object that represents the context for the current operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pplx::task object of type utility::string_t that represents the current operation.</dd></dl>
+<p>The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob. The copy ID and copy status fields are fetched, and the rest of the copy state is cleared. </p>
+
+</div>
+</div>
 <a class="anchor" id="a26678d05be3ac0f744ec7094cd54d702"></a>
 <div class="memitem">
 <div class="memproto">
@@ -3506,7 +3886,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Dec 21 2016 11:29:43 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 7 2017 11:59:31 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.10
 </small></address>

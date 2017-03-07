@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>wastorage.v120</id>
-    <version>2.6.0</version>
+    <version>3.0.0</version>
     <title>Microsoft Azure Storage Client Library for C++</title>
     <authors>Microsoft Corporation</authors>
     <owners>Microsoft Corporation</owners>
@@ -23,15 +23,15 @@
     <file src="Microsoft.WindowsAzure.Storage\includes\wascore\basic_types.h" target="build\native\include\wascore" />
     <file src="Microsoft.WindowsAzure.Storage\includes\wascore\constants.h" target="build\native\include\wascore" />
     <file src="Microsoft.WindowsAzure.Storage\includes\wascore\constants.dat" target="build\native\include\wascore" />
-    <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.lib" target="lib\native\v120\Win32\Debug" />
-    <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.dll" target="lib\native\v120\Win32\Debug" />
-    <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastorage.pdb" target="lib\native\v120\Win32\Debug" />
+    <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastoraged.lib" target="lib\native\v120\Win32\Debug" />
+    <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastoraged.dll" target="lib\native\v120\Win32\Debug" />
+    <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Debug\wastoraged.pdb" target="lib\native\v120\Win32\Debug" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Release\wastorage.lib" target="lib\native\v120\Win32\Release" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Release\wastorage.dll" target="lib\native\v120\Win32\Release" />
     <file src="Microsoft.WindowsAzure.Storage\v120\Win32\Release\wastorage.pdb" target="lib\native\v120\Win32\Release" />
-    <file src="Microsoft.WindowsAzure.Storage\v120\x64\Debug\wastorage.lib" target="lib\native\v120\x64\Debug" />
-    <file src="Microsoft.WindowsAzure.Storage\v120\x64\Debug\wastorage.dll" target="lib\native\v120\x64\Debug" />
-    <file src="Microsoft.WindowsAzure.Storage\v120\x64\Debug\wastorage.pdb" target="lib\native\v120\x64\Debug" />
+    <file src="Microsoft.WindowsAzure.Storage\v120\x64\Debug\wastoraged.lib" target="lib\native\v120\x64\Debug" />
+    <file src="Microsoft.WindowsAzure.Storage\v120\x64\Debug\wastoraged.dll" target="lib\native\v120\x64\Debug" />
+    <file src="Microsoft.WindowsAzure.Storage\v120\x64\Debug\wastoraged.pdb" target="lib\native\v120\x64\Debug" />
     <file src="Microsoft.WindowsAzure.Storage\v120\x64\Release\wastorage.lib" target="lib\native\v120\x64\Release" />
     <file src="Microsoft.WindowsAzure.Storage\v120\x64\Release\wastorage.dll" target="lib\native\v120\x64\Release" />
     <file src="Microsoft.WindowsAzure.Storage\v120\x64\Release\wastorage.pdb" target="lib\native\v120\x64\Release" />

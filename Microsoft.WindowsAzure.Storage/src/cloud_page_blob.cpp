@@ -66,7 +66,7 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(parsed_properties);
             properties->update_page_blob_sequence_number(parsed_properties);
         });
-        return core::istream_descriptor::create(page_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_block_size).then([command, context, start_offset, content_md5, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(page_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_page_size).then([command, context, start_offset, content_md5, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             auto end_offset = start_offset + request_body.length() - 1;
@@ -268,5 +268,34 @@ namespace azure { namespace storage {
             return pplx::task_from_result(reader.move_result());
         });
         return core::executor<std::vector<page_diff_range>>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<utility::string_t> cloud_page_blob::start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        assert_no_snapshot();
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options(), type());
+
+        auto copy_state = m_copy_state;
+
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
+        command->set_build_request(std::bind(protocol::incremental_copy_blob, source, condition, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([copy_state](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        {
+            protocol::preprocess_response_void(response, result, context);
+            auto new_state = protocol::response_parsers::parse_copy_state(response);
+            *copy_state = new_state;
+            return new_state.copy_id();
+        });
+        return core::executor<utility::string_t>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<utility::string_t> cloud_page_blob::start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        web::http::uri raw_source_uri = source.snapshot_qualified_uri().primary_uri();
+        web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
+
+        return start_incremental_copy_async(source_uri, condition, options, context);
     }
 }} // namespace azure::storage

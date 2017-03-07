@@ -22,6 +22,9 @@
 #include "wascore/basic_types.h"
 #include "wascore/constants.h"
 
+#pragma push_macro("max")
+#undef max
+
 namespace azure { namespace storage {
 
     class operation_context;
@@ -458,6 +461,15 @@ namespace azure { namespace storage {
         void merge(const option_with_default<T>& value, const T& fallback_value)
         {
             merge(value.m_has_value ? (const T&)value : fallback_value);
+        }
+
+        /// <summary>
+        /// Indicates whether a specified value is set.
+        /// </summary>
+        /// <returns>A boolean indicating whether a specified value is set.</retruns>
+        bool has_value() const
+        {
+            return m_has_value;
         }
 
     private:
@@ -1171,3 +1183,5 @@ namespace azure { namespace storage {
 #ifndef _WIN32
 #define UNREFERENCED_PARAMETER(P) (P)
 #endif
+
+#pragma pop_macro("max")

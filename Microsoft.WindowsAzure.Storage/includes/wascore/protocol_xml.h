@@ -23,6 +23,9 @@
 #include "was/file.h"
 #include "wascore/xmlhelpers.h"
 
+#pragma push_macro("max")
+#undef max
+
 namespace azure { namespace storage { namespace protocol {
 
     class storage_error_reader : public core::xml::xml_reader
@@ -846,3 +849,5 @@ namespace azure { namespace storage { namespace protocol {
     };
 
 }}} // namespace azure::storage::protocol
+
+#pragma pop_macro("max")

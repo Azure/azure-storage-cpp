@@ -285,9 +285,10 @@ namespace azure { namespace storage {
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::create_blob_container, public_access, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties, public_access] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
+            properties->m_public_access = public_access;
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
         return core::executor<void>::execute_async(command, modified_options, context);
@@ -495,12 +496,16 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return blob_container_permissions();
         });
-        command->set_postprocess_response([] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<blob_container_permissions>
+        command->set_postprocess_response([properties](const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<blob_container_permissions>
         {
             blob_container_permissions permissions;
             protocol::access_policy_reader<blob_shared_access_policy> reader(response.body());
             permissions.set_policies(reader.move_policies());
-            permissions.set_public_access(protocol::blob_response_parsers::parse_public_access_type(response));
+
+            auto public_access_type = protocol::parse_public_access_type(response);
+            permissions.set_public_access(public_access_type);
+            properties->m_public_access = public_access_type;
+
             return pplx::task_from_result<blob_container_permissions>(permissions);
         });
         return core::executor<blob_container_permissions>::execute_async(command, modified_options, context);

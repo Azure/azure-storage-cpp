@@ -236,18 +236,22 @@ namespace azure { namespace storage { namespace core {
 
         pplx::task<int_type> _putc(char_type ch)
         {
-            ++m_total_written;
-            m_hash_provider.write(&ch, 1);
-
-            return m_inner_streambuf.putc(ch);
+            return m_inner_streambuf.putc(ch).then([this, ch](int_type ch_written) -> int_type 
+            {
+                ++m_total_written;
+                m_hash_provider.write(&ch, 1);
+                return ch_written;
+            });
         }
 
         pplx::task<size_t> _putn(const char_type* ptr, size_t count)
         {
-            m_total_written += count;
-            m_hash_provider.write(ptr, count);
-
-            return m_inner_streambuf.putn_nocopy(ptr, count);
+            return m_inner_streambuf.putn_nocopy(ptr, count).then([this, ptr](size_t count) -> size_t
+            {
+                m_total_written += count;
+                m_hash_provider.write(ptr, count);
+                return count;
+            });
         }
 
         utility::string_t hash() const

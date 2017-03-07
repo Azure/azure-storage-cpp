@@ -178,7 +178,7 @@ namespace azure { namespace storage {
                 protocol::preprocess_response_void(response, result, context);
                 properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             });
-            return core::istream_descriptor::create(source, modified_options.store_blob_content_md5(), length).then([command, context, properties, metadata, condition, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
+            return core::istream_descriptor::create(source, modified_options.store_blob_content_md5(), length, protocol::max_single_blob_upload_threshold).then([command, context, properties, metadata, condition, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
             {
                 if (!request_body.content_md5().empty())
                 {
@@ -189,6 +189,28 @@ namespace azure { namespace storage {
                 command->set_request_body(request_body);
                 return core::executor<void>::execute_async(command, modified_options, context);
             });
+        }
+
+        // Check if the total required blocks for the upload exceeds the maximum allowable block limit.
+        // Adjusts the block size to ensure a successful upload only if the value has not been explicitly set.
+        // Otherwise, throws a storage_exception if the default value has been changed or if the blob size exceeds the maximum capacity.
+        if (length != std::numeric_limits<utility::size64_t>::max())
+        {
+            auto totalBlocks = std::ceil(static_cast<double>(length) / modified_options.stream_write_size_in_bytes());
+
+            // Check if the total required blocks for the upload exceeds the maximum allowable block limit.
+            if (totalBlocks > protocol::max_block_number)
+            {
+                if (modified_options.stream_write_size_in_bytes().has_value() || length > protocol::max_block_blob_size)
+                {
+                    throw storage_exception(protocol::error_blob_over_max_block_limit);
+                }
+                else
+                {
+                    // Scale the block size to ensure a successful upload (only if the user did not specify a value).
+                    modified_options.set_stream_write_size_in_bytes(static_cast<size_t>(std::ceil(static_cast<double>(length)) / protocol::max_block_number));
+                }
+            }
         }
 
         return open_write_async(condition, modified_options, context).then([source, length] (concurrency::streams::ostream blob_stream) -> pplx::task<void>

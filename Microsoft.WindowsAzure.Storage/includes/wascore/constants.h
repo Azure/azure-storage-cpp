@@ -24,12 +24,21 @@
 namespace azure { namespace storage { namespace protocol {
 
     // size constants
-    const size_t max_block_size = 4 * 1024 * 1024;
-    const size_t single_block_size = 4 * 1024 * 1024;
+    const size_t max_block_number = 50000;
+    const size_t max_block_size = 100 * 1024 * 1024;
+    const utility::size64_t max_block_blob_size = static_cast<utility::size64_t>(max_block_number) * max_block_size;
+    const size_t max_append_block_size = 4 * 1024 * 1024;
+    const size_t max_page_size = 4 * 1024 * 1024;
+    const size_t max_range_size = 4 * 1024 * 1024;
+    const utility::size64_t max_single_blob_upload_threshold = 256 * 1024 * 1024;
+    
+    const size_t default_stream_write_size = 4 * 1024 * 1024;
+    const size_t default_stream_read_size = 4 * 1024 * 1024;
     const size_t default_buffer_size = 64 * 1024;
-    const utility::size64_t default_single_blob_upload_threshold = 32 * 1024 * 1024;
+    const utility::size64_t default_single_blob_upload_threshold = 128 * 1024 * 1024;
     const utility::size64_t default_single_blob_download_threshold = 32 * 1024 * 1024;
     const utility::size64_t default_single_block_download_threshold = 4 * 1024 * 1024;
+    const size_t transactional_md5_block_size = 4 * 1024 * 1024;
 
     // duration constants
     const std::chrono::seconds default_retry_interval(3);
@@ -53,7 +62,7 @@ namespace azure { namespace storage { namespace protocol {
     const int maximum_share_quota(5120);
 
 #define _CONSTANTS
-#define DAT(a,b) extern WASTORAGE_API const utility::char_t* a; const size_t a ## _size{ sizeof(b) / sizeof(utility::char_t) - 1 };
+#define DAT(a, b) WASTORAGE_API extern const utility::char_t a[]; const size_t a ## _size = sizeof(b) / sizeof(utility::char_t) - 1;
 #include "constants.dat"
 #undef DAT
 #undef _CONSTANTS

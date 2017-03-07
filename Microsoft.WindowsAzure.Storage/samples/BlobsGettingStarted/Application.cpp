@@ -18,10 +18,10 @@
 #include "stdafx.h"
 #include "samples_common.h"
 
-#include "was/storage_account.h"
-#include "was/blob.h"
-#include "cpprest/filestream.h"
-#include "cpprest/containerstream.h"
+#include <was/storage_account.h>
+#include <was/blob.h>
+#include <cpprest/filestream.h>
+#include <cpprest/containerstream.h>
 
 namespace azure { namespace storage { namespace samples {
 

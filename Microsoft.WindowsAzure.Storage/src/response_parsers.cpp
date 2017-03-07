@@ -232,19 +232,25 @@ namespace azure { namespace storage { namespace protocol {
             state.m_status = parse_copy_status(status);
             state.m_copy_id = get_header_value(headers, ms_header_copy_id);
             state.m_source = get_header_value(headers, ms_header_copy_source);
-            state.m_completion_time = parse_copy_completion_time(get_header_value(headers, ms_header_copy_completion_time));
+            state.m_completion_time = parse_datetime(get_header_value(headers, ms_header_copy_completion_time));
             state.m_status_description = get_header_value(headers, ms_header_copy_status_description);
+            state.m_destination_snapshot_time = parse_datetime(get_header_value(headers, ms_header_copy_destination_snapshot), utility::datetime::date_format::ISO_8601);
             parse_copy_progress(get_header_value(headers, ms_header_copy_progress), state.m_bytes_copied, state.m_total_bytes);
         }
 
         return state;
     }
 
-    utility::datetime response_parsers::parse_copy_completion_time(const utility::string_t& value)
+    bool response_parsers::parse_boolean(const utility::string_t& value)
+    {
+        return value == _XPLATSTR("true");
+    }
+
+    utility::datetime response_parsers::parse_datetime(const utility::string_t& value, utility::datetime::date_format format)
     {
         if (!value.empty())
         {
-            return utility::datetime::from_string(value, utility::datetime::date_format::RFC_1123);
+            return utility::datetime::from_string(value, format);
         }
         else
         {
@@ -326,6 +332,27 @@ namespace azure { namespace storage { namespace protocol {
 
             return storage_extended_error(std::move(error_code), std::move(error_message), std::move(details));
         }
+    }
+
+    blob_container_public_access_type parse_public_access_type(const utility::string_t& value)
+    {
+        if (value == resource_blob)
+        {
+            return blob_container_public_access_type::blob;
+        }
+        else if (value == resource_container)
+        {
+            return blob_container_public_access_type::container;
+        }
+        else
+        {
+            return blob_container_public_access_type::off;
+        }
+    }
+    
+    blob_container_public_access_type parse_public_access_type(const web::http::http_response& response)
+    {
+        return parse_public_access_type(get_header_value(response.headers(), ms_header_blob_public_access));
     }
 
 }}} // namespace azure::storage::protocol

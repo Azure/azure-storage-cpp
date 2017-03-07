@@ -24,7 +24,7 @@
 namespace azure { namespace storage { namespace protocol {
 
 #define _RESOURCES
-#define DAT(a, b) extern const char* a; const size_t a ## _size{ sizeof(b) / sizeof(utility::char_t) - 1 };
+#define DAT(a, b) extern const char* a; const size_t a ## _size = sizeof(b) / sizeof(char) - 1;
 #include "wascore/constants.dat"
 #undef DAT
 #undef _RESOURCES

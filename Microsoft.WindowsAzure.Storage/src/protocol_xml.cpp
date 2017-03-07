@@ -101,6 +101,11 @@ namespace azure { namespace storage { namespace protocol {
                 m_properties.m_lease_duration = parse_lease_duration(get_current_element_text());
                 return;
             }
+
+            if (element_name == xml_public_access)
+            {
+                m_properties.m_public_access = parse_public_access_type(get_current_element_text());
+            }
         }
 
         if (element_name == xml_name)
@@ -279,7 +284,7 @@ namespace azure { namespace storage { namespace protocol {
 
             if (element_name == xml_copy_completion_time)
             {
-                m_copy_state.m_completion_time = response_parsers::parse_copy_completion_time(get_current_element_text());
+                m_copy_state.m_completion_time = response_parsers::parse_datetime(get_current_element_text());
                 return;
             }
 
@@ -287,6 +292,17 @@ namespace azure { namespace storage { namespace protocol {
             {
                 m_copy_state.m_status_description = get_current_element_text();
                 return;
+            }
+
+            if (element_name == xml_incremental_copy)
+            {
+                m_properties.m_is_incremental_copy = response_parsers::parse_boolean(get_current_element_text());
+                return;
+            }
+
+            if (element_name == xml_copy_destination_snapshot)
+            {
+                m_copy_state.m_destination_snapshot_time = response_parsers::parse_datetime(get_current_element_text(), utility::datetime::date_format::ISO_8601);
             }
         }
 

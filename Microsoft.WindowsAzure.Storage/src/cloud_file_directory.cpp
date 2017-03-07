@@ -86,24 +86,24 @@ namespace azure { namespace storage {
         m_share = cloud_file_share(std::move(share_name), cloud_file_client(core::get_service_client_uri(m_uri), std::move(credentials)));
     }
 
-    list_file_and_diretory_result_iterator cloud_file_directory::list_files_and_directories(int64_t max_results, const file_request_options& options, operation_context context) const
+    list_file_and_diretory_result_iterator cloud_file_directory::list_files_and_directories(const utility::string_t& prefix, int64_t max_results, const file_request_options& options, operation_context context) const
     {
         auto instance = std::make_shared<cloud_file_directory>(*this);
         return list_file_and_diretory_result_iterator(
-            [instance, options, context](const continuation_token& token, size_t max_results_per_segment)
+            [instance, prefix, options, context](const continuation_token& token, size_t max_results_per_segment)
         {
-            return instance->list_files_and_directories_segmented(max_results_per_segment, token, options, context);
+            return instance->list_files_and_directories_segmented(prefix, max_results_per_segment, token, options, context);
         },
             max_results, 0);
     }
 
-    pplx::task<list_file_and_directory_result_segment> cloud_file_directory::list_files_and_directories_segmented_async(int64_t max_results, const continuation_token& token, const file_request_options& options, operation_context context) const
+    pplx::task<list_file_and_directory_result_segment> cloud_file_directory::list_files_and_directories_segmented_async(const utility::string_t& prefix, int64_t max_results, const continuation_token& token, const file_request_options& options, operation_context context) const
     {
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
         auto command = std::make_shared<core::storage_command<list_file_and_directory_result_segment>>(uri());
-        command->set_build_request(std::bind(protocol::list_files_and_directories, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::list_files_and_directories, prefix, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<list_file_and_directory_result_segment>, list_file_and_directory_result_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));

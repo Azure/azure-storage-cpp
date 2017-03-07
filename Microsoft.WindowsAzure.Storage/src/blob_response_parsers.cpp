@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "wascore/protocol.h"
+#include "wascore/constants.h"
 
 namespace azure { namespace storage { namespace protocol {
 
@@ -28,24 +29,8 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_lease_status = parse_lease_status(response);
         properties.m_lease_state = parse_lease_state(response);
         properties.m_lease_duration = parse_lease_duration(response);
+        properties.m_public_access = parse_public_access_type(response);
         return properties;
-    }
-
-    blob_container_public_access_type blob_response_parsers::parse_public_access_type(const web::http::http_response& response)
-    {
-        auto value = get_header_value(response.headers(), ms_header_blob_public_access);
-        if (value == resource_blob)
-        {
-            return blob_container_public_access_type::blob;
-        }
-        else if (value == resource_container)
-        {
-            return blob_container_public_access_type::container;
-        }
-        else
-        {
-            return blob_container_public_access_type::off;
-        }
     }
 
     blob_type blob_response_parsers::parse_blob_type(const utility::string_t& value)
@@ -106,11 +91,16 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_content_disposition = get_header_value(headers, header_content_disposition);
         properties.m_content_encoding = get_header_value(headers, web::http::header_names::content_encoding);
         properties.m_content_language = get_header_value(headers, web::http::header_names::content_language);
-        properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
         properties.m_content_type = get_header_value(headers, web::http::header_names::content_type);
         properties.m_type = parse_blob_type(get_header_value(headers, ms_header_blob_type));
+        properties.m_content_md5 = get_header_value(headers, ms_header_blob_content_md5);
+        if (properties.m_content_md5.empty())
+        {
+            properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
+        }
 
-        properties.m_server_encrypted = (get_header_value(headers, ms_header_server_encrypted) == _XPLATSTR("true"));
+        properties.m_server_encrypted = response_parsers::parse_boolean(get_header_value(headers, ms_header_server_encrypted));
+        properties.m_is_incremental_copy = response_parsers::parse_boolean(get_header_value(headers, ms_header_incremental_copy));
 
         return properties;
     }

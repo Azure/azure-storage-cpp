@@ -64,16 +64,14 @@ namespace azure { namespace storage {
         m_append_blob_committed_block_count = parsed_properties.append_blob_committed_block_count();
     }
 
-    void cloud_blob_properties::update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5)
+    void cloud_blob_properties::update_all(const cloud_blob_properties& parsed_properties)
     {
         if ((type() != blob_type::unspecified) && (type() != parsed_properties.type()))
         {
             throw storage_exception(protocol::error_blob_type_mismatch, false);
         }
 
-        utility::string_t content_md5(ignore_md5 ? m_content_md5 : parsed_properties.content_md5());
         *this = parsed_properties;
-        m_content_md5 = content_md5;
     }
 
 }} // namespace azure::storage

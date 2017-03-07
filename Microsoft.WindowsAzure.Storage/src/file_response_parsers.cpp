@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "wascore/protocol.h"
+#include "wascore/constants.h"
 
 namespace azure { namespace storage { namespace protocol {
 
@@ -64,9 +65,13 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_content_disposition = get_header_value(headers, header_content_disposition);
         properties.m_content_encoding = get_header_value(headers, web::http::header_names::content_encoding);
         properties.m_content_language = get_header_value(headers, web::http::header_names::content_language);
-        properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
         properties.m_content_type = get_header_value(headers, web::http::header_names::content_type);
         properties.m_type = get_header_value(headers, _XPLATSTR("x-ms-file-type"));
+        properties.m_content_md5 = get_header_value(headers, ms_header_content_md5);
+        if (properties.m_content_md5.empty())
+        {
+            properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
+        }
 
         return properties;
     }

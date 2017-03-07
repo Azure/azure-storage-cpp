@@ -108,6 +108,7 @@ SUITE(Blob)
     TEST_FIXTURE(container_test_base, container_create_public_off)
     {
         m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        CHECK(m_container.properties().public_access() == azure::storage::blob_container_public_access_type::off);
         check_public_access(azure::storage::blob_container_public_access_type::off);
         check_container_no_stale_property(m_container);
     }
@@ -115,6 +116,7 @@ SUITE(Blob)
     TEST_FIXTURE(container_test_base, container_create_public_blob)
     {
         m_container.create(azure::storage::blob_container_public_access_type::blob, azure::storage::blob_request_options(), m_context);
+        CHECK(m_container.properties().public_access() == azure::storage::blob_container_public_access_type::blob);
         check_public_access(azure::storage::blob_container_public_access_type::blob);
         check_container_no_stale_property(m_container);
     }
@@ -122,6 +124,7 @@ SUITE(Blob)
     TEST_FIXTURE(container_test_base, container_create_public_container)
     {
         m_container.create(azure::storage::blob_container_public_access_type::container, azure::storage::blob_request_options(), m_context);
+        CHECK(m_container.properties().public_access() == azure::storage::blob_container_public_access_type::container);
         check_public_access(azure::storage::blob_container_public_access_type::container);
         check_container_no_stale_property(m_container);
     }
@@ -150,12 +153,14 @@ SUITE(Blob)
         // Create with 2 pairs
         m_container.metadata()[_XPLATSTR("key1")] = _XPLATSTR("value1");
         m_container.metadata()[_XPLATSTR("key2")] = _XPLATSTR("value2");
-        m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        m_container.create(get_random_enum(azure::storage::blob_container_public_access_type::blob), azure::storage::blob_request_options(), m_context);
         check_container_no_stale_property(m_container);
 
         auto same_container = m_client.get_container_reference(m_container.name());
+        CHECK(same_container.properties().public_access() == azure::storage::blob_container_public_access_type::off);
         CHECK(same_container.metadata().empty());
         same_container.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK(same_container.properties().public_access() == m_container.properties().public_access());
         CHECK_EQUAL(2U, same_container.metadata().size());
         CHECK_UTF8_EQUAL(_XPLATSTR("value1"), same_container.metadata()[_XPLATSTR("key1")]);
         CHECK_UTF8_EQUAL(_XPLATSTR("value2"), same_container.metadata()[_XPLATSTR("key2")]);

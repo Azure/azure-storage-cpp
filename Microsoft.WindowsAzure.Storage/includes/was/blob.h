@@ -20,6 +20,9 @@
 #include "limits"
 #include "service_client.h"
 
+#pragma push_macro("max")
+#undef max
+
 namespace azure { namespace storage {
 
     class cloud_blob;
@@ -1072,7 +1075,8 @@ namespace azure { namespace storage {
             m_lease_state(azure::storage::lease_state::unspecified),
             m_lease_duration(azure::storage::lease_duration::unspecified),
             m_page_blob_sequence_number(0), m_append_blob_committed_block_count(0),
-            m_server_encrypted(false)
+            m_server_encrypted(false),
+            m_is_incremental_copy(false)
         {
         }
 
@@ -1114,6 +1118,7 @@ namespace azure { namespace storage {
                 m_page_blob_sequence_number = std::move(other.m_page_blob_sequence_number);
                 m_append_blob_committed_block_count = std::move(other.m_append_blob_committed_block_count);
                 m_server_encrypted = std::move(other.m_server_encrypted);
+                m_is_incremental_copy = std::move(other.m_is_incremental_copy);
             }
             return *this;
         }
@@ -1317,6 +1322,15 @@ namespace azure { namespace storage {
             return m_server_encrypted;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether or not this blob is an incremental copy.
+        /// </summary>
+        /// <returns><c>true</c> if the blob is an incremental copy; otherwise, <c>false</c>.</returns>
+        bool is_incremental_copy() const
+        {
+            return m_is_incremental_copy;
+        }
+
     private:
 
         /// <summary>
@@ -1350,13 +1364,14 @@ namespace azure { namespace storage {
         int64_t m_page_blob_sequence_number;
         int m_append_blob_committed_block_count;
         bool m_server_encrypted;
+        bool m_is_incremental_copy;
 
         void copy_from_root(const cloud_blob_properties& root_blob_properties);
         void update_etag_and_last_modified(const cloud_blob_properties& parsed_properties);
         void update_size(const cloud_blob_properties& parsed_properties);
         void update_page_blob_sequence_number(const cloud_blob_properties& parsed_properties);
         void update_append_blob_committed_block_count(const cloud_blob_properties& parsed_properties);
-        void update_all(const cloud_blob_properties& parsed_properties, bool ignore_md5);
+        void update_all(const cloud_blob_properties& parsed_properties);
         
         void set_server_encrypted(bool server_encrypted)
         {
@@ -1531,8 +1546,8 @@ namespace azure { namespace storage {
             m_disable_content_md5_validation(false),
             m_parallelism_factor(1),
             m_single_blob_upload_threshold(protocol::default_single_blob_upload_threshold),
-            m_stream_write_size(protocol::max_block_size),
-            m_stream_read_size(protocol::max_block_size),
+            m_stream_write_size(protocol::default_stream_write_size),
+            m_stream_read_size(protocol::default_stream_read_size),
             m_absorb_conditional_errors_on_retry(false)
         {
         }
@@ -1662,7 +1677,7 @@ namespace azure { namespace storage {
         /// Gets the maximum size of a blob in bytes that may be uploaded as a single blob.
         /// </summary>
         /// <returns>The maximum size of a blob, in bytes, that may be uploaded as a single blob,
-        /// ranging from between 1 and 64 MB inclusive.</returns>
+        /// ranging from between 1 and 256 MB inclusive.</returns>
         utility::size64_t single_blob_upload_threshold_in_bytes() const
         {
             return m_single_blob_upload_threshold;
@@ -1672,10 +1687,10 @@ namespace azure { namespace storage {
         /// Sets the maximum size of a blob in bytes that may be uploaded as a single blob.
         /// </summary>
         /// <param name="value">The maximum size of a blob, in bytes, that may be uploaded as a single blob,
-        /// ranging from between 1 and 64 MB inclusive.</param>
+        /// ranging from between 1 and 256 MB inclusive.</param>
         void set_single_blob_upload_threshold_in_bytes(utility::size64_t value)
         {
-            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, 64 * 1024 * 1024);
+            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, 256 * 1024 * 1024);
             m_single_blob_upload_threshold = value;
         }
 
@@ -1704,7 +1719,7 @@ namespace azure { namespace storage {
         /// Gets the minimum number of bytes to buffer when reading from a blob stream.
         /// </summary>
         /// <returns>The minimum number of bytes to buffer, being at least 16KB.</returns>
-        size_t stream_read_size_in_bytes() const
+        option_with_default<size_t> stream_read_size_in_bytes() const
         {
             return m_stream_read_size;
         }
@@ -1722,8 +1737,8 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <returns>The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</returns>
-        size_t stream_write_size_in_bytes() const
+        /// <returns>The minimum number of bytes to buffer, ranging from between 16 KB and 100 MB inclusive.</returns>
+        option_with_default<size_t> stream_write_size_in_bytes() const
         {
             return m_stream_write_size;
         }
@@ -1731,10 +1746,10 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 4 MB inclusive.</param>
+        /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 100 MB inclusive.</param>
         void set_stream_write_size_in_bytes(size_t value)
         {
-            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, 4 * 1024 * 1024);
+            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, 100 * 1024 * 1024);
             m_stream_write_size = value;
         }
 
@@ -2103,7 +2118,8 @@ namespace azure { namespace storage {
         /// </summary>
         cloud_blob_container_properties()
             : m_lease_status(azure::storage::lease_status::unspecified), m_lease_state(azure::storage::lease_state::unspecified),
-            m_lease_duration(azure::storage::lease_duration::unspecified)
+            m_lease_duration(azure::storage::lease_duration::unspecified),
+            m_public_access(azure::storage::blob_container_public_access_type::off)
         {
         }
 
@@ -2134,6 +2150,7 @@ namespace azure { namespace storage {
                 m_lease_status = std::move(other.m_lease_status);
                 m_lease_state = std::move(other.m_lease_state);
                 m_lease_duration = std::move(other.m_lease_duration);
+                m_public_access = std::move(other.m_public_access);
             }
             return *this;
         }
@@ -2184,6 +2201,15 @@ namespace azure { namespace storage {
             return m_lease_duration;
         }
 
+        /// <summary>
+        /// Gets the public access setting for the container.
+        /// </summary>
+        /// <returns>The public access setting for the container.</returns>
+        azure::storage::blob_container_public_access_type public_access() const
+        {
+            return m_public_access;
+        }
+
     private:
 
         /// <summary>
@@ -2201,6 +2227,7 @@ namespace azure { namespace storage {
         azure::storage::lease_status m_lease_status;
         azure::storage::lease_state m_lease_state;
         azure::storage::lease_duration m_lease_duration;
+        azure::storage::blob_container_public_access_type m_public_access;
 
         void update_etag_and_last_modified(const cloud_blob_container_properties& parsed_properties);
 
@@ -6300,6 +6327,124 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
 
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const cloud_page_blob& source)
+        {
+            return start_incremental_copy_async(source).get();
+        }
+
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const web::http::uri& source)
+        {
+            return start_incremental_copy_async(source).get();
+        }
+
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return start_incremental_copy_async(source, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the incremental copy operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_incremental_copy(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return start_incremental_copy_async(source, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source)
+        {
+            return start_incremental_copy_async(source, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source)
+        {
+            return start_incremental_copy_async(source, access_condition(), blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context);
+
     private:
 
         /// <summary>
@@ -7153,3 +7298,5 @@ namespace azure { namespace storage {
     };
 
 }} // namespace azure::storage
+
+#pragma pop_macro("max")

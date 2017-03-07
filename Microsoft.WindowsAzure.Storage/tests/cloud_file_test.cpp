@@ -472,6 +472,14 @@ SUITE(File)
             CHECK_UTF8_EQUAL(content[i], download_content);
             file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
             CHECK(!file.properties().content_md5().empty());
+
+            auto same_file = m_directory.get_file_reference(filename[i]);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> buff;
+            same_file.download_range_to_stream(buff.create_ostream(), 0, content[i].length() / 2);
+            std::vector<uint8_t>& data = buff.collection();
+            std::string download_partial_content(data.begin(), data.end());
+            CHECK_UTF8_EQUAL(content[i].substr(0, content[i].length() / 2), download_partial_content);
+            CHECK_UTF8_EQUAL(file.properties().content_md5(), same_file.properties().content_md5());
         }
     }
 

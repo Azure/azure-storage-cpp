@@ -67,6 +67,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request delete_blob(delete_snapshots_option snapshots_option, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request incremental_copy_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     void add_lease_id(web::http::http_request& request, const access_condition& condition);
     void add_sequence_number_condition(web::http::http_request& request, const access_condition& condition);
     void add_access_condition(web::http::http_request& request, const access_condition& condition);
@@ -118,7 +119,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request get_file_share_stats(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request list_files_and_directories(int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_files_and_directories(const utility::string_t& prefix, int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request create_file_directory(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request delete_file_directory(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_directory_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
@@ -169,6 +170,7 @@ namespace azure { namespace storage { namespace protocol {
     int parse_approximate_messages_count(const web::http::http_response& response);
     utility::string_t parse_pop_receipt(const web::http::http_response& response);
     utility::datetime parse_next_visible_time(const web::http::http_response& response);
+    blob_container_public_access_type parse_public_access_type(const utility::string_t& value);
 
     utility::string_t get_header_value(const web::http::http_response& response, const utility::string_t& header);
     utility::string_t get_header_value(const web::http::http_headers& headers, const utility::string_t& header);
@@ -183,14 +185,16 @@ namespace azure { namespace storage { namespace protocol {
     std::chrono::seconds parse_lease_time(const web::http::http_response& response);
     cloud_metadata parse_metadata(const web::http::http_response& response);
     storage_extended_error parse_extended_error(const web::http::http_response& response);
+    blob_container_public_access_type parse_public_access_type(const web::http::http_response& response);
 
     class response_parsers
     {
     public:
         static copy_state parse_copy_state(const web::http::http_response& response);
-        static utility::datetime parse_copy_completion_time(const utility::string_t& value);
         static bool parse_copy_progress(const utility::string_t& value, int64_t& bytes_copied, int64_t& bytes_total);
         static copy_status parse_copy_status(const utility::string_t& value);
+        static bool parse_boolean(const utility::string_t& value);
+        static utility::datetime parse_datetime(const utility::string_t& value, utility::datetime::date_format format = utility::datetime::date_format::RFC_1123);
     };
 
     class blob_response_parsers
@@ -198,7 +202,6 @@ namespace azure { namespace storage { namespace protocol {
     public:
         static blob_type parse_blob_type(const utility::string_t& value);
         static utility::size64_t parse_blob_size(const web::http::http_response& response);
-        static blob_container_public_access_type parse_public_access_type(const web::http::http_response& response);
 
         static cloud_blob_container_properties parse_blob_container_properties(const web::http::http_response& response);
         static cloud_blob_properties parse_blob_properties(const web::http::http_response& response);

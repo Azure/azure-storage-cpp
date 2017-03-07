@@ -24,7 +24,11 @@
 #include "util.h"
 #include "streams.h"
 #include "was/auth.h"
+#include "wascore/constants.h"
 #include "wascore/resources.h"
+
+#pragma push_macro("max")
+#undef max
 
 namespace azure { namespace storage { namespace core {
 
@@ -630,6 +634,10 @@ namespace azure { namespace storage { namespace core {
                         instance->m_current_location = retry.target_location();
                         instance->m_current_location_mode = retry.updated_location_mode();
 
+                        // Hash provider may be closed by Casablanca due to stream error. Close hash provider and force to recreation when retry.
+                        instance->m_hash_provider.close();
+                        instance->m_is_hashing_started = false;
+
                         if (instance->m_response_streambuf)
                         {
                             instance->m_total_downloaded += instance->m_response_streambuf.total_written();
@@ -857,3 +865,5 @@ namespace azure { namespace storage { namespace core {
     };
 
 }}} // namespace azure::storage::core
+
+#pragma pop_macro("max")

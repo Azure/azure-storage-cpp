@@ -18,9 +18,9 @@
 #include "stdafx.h"
 #include "samples_common.h"
 
-#include "was/storage_account.h"
-#include "was/file.h"
-#include "cpprest/filestream.h"
+#include <was/storage_account.h>
+#include <was/file.h>
+#include <cpprest/filestream.h>
 
 namespace azure { namespace storage { namespace samples {
 

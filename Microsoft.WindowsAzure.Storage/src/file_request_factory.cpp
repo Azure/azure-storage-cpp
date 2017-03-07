@@ -205,10 +205,15 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request list_files_and_directories(int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request list_files_and_directories(const utility::string_t& prefix, int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_directory, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
+
+        if (!prefix.empty())
+        {
+            uri_builder.append_query(core::make_query_parameter(uri_query_prefix, prefix));
+        }
         
         if (!token.empty())
         {

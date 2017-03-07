@@ -344,6 +344,8 @@ namespace azure { namespace storage {
         utility::datetime m_next_visible_time;
         int m_dequeue_count;
 
+        void update_message_info(const cloud_queue_message& message_info);
+
         friend class cloud_queue;
     };
 

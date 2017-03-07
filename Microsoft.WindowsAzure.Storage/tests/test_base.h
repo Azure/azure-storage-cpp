@@ -67,6 +67,7 @@ protected:
 
 public:
 
+    static utility::datetime parse_datetime(const utility::string_t& value, utility::datetime::date_format format = utility::datetime::date_format::RFC_1123);
     static utility::string_t get_string(utility::char_t value1, utility::char_t value2);
     static void initialize_random();
     static bool get_random_boolean();
@@ -79,4 +80,27 @@ public:
     static std::vector<uint8_t> get_random_binary_data();
     static utility::uuid get_random_guid();
     static utility::string_t get_object_name(const utility::string_t& object_type_name);
+    
+    template <typename TEnum> 
+    static TEnum get_random_enum(TEnum max_enum_value)
+    {
+        initialize_random();
+        return static_cast<TEnum>(rand() % (static_cast<int>(max_enum_value)+1));
+    }
+
+    template <typename It, typename T> 
+    static std::vector<T> transform_if(It it, std::function<bool(const typename It::value_type &)> func_if, std::function<T(const typename It::value_type &)> func_tran)
+    {
+        std::vector<T> results;
+        It end_it;
+        while (it != end_it)
+        {
+            if (func_if(*it))
+            {
+                results.push_back(func_tran(*it));
+            }
+            ++it;
+        }
+        return results;
+    }
 };

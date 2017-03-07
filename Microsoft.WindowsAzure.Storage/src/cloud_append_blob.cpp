@@ -62,7 +62,7 @@ namespace azure { namespace storage {
             properties->update_append_blob_committed_block_count(parsed_properties);
             return utility::conversions::scan_string<int64_t>(protocol::get_header_value(response.headers(), protocol::ms_header_blob_append_offset));
         });
-        return core::istream_descriptor::create(block_data, needs_md5).then([command, context, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<int64_t>
+        return core::istream_descriptor::create(block_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_append_block_size).then([command, context, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<int64_t>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             command->set_build_request(std::bind(protocol::append_block, md5, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));

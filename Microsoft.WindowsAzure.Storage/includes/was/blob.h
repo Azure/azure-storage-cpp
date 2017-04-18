@@ -2667,7 +2667,8 @@ namespace azure { namespace storage {
         void initialize()
         {
             set_authentication_scheme(azure::storage::authentication_scheme::shared_key);
-            m_default_request_options.set_retry_policy(exponential_retry_policy());
+            if (!m_default_request_options.retry_policy().is_valid())
+                m_default_request_options.set_retry_policy(exponential_retry_policy());
             m_directory_delimiter = protocol::directory_delimiter;
         }
 

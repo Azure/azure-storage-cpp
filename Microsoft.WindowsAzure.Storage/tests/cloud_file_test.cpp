@@ -535,6 +535,59 @@ SUITE(File)
             CHECK(download_buffer.collection().size() == target_length);
             CHECK(std::equal(data.begin(), data.end(), download_buffer.collection().begin()));
         }
+
+        // file with size larger than 32MB.
+        // With offset not zero.
+        {
+            auto file_name = get_random_string(20);
+            auto file = m_share.get_root_directory_reference().get_file_reference(file_name);
+            size_t target_length = 100 * 1024 * 1024;
+            azure::storage::file_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(false);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
+
+            // download target file in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            utility::size64_t actual_offset = rand() % 255 + 1;
+            utility::size64_t actual_length = target_length - actual_offset;
+            file.download_range_to_stream(download_buffer.create_ostream(), actual_offset, actual_length, azure::storage::file_access_condition(), option, context);
+
+            check_parallelism(context, 2);
+            CHECK(file.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin() + actual_offset, data.end(), download_buffer.collection().begin()));
+        }
+
+        // file with size larger than 32MB.
+        // With offset not zero, length = max.
+        {
+            auto file_name = get_random_string(20);
+            auto file = m_share.get_root_directory_reference().get_file_reference(file_name);
+            size_t target_length = 100 * 1024 * 1024;
+            azure::storage::file_request_options option;
+            option.set_parallelism_factor(2);
+            option.set_use_transactional_md5(false);
+            std::vector<uint8_t> data;
+            data.resize(target_length);
+            concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
+            file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
+
+            // download target file in parallel.
+            azure::storage::operation_context context;
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            utility::size64_t actual_offset = rand() % 255 + 1;
+            file.download_range_to_stream(download_buffer.create_ostream(), actual_offset, std::numeric_limits<utility::size64_t>::max(), azure::storage::file_access_condition(), option, context);
+
+            check_parallelism(context, 2);
+            CHECK(file.properties().size() == target_length);
+            CHECK(download_buffer.collection().size() == target_length);
+            CHECK(std::equal(data.begin() + actual_offset, data.end(), download_buffer.collection().begin()));
+        }
     }
 
     TEST_FIXTURE(file_test_base, parallel_download_with_md5)

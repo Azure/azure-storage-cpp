@@ -574,10 +574,23 @@ namespace azure { namespace storage {
                 single_file_download_threshold = protocol::default_single_block_download_threshold;
             }
 
+            if (offset >= std::numeric_limits<utility::size64_t>::max())
+            {
+                if (length == 0)
+                {
+                    offset = 0;
+                    length = std::numeric_limits<utility::size64_t>::max();
+                }
+                else
+                {
+                    throw std::invalid_argument("length");
+                }
+            }
+
             // download first range.
             // if 416 thrown, it's an empty blob. need to download attributes.
             // otherwise, properties must be updated for further parallel download.
-            return instance->download_single_range_to_stream_async(target, 0, single_file_download_threshold, condition, options, context, true).then([=](pplx::task<void> download_task)
+            return instance->download_single_range_to_stream_async(target, offset, length < single_file_download_threshold ? length : single_file_download_threshold, condition, options, context, true).then([=](pplx::task<void> download_task)
             {
                 try
                 {
@@ -587,7 +600,7 @@ namespace azure { namespace storage {
                 {
                     // For empty blob, swallow the exception and update the attributes.
                     if (e.result().http_status_code() == web::http::status_codes::RangeNotSatisfiable
-                        && offset >= std::numeric_limits<utility::size64_t>::max())
+                        && offset == 0)
                     {
                         return instance->download_attributes_async(condition, options, context);
                     }
@@ -597,26 +610,21 @@ namespace azure { namespace storage {
                     }
                 }
 
-                if ((offset >= std::numeric_limits<utility::size64_t>::max() && instance->properties().size() <= single_file_download_threshold)
-                    || (offset < std::numeric_limits<utility::size64_t>::max() && length <= single_file_download_threshold))
+                // download the rest data in parallel.
+                utility::size64_t target_offset = offset;
+                utility::size64_t target_length = length;
+                if (target_length >= std::numeric_limits<utility::size64_t>::max())
+                {
+                    target_length = instance->properties().size() - offset;
+                }
+
+                // Download completes in first range download.
+                if (target_length <= single_file_download_threshold)
                 {
                     return pplx::task_from_result();
                 }
-
-                // download the rest data in parallel.
-                utility::size64_t target_offset;
-                utility::size64_t target_length;
-
-                if (offset >= std::numeric_limits<utility::size64_t>::max())
-                {
-                    target_offset = single_file_download_threshold;
-                    target_length = instance->properties().size() - single_file_download_threshold;
-                }
-                else
-                {
-                    target_offset = offset + single_file_download_threshold;
-                    target_length = length - single_file_download_threshold;
-                }
+                target_offset += single_file_download_threshold;
+                target_length -= single_file_download_threshold;
 
                 return pplx::task_from_result().then([instance, target, target_offset, target_length, single_file_download_threshold, condition, options, context]()
                 {

@@ -2868,7 +2868,7 @@ namespace azure { namespace storage {
         int64_t m_bytes_copied;
         int64_t m_total_bytes;
         copy_status m_status;
-        web::http::uri m_source;
+        utility::string_t m_source;
         utility::datetime m_destination_snapshot_time;
 
         friend class protocol::response_parsers;

@@ -2748,13 +2748,30 @@ namespace azure { namespace storage {
     public:
 
         copy_state()
-            : m_bytes_copied(0), m_total_bytes(0), m_status(copy_status::invalid)
         {
         }
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
-        // have implicitly-declared move constructor and move assignment operator.
+        copy_state(const copy_state& other)
+        {
+            *this = other;
+        }
+
+        copy_state& operator=(const copy_state& other)
+        {
+            if (this != &other)
+            {
+                m_copy_id = other.m_copy_id;
+                m_completion_time = other.m_completion_time;
+                m_status_description = other.m_status_description;
+                m_bytes_copied = other.m_bytes_copied;
+                m_total_bytes = other.m_total_bytes;
+                m_status = other.m_status;
+                m_source = other.m_source;
+                *m_source_uri = *other.m_source_uri;
+                m_destination_snapshot_time = other.m_destination_snapshot_time;
+            }
+            return *this;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::copy_state" /> class based on an existing instance.
@@ -2781,11 +2798,11 @@ namespace azure { namespace storage {
                 m_total_bytes = std::move(other.m_total_bytes);
                 m_status = std::move(other.m_status);
                 m_source = std::move(other.m_source);
+                *m_source_uri = std::move(*other.m_source_uri);
                 m_destination_snapshot_time = std::move(other.m_destination_snapshot_time);
             }
             return *this;
         }
-#endif
 
         /// <summary>
         /// Gets the ID of the copy blob operation.
@@ -2820,6 +2837,19 @@ namespace azure { namespace storage {
         /// </summary>
         /// <returns>A <see cref="web::http::uri" /> indicating the source of a copy operation.</returns>
         const web::http::uri& source() const
+        {
+            if (m_source_uri->is_empty())
+            {
+                *m_source_uri = m_source;
+            }
+            return *m_source_uri;
+        }
+
+        /// <summary>
+        /// Gets the URI string of the source blob for a copy operation.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> indicating the source of a copy operation.</returns>
+        const utility::string_t& source_raw() const
         {
             return m_source;
         }
@@ -2865,10 +2895,11 @@ namespace azure { namespace storage {
         utility::string_t m_copy_id;
         utility::datetime m_completion_time;
         utility::string_t m_status_description;
-        int64_t m_bytes_copied;
-        int64_t m_total_bytes;
-        copy_status m_status;
-        web::http::uri m_source;
+        int64_t m_bytes_copied = 0;
+        int64_t m_total_bytes = 0;
+        copy_status m_status = copy_status::invalid;
+        utility::string_t m_source;
+        std::unique_ptr<web::http::uri> m_source_uri = std::unique_ptr<web::http::uri>(new web::http::uri());
         utility::datetime m_destination_snapshot_time;
 
         friend class protocol::response_parsers;

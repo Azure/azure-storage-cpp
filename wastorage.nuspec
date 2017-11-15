@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>wastorage</id>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <title>Microsoft Azure Storage Client Library for C++</title>
     <authors>Microsoft Corporation</authors>
     <owners>Microsoft Corporation</owners>
@@ -14,8 +14,8 @@
     <releaseNotes>Public release</releaseNotes>
     <tags>Microsoft Azure Storage Table Blob Queue File Scalable windowsazureofficial</tags>
     <dependencies>
-      <dependency id="wastorage.v120" version="3.0.0" />
-      <dependency id="wastorage.v140" version="3.0.0" />
+      <dependency id="wastorage.v120" version="3.0.1" />
+      <dependency id="wastorage.v140" version="3.0.1" />
     </dependencies>
   </metadata>
   <files>

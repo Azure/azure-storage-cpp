@@ -1,6 +1,13 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v3.1:
+- #136 Fixed error in get blob properties when value in x-ms-copy-source is not encoded correctly.
+- #124 Fixed the bug in parallel download when offset not zero.
+- #123 Fixed the bug that client will overwrite default retry poilcy.
+- Fixed #132 build issue caused by macro min
+- Throwed exception to warn on the conflict between primary_only and download_services_stats
+
 Changes in v3.0:
 - Default Rest API version is 2016-05-31.
 - Supported large block size to 100MB, single blob upload threshold to 256MB.

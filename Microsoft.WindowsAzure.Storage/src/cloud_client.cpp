@@ -55,6 +55,11 @@ namespace azure { namespace storage {
 
     pplx::task<service_stats> cloud_client::download_service_stats_base_async(const request_options& modified_options, operation_context context) const
     {
+        if (modified_options.location_mode() == location_mode::primary_only)
+        {
+            throw storage_exception("download_service_stats cannot be run with a 'primary_only' location mode.");
+        }
+
         auto command = std::make_shared<core::storage_command<service_stats>>(base_uri());
         command->set_build_request(std::bind(protocol::get_service_stats, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());

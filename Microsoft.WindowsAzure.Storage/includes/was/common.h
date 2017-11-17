@@ -30,6 +30,9 @@
 #include <boost/asio/ip/address.hpp>
 #endif
 
+#pragma push_macro("min")
+#undef min
+
 namespace azure { namespace storage {
 
     namespace protocol
@@ -2907,3 +2910,5 @@ namespace azure { namespace storage {
     };
 
 }} // namespace azure::storage
+
+#pragma pop_macro("min")

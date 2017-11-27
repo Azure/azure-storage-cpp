@@ -248,7 +248,7 @@ namespace azure { namespace storage {
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
-            properties->update_etag(protocol::file_response_parsers::parse_file_directory_properties(response));
+            properties->update_etag_and_last_modified(protocol::file_response_parsers::parse_file_directory_properties(response));
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }

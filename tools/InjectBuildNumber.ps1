@@ -29,3 +29,7 @@ UpdateVersionInFile ((Split-Path -Parent $PSCommandPath) + '\..\wastorage.v120.n
 UpdateVersionInFile ((Split-Path -Parent $PSCommandPath) + '\..\wastorage.v140.nuspec') '    <version>' '</version>' 4
 
 UpdateVersionInFile ((Split-Path -Parent $PSCommandPath) + '\..\wastorage.nuspec') '    <version>' '</version>' 4
+
+UpdateVersionInFile ((Split-Path -Parent $PSCommandPath) + '\..\wastorage.nuspec') '      <dependency id="wastorage.v120" version="' '" />' 4
+
+UpdateVersionInFile ((Split-Path -Parent $PSCommandPath) + '\..\wastorage.nuspec') '      <dependency id="wastorage.v140" version="' '" />' 4

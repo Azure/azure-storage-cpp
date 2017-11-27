@@ -318,15 +318,17 @@ namespace azure { namespace storage {
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
+        auto update_properties = m_properties;
         auto properties = cloud_file_share_properties(*m_properties);
         properties.m_quota = quota;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
         command->set_build_request(std::bind(protocol::set_file_share_properties, properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([](const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([update_properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
+            update_properties->update_etag_and_last_modified(protocol::file_response_parsers::parse_file_share_properties(response));
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }

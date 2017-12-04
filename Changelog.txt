@@ -7,6 +7,9 @@ Changes in v3.1:
 - #123 Fixed the bug that client will overwrite default retry poilcy.
 - Fixed #132 build issue caused by macro min
 - Throwed exception to warn on the conflict between primary_only and download_services_stats
+- Fixed the bug that file share's ETag not updated after quota resize.
+- Fixed the bug that file directory's LMT not updated after upload metadata.
+- Fixed the bug that file's LMT not updated after upload metadata.
 
 Changes in v3.0:
 - Default Rest API version is 2016-05-31.

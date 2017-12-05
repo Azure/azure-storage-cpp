@@ -301,7 +301,6 @@ SUITE(Blob)
             CHECK(same_blob.properties().content_md5().empty());
             CHECK_UTF8_EQUAL(_XPLATSTR("application/octet-stream"), same_blob.properties().content_type());
             CHECK(azure::storage::lease_status::unlocked == same_blob.properties().lease_status());
-            CHECK(blob.properties().server_encrypted() == same_blob.properties().server_encrypted());
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -316,14 +315,14 @@ SUITE(Blob)
             CHECK(blob.properties().last_modified().to_interval() > same_blob.properties().last_modified().to_interval());
 
             same_blob.download_attributes(azure::storage::access_condition(), options, m_context);
-            check_blob_properties_equal(blob.properties(), same_blob.properties());
+            check_blob_properties_equal(blob.properties(), same_blob.properties(), true);
         }
 
         {
             auto same_blob = m_container.get_page_blob_reference(blob.name());
             auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
             same_blob.download_to_stream(stream, azure::storage::access_condition(), options, m_context);
-            check_blob_properties_equal(blob.properties(), same_blob.properties());
+            check_blob_properties_equal(blob.properties(), same_blob.properties(), true);
         }
 
         {
@@ -332,12 +331,12 @@ SUITE(Blob)
             azure::storage::blob_request_options options;
             options.set_use_transactional_md5(true);
             same_blob.download_range_to_stream(stream, 0, 128, azure::storage::access_condition(), options, azure::storage::operation_context());
-            check_blob_properties_equal(blob.properties(), same_blob.properties());
+            check_blob_properties_equal(blob.properties(), same_blob.properties(), true);
         }
         
         {
             auto listing = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, options);
-            check_blob_properties_equal(blob.properties(), listing.front().properties());
+            check_blob_properties_equal(blob.properties(), listing.front().properties(), true);
         }
     }
 

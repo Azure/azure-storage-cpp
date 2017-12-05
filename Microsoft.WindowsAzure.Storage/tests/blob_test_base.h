@@ -48,7 +48,7 @@ protected:
     static utility::string_t get_random_container_name(size_t length = 10);
     static void check_blob_equal(const azure::storage::cloud_blob& expected, const azure::storage::cloud_blob& actual);
     static void check_blob_copy_state_equal(const azure::storage::copy_state& expected, const azure::storage::copy_state& actual);
-    static void check_blob_properties_equal(const azure::storage::cloud_blob_properties& expected, const azure::storage::cloud_blob_properties& actual);
+    static void check_blob_properties_equal(const azure::storage::cloud_blob_properties& expected, const azure::storage::cloud_blob_properties& actual, bool check_settable_only = false);
 
     std::vector<azure::storage::cloud_blob_container> list_all_containers(const utility::string_t& prefix, azure::storage::container_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options);
     std::vector<azure::storage::cloud_blob> list_all_blobs_from_client(const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options);

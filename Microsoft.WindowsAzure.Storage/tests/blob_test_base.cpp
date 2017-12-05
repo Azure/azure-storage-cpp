@@ -128,7 +128,7 @@ void blob_service_test_base::check_blob_copy_state_equal(const azure::storage::c
     CHECK_UTF8_EQUAL(expected.source().to_string(), actual.source().to_string());
 }
 
-void blob_service_test_base::check_blob_properties_equal(const azure::storage::cloud_blob_properties& expected, const azure::storage::cloud_blob_properties& actual)
+void blob_service_test_base::check_blob_properties_equal(const azure::storage::cloud_blob_properties& expected, const azure::storage::cloud_blob_properties& actual, bool check_settable_only)
 {
     CHECK_UTF8_EQUAL(expected.etag(), actual.etag());
     CHECK(expected.last_modified() == actual.last_modified());
@@ -138,5 +138,8 @@ void blob_service_test_base::check_blob_properties_equal(const azure::storage::c
     CHECK_UTF8_EQUAL(expected.content_language(), actual.content_language());
     CHECK_UTF8_EQUAL(expected.content_md5(), actual.content_md5());
     CHECK_UTF8_EQUAL(expected.content_type(), actual.content_type());
-    CHECK(expected.server_encrypted() == actual.server_encrypted());
+    if (!check_settable_only)
+    {
+        CHECK(expected.server_encrypted() == actual.server_encrypted());
+    }
 }

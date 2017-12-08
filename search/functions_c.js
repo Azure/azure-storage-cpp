@@ -8,5 +8,5 @@ var searchData=
   ['operation_5fexpiry_5ftime',['operation_expiry_time',['../classazure_1_1storage_1_1request__options.html#aa8e36e4595f9eac722edf9964629d951',1,'azure::storage::request_options']]],
   ['operation_5ftype',['operation_type',['../classazure_1_1storage_1_1table__operation.html#a7a46571d92c859b54e495f9e7dcff824',1,'azure::storage::table_operation']]],
   ['operations',['operations',['../classazure_1_1storage_1_1table__batch__operation.html#a956abdffa0b998d83b36346cc3c63541',1,'azure::storage::table_batch_operation::operations()'],['../classazure_1_1storage_1_1table__batch__operation.html#a20c709a9285d6b62784dbfd110e56daa',1,'azure::storage::table_batch_operation::operations() const ']]],
-  ['operator_3d',['operator=',['../classazure_1_1storage_1_1operation__context.html#a3e4dbef347e6f4ea5ddb5097c3979fa8',1,'azure::storage::operation_context']]]
+  ['operator_3d',['operator=',['../classazure_1_1storage_1_1operation__context.html#a3e4dbef347e6f4ea5ddb5097c3979fa8',1,'azure::storage::operation_context::operator=()'],['../classazure_1_1storage_1_1copy__state.html#aacd7f6c1983aac02f19b54c122fd2f54',1,'azure::storage::copy_state::operator=()']]]
 ];

@@ -613,7 +613,8 @@ namespace azure { namespace storage {
                 // download the rest data in parallel.
                 utility::size64_t target_offset = offset;
                 utility::size64_t target_length = length;
-                if (target_length >= std::numeric_limits<utility::size64_t>::max())
+                if (target_length >= std::numeric_limits<utility::size64_t>::max()
+                    || target_length > instance->properties().size() - offset)
                 {
                     target_length = instance->properties().size() - offset;
                 }
@@ -626,7 +627,7 @@ namespace azure { namespace storage {
                 target_offset += single_file_download_threshold;
                 target_length -= single_file_download_threshold;
 
-                return pplx::task_from_result().then([instance, target, target_offset, target_length, single_file_download_threshold, condition, options, context]()
+                return pplx::task_from_result().then([instance, offset, target, target_offset, target_length, single_file_download_threshold, condition, options, context]()
                 {
                     auto semaphore = std::make_shared<core::async_semaphore>(options.parallelism_factor());
                     // lock to the target ostream
@@ -645,12 +646,13 @@ namespace azure { namespace storage {
                         {
                             current_length = target_offset + target_length - current_offset;
                         }
-                        semaphore->lock_async().then([instance, &mutex, semaphore, condition_variable, &condition_variable_mutex, &writer, target, smallest_offset, current_offset, current_length, condition, options, context]()
+                        semaphore->lock_async().then([instance, &mutex, semaphore, condition_variable, &condition_variable_mutex, &writer, offset, target, smallest_offset, current_offset, current_length, condition, options, context]()
                         {
                             concurrency::streams::container_buffer<std::vector<uint8_t>> buffer;
                             auto segment_ostream = buffer.create_ostream();
                             // if trasaction MD5 is enabled, it will be checked inside each download_single_range_to_stream_async.
-                            instance->download_single_range_to_stream_async(segment_ostream, current_offset, current_length, condition, options, context, false, true).then([buffer, segment_ostream, semaphore, condition_variable, &condition_variable_mutex, smallest_offset, current_offset, current_length, &mutex, target, &writer, options](pplx::task<void> download_task)
+                            instance->download_single_range_to_stream_async(segment_ostream, current_offset, current_length, condition, options, context)
+                                .then([buffer, segment_ostream, semaphore, condition_variable, &condition_variable_mutex, smallest_offset, offset, current_offset, current_length, &mutex, target, &writer, options](pplx::task<void> download_task)
                             {
                                 segment_ostream.close().then([download_task](pplx::task<void> close_task)
                                 {
@@ -664,7 +666,7 @@ namespace azure { namespace storage {
                                 if (target.can_seek())
                                 {
                                     pplx::extensibility::scoped_rw_lock_t guard(mutex);
-                                    target.streambuf().seekpos(current_offset, std::ios_base::out);
+                                    target.streambuf().seekpos(current_offset - offset, std::ios_base::out);
                                     target.streambuf().putn_nocopy(buffer.collection().data(), buffer.collection().size()).wait();
                                     *smallest_offset += protocol::transactional_md5_block_size;
                                     released = true;

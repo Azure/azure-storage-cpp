@@ -1178,6 +1178,16 @@ namespace azure { namespace storage {
         std::shared_ptr<basic_retry_policy> m_policy;
     };
 
+    /// <summary>
+    /// Sets the ambient scheduler to be used by the PPL constructs.
+    /// </summary>
+    WASTORAGE_API void __cdecl set_wastorage_ambient_scheduler(const std::shared_ptr<pplx::scheduler_interface>& scheduler);
+
+    /// <summary>
+    /// Gets the ambient scheduler to be used by the PPL constructs
+    /// </summary>
+    WASTORAGE_API const std::shared_ptr<pplx::scheduler_interface>& __cdecl get_wastorage_ambient_scheduler();
+
 }} // namespace azure::storage
 
 #ifndef _WIN32

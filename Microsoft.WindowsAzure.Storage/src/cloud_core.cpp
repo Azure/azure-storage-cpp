@@ -58,4 +58,14 @@ namespace azure { namespace storage {
         }
     }
 
+    void __cdecl set_wastorage_ambient_scheduler(const std::shared_ptr<pplx::scheduler_interface>& scheduler)
+    {
+        pplx::set_ambient_scheduler(scheduler);
+    }
+
+    const std::shared_ptr<pplx::scheduler_interface>& __cdecl get_wastorage_ambient_scheduler()
+    {
+        return pplx::get_ambient_scheduler();
+    }
+
 }} // namespace azure::storage

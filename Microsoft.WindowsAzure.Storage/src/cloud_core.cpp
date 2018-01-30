@@ -23,6 +23,8 @@
 
 namespace azure { namespace storage {
 
+    static std::shared_ptr<delayed_scheduler_interface> s_delayedScheduler;
+
     storage_uri::storage_uri(web::http::uri primary_uri)
         : m_primary_uri(std::move(primary_uri))
     {
@@ -66,6 +68,16 @@ namespace azure { namespace storage {
     const std::shared_ptr<pplx::scheduler_interface>& __cdecl get_wastorage_ambient_scheduler()
     {
         return pplx::get_ambient_scheduler();
+    }
+
+    void __cdecl set_wastorage_ambient_delayed_scheduler(const std::shared_ptr<delayed_scheduler_interface>& scheduler)
+    {
+        s_delayedScheduler = scheduler;
+    }
+
+    const std::shared_ptr<delayed_scheduler_interface>& __cdecl get_wastorage_ambient_delayed_scheduler()
+    {
+        return s_delayedScheduler;
     }
 
 }} // namespace azure::storage

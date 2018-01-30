@@ -1179,6 +1179,14 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
+    /// Interface for scheduling tasks that start after a provided delay in milliseconds
+    /// </summary>
+    struct __declspec(novtable) delayed_scheduler_interface
+    {
+        virtual void schedule_after(pplx::TaskProc_t function, void* context, long long delayInMs) = 0;
+    };
+
+    /// <summary>
     /// Sets the ambient scheduler to be used by the PPL constructs.
     /// </summary>
     WASTORAGE_API void __cdecl set_wastorage_ambient_scheduler(const std::shared_ptr<pplx::scheduler_interface>& scheduler);
@@ -1187,6 +1195,16 @@ namespace azure { namespace storage {
     /// Gets the ambient scheduler to be used by the PPL constructs
     /// </summary>
     WASTORAGE_API const std::shared_ptr<pplx::scheduler_interface>& __cdecl get_wastorage_ambient_scheduler();
+
+    /// <summary>
+    /// Sets the ambient scheduler to be used for scheduling delayed tasks
+    /// </summary>
+    WASTORAGE_API void __cdecl set_wastorage_ambient_delayed_scheduler(const std::shared_ptr<delayed_scheduler_interface>& scheduler);
+
+    /// <summary>
+    /// Gets the ambient scheduler to be used for scheduling delayed tasks
+    /// </summary>
+    WASTORAGE_API const std::shared_ptr<delayed_scheduler_interface>& __cdecl get_wastorage_ambient_delayed_scheduler();
 
 }} // namespace azure::storage
 

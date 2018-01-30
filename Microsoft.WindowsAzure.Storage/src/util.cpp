@@ -369,6 +369,50 @@ namespace azure { namespace storage {  namespace core {
     }
 
 #ifdef _WIN32
+class default_delayed_scheduler : public delayed_scheduler_interface
+{
+public:
+    void schedule_after(pplx::TaskProc_t callback, void* context, long long delay) override
+    {
+        auto state = std::make_unique<callback_state>(callback, context);
+        auto timer = CreateThreadpoolTimer(timer_fired, state.get(), nullptr);
+        if (!timer)
+        {
+            throw std::runtime_error("Timer");
+        }
+
+        ULARGE_INTEGER due;
+        due.QuadPart = static_cast<ULONGLONG>(-(delay * 10000LL));
+
+        FILETIME ft;
+        ft.dwHighDateTime = due.HighPart;
+        ft.dwLowDateTime = due.LowPart;
+
+        SetThreadpoolTimer(timer, &ft, 0 /*msPeriod*/, 0 /*msWindowLength*/);
+        state.release();
+    }
+
+private:
+    struct callback_state
+    {
+        callback_state(pplx::TaskProc_t callback, void* context) :
+            m_callback(callback), m_context(context)
+        {}
+
+        pplx::TaskProc_t m_callback;
+        void* m_context;
+    };
+
+    static void __stdcall timer_fired(PTP_CALLBACK_INSTANCE, PVOID context, PTP_TIMER timer)
+    {
+        CloseThreadpoolTimer(timer);
+        std::unique_ptr<callback_state> state(reinterpret_cast<callback_state*>(context));
+        state->m_callback(state->m_context);
+    }
+};
+#endif
+
+#ifdef _WIN32
     class delay_event
 #else
     class delay_event : public std::enable_shared_from_this<delay_event>
@@ -377,18 +421,28 @@ namespace azure { namespace storage {  namespace core {
     public:
 #ifdef _WIN32
         delay_event(std::chrono::milliseconds timeout)
-            : m_callback(new concurrency::call<int>(std::function<void(int)>(std::bind(&delay_event::timer_fired, this, std::placeholders::_1)))), m_timer(static_cast<unsigned int>(timeout.count()), 0, m_callback, false)
+            : m_timeout(timeout)
         {
-        }
-
-        ~delay_event()
-        {
-            delete m_callback;
         }
 
         void start()
         {
-            m_timer.start();
+            static default_delayed_scheduler default_scheduler;
+            auto ambient_delayed_scheduler = get_wastorage_ambient_delayed_scheduler();
+            if (ambient_delayed_scheduler)
+            {
+                ambient_delayed_scheduler->schedule_after(
+                    [](void* event) { reinterpret_cast<delay_event*>(event)->timer_fired(0); },
+                    this,
+                    m_timeout.count());
+            }
+            else
+            {
+                default_scheduler.schedule_after(
+                    [](void* event) { reinterpret_cast<delay_event*>(event)->timer_fired(0); },
+                    this,
+                    m_timeout.count());
+            }
         }
 #else
         delay_event(std::chrono::milliseconds timeout)
@@ -409,8 +463,7 @@ namespace azure { namespace storage {  namespace core {
     private:
         pplx::task_completion_event<void> m_completion_event;
 #ifdef _WIN32
-        concurrency::call<int>* m_callback;
-        concurrency::timer<int> m_timer;
+        std::chrono::milliseconds m_timeout;
 #else
         boost::asio::deadline_timer m_timer;
 #endif

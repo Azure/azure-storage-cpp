@@ -23,7 +23,9 @@
 
 namespace azure { namespace storage {
 
+#ifdef _WIN32
     static std::shared_ptr<delayed_scheduler_interface> s_delayedScheduler;
+#endif
 
     storage_uri::storage_uri(web::http::uri primary_uri)
         : m_primary_uri(std::move(primary_uri))

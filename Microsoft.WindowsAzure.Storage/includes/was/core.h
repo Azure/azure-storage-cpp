@@ -1178,6 +1178,7 @@ namespace azure { namespace storage {
         std::shared_ptr<basic_retry_policy> m_policy;
     };
 
+#ifdef _WIN32
     /// <summary>
     /// Interface for scheduling tasks that start after a provided delay in milliseconds
     /// </summary>
@@ -1187,24 +1188,25 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
-    /// Sets the ambient scheduler to be used by the PPL constructs.
+    /// Sets the ambient scheduler to be used by the PPL constructs. Note this is not thread safe.
     /// </summary>
     WASTORAGE_API void __cdecl set_wastorage_ambient_scheduler(const std::shared_ptr<pplx::scheduler_interface>& scheduler);
 
     /// <summary>
-    /// Gets the ambient scheduler to be used by the PPL constructs
+    /// Gets the ambient scheduler to be used by the PPL constructs. Note this is not thread safe.
     /// </summary>
     WASTORAGE_API const std::shared_ptr<pplx::scheduler_interface>& __cdecl get_wastorage_ambient_scheduler();
 
     /// <summary>
-    /// Sets the ambient scheduler to be used for scheduling delayed tasks
+    /// Sets the ambient scheduler to be used for scheduling delayed tasks. Note this is not thread safe.
     /// </summary>
     WASTORAGE_API void __cdecl set_wastorage_ambient_delayed_scheduler(const std::shared_ptr<delayed_scheduler_interface>& scheduler);
 
     /// <summary>
-    /// Gets the ambient scheduler to be used for scheduling delayed tasks
+    /// Gets the ambient scheduler to be used for scheduling delayed tasks. Note this is not thread safe.
     /// </summary>
     WASTORAGE_API const std::shared_ptr<delayed_scheduler_interface>& __cdecl get_wastorage_ambient_delayed_scheduler();
+#endif
 
 }} // namespace azure::storage
 

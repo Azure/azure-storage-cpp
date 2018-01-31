@@ -60,6 +60,7 @@ namespace azure { namespace storage {
         }
     }
 
+#ifdef _WIN32
     void __cdecl set_wastorage_ambient_scheduler(const std::shared_ptr<pplx::scheduler_interface>& scheduler)
     {
         pplx::set_ambient_scheduler(scheduler);
@@ -79,5 +80,6 @@ namespace azure { namespace storage {
     {
         return s_delayedScheduler;
     }
+#endif
 
 }} // namespace azure::storage

@@ -304,6 +304,23 @@ namespace azure { namespace storage { namespace protocol {
             {
                 m_copy_state.m_destination_snapshot_time = response_parsers::parse_datetime(get_current_element_text(), utility::datetime::date_format::ISO_8601);
             }
+
+			if (element_name == xml_access_tier)
+			{
+				auto current_text = get_current_element_text();
+				m_properties.m_standard_blob_tier = response_parsers::parse_standard_blob_tier(current_text);
+				m_properties.m_premium_blob_tier = response_parsers::parse_premium_blob_tier(current_text);
+			}
+
+			if (element_name == xml_access_tier_inferred)
+			{
+				m_properties.m_access_tier_inferred = response_parsers::parse_boolean(get_current_element_text());
+			}
+
+			if (element_name == xml_access_tier_change_time)
+			{
+				m_properties.m_access_tier_change_time = response_parsers::parse_datetime(get_current_element_text());
+			}
         }
 
         if (element_name == xml_snapshot)

@@ -1,6 +1,22 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v3.2:
+- Added support for blob archive feature, which includes following changes:
+  - Added two new APIs for `cloud_blob` to support copying a blob to a new destination setting premium access tier, note that currently, only premium page blobs are supported so these two APIs should only be used for page blobs.
+    - `utility::string_t start_copy(const web::http::uri& source, const azure::storage::premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)`.
+    - `pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)`.
+  - Added two new APIs for block blob to support setting the standard blob tier.
+    - `void set_standard_blob_tier(const standard_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)`
+    - `pplx::task<void> set_standard_blob_tier_async(const standard_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)`
+  - Added two new APIs for page blob to support setting the premium blob tier.
+    - `void set_premium_blob_tier(const premium_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)`
+    - `pplx::task<void> set_premium_blob_tier_async(const premium_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)`
+  - `cloud_blob_properties` now contains 4 more attributes: ` standard_blob_tier`, `premium_blob_tier`, `archive_status`, `access_tier_inferred`. They will be updated using `download_attributes`, and will be set to server returned value when calling `list_blobs`.
+  - Added two new APIs to support creating page blob with premium access tier.
+    - `pplx::task<void> create_async(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)`
+    - `void create(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)`
+
 Changes in v3.1:
 - #136 Fixed error in get blob properties when value in x-ms-copy-source is not encoded correctly.
 - #124 Fixed the bug in parallel download when offset not zero.

@@ -355,4 +355,64 @@ namespace azure { namespace storage { namespace protocol {
         return parse_public_access_type(get_header_value(response.headers(), ms_header_blob_public_access));
     }
 
+	premium_blob_tier response_parsers::parse_premium_blob_tier(const utility::string_t& value)
+	{
+		if (value == header_value_access_tier_p4)
+		{
+			return premium_blob_tier::p4;
+		}
+		else if (value == header_value_access_tier_p6)
+		{
+			return premium_blob_tier::p6;
+		}
+		else if (value == header_value_access_tier_p10)
+		{
+			return premium_blob_tier::p10;
+		}
+		else if (value == header_value_access_tier_p20)
+		{
+			return premium_blob_tier::p20;
+		}
+		else if (value == header_value_access_tier_p30)
+		{
+			return premium_blob_tier::p30;
+		}
+		else if (value == header_value_access_tier_p40)
+		{
+			return premium_blob_tier::p40;
+		}
+		else if (value == header_value_access_tier_p50)
+		{
+			return premium_blob_tier::p50;
+		}
+		else if (value == header_value_access_tier_p60)
+		{
+			return premium_blob_tier::p60;
+		}
+		else
+		{
+			return premium_blob_tier::unknown;
+		}
+	}
+
+	standard_blob_tier response_parsers::parse_standard_blob_tier(const utility::string_t& value)
+	{
+		if (value == header_value_access_tier_hot)
+		{
+			return standard_blob_tier::hot;
+		}
+		else if (value == header_value_access_tier_cool)
+		{
+			return standard_blob_tier::cool;
+		}
+		else if (value == header_value_access_tier_archive)
+		{
+			return standard_blob_tier::archive;
+		}
+		else
+		{
+			return standard_blob_tier::unknown;
+		}
+	}
+
 }}} // namespace azure::storage::protocol

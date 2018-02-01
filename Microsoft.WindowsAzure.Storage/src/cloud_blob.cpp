@@ -108,6 +108,39 @@ namespace azure { namespace storage {
         }
     }
 
+    utility::string_t cloud_blob::get_premium_access_tier_string(const premium_blob_tier tier)
+    {
+        switch (tier)
+        {
+        case premium_blob_tier::p4:
+            return protocol::header_value_access_tier_p4;
+
+        case premium_blob_tier::p6:
+            return protocol::header_value_access_tier_p6;
+
+        case premium_blob_tier::p10:
+            return protocol::header_value_access_tier_p10;
+
+        case premium_blob_tier::p20:
+            return protocol::header_value_access_tier_p20;
+
+        case premium_blob_tier::p30:
+            return protocol::header_value_access_tier_p30;
+
+        case premium_blob_tier::p40:
+            return protocol::header_value_access_tier_p40;
+
+        case premium_blob_tier::p50:
+            return protocol::header_value_access_tier_p50;
+
+        case premium_blob_tier::p60:
+            return protocol::header_value_access_tier_p60;
+
+        default:
+            return protocol::header_value_access_tier_unknown;
+        }
+    }
+
     utility::string_t cloud_blob::get_shared_access_signature(const blob_shared_access_policy& policy, const utility::string_t& stored_policy_identifier, const cloud_blob_shared_access_headers& headers) const
     {
         if (!service_client().credentials().is_shared_key())
@@ -774,7 +807,7 @@ namespace azure { namespace storage {
         return core::executor<bool>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -784,13 +817,14 @@ namespace azure { namespace storage {
         auto copy_state = m_copy_state;
 
         auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
-        command->set_build_request(std::bind(protocol::copy_blob, source, source_condition, metadata(), destination_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::copy_blob, source, get_premium_access_tier_string(tier), source_condition, metadata(), destination_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties, copy_state] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties, copy_state, tier] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             auto new_state = protocol::response_parsers::parse_copy_state(response);
+            properties->m_premium_blob_tier = tier;
             *copy_state = new_state;
             return new_state.copy_id();
         });

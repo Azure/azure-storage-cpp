@@ -53,6 +53,66 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
+    standard_blob_tier blob_response_parsers::parse_standard_blob_tier(const utility::string_t& value)
+    {
+        if (value == header_value_access_tier_hot)
+        {
+            return standard_blob_tier::hot;
+        }
+        else if (value == header_value_access_tier_cool)
+        {
+            return standard_blob_tier::cool;
+        }
+        else if (value == header_value_access_tier_archive)
+        {
+            return standard_blob_tier::archive;
+        }
+        else
+        {
+            return standard_blob_tier::unknown;
+        }
+    }
+
+    premium_blob_tier blob_response_parsers::parse_premium_blob_tier(const utility::string_t& value)
+    {
+        if (value == header_value_access_tier_p4)
+        {
+            return premium_blob_tier::p4;
+        }
+        else if (value == header_value_access_tier_p6)
+        {
+            return premium_blob_tier::p6;
+        }
+        else if (value == header_value_access_tier_p10)
+        {
+            return premium_blob_tier::p10;
+        }
+        else if (value == header_value_access_tier_p20)
+        {
+            return premium_blob_tier::p20;
+        }
+        else if (value == header_value_access_tier_p30)
+        {
+            return premium_blob_tier::p30;
+        }
+        else if (value == header_value_access_tier_p40)
+        {
+            return premium_blob_tier::p40;
+        }
+        else if (value == header_value_access_tier_p50)
+        {
+            return premium_blob_tier::p50;
+        }
+        else if (value == header_value_access_tier_p60)
+        {
+            return premium_blob_tier::p60;
+        }
+        else
+        {
+            return premium_blob_tier::unknown;
+        }
+    }
+
     utility::size64_t blob_response_parsers::parse_blob_size(const web::http::http_response& response)
     {
         auto& headers = response.headers();
@@ -71,6 +131,22 @@ namespace azure { namespace storage { namespace protocol {
         }
 
         return headers.content_length();
+    }
+
+    archive_status blob_response_parsers::parse_archive_status(const utility::string_t& value)
+    {
+        if (value == header_value_archive_status_to_hot)
+        {
+            return archive_status::rehydrate_pending_to_hot;
+        }
+        else if (value == header_value_archive_status_to_cool)
+        {
+            return archive_status::rehydrate_pending_to_cool;
+        }
+        else
+        {
+            return archive_status::unknown;
+        }
     }
 
     cloud_blob_properties blob_response_parsers::parse_blob_properties(const web::http::http_response& response)
@@ -98,9 +174,20 @@ namespace azure { namespace storage { namespace protocol {
         {
             properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
         }
+        
+        auto change_time_string = get_header_value(headers, ms_header_tier_change_time);
+        if (!change_time_string.empty())
+        {
+            properties.m_access_tier_change_time = utility::datetime::from_string(change_time_string, utility::datetime::date_format::RFC_1123);
+        }
 
+        auto tier_string = get_header_value(headers, ms_header_access_tier);
+        properties.m_standard_blob_tier = parse_standard_blob_tier(tier_string);
+        properties.m_premium_blob_tier = parse_premium_blob_tier(tier_string);
+        properties.m_archive_status = parse_archive_status(get_header_value(headers, ms_header_archive_status));
         properties.m_server_encrypted = response_parsers::parse_boolean(get_header_value(headers, ms_header_server_encrypted));
         properties.m_is_incremental_copy = response_parsers::parse_boolean(get_header_value(headers, ms_header_incremental_copy));
+        properties.m_access_tier_inferred = response_parsers::parse_boolean(get_header_value(headers, ms_header_access_tier_inferred));
 
         return properties;
     }

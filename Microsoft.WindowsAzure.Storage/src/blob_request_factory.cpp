@@ -372,13 +372,17 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_page_blob(utility::size64_t size, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_page_blob(utility::size64_t size, const utility::string_t& tier, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         web::http::http_headers& headers = request.headers();
         headers.add(ms_header_blob_type, header_value_blob_type_page);
         headers.add(ms_header_blob_content_length, size);
         headers.add(ms_header_blob_sequence_number, sequence_number);
+        if (tier != header_value_access_tier_unknown)
+        {
+            headers.add(ms_header_access_tier, tier);
+        }
         add_properties(request, properties);
         add_metadata(request, metadata);
         add_access_condition(request, condition);
@@ -505,10 +509,14 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request copy_blob(const web::http::uri& source, const utility::string_t& tier, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_copy_source, source.to_string());
+        if (tier != header_value_access_tier_unknown)
+        {
+            request.headers().add(ms_header_access_tier, tier);
+        }
         add_source_access_condition(request, source_condition);
         add_access_condition(request, condition);
         add_metadata(request, metadata);
@@ -532,6 +540,17 @@ namespace azure { namespace storage { namespace protocol {
         request.headers().add(ms_header_copy_source, source.to_string());
         add_access_condition(request, condition);
         add_metadata(request, metadata);
+        return request;
+    }
+
+    web::http::http_request set_blob_tier(const utility::string_t& tier, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_tier, /* do_encoding */ false));
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        
+        request.headers().add(ms_header_access_tier, tier);
+        add_append_condition(request, condition);
+        add_access_condition(request, condition);
         return request;
     }
 

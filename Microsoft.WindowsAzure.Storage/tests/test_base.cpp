@@ -32,6 +32,8 @@ test_config::test_config()
     config_file >> config;
 
     auto target_name = config[_XPLATSTR("target")].as_string();
+    auto premium_target_name = config[_XPLATSTR("premium_target")].as_string();
+    auto blob_storage_target_name = config[_XPLATSTR("blob_storage_target")].as_string();
     web::json::value& tenants = config[_XPLATSTR("tenants")];
 
     for (web::json::array::const_iterator it = tenants.as_array().cbegin(); it != tenants.as_array().cend(); ++it)
@@ -52,8 +54,38 @@ test_config::test_config()
                 const web::json::value& connection_string_obj = it->at(_XPLATSTR("connection_string"));
                 m_account = azure::storage::cloud_storage_account::parse(connection_string_obj.as_string());
             }
-
-            break;
+        }
+        else if (name_obj.as_string() == premium_target_name)
+        {
+            if (!it->has_field(_XPLATSTR("connection_string")))
+            {
+                azure::storage::storage_credentials credentials(it->at(_XPLATSTR("account_name")).as_string(), it->at(_XPLATSTR("account_key")).as_string());
+                azure::storage::storage_uri blob_uri(it->at(_XPLATSTR("blob_primary_endpoint")).as_string(), it->at(_XPLATSTR("blob_secondary_endpoint")).as_string());
+                azure::storage::storage_uri queue_uri(it->at(_XPLATSTR("queue_primary_endpoint")).as_string(), it->at(_XPLATSTR("queue_secondary_endpoint")).as_string());
+                azure::storage::storage_uri table_uri(it->at(_XPLATSTR("table_primary_endpoint")).as_string(), it->at(_XPLATSTR("table_secondary_endpoint")).as_string());
+                m_premium_account = azure::storage::cloud_storage_account(credentials, blob_uri, queue_uri, table_uri);
+            }
+            else
+            {
+                const web::json::value& connection_string_obj = it->at(_XPLATSTR("connection_string"));
+                m_premium_account = azure::storage::cloud_storage_account::parse(connection_string_obj.as_string());
+            }
+        }
+        else if (name_obj.as_string() == blob_storage_target_name)
+        {
+            if (!it->has_field(_XPLATSTR("connection_string")))
+            {
+                azure::storage::storage_credentials credentials(it->at(_XPLATSTR("account_name")).as_string(), it->at(_XPLATSTR("account_key")).as_string());
+                azure::storage::storage_uri blob_uri(it->at(_XPLATSTR("blob_primary_endpoint")).as_string(), it->at(_XPLATSTR("blob_secondary_endpoint")).as_string());
+                azure::storage::storage_uri queue_uri(it->at(_XPLATSTR("queue_primary_endpoint")).as_string(), it->at(_XPLATSTR("queue_secondary_endpoint")).as_string());
+                azure::storage::storage_uri table_uri(it->at(_XPLATSTR("table_primary_endpoint")).as_string(), it->at(_XPLATSTR("table_secondary_endpoint")).as_string());
+                m_blob_storage_account = azure::storage::cloud_storage_account(credentials, blob_uri, queue_uri, table_uri);
+            }
+            else
+            {
+                const web::json::value& connection_string_obj = it->at(_XPLATSTR("connection_string"));
+                m_blob_storage_account = azure::storage::cloud_storage_account::parse(connection_string_obj.as_string());
+            }
         }
     }
 }

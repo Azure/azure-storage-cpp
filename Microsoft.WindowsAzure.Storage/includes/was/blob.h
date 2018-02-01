@@ -988,6 +988,106 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
+    /// The tier of the block blob on a standard storage account.
+    /// </summary>
+    enum class standard_blob_tier
+    {
+        /// <summary>
+        /// The tier is not recognized by this version of the library
+        /// </summary>
+        unknown,
+
+        /// <summary>
+        /// Hot Storage
+        /// </summary>
+        hot,
+
+        /// <summary>
+        /// Cool Storage
+        /// </summary>
+        cool,
+
+        /// <summary>
+        /// Archive Storage
+        /// </summary>
+        archive
+    };
+
+    /// <summary>
+    /// The tier of the page blob.
+    /// Please take a look at https://docs.microsoft.com/en-us/azure/storage/storage-premium-storage#scalability-and-performance-targets
+    /// for detailed information on the corresponding IOPS and throughput per PremiumPageBlobTier.
+    /// </summary>
+    enum class premium_blob_tier
+    {
+        /// <summary>
+        /// The tier is not recognized by this version of the library
+        /// </summary>
+        unknown,
+
+        /// <summary>
+        /// P4 Tier
+        /// </summary>
+        p4,
+
+        /// <summary>
+        /// P6 Tier
+        /// </summary>
+        p6,
+
+        /// <summary>
+        /// P10 Tier
+        /// </summary>
+        p10,
+
+        /// <summary>
+        /// P20 Tier
+        /// </summary>
+        p20,
+
+        /// <summary>
+        /// P30 Tier
+        /// </summary>
+        p30,
+
+        /// <summary>
+        /// P40 Tier
+        /// </summary>
+        p40,
+
+        /// <summary>
+        /// P50 Tier
+        /// </summary>
+        p50,
+
+        /// <summary>
+        /// P60 Tier
+        /// </summary>
+        p60
+    };
+
+    /// <summary>
+    /// The status of the blob if being re-hydrated.
+    /// </summary>
+    enum class archive_status
+    {
+        /// <summary>
+        /// The blob's archive status is unknown
+        /// </summary>
+        unknown,
+
+        /// <summary>
+        /// The blob is being re-hydrated to hot
+        /// </summary>
+        rehydrate_pending_to_hot,
+
+        /// <summary>
+        /// The blob is being re-hydrated to cool
+        /// </summary>
+        rehydrate_pending_to_cool
+    };
+
+    /// <summary>
     /// Represents the permissions for a container.
     /// </summary>
     class blob_container_permissions : public cloud_permissions<blob_shared_access_policy>
@@ -1331,6 +1431,51 @@ namespace azure { namespace storage {
             return m_is_incremental_copy;
         }
 
+        /// <summary>
+        /// Gets a value indicating the standard blob tier if the blob is a block blob.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::standard_blob_tier" /> enum that indicates the blob's tier.</returns>
+        azure::storage::standard_blob_tier standard_blob_tier() const
+        {
+            return m_standard_blob_tier;
+        }
+
+        /// <summary>
+        /// Gets a value indicating the premium blob tier if the blob is a page blob.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::premium_blob_tier" /> enum that indicates the blob's tier.</returns>
+        azure::storage::premium_blob_tier premium_blob_tier() const
+        {
+            return m_premium_blob_tier;
+        }
+
+        /// <summary>
+        /// Gets a value indicating the archive status of the blob.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::archive_status" /> object that indicates the blob's archive status.</returns>
+        azure::storage::archive_status archive_status() const
+        {
+            return m_archive_status;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether or not the access tier is inferred. 
+        /// </summary>
+        /// <returns><c>true</c> if the access tier is not explicitly set on a page blob on premium accounts; otherwise, <c>false</c>.</returns>
+        bool access_tier_inferred() const
+        {
+            return m_access_tier_inferred;
+        }
+
+        /// <summary>
+        /// Gets the access tier change time for the blob, expressed as a UTC value.
+        /// </summary>
+        /// <returns>The access tier change time, in UTC format.</returns>
+        utility::datetime access_tier_change_time() const
+        {
+            return m_access_tier_change_time;
+        }
+
     private:
 
         /// <summary>
@@ -1357,14 +1502,19 @@ namespace azure { namespace storage {
         utility::string_t m_content_type;
         utility::string_t m_etag;
         utility::datetime m_last_modified;
+        utility::datetime m_access_tier_change_time;
         blob_type m_type;
         azure::storage::lease_status m_lease_status;
         azure::storage::lease_state m_lease_state;
         azure::storage::lease_duration m_lease_duration;
+        azure::storage::standard_blob_tier m_standard_blob_tier;
+        azure::storage::premium_blob_tier m_premium_blob_tier;
+        azure::storage::archive_status m_archive_status;
         int64_t m_page_blob_sequence_number;
         int m_append_blob_committed_block_count;
         bool m_server_encrypted;
         bool m_is_incremental_copy;
+        bool m_access_tier_inferred;
 
         void copy_from_root(const cloud_blob_properties& root_blob_properties);
         void update_etag_and_last_modified(const cloud_blob_properties& parsed_properties);
@@ -2391,7 +2541,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
+        /// Initiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::container_result_segment" /> that represents the current operation.</returns>
@@ -2401,7 +2551,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
+        /// Initiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="prefix">The container name prefix.</param>
         /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
@@ -2412,7 +2562,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
+        /// Initiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
         /// </summary>
         /// <param name="prefix">The container name prefix.</param>
         /// <param name="includes">An <see cref="azure::storage::container_listing_details::values" /> enumeration describing which items to include in the listing.</param>
@@ -2476,7 +2626,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items in the container.
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
@@ -2487,7 +2637,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items in the container.
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
@@ -2521,7 +2671,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get the properties of the service.
+        /// Initiates an asynchronous operation to get the properties of the service.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_properties" /> that represents the current operation.</returns>
         pplx::task<service_properties> download_service_properties_async() const
@@ -2530,7 +2680,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get the properties of the service.
+        /// Initiates an asynchronous operation to get the properties of the service.
         /// </summary>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
@@ -2560,7 +2710,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set the service properties for the Blob service client.
+        /// Initiates an asynchronous operation to set the service properties for the Blob service client.
         /// </summary>
         /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Blob service client.</param>
         /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
@@ -2571,7 +2721,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set the service properties for the Blob service client.
+        /// Initiates an asynchronous operation to set the service properties for the Blob service client.
         /// </summary>
         /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Blob service client.</param>
         /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
@@ -2601,7 +2751,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get the stats of the service.
+        /// Initiates an asynchronous operation to get the stats of the service.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
         pplx::task<service_stats> download_service_stats_async() const
@@ -2610,7 +2760,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get the stats of the service.
+        /// Initiates an asynchronous operation to get the stats of the service.
         /// </summary>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
@@ -2855,7 +3005,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to retrieve the container's attributes.
+        /// Initiates an asynchronous operation to retrieve the container's attributes.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> download_attributes_async()
@@ -2864,7 +3014,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to retrieve the container's attributes.
+        /// Initiates an asynchronous operation to retrieve the container's attributes.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -2892,7 +3042,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set the container's user-defined metadata.
+        /// Initiates an asynchronous operation to set the container's user-defined metadata.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_metadata_async()
@@ -2901,7 +3051,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set the container's user-defined metadata.
+        /// Initiates an asynchronous operation to set the container's user-defined metadata.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -2935,7 +3085,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to acquire a lease on the container.
+        /// Initiates an asynchronous operation to acquire a lease on the container.
         /// </summary>
         /// <param name="duration">An <see cref="azure::storage::lease_time" /> object representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed..</param>
@@ -2946,7 +3096,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to acquire a lease on the container.
+        /// Initiates an asynchronous operation to acquire a lease on the container.
         /// </summary>
         /// <param name="duration">An <see cref="azure::storage::lease_time" /> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
@@ -2976,7 +3126,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to renew a lease on the container.
+        /// Initiates an asynchronous operation to renew a lease on the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> renew_lease_async() const
@@ -2985,7 +3135,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to renew a lease on the container.
+        /// Initiates an asynchronous operation to renew a lease on the container.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3017,7 +3167,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to change the lease ID for a lease on the container.
+        /// Initiates an asynchronous operation to change the lease ID for a lease on the container.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -3027,7 +3177,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to change the lease ID for a lease on the container.
+        /// Initiates an asynchronous operation to change the lease ID for a lease on the container.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
@@ -3056,7 +3206,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to release a lease on the container.
+        /// Initiates an asynchronous operation to release a lease on the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> release_lease_async() const
@@ -3065,7 +3215,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to release a lease on the container.
+        /// Initiates an asynchronous operation to release a lease on the container.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3097,7 +3247,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to break the current lease on the container.
+        /// Initiates an asynchronous operation to break the current lease on the container.
         /// </summary>
         /// <param name="break_period">An <see cref="azure::storage::lease_break_period" /> representing the amount of time to allow the lease to remain.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
@@ -3107,7 +3257,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to break the current lease on the container.
+        /// Initiates an asynchronous operation to break the current lease on the container.
         /// </summary>
         /// <param name="break_period">An <see cref="azure::storage::lease_break_period" /> representing the amount of time to allow the lease to remain.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
@@ -3137,7 +3287,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create the container.
+        /// Initiates an asynchronous operation to create the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> create_async()
@@ -3146,7 +3296,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create the container.
+        /// Initiates an asynchronous operation to create the container.
         /// </summary>
         /// <param name="public_access">An <see cref="azure::storage::blob_container_public_access_type" /> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3176,7 +3326,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create the container if it does not already exist.
+        /// Initiates an asynchronous operation to create the container if it does not already exist.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> create_if_not_exists_async()
@@ -3185,7 +3335,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create the container if it does not already exist and specify the level of public access to the container's data.
+        /// Initiates an asynchronous operation to create the container if it does not already exist and specify the level of public access to the container's data.
         /// </summary>
         /// <param name="public_access">An <see cref="azure::storage::blob_container_public_access_type" /> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3213,7 +3363,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the container.
+        /// Initiates an asynchronous operation to delete the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> delete_container_async()
@@ -3222,7 +3372,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the container.
+        /// Initiates an asynchronous operation to delete the container.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3252,7 +3402,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the container if it already exists.
+        /// Initiates an asynchronous operation to delete the container if it already exists.
         /// </summary>
         /// <returns><c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.</returns>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -3262,7 +3412,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the container if it already exists.
+        /// Initiates an asynchronous operation to delete the container if it already exists.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3332,7 +3482,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
@@ -3343,7 +3493,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
@@ -3355,7 +3505,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="prefix">The blob name prefix.</param>
@@ -3391,7 +3541,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set permissions for the container.
+        /// Initiates an asynchronous operation to set permissions for the container.
         /// </summary>
         /// <param name="permissions">The permissions to apply to the container.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -3401,7 +3551,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set permissions for the container.
+        /// Initiates an asynchronous operation to set permissions for the container.
         /// </summary>
         /// <param name="permissions">The permissions to apply to the container.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -3432,7 +3582,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get permissions settings for the container.
+        /// Initiates an asynchronous operation to get permissions settings for the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::blob_container_permissions" /> that represents the current operation.</returns>
         pplx::task<blob_container_permissions> download_permissions_async()
@@ -3441,7 +3591,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get permissions settings for the container.
+        /// Initiates an asynchronous operation to get permissions settings for the container.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3470,7 +3620,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to check the existence of the container.
+        /// Initiates an asynchronous operation to check the existence of the container.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> exists_async()
@@ -3479,7 +3629,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to check the existence of the container.
+        /// Initiates an asynchronous operation to check the existence of the container.
         /// </summary>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
@@ -3731,7 +3881,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="token">A continuation token returned by a previous listing operation.</param>
@@ -3742,7 +3892,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
         /// in the container.
         /// </summary>
         /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
@@ -3954,7 +4104,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for reading from the blob.
+        /// Initiates an asynchronous operation to open a stream for reading from the blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::istream" /> that represents the current operation.</returns>
         pplx::task<concurrency::streams::istream> open_read_async()
@@ -3963,7 +4113,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for reading from the blob.
+        /// Initiates an asynchronous operation to open a stream for reading from the blob.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -3992,7 +4142,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to check the existence of the blob.
+        /// Initiates an asynchronous operation to check the existence of the blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> exists_async()
@@ -4001,7 +4151,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to check the existence of the blob.
+        /// Initiates an asynchronous operation to check the existence of the blob.
         /// </summary>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
@@ -4031,7 +4181,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to populate a blob's properties and metadata.
+        /// Initiates an asynchronous operation to populate a blob's properties and metadata.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> download_attributes_async()
@@ -4040,7 +4190,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to populate a blob's properties and metadata.
+        /// Initiates an asynchronous operation to populate a blob's properties and metadata.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -4068,7 +4218,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to update the blob's metadata.
+        /// Initiates an asynchronous operation to update the blob's metadata.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_metadata_async()
@@ -4077,7 +4227,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to update the blob's metadata.
+        /// Initiates an asynchronous operation to update the blob's metadata.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -4105,7 +4255,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to update the blob's properties.
+        /// Initiates an asynchronous operation to update the blob's properties.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_properties_async()
@@ -4114,7 +4264,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to update the blob's properties.
+        /// Initiates an asynchronous operation to update the blob's properties.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -4143,7 +4293,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the blob.
+        /// Initiates an asynchronous operation to delete the blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> delete_blob_async()
@@ -4152,7 +4302,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the blob.
+        /// Initiates an asynchronous operation to delete the blob.
         /// </summary>
         /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -4184,7 +4334,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the blob if it already exists.
+        /// Initiates an asynchronous operation to delete the blob if it already exists.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> delete_blob_if_exists_async()
@@ -4193,7 +4343,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to delete the blob if it already exists.
+        /// Initiates an asynchronous operation to delete the blob if it already exists.
         /// </summary>
         /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -4228,7 +4378,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to acquire a lease on the blob.
+        /// Initiates an asynchronous operation to acquire a lease on the blob.
         /// </summary>
         /// <param name="duration">An <see cref="azure::storage::lease_time" /> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
@@ -4239,7 +4389,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to acquire a lease on the blob.
+        /// Initiates an asynchronous operation to acquire a lease on the blob.
         /// </summary>
         /// <param name="duration">An <see cref="azure::storage::lease_time" /> representing the span of time for which to acquire the lease.</param>
         /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
@@ -4270,7 +4420,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to renew a lease on the blob.
+        /// Initiates an asynchronous operation to renew a lease on the blob.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -4280,7 +4430,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to renew a lease on the blob.
+        /// Initiates an asynchronous operation to renew a lease on the blob.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -4313,7 +4463,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to change the lease ID on the blob.
+        /// Initiates an asynchronous operation to change the lease ID on the blob.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
@@ -4324,7 +4474,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to change the lease ID on the blob.
+        /// Initiates an asynchronous operation to change the lease ID on the blob.
         /// </summary>
         /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
@@ -4354,7 +4504,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to release the lease on the blob.
+        /// Initiates an asynchronous operation to release the lease on the blob.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -4364,7 +4514,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to release the lease on the blob.
+        /// Initiates an asynchronous operation to release the lease on the blob.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -4396,7 +4546,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to break the current lease on the blob.
+        /// Initiates an asynchronous operation to break the current lease on the blob.
         /// </summary>
         /// <param name="break_period">An <see cref="azure::storage::lease_break_period" /> representing the amount of time to allow the lease to remain.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
@@ -4406,7 +4556,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to break the current lease on the blob.
+        /// Initiates an asynchronous operation to break the current lease on the blob.
         /// </summary>
         /// <param name="break_period">An <see cref="azure::storage::lease_break_period" /> representing the amount of time to allow the lease to remain.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
@@ -4437,7 +4587,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the contents of a blob to a stream.
+        /// Initiates an asynchronous operation to download the contents of a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -4447,7 +4597,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the contents of a blob to a stream.
+        /// Initiates an asynchronous operation to download the contents of a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -4485,7 +4635,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download a range of bytes in a blob to a stream.
+        /// Initiates an asynchronous operation to download a range of bytes in a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
         /// <param name="offset">The offset at which to begin downloading the blob, in bytes.</param>
@@ -4497,7 +4647,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download a range of bytes in a blob to a stream.
+        /// Initiates an asynchronous operation to download a range of bytes in a blob to a stream.
         /// </summary>
         /// <param name="target">The target stream.</param>
         /// <param name="offset">The offset at which to begin downloading the blob, in bytes.</param>
@@ -4530,7 +4680,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the contents of a blob to a file.
+        /// Initiates an asynchronous operation to download the contents of a blob to a file.
         /// </summary>
         /// <param name="path">The target file.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -4540,7 +4690,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the contents of a blob to a file.
+        /// Initiates an asynchronous operation to download the contents of a blob to a file.
         /// </summary>
         /// <param name="path">The target file.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -4622,7 +4772,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -4638,7 +4788,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -4654,7 +4804,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
@@ -4671,7 +4821,7 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<utility::string_t> start_copy_from_blob_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
@@ -4784,7 +4934,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -4798,7 +4948,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -4812,7 +4962,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source file.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -4823,7 +4973,7 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_file& source);
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
@@ -4835,10 +4985,13 @@ namespace azure { namespace storage {
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
+        pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async_impl(source, premium_blob_tier::unknown, source_condition, destination_condition, options, context);
+        }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
@@ -4853,7 +5006,7 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
+        /// Initiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source file.</param>
         /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
@@ -4889,7 +5042,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to abort an ongoing blob copy operation.
+        /// Initiates an asynchronous operation to abort an ongoing blob copy operation.
         /// </summary>
         /// <param name="copy_id">A string identifying the copy operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -4899,7 +5052,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to abort an ongoing blob copy operation.
+        /// Initiates an asynchronous operation to abort an ongoing blob copy operation.
         /// </summary>
         /// <param name="copy_id">A string identifying the copy operation.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -4931,7 +5084,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create a snapshot of the blob.
+        /// Initiates an asynchronous operation to create a snapshot of the blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_blob" /> that represents the current operation.</returns>
         pplx::task<azure::storage::cloud_blob> create_snapshot_async()
@@ -4940,7 +5093,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create a snapshot of the blob.
+        /// Initiates an asynchronous operation to create a snapshot of the blob.
         /// </summary>
         /// <param name="metadata">A collection of name-value pairs defining the metadata of the snapshot.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -5087,12 +5240,30 @@ namespace azure { namespace storage {
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
         WASTORAGE_API cloud_blob(utility::string_t name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, azure::storage::copy_state copy_state);
 
+		/// <summary>
+		/// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+		/// </summary>
+		/// <param name="source">The URI of a source blob.</param>
+		/// <param name="tier">An enum that represents the <see cref="azure::storage::premium_blob_tier" /> for the destination blob.</param>
+		/// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+		/// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+		/// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+		/// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+		/// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+		/// <remarks>
+		/// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+		/// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+		/// </remarks>
+		WASTORAGE_API pplx::task<utility::string_t> start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
+
         void assert_no_snapshot() const;
 
         void set_type(blob_type value)
         {
             m_properties->set_type(value);
         }
+
+        utility::string_t get_premium_access_tier_string(const premium_blob_tier tier);
 
         std::shared_ptr<cloud_blob_properties> m_properties;
         std::shared_ptr<cloud_metadata> m_metadata;
@@ -5225,7 +5396,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to the block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to open a stream for writing to the block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         pplx::task<concurrency::streams::ostream> open_write_async()
@@ -5234,7 +5405,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to the block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to open a stream for writing to the block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -5268,7 +5439,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an enumerable collection of the blob's blocks, 
+        /// Initiates an asynchronous operation to return an enumerable collection of the blob's blocks, 
         /// using the specified block list filter.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::block_list_item" />, that represents the current operation.</returns>
@@ -5278,7 +5449,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to return an enumerable collection of the blob's blocks, 
+        /// Initiates an asynchronous operation to return an enumerable collection of the blob's blocks, 
         /// using the specified block list filter.
         /// </summary>
         /// <param name="listing_filter">One of the enumeration values that indicates whether to return
@@ -5311,7 +5482,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the blob's contents as a string.
+        /// Initiates an asynchronous operation to download the blob's contents as a string.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         pplx::task<utility::string_t> download_text_async()
@@ -5320,13 +5491,36 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the blob's contents as a string.
+        /// Initiates an asynchronous operation to download the blob's contents as a string.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         WASTORAGE_API pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+
+        /// <summary>
+        /// Sets standard account's blob tier.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::standard_blob_tier" /> enum that represents the blob tier to be set.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        void set_standard_blob_tier(const standard_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)
+        {
+            set_standard_blob_tier_async(tier, condition, options, context).wait();
+        }
+        
+        /// <summary>
+        /// Initiates an asynchronous operation to set standard account's blob tier.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::standard_blob_tier" /> enum that represents the blob tier to be set.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> set_standard_blob_tier_async(const standard_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context);
 
         /// <summary>
         /// Uploads a single block.
@@ -5356,7 +5550,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a single block.
+        /// Initiates an asynchronous operation to upload a single block.
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
@@ -5369,7 +5563,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a single block.
+        /// Initiates an asynchronous operation to upload a single block.
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
@@ -5403,7 +5597,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a list of blocks to a new or existing blob. 
+        /// Initiates an asynchronous operation to upload a list of blocks to a new or existing blob. 
         /// </summary>
         /// <param name="block_list">An enumerable collection of block IDs, as Base64-encoded strings.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -5413,7 +5607,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a list of blocks to a new or existing blob. 
+        /// Initiates an asynchronous operation to upload a list of blocks to a new or existing blob. 
         /// </summary>
         /// <param name="block_list">An enumerable collection of block IDs, as Base64-encoded strings.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -5467,7 +5661,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -5477,7 +5671,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -5490,7 +5684,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -5501,7 +5695,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -5533,7 +5727,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a file to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a file to a block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -5543,7 +5737,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a file to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a file to a block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -5609,7 +5803,7 @@ namespace azure { namespace storage {
 
         friend class cloud_blob_container;
         friend class cloud_blob_directory;
-    };
+};
 
     /// <summary>
     /// Represents a Windows Azure page blob.
@@ -5744,7 +5938,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to an existing page blob.
+        /// Initiates an asynchronous operation to open a stream for writing to an existing page blob.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         pplx::task<concurrency::streams::ostream> open_write_async()
@@ -5753,7 +5947,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to an existing page blob.
+        /// Initiates an asynchronous operation to open a stream for writing to an existing page blob.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -5762,7 +5956,7 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to a new page blob.
+        /// Initiates an asynchronous operation to open a stream for writing to a new page blob.
         /// </summary>
         /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
@@ -5772,7 +5966,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to a new page blob.
+        /// Initiates an asynchronous operation to open a stream for writing to a new page blob.
         /// </summary>
         /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
         /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
@@ -5806,7 +6000,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to clear pages from a page blob.
+        /// Initiates an asynchronous operation to clear pages from a page blob.
         /// </summary>
         /// <param name="start_offset">The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</param>
         /// <param name="length">The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</param>
@@ -5817,7 +6011,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to clear pages from a page blob.
+        /// Initiates an asynchronous operation to clear pages from a page blob.
         /// </summary>
         /// <param name="start_offset">The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</param>
         /// <param name="length">The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</param>
@@ -5874,7 +6068,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_range" />, that represents the current operation.</returns>
         pplx::task<std::vector<page_range>> download_page_ranges_async() const
@@ -5883,7 +6077,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -5895,7 +6089,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
@@ -5906,7 +6100,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
         /// </summary>
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
         /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
@@ -5967,7 +6161,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
         /// </summary>
         /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_diff_range" />, that represents the current operation.</returns>
@@ -5977,7 +6171,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
         /// </summary>
         /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -5990,7 +6184,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
         /// </summary>
         /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
@@ -6002,7 +6196,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
         /// </summary>
         /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
         /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
@@ -6042,7 +6236,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to write pages to a page blob.
+        /// Initiates an asynchronous operation to write pages to a page blob.
         /// </summary>
         /// <param name="source">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
@@ -6055,7 +6249,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to write pages to a page blob.
+        /// Initiates an asynchronous operation to write pages to a page blob.
         /// </summary>
         /// <param name="source">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
@@ -6114,7 +6308,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6124,7 +6318,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
@@ -6138,7 +6332,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -6149,7 +6343,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -6183,7 +6377,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6193,7 +6387,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
         /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
@@ -6226,7 +6420,21 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create a page blob.
+        /// Creates a page blob.
+        /// </summary>
+        /// <param name="size">The maximum size of the page blob, in bytes.</param>
+        /// <param name="tier">A <see cref="azure::storage::premium_blob_tier" /> enum that represents the tier of the page blob to be created.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void create(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            create_async(size, tier, sequence_number, condition, options, context).wait();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to create a page blob.
         /// </summary>
         /// <param name="size">The maximum size of the page blob, in bytes.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6236,7 +6444,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create a page blob.
+        /// Initiates an asynchronous operation to create a page blob.
         /// </summary>
         /// <param name="size">The maximum size of the page blob, in bytes.</param>
         /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
@@ -6244,7 +6452,22 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> create_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> create_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return create_async(size, premium_blob_tier::unknown, sequence_number, condition, options, context);
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to create a page blob.
+        /// </summary>
+        /// <param name="size">The maximum size of the page blob, in bytes.</param>
+        /// <param name="tier">A <see cref="azure::storage::premium_blob_tier" /> object that represents the tier of the page blob to be created.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> create_async(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
         /// Resizes the page blob to the specified size.
@@ -6268,7 +6491,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to resize the page blob to the specified size.
+        /// Initiates an asynchronous operation to resize the page blob to the specified size.
         /// </summary>
         /// <param name="size">The size of the page blob, in bytes.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6278,7 +6501,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to resize the page blob to the specified size.
+        /// Initiates an asynchronous operation to resize the page blob to the specified size.
         /// </summary>
         /// <param name="size">The size of the page blob, in bytes.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -6309,7 +6532,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set the page blob's sequence number.
+        /// Initiates an asynchronous operation to set the page blob's sequence number.
         /// </summary>
         /// <param name="sequence_number">A value of type <see cref="azure::storage::sequence_number" />, indicating the operation to perform on the sequence number.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6319,7 +6542,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to set the page blob's sequence number.
+        /// Initiates an asynchronous operation to set the page blob's sequence number.
         /// </summary>
         /// <param name="sequence_number">A value of type <see cref="azure::storage::sequence_number" />, indicating the operation to perform on the sequence number.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -6391,7 +6614,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// Initiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
         /// </summary>
         /// <param name="source">The source page blob object specified a snapshot.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -6405,7 +6628,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// Initiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
         /// </summary>
         /// <param name="source">The URI of a snapshot of source page blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
@@ -6419,7 +6642,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// Initiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
         /// </summary>
         /// <param name="source">The source page blob object specified a snapshot.</param>
         /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
@@ -6433,7 +6656,7 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context);
 
         /// <summary>
-        /// Intitiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// Initiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
         /// </summary>
         /// <param name="source">The URI of a snapshot of source page blob.</param>
         /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
@@ -6446,6 +6669,66 @@ namespace azure { namespace storage {
         /// </remarks>
         WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context);
 
+        /// <summary>
+        /// Sets premium account's page blob tier.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::premium_blob_tier" /> enum that represents the blob tier to be set.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        void set_premium_blob_tier(const premium_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)
+        {
+            set_premium_blob_tier_async(tier, condition, options, context).wait();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to set premium account's blob tier.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::premium_blob_tier" /> enum that represents the blob tier to be set.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> set_premium_blob_tier_async(const premium_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context);
+
+		/// <summary>
+		/// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
+		/// </summary>
+		/// <param name="source">The URI of a source blob.</param>
+		/// <param name="tier">An enum that represents the <see cref="azure::storage::premium_blob_tier" /> for the destination blob.</param>
+		/// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+		/// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+		/// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+		/// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+		/// <returns>The copy ID associated with the copy operation.</returns>
+		/// <remarks>
+		/// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+		/// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+		/// </remarks>
+		utility::string_t start_copy(const web::http::uri& source, const azure::storage::premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+		{
+			return start_copy_async(source, tier, source_condition, destination_condition, options, context).get();
+		}
+
+		/// <summary>
+		/// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+		/// </summary>
+		/// <param name="source">The URI of a source blob.</param>
+		/// <param name="tier">An enum that represents the <see cref="azure::storage::premium_blob_tier" /> for the destination blob.</param>
+		/// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+		/// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+		/// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+		/// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+		/// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+		/// <remarks>
+		/// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+		/// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+		/// </remarks>
+		pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+		{
+			return start_copy_async_impl(source, tier, source_condition, destination_condition, options, context);
+		}
     private:
 
         /// <summary>
@@ -6545,7 +6828,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create an empty append blob. If the blob already exists, this will replace it. To avoid overwriting and instead throw an error, please pass in an <see cref="azure::storage::access_condition"/>
+        /// Initiates an asynchronous operation to create an empty append blob. If the blob already exists, this will replace it. To avoid overwriting and instead throw an error, please pass in an <see cref="azure::storage::access_condition"/>
         /// parameter generated using <see cref="azure::storage::access_condition::generate_if_not_exists_condition"/>
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6555,7 +6838,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to create an empty append blob. If the blob already exists, this will replace it. To avoid overwriting and instead throw an error, please pass in an <see cref="azure::storage::access_condition"/>
+        /// Initiates an asynchronous operation to create an empty append blob. If the blob already exists, this will replace it. To avoid overwriting and instead throw an error, please pass in an <see cref="azure::storage::access_condition"/>
         /// parameter generated using <see cref="azure::storage::access_condition::generate_if_not_exists_condition"/>
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -6592,7 +6875,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to commit a new block of data to the end of the blob.
+        /// Initiates an asynchronous operation to commit a new block of data to the end of the blob.
         /// </summary>
         /// <param name="block_data">A stream that provides the data for the block.</param>
         /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
@@ -6604,7 +6887,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to commit a new block of data to the end of the blob.
+        /// Initiates an asynchronous operation to commit a new block of data to the end of the blob.
         /// </summary>
         /// <param name="block_data">A stream that provides the data for the block.</param>
         /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
@@ -6637,7 +6920,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the blob's contents as a string.
+        /// Initiates an asynchronous operation to download the blob's contents as a string.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         pplx::task<utility::string_t> download_text_async()
@@ -6646,7 +6929,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to download the blob's contents as a string.
+        /// Initiates an asynchronous operation to download the blob's contents as a string.
         /// </summary>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -6678,7 +6961,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to the append blob.
+        /// Initiates an asynchronous operation to open a stream for writing to the append blob.
         /// </summary>
         /// <param name="create_new">Use <c>true</c> to create a new append blob or overwrite an existing one, <c>false</c> to append to an existing blob.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
@@ -6688,7 +6971,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to open a stream for writing to the append blob.
+        /// Initiates an asynchronous operation to open a stream for writing to the append blob.
         /// </summary>
         /// <param name="create_new">Use <c>true</c> to create a new append blob or overwrite an existing one, <c>false</c> to append to an existing blob.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -6766,7 +7049,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6781,7 +7064,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
@@ -6801,7 +7084,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -6817,7 +7100,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="source">The stream providing the blob content.</param>
         /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
@@ -6868,7 +7151,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a file to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a file to the append blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
@@ -6883,7 +7166,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Intitiates an asynchronous operation to upload a file to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// Initiates an asynchronous operation to upload a file to the append blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
         /// <param name="path">The file providing the blob content.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>

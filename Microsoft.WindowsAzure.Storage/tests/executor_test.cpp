@@ -168,4 +168,49 @@ SUITE(Core)
         CHECK_EQUAL(true, caught_storage_exception);
         CHECK_EQUAL(true, caught_http_exception);
     }
+
+#ifdef _WIN32
+    class delayed_scheduler : public azure::storage::delayed_scheduler_interface
+    {
+    public:
+        virtual void schedule_after(pplx::TaskProc_t function, void* context, long long delayInMs) override
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayInMs));
+            function(context);
+        }
+    };
+
+    TEST_FIXTURE(block_blob_test_base, verify_retry_after_delay)
+    {
+        const size_t buffer_size = 1024;
+        std::vector<uint8_t> buffer;
+        buffer.resize(buffer_size);
+        auto md5 = fill_buffer_and_get_md5(buffer);
+        auto stream = concurrency::streams::bytestream::open_istream(buffer);
+
+        azure::storage::operation_context context;
+        static bool throwException = true;
+        context.set_response_received([](web::http::http_request&, const web::http::http_response&, azure::storage::operation_context context)
+        {
+            if (throwException)
+            {
+                throwException = false;
+                throw azure::storage::storage_exception("retry");
+            }
+        });
+
+        bool failed = false;
+        try
+        {
+            m_blob.upload_block(get_block_id(0), stream, md5, azure::storage::access_condition(), azure::storage::blob_request_options(), context);
+        }
+        catch (azure::storage::storage_exception&)
+        {
+            failed = true;
+        }
+
+        CHECK_EQUAL(false, failed);
+        CHECK_EQUAL(false, throwException);
+    }
+#endif
 }

@@ -263,4 +263,43 @@ namespace azure { namespace storage {
         });
     }
 
+    pplx::task<void> cloud_block_blob::set_standard_blob_tier_async(const standard_blob_tier tier, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options(), type());
+
+        auto command = std::make_shared<core::storage_command<void>>(uri());
+        utility::string_t tier_str;
+
+        switch (tier)
+        {
+        case standard_blob_tier::archive:
+            tier_str = protocol::header_value_access_tier_archive;
+            break;
+
+        case standard_blob_tier::hot:
+            tier_str = protocol::header_value_access_tier_hot;
+            break;
+
+        case standard_blob_tier::cool:
+            tier_str = protocol::header_value_access_tier_cool;
+            break;
+
+        default:
+            tier_str = protocol::header_value_access_tier_unknown;
+            break;
+        }
+
+        auto properties = m_properties;
+
+        command->set_build_request(std::bind(protocol::set_blob_tier, tier_str, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([properties, tier](const web::http::http_response& response, const request_result& result, operation_context context) -> void
+        {
+            protocol::preprocess_response_void(response, result, context);
+            properties->m_standard_blob_tier = tier;
+        });
+        return core::executor<void>::execute_async(command, modified_options, context);
+    }
+
 }} // namespace azure::storage

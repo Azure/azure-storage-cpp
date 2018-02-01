@@ -716,4 +716,39 @@ SUITE(Blob)
             CHECK_NOTHROW(inc_copy.delete_blob(azure::storage::delete_snapshots_option::include_snapshots, azure::storage::access_condition(), azure::storage::blob_request_options(), context));
         }
     }
+
+    // Validate set standard blob tier for block blob on blob storage account.
+    TEST_FIXTURE(page_blob_test_base, page_blob_premium_tier)
+    {
+        // preparation
+        m_premium_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        auto blob = m_premium_container.get_page_blob_reference(_XPLATSTR("pageblob"));
+        azure::storage::blob_request_options options;
+        // check default tier is p10
+        blob.create(1024);
+        blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p10 == blob.properties().premium_blob_tier());
+
+        // check create page blob sets the tier to be p20
+        blob.create(1024, azure::storage::premium_blob_tier::p20, 0, azure::storage::access_condition(), options, azure::storage::operation_context());
+        CHECK(azure::storage::premium_blob_tier::p20 == blob.properties().premium_blob_tier());
+        blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p20 == blob.properties().premium_blob_tier());
+
+        // test can convert p20 to p30, p30 to p40.
+        blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p30, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::premium_blob_tier::p30 == blob.properties().premium_blob_tier());
+        // validate server has been updated
+        blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p30 == blob.properties().premium_blob_tier());
+        blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p40, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::premium_blob_tier::p40 == blob.properties().premium_blob_tier());
+        // validate server has been updated
+        blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p40 == blob.properties().premium_blob_tier());
+
+        m_blob_storage_container.delete_container_if_exists();
+    }
 }

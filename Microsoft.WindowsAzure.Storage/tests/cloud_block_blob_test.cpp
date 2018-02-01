@@ -71,6 +71,8 @@ void block_blob_test_base::check_block_list_equal(const std::vector<azure::stora
 }
 
 static std::string INTENDED_ERR_MSG = "Intended exception from currupted_ostreambuf.";
+static std::string ARCHIVE_BLOB_IN_STANDARD_ACCOUNT_ERR_MSG = "Blob access tier is supported only for Blob Storage accounts.";
+static std::string REHYDRATE_CANNOT_SET_TO_ARCHIVE_ERR_MSG = "This operation is not permitted because the blob is being rehydrated.";
 
 template<typename _CharType>
 class currupted_ostreambuf : public Concurrency::streams::details::basic_rawptr_buffer<_CharType>
@@ -817,5 +819,84 @@ SUITE(Blob)
             CHECK_NOTHROW(task.get());
             CHECK_EQUAL(2, static_cast<const currupted_ostreambuf<uint8_t>*>(target.streambuf().get_base().get())->call_count());
         }
+    }
+
+    // Validate set standard blob tier for block blob on standard account.
+    TEST_FIXTURE(block_blob_test_base, block_blob_standard_tier)
+    {
+        // preparation
+        azure::storage::blob_request_options options;
+        m_blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), options, m_context);
+
+        // test can convert hot->cool or cool->hot.
+        m_blob.set_standard_blob_tier(azure::storage::standard_blob_tier::cool, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::standard_blob_tier::cool == m_blob.properties().standard_blob_tier());
+        // validate server has been updated
+        m_blob.download_attributes();
+        CHECK(azure::storage::standard_blob_tier::cool == m_blob.properties().standard_blob_tier());
+        m_blob.set_standard_blob_tier(azure::storage::standard_blob_tier::hot, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::standard_blob_tier::hot == m_blob.properties().standard_blob_tier());
+        // validate server has been updated
+        m_blob.download_attributes();
+        CHECK(azure::storage::standard_blob_tier::hot == m_blob.properties().standard_blob_tier());
+
+        // test standard storage cannot set archive.
+        CHECK_STORAGE_EXCEPTION(m_blob.set_standard_blob_tier(azure::storage::standard_blob_tier::archive, azure::storage::access_condition(), options, azure::storage::operation_context()), ARCHIVE_BLOB_IN_STANDARD_ACCOUNT_ERR_MSG);
+        // validate local has not been updated.
+        CHECK(azure::storage::standard_blob_tier::hot == m_blob.properties().standard_blob_tier());
+    }
+
+    // Validate set standard blob tier for block blob on blob storage account.
+    TEST_FIXTURE(block_blob_test_base, block_blob_premium_tier)
+    {
+        // preparation
+        m_blob_storage_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        auto blob = m_blob_storage_container.get_block_blob_reference(_XPLATSTR("blockblob"));
+        azure::storage::blob_request_options options;
+        blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), options, m_context);
+
+        // test can convert hot->cool or cool->hot.
+        blob.set_standard_blob_tier(azure::storage::standard_blob_tier::cool, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::standard_blob_tier::cool == blob.properties().standard_blob_tier());
+        // validate server has been updated
+        blob.download_attributes();
+        CHECK(azure::storage::standard_blob_tier::cool == blob.properties().standard_blob_tier());
+        blob.set_standard_blob_tier(azure::storage::standard_blob_tier::hot, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::standard_blob_tier::hot == blob.properties().standard_blob_tier());
+        // validate server has been updated
+        blob.download_attributes();
+        CHECK(azure::storage::standard_blob_tier::hot == blob.properties().standard_blob_tier());
+
+        // test premium storage can set archive.
+        blob.set_standard_blob_tier(azure::storage::standard_blob_tier::archive, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::standard_blob_tier::archive == blob.properties().standard_blob_tier());
+        // validate server has been updated
+        blob.download_attributes();
+        CHECK(azure::storage::standard_blob_tier::archive == blob.properties().standard_blob_tier());
+
+        // test archive storage can set back to archive.
+        blob.set_standard_blob_tier(azure::storage::standard_blob_tier::archive, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been changed.
+        CHECK(azure::storage::standard_blob_tier::archive == blob.properties().standard_blob_tier());
+        // validate server has been changed
+        blob.download_attributes();
+        CHECK(azure::storage::standard_blob_tier::archive == blob.properties().standard_blob_tier());
+
+        // test archive storage can set back to cool.
+        blob.set_standard_blob_tier(azure::storage::standard_blob_tier::cool, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate local has been not been updated.
+        CHECK(azure::storage::standard_blob_tier::cool == blob.properties().standard_blob_tier());
+        // validate server has been archive information
+        blob.download_attributes();
+        CHECK(azure::storage::archive_status::rehydrate_pending_to_cool == blob.properties().archive_status());
+        //validate cannot set back to archive immediately
+        CHECK_STORAGE_EXCEPTION(blob.set_standard_blob_tier(azure::storage::standard_blob_tier::archive, azure::storage::access_condition(), options, azure::storage::operation_context()), REHYDRATE_CANNOT_SET_TO_ARCHIVE_ERR_MSG);
+
+        m_blob_storage_container.delete_container_if_exists();
     }
 }

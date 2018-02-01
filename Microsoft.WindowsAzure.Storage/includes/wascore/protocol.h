@@ -55,7 +55,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request put_page(page_range range, page_write write, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request append_block(const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request put_block_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_page_blob(utility::size64_t size, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_page_blob(utility::size64_t size, const utility::string_t& tier, int64_t sequence_number, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request put_append_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_blob_properties(const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
@@ -65,9 +65,10 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request snapshot_blob(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_blob_metadata(const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request delete_blob(delete_snapshots_option snapshots_option, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request copy_blob(const web::http::uri& source, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request copy_blob(const web::http::uri& source, const utility::string_t& tier, const access_condition& source_condition, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request incremental_copy_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_blob_tier(const utility::string_t& tier, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     void add_lease_id(web::http::http_request& request, const access_condition& condition);
     void add_sequence_number_condition(web::http::http_request& request, const access_condition& condition);
     void add_access_condition(web::http::http_request& request, const access_condition& condition);
@@ -195,13 +196,18 @@ namespace azure { namespace storage { namespace protocol {
         static copy_status parse_copy_status(const utility::string_t& value);
         static bool parse_boolean(const utility::string_t& value);
         static utility::datetime parse_datetime(const utility::string_t& value, utility::datetime::date_format format = utility::datetime::date_format::RFC_1123);
+        static standard_blob_tier parse_standard_blob_tier(const utility::string_t& value);
+        static premium_blob_tier parse_premium_blob_tier(const utility::string_t& value);
     };
 
     class blob_response_parsers
     {
     public:
         static blob_type parse_blob_type(const utility::string_t& value);
+        static standard_blob_tier parse_standard_blob_tier(const utility::string_t & value);
+        static premium_blob_tier parse_premium_blob_tier(const utility::string_t & value);
         static utility::size64_t parse_blob_size(const web::http::http_response& response);
+        static archive_status parse_archive_status(const utility::string_t& value);
 
         static cloud_blob_container_properties parse_blob_container_properties(const web::http::http_response& response);
         static cloud_blob_properties parse_blob_properties(const web::http::http_response& response);

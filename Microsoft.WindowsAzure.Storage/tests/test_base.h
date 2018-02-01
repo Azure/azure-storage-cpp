@@ -35,11 +35,23 @@ public:
         return m_account;
     }
 
+    const azure::storage::cloud_storage_account& premium_account() const
+    {
+        return m_premium_account;
+    }
+
+    const azure::storage::cloud_storage_account& blob_storage_account() const
+    {
+        return m_blob_storage_account;
+    }
+
 private:
 
     test_config();
 
     azure::storage::cloud_storage_account m_account;
+    azure::storage::cloud_storage_account m_premium_account;
+    azure::storage::cloud_storage_account m_blob_storage_account;
 };
 
 class test_base

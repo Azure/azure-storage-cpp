@@ -69,6 +69,22 @@ std::vector<azure::storage::cloud_blob> container_test_base::list_all_blobs(cons
     return blobs;
 }
 
+std::vector<azure::storage::cloud_blob> container_test_base::list_all_blobs(const azure::storage::cloud_blob_container& container, const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options)
+{
+    std::vector<azure::storage::cloud_blob> blobs;
+    azure::storage::list_blob_item_iterator end_of_result;
+    auto iter = container.list_blobs(prefix, true, includes, max_results, options, m_context);
+    for (; iter != end_of_result; ++iter)
+    {
+        if (iter->is_blob())
+        {
+            blobs.push_back(iter->as_blob());
+        }
+    }
+
+    return blobs;
+}
+
 #pragma endregion
 
 SUITE(Blob)
@@ -279,6 +295,127 @@ SUITE(Blob)
         {
             CHECK(iter->metadata().empty());
         }
+    }
+
+    TEST_FIXTURE(container_test_base, container_list_premium_blobs)
+    {
+        //preparation
+        // Note that this case could fail due to not sufficient quota. Clean up the premium account could solve the issue.
+        
+        m_premium_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        m_blob_storage_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        std::map<utility::string_t, azure::storage::cloud_page_blob> premium_page_blobs;
+        std::map<utility::string_t, azure::storage::cloud_block_blob> block_blobs;
+
+        for (int i = 0; i < 3; i++)
+        {
+            auto index = utility::conversions::print_string(i);
+            auto blob = m_blob_storage_container.get_block_blob_reference(_XPLATSTR("blockblob") + index);
+            blob.metadata()[_XPLATSTR("index")] = index;
+
+            std::vector<uint8_t> buffer;
+            buffer.resize(i * 16 * 1024);
+            auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(buffer);
+            blob.upload_from_stream(stream, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            block_blobs[blob.name()] = blob;
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            auto index = utility::conversions::print_string(i);
+            auto blob = m_premium_container.get_page_blob_reference(_XPLATSTR("pageblob") + index);
+            blob.metadata()[_XPLATSTR("index")] = index;
+
+            blob.create(i * 512, azure::storage::premium_blob_tier::p4, 0, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            premium_page_blobs[blob.name()] = blob;
+        }
+        
+        block_blobs[_XPLATSTR("blockblob0")].set_standard_blob_tier(azure::storage::standard_blob_tier::hot, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        block_blobs[_XPLATSTR("blockblob1")].set_standard_blob_tier(azure::storage::standard_blob_tier::cool, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        block_blobs[_XPLATSTR("blockblob2")].set_standard_blob_tier(azure::storage::standard_blob_tier::archive, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        premium_page_blobs[_XPLATSTR("pageblob0")].set_premium_blob_tier(azure::storage::premium_blob_tier::p4, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        premium_page_blobs[_XPLATSTR("pageblob1")].set_premium_blob_tier(azure::storage::premium_blob_tier::p6, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        premium_page_blobs[_XPLATSTR("pageblob2")].set_premium_blob_tier(azure::storage::premium_blob_tier::p10, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+
+        //test block blob.
+        auto listing1 = list_all_blobs(m_blob_storage_container, utility::string_t(), azure::storage::blob_listing_details::all, 0, azure::storage::blob_request_options());
+        CHECK_EQUAL(3U, listing1.size());
+        for (auto iter = listing1.begin(); iter != listing1.end(); ++iter)
+        {
+            auto blob = block_blobs.find(iter->name());
+            CHECK(blob != block_blobs.end());
+
+            CHECK_UTF8_EQUAL(blob->second.uri().primary_uri().to_string(), iter->uri().primary_uri().to_string());
+            CHECK_UTF8_EQUAL(blob->second.uri().secondary_uri().to_string(), iter->uri().secondary_uri().to_string());
+
+            auto index_str = blob->second.metadata().find(_XPLATSTR("index"));
+            CHECK(index_str != blob->second.metadata().end());
+            auto index = utility::conversions::scan_string<int>(index_str->second);
+
+            CHECK_EQUAL(index * 16 * 1024, iter->properties().size());
+
+            switch (iter->properties().standard_blob_tier())
+            {
+            case azure::storage::standard_blob_tier::hot:
+                CHECK(!iter->name().compare(_XPLATSTR("blockblob0")));
+                CHECK(azure::storage::premium_blob_tier::unknown == iter->properties().premium_blob_tier());
+                break;
+            case azure::storage::standard_blob_tier::cool:
+                CHECK(!iter->name().compare(_XPLATSTR("blockblob1")));
+                CHECK(azure::storage::premium_blob_tier::unknown == iter->properties().premium_blob_tier());
+                break;
+            case azure::storage::standard_blob_tier::archive:
+                CHECK(!iter->name().compare(_XPLATSTR("blockblob2")));
+                CHECK(azure::storage::premium_blob_tier::unknown == iter->properties().premium_blob_tier());
+                break;
+            default:
+                CHECK(false);
+                break;
+            }
+            block_blobs.erase(blob);
+        }
+        CHECK_EQUAL(0U, block_blobs.size());
+
+        //test page blob.
+        auto listing2 = list_all_blobs(m_premium_container, utility::string_t(), azure::storage::blob_listing_details::all, 0, azure::storage::blob_request_options());
+        CHECK_EQUAL(3U, listing2.size());
+        for (auto iter = listing2.begin(); iter != listing2.end(); ++iter)
+        {
+            auto blob = premium_page_blobs.find(iter->name());
+            CHECK(blob != premium_page_blobs.end());
+
+            CHECK_UTF8_EQUAL(blob->second.uri().primary_uri().to_string(), iter->uri().primary_uri().to_string());
+            CHECK_UTF8_EQUAL(blob->second.uri().secondary_uri().to_string(), iter->uri().secondary_uri().to_string());
+
+            auto index_str = blob->second.metadata().find(_XPLATSTR("index"));
+            CHECK(index_str != blob->second.metadata().end());
+            auto index = utility::conversions::scan_string<int>(index_str->second);
+
+            CHECK_EQUAL(index * 512, iter->properties().size());
+
+            switch (iter->properties().premium_blob_tier())
+            {
+            case azure::storage::premium_blob_tier::p4:
+                CHECK(!iter->name().compare(_XPLATSTR("pageblob0")));
+                CHECK(azure::storage::standard_blob_tier::unknown == iter->properties().standard_blob_tier());
+                break;
+            case azure::storage::premium_blob_tier::p6:
+                CHECK(!iter->name().compare(_XPLATSTR("pageblob1")));
+                CHECK(azure::storage::standard_blob_tier::unknown == iter->properties().standard_blob_tier());
+                break;
+            case azure::storage::premium_blob_tier::p10:
+                CHECK(!iter->name().compare(_XPLATSTR("pageblob2")));
+                CHECK(azure::storage::standard_blob_tier::unknown == iter->properties().standard_blob_tier());
+                break;
+            default:
+                CHECK(false);
+                break;
+            }
+            premium_page_blobs.erase(blob);
+        }
+        CHECK_EQUAL(0U, premium_page_blobs.size());
+        m_premium_container.delete_container();
+        m_blob_storage_container.delete_container();
     }
 
     TEST_FIXTURE(blob_test_base, container_stored_policy)

@@ -32,7 +32,9 @@ class blob_service_test_base : public test_base
 public:
 
     blob_service_test_base()
-        : m_client(test_config::instance().account().create_cloud_blob_client())
+        : m_client(test_config::instance().account().create_cloud_blob_client()),
+        m_premium_client(test_config::instance().premium_account().create_cloud_blob_client()),
+        m_blob_storage_client(test_config::instance().blob_storage_account().create_cloud_blob_client())
     {
     }
 
@@ -54,6 +56,8 @@ protected:
     std::vector<azure::storage::cloud_blob> list_all_blobs_from_client(const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options);
 
     azure::storage::cloud_blob_client m_client;
+    azure::storage::cloud_blob_client m_premium_client;
+    azure::storage::cloud_blob_client m_blob_storage_client;
 };
 
 class temp_file : public blob_service_test_base
@@ -144,13 +148,15 @@ public:
     container_test_base()
     {
         m_container = m_client.get_container_reference(get_random_container_name());
+        m_premium_container = m_premium_client.get_container_reference(get_random_container_name());/* manage create and delete in test case since it's not for all test cases*/
+        m_blob_storage_container = m_blob_storage_client.get_container_reference(get_random_container_name());/* manage create and delete in test case since it's not for all test cases*/
     }
 
     ~container_test_base()
     {
         try
         {
-            m_container.delete_container(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            m_container.delete_container_if_exists(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         }
         catch (const azure::storage::storage_exception&)
         {
@@ -161,10 +167,13 @@ protected:
 
     void check_public_access(azure::storage::blob_container_public_access_type access);
     std::vector<azure::storage::cloud_blob> list_all_blobs(const utility::string_t& prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options& options);
+    std::vector<azure::storage::cloud_blob> list_all_blobs(const azure::storage::cloud_blob_container & container, const utility::string_t & prefix, azure::storage::blob_listing_details::values includes, int max_results, const azure::storage::blob_request_options & options);
     void check_lease_access(azure::storage::cloud_blob_container& container, azure::storage::lease_state state, const utility::string_t& lease_id, bool fake, bool allow_delete);
     static void check_container_no_stale_property(azure::storage::cloud_blob_container& container);
 
     azure::storage::cloud_blob_container m_container;
+    azure::storage::cloud_blob_container m_premium_container;
+    azure::storage::cloud_blob_container m_blob_storage_container;
 };
 
 class blob_test_base : public container_test_base

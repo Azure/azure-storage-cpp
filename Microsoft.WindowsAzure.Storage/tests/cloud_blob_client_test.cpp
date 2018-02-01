@@ -169,7 +169,7 @@ SUITE(Blob)
         create_containers(prefix, 1, get_random_enum(azure::storage::blob_container_public_access_type::blob));
 
         auto listing = list_all_containers(utility::string_t(), azure::storage::container_listing_details::all, 5001, azure::storage::blob_request_options());
-        
+
         check_container_list(listing, prefix, false);
     }
 

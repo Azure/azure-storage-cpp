@@ -147,7 +147,7 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<void> cloud_page_blob::create_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_page_blob::create_async(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -156,13 +156,14 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::put_page_blob, size, sequence_number, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::put_page_blob, size, get_premium_access_tier_string(tier), sequence_number, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties, size] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties, size, tier] (const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             properties->m_size = size;
+            properties->m_premium_blob_tier = tier;
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }
@@ -297,5 +298,24 @@ namespace azure { namespace storage {
         web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
 
         return start_incremental_copy_async(source_uri, condition, options, context);
+    }
+
+    pplx::task<void> cloud_page_blob::set_premium_blob_tier_async(const premium_blob_tier tier, const access_condition& condition, const blob_request_options& options, operation_context context)
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options(), type());
+
+        auto command = std::make_shared<core::storage_command<void>>(uri());
+
+        auto properties = m_properties;
+
+        command->set_build_request(std::bind(protocol::set_blob_tier, get_premium_access_tier_string(tier), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([properties, tier](const web::http::http_response& response, const request_result& result, operation_context context) -> void
+        {
+            protocol::preprocess_response_void(response, result, context);
+            properties->m_premium_blob_tier = tier;
+        });
+        return core::executor<void>::execute_async(command, modified_options, context);
     }
 }} // namespace azure::storage

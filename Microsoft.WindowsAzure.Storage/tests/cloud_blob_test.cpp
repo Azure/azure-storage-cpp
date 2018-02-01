@@ -563,19 +563,19 @@ SUITE(Blob)
 
         snapshot1.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         m_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        check_blob_properties_equal(m_blob.properties(), snapshot1.properties());
+        check_blob_properties_equal(m_blob.properties(), snapshot1.properties(), true);
 
         web::http::uri snapshot1_primary_uri(m_blob.uri().primary_uri().to_string() + _XPLATSTR("?snapshot=") + snapshot1.snapshot_time());
         web::http::uri snapshot1_secondary_uri(m_blob.uri().secondary_uri().to_string() + _XPLATSTR("?snapshot=") + snapshot1.snapshot_time());
         azure::storage::cloud_blob snapshot1_clone(azure::storage::storage_uri(snapshot1_primary_uri, snapshot1_secondary_uri), m_blob.service_client().credentials());
         CHECK(snapshot1.snapshot_time() == snapshot1_clone.snapshot_time());
         snapshot1_clone.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        check_blob_properties_equal(snapshot1.properties(), snapshot1_clone.properties());
+        check_blob_properties_equal(snapshot1.properties(), snapshot1_clone.properties(), true);
 
         azure::storage::cloud_blob snapshot1_clone2(m_blob.uri(), snapshot1.snapshot_time(), m_blob.service_client().credentials());
         CHECK(snapshot1.snapshot_time() == snapshot1_clone2.snapshot_time());
         snapshot1_clone2.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        check_blob_properties_equal(snapshot1.properties(), snapshot1_clone2.properties());
+        check_blob_properties_equal(snapshot1.properties(), snapshot1_clone2.properties(), true);
 
         m_blob.upload_text(_XPLATSTR("2"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_UTF8_EQUAL(_XPLATSTR("1"), azure::storage::cloud_block_blob(snapshot1).download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
@@ -641,6 +641,21 @@ SUITE(Blob)
         copy2.start_copy(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK(wait_for_copy(copy2));
         CHECK_THROW(copy2.start_copy(blob, azure::storage::access_condition::generate_if_match_condition(blob.properties().etag()), azure::storage::access_condition::generate_if_match_condition(_XPLATSTR("\"0xFFFFFFFFFFFFFFF\"")), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+    }
+
+    TEST_FIXTURE(blob_test_base, blob_copy_with_premium_access_tier)
+    {
+        m_premium_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        auto blob = m_premium_container.get_page_blob_reference(_XPLATSTR("source"));
+        blob.create(1024);
+
+        auto dest = m_premium_container.get_page_blob_reference(_XPLATSTR("dest"));
+        azure::storage::blob_request_options options;
+
+        dest.start_copy(defiddler(blob.uri().primary_uri()), azure::storage::premium_blob_tier::p30, azure::storage::access_condition(), azure::storage::access_condition(), options, m_context);
+        CHECK(azure::storage::premium_blob_tier::p30 == dest.properties().premium_blob_tier());
+        dest.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p30 == dest.properties().premium_blob_tier());
     }
 
     /// <summary>

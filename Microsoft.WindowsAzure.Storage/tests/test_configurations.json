@@ -1,15 +1,27 @@
 {
-	"target": "production",
-	"tenants": [
-		{
-			"name": "devstore",
-			"type": "devstore",
-			"connection_string": "UseDevelopmentStorage=true"
-		},
-		{
-			"name": "production",
-			"type": "cloud",
-			"connection_string": "DefaultEndpointsProtocol=https;AccountName=myaccountname;AccountKey=myaccountkey"
-		}
-	]
+  "target": "production",
+  "premium_target": "premium_account",
+  "blob_storage_target": "blob_storage_account",
+  "tenants": [
+    {
+      "name": "devstore",
+      "type": "devstore",
+      "connection_string": "UseDevelopmentStorage=true"
+    },
+    {
+      "name": "production",
+      "type": "cloud",
+      "connection_string": "DefaultEndpointsProtocol=https;"
+    },
+    {
+      "name": "premium_account",
+      "type": "cloud",
+      "connection_string": "DefaultEndpointsProtocol=https;"
+    },
+    {
+      "name": "blob_storage_account",
+      "type": "cloud",
+      "connection_string": "DefaultEndpointsProtocol=https;"
+    }
+  ]
 }

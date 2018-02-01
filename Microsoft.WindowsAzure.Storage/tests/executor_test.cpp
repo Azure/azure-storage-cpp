@@ -182,6 +182,8 @@ SUITE(Core)
 
     TEST_FIXTURE(block_blob_test_base, verify_retry_after_delay)
     {
+        azure::storage::set_wastorage_ambient_delayed_scheduler(std::make_shared<delayed_scheduler>());
+
         const size_t buffer_size = 1024;
         std::vector<uint8_t> buffer;
         buffer.resize(buffer_size);
@@ -209,6 +211,7 @@ SUITE(Core)
             failed = true;
         }
 
+        azure::storage::set_wastorage_ambient_delayed_scheduler(nullptr);
         CHECK_EQUAL(false, failed);
         CHECK_EQUAL(false, throwException);
     }

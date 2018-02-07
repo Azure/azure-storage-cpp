@@ -377,7 +377,8 @@ namespace azure { namespace storage {  namespace core {
     public:
 #ifdef _WIN32
         delay_event(std::chrono::milliseconds timeout)
-            : m_callback(new concurrency::call<int>(std::function<void(int)>(std::bind(&delay_event::timer_fired, this, std::placeholders::_1)))), m_timer(static_cast<unsigned int>(timeout.count()), 0, m_callback, false)
+            : m_callback(new concurrency::call<int>(std::function<void(int)>(std::bind(&delay_event::timer_fired, this, std::placeholders::_1)))), m_timer(static_cast<unsigned int>(timeout.count()), 0, m_callback, false),
+            m_timeout(timeout)
         {
         }
 
@@ -388,7 +389,18 @@ namespace azure { namespace storage {  namespace core {
 
         void start()
         {
-            m_timer.start();
+            const auto& ambient_delayed_scheduler = get_wastorage_ambient_delayed_scheduler();
+            if (ambient_delayed_scheduler)
+            {
+                ambient_delayed_scheduler->schedule_after(
+                    [](void* event) { reinterpret_cast<delay_event*>(event)->timer_fired(0); },
+                    this,
+                    m_timeout.count());
+            }
+            else
+            {
+                m_timer.start();
+            }
         }
 #else
         delay_event(std::chrono::milliseconds timeout)
@@ -411,6 +423,7 @@ namespace azure { namespace storage {  namespace core {
 #ifdef _WIN32
         concurrency::call<int>* m_callback;
         concurrency::timer<int> m_timer;
+        std::chrono::milliseconds m_timeout;
 #else
         boost::asio::deadline_timer m_timer;
 #endif

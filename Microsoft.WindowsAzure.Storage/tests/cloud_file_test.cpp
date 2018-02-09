@@ -45,6 +45,9 @@ SUITE(File)
         CHECK(m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context));
         CHECK(!m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context));
         CHECK_EQUAL(m_file.properties().length(), 1024U);
+        m_file.download_attributes();
+ 
+        CHECK_EQUAL(m_file.properties().server_encrypted(), true);
 
         CHECK(m_file.exists(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context));
 
@@ -287,9 +290,11 @@ SUITE(File)
     {
         utility::string_t content = _XPLATSTR("content");
         m_file.create(content.length(), azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK(!m_file.properties().server_encrypted());
         m_file.upload_text(content, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         auto download_content = m_file.download_text(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         CHECK(content == download_content);
+        CHECK(m_file.properties().server_encrypted());
     }
 
     TEST_FIXTURE(file_test_base, file_upload_download_from_file)

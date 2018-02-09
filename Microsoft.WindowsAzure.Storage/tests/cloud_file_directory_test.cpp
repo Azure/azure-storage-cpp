@@ -103,9 +103,11 @@ SUITE(File)
         CHECK(m_directory.metadata().empty());
         CHECK(m_directory.properties().etag().empty());
         CHECK(!m_directory.properties().last_modified().is_initialized());
+        CHECK(!m_directory.properties().server_encrypted());
 
         m_directory.create_if_not_exists(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         m_directory.download_attributes();
+        CHECK(m_directory.properties().server_encrypted());
 
         CHECK(m_directory.get_parent_share_reference().is_valid());
         check_equal(m_share, m_directory.get_parent_share_reference());

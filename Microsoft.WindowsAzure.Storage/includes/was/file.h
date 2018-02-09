@@ -1558,6 +1558,7 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_file_directory_properties" /> class.
         /// </summary>
         cloud_file_directory_properties()
+            : m_server_encrypted(false)
         {
         }
 
@@ -1600,6 +1601,24 @@ namespace azure { namespace storage {
             return m_last_modified;
         }
 
+        /// <summary>
+        /// Gets if the server is encrypted.
+        /// </summary>
+        /// <returns><c>true</c> if a server is encrypted.</returns>
+        bool server_encrypted()
+        {
+            return m_server_encrypted;
+        }
+
+        /// <summary>
+        /// Sets if the server is encrypted.
+        /// </summary>
+        /// <param name="value">If the server is encrypted.</param>
+        void set_server_encrypted(bool value)
+        {
+            m_server_encrypted = value;
+        }
+
     private:
 
         utility::string_t m_etag;
@@ -1607,6 +1626,7 @@ namespace azure { namespace storage {
 
         void update_etag_and_last_modified(const cloud_file_directory_properties& other);
         void update_etag(const cloud_file_directory_properties& other);
+        bool m_server_encrypted;
 
         friend class cloud_file_directory;
         friend class protocol::file_response_parsers;
@@ -2258,7 +2278,8 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_file_properties" /> class.
         /// </summary>
         cloud_file_properties()
-            : m_length(0)
+            : m_length(0),
+            m_server_encrypted(false)
         {
         }
 
@@ -2445,6 +2466,24 @@ namespace azure { namespace storage {
             m_content_disposition = std::move(value);
         }
 
+        /// <summary>
+        /// Gets if the server is encrypted.
+        /// </summary>
+        /// <returns><c>true</c> if a server is encrypted.</returns>
+        bool server_encrypted()
+        {
+            return m_server_encrypted;
+        }
+
+        /// <summary>
+        /// Sets if the server is encrypted.
+        /// </summary>
+        /// <param name="value">If the server is encrypted.</param>
+        void set_server_encrypted(bool value)
+        {
+            m_server_encrypted = value;
+        }
+
     private:
 
         utility::size64_t m_length;
@@ -2458,6 +2497,8 @@ namespace azure { namespace storage {
         utility::string_t m_cache_control;
         utility::string_t m_content_md5;
         utility::string_t m_content_disposition;
+
+        bool m_server_encrypted;
 
         void update_etag_and_last_modified(const cloud_file_properties& other);
         void update_etag(const cloud_file_properties& other);

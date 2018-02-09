@@ -776,6 +776,15 @@ namespace azure { namespace storage {
             m_extended_error = std::move(value);
         }
 
+        /// <summary>
+        /// Gets if the request is server encrypted.
+        /// </summary>
+        /// <returns><c>true</c> if a request is encrypted.</returns>
+        bool request_server_encrypted()
+        {
+            return m_request_server_encrypted;
+        }
+
     private:
 
         void parse_headers(const web::http::http_headers& headers);

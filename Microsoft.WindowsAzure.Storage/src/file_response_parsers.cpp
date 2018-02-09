@@ -35,6 +35,7 @@ namespace azure { namespace storage { namespace protocol {
         cloud_file_directory_properties properties;
         properties.m_etag = parse_etag(response);
         properties.m_last_modified = parse_last_modified(response);
+        properties.m_server_encrypted = response_parsers::parse_boolean(get_header_value(response.headers(), ms_header_server_encrypted));
         return properties;
     }
 
@@ -68,6 +69,7 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_content_type = get_header_value(headers, web::http::header_names::content_type);
         properties.m_type = get_header_value(headers, _XPLATSTR("x-ms-file-type"));
         properties.m_content_md5 = get_header_value(headers, ms_header_content_md5);
+        properties.m_server_encrypted = response_parsers::parse_boolean(get_header_value(headers, ms_header_server_encrypted));
         if (properties.m_content_md5.empty())
         {
             properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);

@@ -107,37 +107,52 @@ namespace azure { namespace storage { namespace core {
 
     hmac_sha256_hash_provider_impl::hmac_sha256_hash_provider_impl(const std::vector<uint8_t>& key)
     {
-        HMAC_CTX_init(&m_hash_context);
-        HMAC_Init_ex(&m_hash_context, &key[0], (int) key.size(), EVP_sha256(), NULL);
+    #if OPENSSL_API_COMPAT < 0x10100000L
+        m_hash_context = (HMAC_CTX*) malloc(sizeof(HMAC_CTX));
+        HMAC_CTX_init(m_hash_context);       
+    #else
+        m_hash_context = HMAC_CTX_new();
+    #endif
+        HMAC_CTX_reset(m_hash_context);
+        HMAC_Init_ex(m_hash_context, &key[0], (int) key.size(), EVP_sha256(), NULL);
     }
 
     void hmac_sha256_hash_provider_impl::write(const uint8_t* data, size_t count)
-    {
-        HMAC_Update(&m_hash_context, data, count);
+    {   
+        HMAC_Update(m_hash_context, data, count);
     }
 
     void hmac_sha256_hash_provider_impl::close()
     {
         unsigned int length = SHA256_DIGEST_LENGTH;
         m_hash.resize(length);
-        HMAC_Final(&m_hash_context, &m_hash[0], &length);
-        HMAC_CTX_cleanup(&m_hash_context);
+        HMAC_Final(m_hash_context, &m_hash[0], &length);
+    #if OPENSSL_API_COMPAT < 0x10100000L
+        HMAC_CTX_cleanup(m_hash_context);
+        free(m_hash_context);
+    #else
+        HMAC_CTX_free(m_hash_context);
+    #endif
+
     }
 
     md5_hash_provider_impl::md5_hash_provider_impl()
     {
-        MD5_Init(&m_hash_context);
+        m_hash_context =(HMAC_CTX*) malloc(sizeof(HMAC_CTX));
+        memset(m_hash_context, 0, sizeof(HMAC_CTX));
+        MD5_Init(m_hash_context);
     }
 
     void md5_hash_provider_impl::write(const uint8_t* data, size_t count)
     {
-        MD5_Update(&m_hash_context, data, count);
+        MD5_Update(m_hash_context, data, count);
     }
 
     void md5_hash_provider_impl::close()
     {
         m_hash.resize(MD5_DIGEST_LENGTH);
-        MD5_Final(m_hash.data(), &m_hash_context);
+        MD5_Final(m_hash.data(), m_hash_context);
+        free(m_hash_context);
     }
 
 #endif

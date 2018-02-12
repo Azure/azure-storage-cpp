@@ -128,7 +128,7 @@ namespace azure { namespace storage { namespace core {
         unsigned int length = SHA256_DIGEST_LENGTH;
         m_hash.resize(length);
         HMAC_Final(m_hash_context, &m_hash[0], &length);
-    #if OPENSSL_VERSION_NUMBER < 0x10100000L
+    #if OPENSSL_VERSION_NUMBER < 0x10100000L || defined (LIBRESSL_VERSION_NUMBER)
         HMAC_CTX_cleanup(m_hash_context);
         OPENSSL_free(m_hash_context);
     #else

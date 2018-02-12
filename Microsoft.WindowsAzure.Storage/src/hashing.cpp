@@ -140,7 +140,7 @@ namespace azure { namespace storage { namespace core {
     md5_hash_provider_impl::md5_hash_provider_impl()
     {
         m_hash_context =(MD5_CTX*) OPENSSL_malloc(sizeof(MD5_CTX));
-        memset(m_hash_context, 0, sizeof(*m_hash_context))
+        memset(m_hash_context, 0, sizeof(*m_hash_context));
         MD5_Init(m_hash_context);
     }
 

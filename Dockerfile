@@ -1,6 +1,7 @@
 FROM debian:stable-slim
 
 RUN apt-get update &&apt-get install -y --fix-missing \
+  build-essential\
   git\
   cmake \
   libboost1.62-all-dev \
@@ -9,6 +10,7 @@ RUN apt-get update &&apt-get install -y --fix-missing \
   libxml++2.6-dev \
   libxml++2.6-doc \
   libcpprest2.9 \
+  uuid-dev\
   libcpprest-dev \
   libunittest++-dev
 # Build azure-storage-cpp, then test to make sure it was built correctly

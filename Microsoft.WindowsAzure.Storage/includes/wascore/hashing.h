@@ -186,7 +186,7 @@ namespace azure { namespace storage { namespace core {
         void close() override;
 
     private:
-        MD5_CTX m_hash_context;
+        MD5_CTX* m_hash_context;
     };
 
 #endif

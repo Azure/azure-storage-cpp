@@ -107,21 +107,21 @@ namespace azure { namespace storage { namespace core {
 
     hmac_sha256_hash_provider_impl::hmac_sha256_hash_provider_impl(const std::vector<uint8_t>& key)
     {
-        HMAC_CTX_init(&m_hash_context);
-        HMAC_Init_ex(&m_hash_context, &key[0], (int) key.size(), EVP_sha256(), NULL);
+        m_hash_context = HMAC_CTX_new();
+        HMAC_Init_ex(m_hash_context, &key[0], (int) key.size(), EVP_sha256(), NULL);
     }
 
     void hmac_sha256_hash_provider_impl::write(const uint8_t* data, size_t count)
     {
-        HMAC_Update(&m_hash_context, data, count);
+        HMAC_Update(m_hash_context, data, count);
     }
 
     void hmac_sha256_hash_provider_impl::close()
     {
         unsigned int length = SHA256_DIGEST_LENGTH;
         m_hash.resize(length);
-        HMAC_Final(&m_hash_context, &m_hash[0], &length);
-        HMAC_CTX_cleanup(&m_hash_context);
+        HMAC_Final(m_hash_context, &m_hash[0], &length);
+        HMAC_CTX_free(m_hash_context);
     }
 
     md5_hash_provider_impl::md5_hash_provider_impl()

@@ -455,13 +455,13 @@ namespace azure { namespace storage {
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
         command->set_destination_stream(target);
         command->set_calculate_response_body_md5(!modified_options.disable_content_md5_validation());
-        command->set_recover_request([target, download_info](utility::size64_t total_written_to_destination_stream, operation_context context) -> bool
+        command->set_recover_request([target, download_info](utility::size64_t bytes_written_to_destination_stream, operation_context context) -> bool
         {
             if (download_info->m_reset_target)
             {
                 download_info->m_total_written_to_destination_stream = 0;
 
-                if (total_written_to_destination_stream > 0)
+                if (bytes_written_to_destination_stream > 0)
                 {
                     if (!target.can_seek())
                     {
@@ -475,7 +475,7 @@ namespace azure { namespace storage {
             }
             else
             {
-                download_info->m_total_written_to_destination_stream = total_written_to_destination_stream;
+                download_info->m_total_written_to_destination_stream += bytes_written_to_destination_stream;
             }
 
             return target.is_open();

@@ -638,15 +638,17 @@ namespace azure { namespace storage { namespace core {
                         instance->m_hash_provider.close();
                         instance->m_is_hashing_started = false;
 
+                        utility::size64_t bytes_downloaded = 0;
                         if (instance->m_response_streambuf)
                         {
-                            instance->m_total_downloaded += instance->m_response_streambuf.total_written();
+                            bytes_downloaded = instance->m_response_streambuf.total_written();
+                            instance->m_total_downloaded += bytes_downloaded;
                         }
 
                         // Try to recover the request. If it cannot be recovered, it cannot be retried
                         // even if the retry policy allowed for a retry.
                         if (instance->m_command->m_recover_request &&
-                            !instance->m_command->m_recover_request(instance->m_total_downloaded, instance->m_context))
+                            !instance->m_command->m_recover_request(bytes_downloaded, instance->m_context))
                         {
                             if (logger::instance().should_log(instance->m_context, client_log_level::log_level_error))
                             {

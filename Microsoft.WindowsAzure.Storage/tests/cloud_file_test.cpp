@@ -125,6 +125,10 @@ SUITE(File)
         m_file.resize(length, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         CHECK_EQUAL(length, m_file.properties().length());
+        //Setting the length back to zero and see that it works.
+        m_file.resize(0U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(0U, m_file.properties().length());
     }
 
     TEST_FIXTURE(file_test_base, file_get_parent_directory_ref)

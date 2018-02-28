@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>wastorage.v120</id>
-    <version>3.1.1</version>
+    <version>3.2.0</version>
     <title>Microsoft Azure Storage Client Library for C++</title>
     <authors>Microsoft Corporation</authors>
     <owners>Microsoft Corporation</owners>

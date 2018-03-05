@@ -179,7 +179,7 @@ DAT(ms_header_copy_destination_snapshot, _XPLATSTR("x-ms-copy-destination-snapsh
 DAT(ms_header_access_tier, _XPLATSTR("x-ms-access-tier"))
 DAT(ms_header_access_tier_inferred, _XPLATSTR("x-ms-access-tier-inferred"))
 DAT(ms_header_archive_status, _XPLATSTR("x-ms-archive-status"))
-DAT(ms_header_tier_change_time, _XPLATSTR("x-ms-access-tier-change-time	"))
+DAT(ms_header_tier_change_time, _XPLATSTR("x-ms-access-tier-change-time"))
 
 // header values
 DAT(header_value_storage_version, _XPLATSTR("2017-04-17"))

@@ -549,7 +549,6 @@ namespace azure { namespace storage { namespace protocol {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         
         request.headers().add(ms_header_access_tier, tier);
-        add_append_condition(request, condition);
         add_access_condition(request, condition);
         return request;
     }

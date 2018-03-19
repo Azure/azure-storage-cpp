@@ -1,6 +1,9 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v3.2.1:
+- Added tag `<requireLicenseAcceptance>true</requireLicenseAcceptance>` in .nuspec files and modified the author to `Microsoft` to comply to the new Microsoft Nuget package rule set. Note that this will require the Nuget package user to accept the license manually when newly installing or upgrading 3.2.1 version (and on) of this client library.
+
 Changes in v3.2:
 - Added support for blob archive feature, which includes following changes:
   - Added two new APIs for `cloud_blob` to support copying a blob to a new destination setting premium access tier, note that currently, only premium page blobs are supported so these two APIs should only be used for page blobs.

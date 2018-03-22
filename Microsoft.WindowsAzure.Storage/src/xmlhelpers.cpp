@@ -147,7 +147,10 @@ namespace azure { namespace storage { namespace core { namespace xml {
                 break;
 
             case XmlNodeType_Text:
-                handle_element(m_elementStack.back());
+            case XmlNodeType_Whitespace:
+				if (m_elementStack.size()) {
+					handle_element(m_elementStack.back());
+				}
                 break;
 
             case XmlNodeType_EndElement:

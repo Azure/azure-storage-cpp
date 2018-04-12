@@ -140,10 +140,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;NDEBUG;_TURN_OFF_PLATFORM_STRING;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/Zi /GF /Gy %(AdditionalOptions)</AdditionalOptions>
+      <ControlFlowGuard Condition="'$(CLRSupport)' == '' or '$(CLRSupport)' == 'false'">Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalOptions>/debug /debugtype:cv,fixup /incremental:no /opt:ref /opt:icf %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,10 +157,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WASTORAGE_DLL;WIN32;NDEBUG;_TURN_OFF_PLATFORM_STRING;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
+      <AdditionalOptions>/Zi /GF /Gy %(AdditionalOptions)</AdditionalOptions>
+      <ControlFlowGuard Condition="'$(CLRSupport)' == '' or '$(CLRSupport)' == 'false'">Guard</ControlFlowGuard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalOptions>/debug /debugtype:cv,fixup /incremental:no /opt:ref /opt:icf %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

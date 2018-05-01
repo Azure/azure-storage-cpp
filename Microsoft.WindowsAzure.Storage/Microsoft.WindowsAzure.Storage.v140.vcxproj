@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="includes\wascore\filestream.h" />
     <ClInclude Include="includes\wascore\protocol_json.h" />
+    <ClInclude Include="includes\wascore\xml_wrapper.h" />
     <ClInclude Include="includes\was\auth.h" />
     <ClInclude Include="includes\was\blob.h" />
     <ClInclude Include="includes\was\common.h" />
@@ -259,6 +260,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\xmlhelpers.cpp" />
+    <ClCompile Include="src\xml_wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="version.rc" />

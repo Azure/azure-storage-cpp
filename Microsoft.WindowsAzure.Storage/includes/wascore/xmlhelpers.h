@@ -47,8 +47,7 @@
 #include <atlbase.h>
 #include <xmllite.h>
 #else
-#include <libxml++/parsers/textreader.h>
-#include <libxml++/document.h>
+#include "wascore/xml_wrapper.h"
 #include <stack>
 #endif 
 
@@ -168,7 +167,7 @@ protected:
 #ifdef _WIN32
     CComPtr<IXmlReader> m_reader;
 #else
-    std::shared_ptr<xmlpp::TextReader> m_reader;
+    std::shared_ptr<xml_text_reader_wrapper> m_reader;
     std::string m_data;
 #endif 
 
@@ -270,8 +269,8 @@ private:
 #ifdef _WIN32
     CComPtr<IXmlWriter> m_writer;
 #else // LINUX
-    std::shared_ptr<xmlpp::Document> m_document;
-    std::stack<xmlpp::Element*> m_elementStack;
+    std::shared_ptr<xml_document_wrapper> m_document;
+    std::stack<xml_element_wrapper*> m_elementStack;
     std::ostream * m_stream;
 #endif
 };

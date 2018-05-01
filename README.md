@@ -99,7 +99,7 @@ git clone https://github.com/Azure/azure-storage-cpp.git
 The project is cloned to a folder called `azure-storage-cpp`. Always use the master branch, which contains the latest release.
 - Install additional dependencies:
 ```bash
-sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev
+sudo apt-get install libxml2-dev uuid-dev
 ```
 - Build the SDK for Release:
 ```bash
@@ -156,7 +156,7 @@ Please note the current build script is only tested on Ubuntu 14.04. Please upda
 Install dependecies with homebrew:
 
 ```
-brew install libxml++ ossp-uuid openssl
+brew install libxml2 ossp-uuid openssl
 ```
 
 As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca.

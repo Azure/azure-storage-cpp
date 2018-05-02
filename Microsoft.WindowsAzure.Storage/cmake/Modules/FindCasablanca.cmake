@@ -27,6 +27,8 @@ find_path(CASABLANCA_INCLUDE_DIR
 find_library(CASABLANCA_LIBRARY
   NAMES 
     cpprest
+    cpprest_2_9
+    cpprest_2_8
   PATHS 
     ${CASABLANCA_PKGCONF_LIBRARY_DIRS}
     ${CASABLANCA_DIR}

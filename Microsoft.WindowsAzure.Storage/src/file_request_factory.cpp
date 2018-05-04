@@ -25,10 +25,7 @@ namespace azure { namespace storage { namespace protocol {
     void add_file_properties(web::http::http_request& request, const cloud_file_properties& properties)
     {
         web::http::http_headers& headers = request.headers();
-        if (properties.length() >= 0)
-        {
-            headers.add(_XPLATSTR("x-ms-content-length"), utility::conversions::print_string(properties.length()));
-        }
+
         if (!core::is_empty_or_whitespace(properties.content_type()))
         {
             headers.add(_XPLATSTR("x-ms-content-type"), properties.content_type());
@@ -259,8 +256,18 @@ namespace azure { namespace storage { namespace protocol {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
 
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        //Note that setting file properties with a length won't resize the file.
+        //If resize is needed, user should call azure::storage::cloud_file::resize instead.
         add_file_properties(request, properties);
 
+        return request;
+    }
+
+    web::http::http_request resize_with_properties(const cloud_file_properties & properties, web::http::uri_builder uri_builder, const std::chrono::seconds & timeout, operation_context context)
+    {
+        auto request = set_file_properties(properties, uri_builder, timeout, context);
+
+        request.headers()[_XPLATSTR("x-ms-content-length")] = utility::conversions::print_string(properties.length());
         return request;
     }
     

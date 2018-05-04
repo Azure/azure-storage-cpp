@@ -20,6 +20,7 @@ var searchData=
   ['is_5fcleared_5frage',['is_cleared_rage',['../classazure_1_1storage_1_1page__diff__range.html#ad3c56767dc6a02d5694d305758c57add',1,'azure::storage::page_diff_range']]],
   ['is_5fconditional',['is_conditional',['../classazure_1_1storage_1_1access__condition.html#ac6821751915a2ee0a03290155aad9f76',1,'azure::storage::access_condition']]],
   ['is_5fdirectory',['is_directory',['../classazure_1_1storage_1_1list__file__and__directory__item.html#a1380c28616ff271cac848ca7b638ca72',1,'azure::storage::list_file_and_directory_item']]],
+  ['is_5fempty_5felement',['is_empty_element',['../classazure_1_1storage_1_1core_1_1xml_1_1xml__text__reader__wrapper.html#aee31fdda5428504de4392b20f8be8aac',1,'azure::storage::core::xml::xml_text_reader_wrapper']]],
   ['is_5ffile',['is_file',['../classazure_1_1storage_1_1list__file__and__directory__item.html#ac228f32c733408d19ad8a886e4304013',1,'azure::storage::list_file_and_directory_item']]],
   ['is_5fincremental_5fcopy',['is_incremental_copy',['../classazure_1_1storage_1_1cloud__blob__properties.html#a1355e943900b7401a185e81bdb2a6ed0',1,'azure::storage::cloud_blob_properties']]],
   ['is_5finitialized',['is_initialized',['../classazure_1_1storage_1_1cloud__storage__account.html#a5c16851a5dcbfc31923b35bde2ffadea',1,'azure::storage::cloud_storage_account']]],

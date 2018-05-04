@@ -22,9 +22,7 @@ if(UNIX)
 	# Prefer the latest (make the latest one first)
     list(REVERSE OPENSSL_ROOT_DIR)
 
-	# There is a dependency chain Libxml++ -> glibmm -> gobject -> glib -> lintl, however, for some reason,
-	# with homebrew at least, the -L for where lintl resides is left out. So, we try to find it where homebrew
-	# would put it, or allow the user to specify it
+
 	if(NOT GETTEXT_LIB_DIR)
 		message(WARNING "No GETTEXT_LIB_DIR specified, assuming: /usr/local/opt/gettext/lib")
 		set(GETTEXT_LIB_DIR "/usr/local/opt/gettext/lib")
@@ -42,10 +40,9 @@ if(UNIX)
   find_package(OpenSSL 1.0.0 REQUIRED)
 
 
-  find_package(Glibmm REQUIRED)
-  find_package(LibXML++ REQUIRED)
   find_package(UUID REQUIRED)
   find_package(Casablanca REQUIRED)
+  find_package(LibXML2 REQUIRED)
 
   if(BUILD_TESTS)
     find_package(UnitTest++ REQUIRED)
@@ -107,16 +104,16 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Binaries)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Binaries)
 
 set(AZURESTORAGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/includes)
-set(AZURESTORAGE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/includes ${CASABLANCA_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS} ${LibXML++_INCLUDE_DIRS} ${UUID_INCLUDE_DIRS} ${Glibmm_INCLUDE_DIRS})
+set(AZURESTORAGE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/includes ${CASABLANCA_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS} ${UUID_INCLUDE_DIRS} ${LibXML2_INCLUDE_DIR})
 
 
 set(AZURESTORAGE_LIBRARY azurestorage)
-set(AZURESTORAGE_LIBRARIES ${AZURESTORAGE_LIBRARY} ${CASABLANCA_LIBRARIES} ${Boost_LIBRARIES} ${Boost_FRAMEWORK} ${OPENSSL_LIBRARIES} ${LibXML++_LIBRARIES} ${UUID_LIBRARIES} ${Glibmm_LIBRARIES})
+set(AZURESTORAGE_LIBRARIES ${AZURESTORAGE_LIBRARY} ${CASABLANCA_LIBRARY} ${Boost_LIBRARIES} ${Boost_FRAMEWORK} ${OPENSSL_LIBRARIES} ${UUID_LIBRARIES} ${LibXML2_LIBRARIES})
 
 # Set version numbers centralized
 set (AZURESTORAGE_VERSION_MAJOR 3)
-set (AZURESTORAGE_VERSION_MINOR 2)
-set (AZURESTORAGE_VERSION_REVISION 1)
+set (AZURESTORAGE_VERSION_MINOR 3)
+set (AZURESTORAGE_VERSION_REVISION 0)
 
 # Add sources per configuration
 add_subdirectory(src)

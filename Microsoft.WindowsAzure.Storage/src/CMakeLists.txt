@@ -4,6 +4,7 @@ include_directories(${AZURESTORAGE_INCLUDE_DIRS})
 # THE ORDER OF FILES IS VERY /VERY/ IMPORTANT
 if(UNIX)
   set(SOURCES
+     xml_wrapper.cpp
      xmlhelpers.cpp
      response_parsers.cpp
      request_result.cpp

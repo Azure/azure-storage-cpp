@@ -25,7 +25,7 @@ namespace azure { namespace storage { namespace protocol {
     void add_file_properties(web::http::http_request& request, const cloud_file_properties& properties)
     {
         web::http::http_headers& headers = request.headers();
-        if (properties.length() >= 0)
+        if (properties.length() > 0)
         {
             headers.add(_XPLATSTR("x-ms-content-length"), utility::conversions::print_string(properties.length()));
         }

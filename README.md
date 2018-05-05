@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (3.2.1)
+# Azure Storage Client Library for C++ (4.0.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -21,7 +21,7 @@ The Azure Storage Client Library for C++ allows you to build applications agains
 # Getting started
 
 For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes.
-Download the [NuGet Package](http://www.nuget.org/packages/wastorage).
+Download the [NuGet Package](http://www.nuget.org/packages/Microsoft.Azure.Storage.CPP).
 
 Azure Storage Client Library for C++ is also avaiable on Vcpkg since v2.5.0. To get know more about Vcpkg, please visit https://github.com/Microsoft/vcpkg.
 
@@ -58,7 +58,7 @@ cd azure-storage-cpp
 
 To install the binaries for the Azure Storage Client Library for C++, type the following into the [NuGet Package Manager console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console):
 
-`Install-Package wastorage`
+`Install-Package Microsoft.Azure.Storage.CPP`
 
 ### Via Vcpkg
 
@@ -99,7 +99,7 @@ git clone https://github.com/Azure/azure-storage-cpp.git
 The project is cloned to a folder called `azure-storage-cpp`. Always use the master branch, which contains the latest release.
 - Install additional dependencies:
 ```bash
-sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev
+sudo apt-get install libxml2-dev uuid-dev
 ```
 - Build the SDK for Release:
 ```bash
@@ -156,7 +156,7 @@ Please note the current build script is only tested on Ubuntu 14.04. Please upda
 Install dependecies with homebrew:
 
 ```
-brew install libxml++ ossp-uuid openssl
+brew install libxml2 ossp-uuid openssl
 ```
 
 As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca.

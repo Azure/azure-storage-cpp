@@ -1,0 +1,35 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Force-Enable-wastorage-v120)' == '' And ('$(PlatformToolset)' != 'v120' Or '$(ApplicationType)' != '')">
+    <Disable-wastorage-v120>true</Disable-wastorage-v120>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Force-Disable-wastorage-v120)' != ''">
+    <Disable-wastorage-v120>true</Disable-wastorage-v120>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Disable-wastorage-v120)' == ''">
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)' == 'Debug' And '$(Platform)' == 'x64'">$(MSBuildThisFileDirectory)..\..\lib\native\v120\x64\Debug\wastoraged.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)' == 'Release' And '$(Platform)' == 'x64'">$(MSBuildThisFileDirectory)..\..\lib\native\v120\x64\Release\wastorage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)' == 'Debug' And ('$(Platform)' == 'Win32' Or '$(Platform)' == 'x86')">$(MSBuildThisFileDirectory)..\..\lib\native\v120\Win32\Debug\wastoraged.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)' == 'Release' And ('$(Platform)' == 'Win32' Or '$(Platform)' == 'x86')">$(MSBuildThisFileDirectory)..\..\lib\native\v120\Win32\Release\wastorage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug' And '$(Platform)' == 'x64' And '$(Disable-wastorage-v120)' == ''">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\x64\Debug\wastoraged.dll" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\x64\Debug\wastoraged.pdb" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release' And '$(Platform)' == 'x64' And '$(Disable-wastorage-v120)' == ''">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\x64\Release\wastorage.dll" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\x64\Release\wastorage.pdb" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug' And ('$(Platform)' == 'Win32' Or '$(Platform)' == 'x86') And '$(Disable-wastorage-v120)' == ''">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\Win32\Debug\wastoraged.dll" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\Win32\Debug\wastoraged.pdb" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release' And ('$(Platform)' == 'Win32' Or '$(Platform)' == 'x86') And '$(Disable-wastorage-v120)' == ''">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\Win32\Release\wastorage.dll" />
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\lib\native\v120\Win32\Release\wastorage.pdb" />
+  </ItemGroup>
+</Project>

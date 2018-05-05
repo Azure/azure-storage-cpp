@@ -111,6 +111,42 @@ SUITE(File)
         CHECK_EQUAL(0U, same_file.metadata().size());
     }
 
+    TEST_FIXTURE(file_test_base, file_properties_resize_wont_work)
+    {
+        m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(1024U, m_file.properties().length());
+
+        //Using newly created properties does not set the size of file back to zero.
+        m_file.properties() = azure::storage::cloud_file_properties();
+        m_file.upload_properties();
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(1024U, m_file.properties().length());
+
+        //Using the properties that explicitly equals to zero to upload properties will not set the size of the file back to zero.
+        m_file.resize(0U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(0U, m_file.properties().length());
+        auto zero_properties = m_file.properties();
+        m_file.resize(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(1024U, m_file.properties().length());
+        m_file.properties() = zero_properties;
+        m_file.upload_properties();
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(1024U, m_file.properties().length());
+
+        //Using the properties that explicitly equals to non-zero will not set the size of the file to this non-zero value.
+        auto non_zero_properties = m_file.properties();
+        m_file.resize(0U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(0U, m_file.properties().length());
+        m_file.properties() = non_zero_properties;
+        m_file.upload_properties();
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(0U, m_file.properties().length());
+    }
+
     TEST_FIXTURE(file_test_base, file_resize)
     {
         m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);

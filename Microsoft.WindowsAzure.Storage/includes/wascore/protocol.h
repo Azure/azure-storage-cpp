@@ -129,6 +129,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request delete_file(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_properties(const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request resize_with_properties(const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request copy_file(const web::http::uri& source, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request copy_file_from_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);

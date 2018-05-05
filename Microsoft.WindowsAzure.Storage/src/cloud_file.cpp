@@ -852,7 +852,7 @@ namespace azure { namespace storage {
         properties->m_length = length;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::set_file_properties, this->properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::resize_with_properties, this->properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {

@@ -1,6 +1,9 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v3.2.2:
+- Reverted commit [d78346b1ca39c85f0950648d80f400072f0adbe7](https://github.com/Azure/azure-storage-cpp/commit/d78346b1ca39c85f0950648d80f400072f0adbe7) applied in 3.2.0 that introduced a bug #174. This bug may cause data loss when user calls `azure::storage::cloud_file::upload_properties` while length equals to 0 in properties.
+
 Changes in v3.2.1:
 - Added tag `<requireLicenseAcceptance>true</requireLicenseAcceptance>` in .nuspec files and modified the author to `Microsoft` to comply to the new Microsoft Nuget package rule set. Note that this will require the Nuget package user to accept the license manually when newly installing or upgrading 3.2.1 version (and on) of this client library.
 

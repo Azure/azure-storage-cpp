@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (3.2.1)
+# Azure Storage Client Library for C++ (3.2.2)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 

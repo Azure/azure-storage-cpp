@@ -1,12 +1,13 @@
 Azure Storage Client Library for C++
 History of Changes
 
-Changes in v3.3.0:
+Changes in v4.0.0:
 - Fixed an issue where blob names that only contains space cannot be listed properly.
 - Added more compiler setting to unblock ApiScanning.
-- Added a new `nuspec` set that will release `Microsoft.Azure.Storage.CPP` and modified the `wastorage`'s nuspec to depend on Microsoft.Azure.Storage.CPP. Note that 3.3.0 will be the last version of `wastorage`. We strongly advice our user to use Nuget package `Microsoft.Azure.Storage.CPP` start from 3.3.0
+- Added a new `nuspec` set that will release `Microsoft.Azure.Storage.CPP` and modified the `wastorage`'s nuspec to depend on Microsoft.Azure.Storage.CPP. Note that 4.0.0 will be the last version of `wastorage`. We strongly advice our user to use Nuget package `Microsoft.Azure.Storage.CPP` start from 4.0.0
 - Resolved an issue where 3rd attempt of retry to download a blob or file will write more data than expected to destination stream.
 - Removed dependency on `libxml++` for Linux platforms. But now this SDK depends on `libxml2`, which is available for most Linux distributions.
+- `azure::storage::file::upload_properties` and `azure::storage::file::upload_properties_async` will no longer resize a file, even when properties contains length that is being set to 0 or other values.
 
 Changes in v3.2.1:
 - Added tag `<requireLicenseAcceptance>true</requireLicenseAcceptance>` in .nuspec files and modified the author to `Microsoft` to comply to the new Microsoft Nuget package rule set. Note that this will require the Nuget package user to accept the license manually when newly installing or upgrading 3.2.1 version (and on) of this client library.

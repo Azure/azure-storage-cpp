@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Microsoft Azure Storage Client Library for C++: Azure Storage Client Library for C++ (3.2.1)</title>
+<title>Microsoft Azure Storage Client Library for C++: Azure Storage Client Library for C++ (4.0.0)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">3.2.1</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -64,7 +64,7 @@ $(function() {
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Azure Storage Client Library for C++ (3.2.1) </div>  </div>
+<div class="title">Azure Storage Client Library for C++ (4.0.0) </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see <a href="http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/">Introduction to Microsoft Azure Storage</a>.</p>
@@ -93,7 +93,7 @@ $(function() {
 </li>
 </ul>
 <h1>Getting started</h1>
-<p>For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes. Download the <a href="http://www.nuget.org/packages/wastorage">NuGet Package</a>.</p>
+<p>For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes. Download the <a href="http://www.nuget.org/packages/Microsoft.Azure.Storage.CPP">NuGet Package</a>.</p>
 <p>Azure Storage Client Library for C++ is also avaiable on Vcpkg since v2.5.0. To get know more about Vcpkg, please visit <a href="https://github.com/Microsoft/vcpkg">https://github.com/Microsoft/vcpkg</a>.</p>
 <h2>Requirements</h2>
 <p>To call Azure services, you must first have an Azure subscription. Sign up for a <a href="https://azure.microsoft.com/en-us/pricing/free-trial/">free trial</a> or use your <a href="https://azure.microsoft.com/en-us/pricing/member-offers/msdn-benefits-details/">MSDN subscriber benefits</a>.</p>
@@ -112,7 +112,7 @@ $(function() {
 <p>To create a local clone of the source for the Azure Storage Client Library for C++ via <code>git</code>, type:</p>
 <div class="fragment"><div class="line">git clone https://github.com/Azure/azure-storage-cpp.git</div><div class="line">cd azure-storage-cpp</div></div><!-- fragment --><h3>Via NuGet</h3>
 <p>To install the binaries for the Azure Storage Client Library for C++, type the following into the <a href="http://docs.nuget.org/docs/start-here/using-the-package-manager-console">NuGet Package Manager console</a>:</p>
-<p><code>Install-Package wastorage</code></p>
+<p><code>Install-Package Microsoft.Azure.Storage.CPP</code></p>
 <h3>Via Vcpkg</h3>
 <p>To install the Azure Storage Client Library for C++ through Vcpkg, you need Vcpkg installed first. Please follow the instructions(<a href="https://github.com/Microsoft/vcpkg#quick-start">https://github.com/Microsoft/vcpkg#quick-start</a>) to install Vcpkg.</p>
 <p>install package with: </p><div class="fragment"><div class="line">C:\src\vcpkg&gt; .\vcpkg install azure-storage-cpp</div></div><!-- fragment --><h4>Visual Studio Version</h4>
@@ -132,7 +132,7 @@ $(function() {
 <p>Once this is complete, then:</p>
 <ul>
 <li>Clone the project using git: <div class="fragment"><div class="line">git clone https://github.com/Azure/azure-storage-cpp.git</div></div><!-- fragment --> The project is cloned to a folder called <code>azure-storage-cpp</code>. Always use the master branch, which contains the latest release.</li>
-<li>Install additional dependencies: <div class="fragment"><div class="line">sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev</div></div><!-- fragment --></li>
+<li>Install additional dependencies: <div class="fragment"><div class="line">sudo apt-get install libxml2-dev uuid-dev</div></div><!-- fragment --></li>
 <li>Build the SDK for Release: <div class="fragment"><div class="line">cd azure-storage-cpp/Microsoft.WindowsAzure.Storage</div><div class="line">mkdir build.release</div><div class="line">cd build.release</div><div class="line">CASABLANCA_DIR=&lt;path to Casablanca&gt; CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release</div><div class="line">make</div></div><!-- fragment --> In the above command, replace <code>&lt;path to Casablanca&gt;</code> to point to your local installation of Casablanca. For example, if the file <code>libcpprest.so</code> exists at location <code>~/Github/Casablanca/cpprestsdk/Release/build.release/Binaries/libcpprest.so</code>, then your <code>cmake</code> command should be: <div class="fragment"><div class="line">CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release</div></div><!-- fragment --> The library is generated under <code>azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/</code>.</li>
 </ul>
 <p>To build and run unit tests:</p><ul>
@@ -144,7 +144,7 @@ $(function() {
 <h2>Getting Started on OSX</h2>
 <p><em>Note that OSX is not officially supported yet, but it has been seen to work, YMMV. This build has been tested to work when the dependencies are installed via homebrew, YMMV if using FINK or MacPorts</em></p>
 <p>Install dependecies with homebrew:</p>
-<div class="fragment"><div class="line">brew install libxml++ ossp-uuid openssl</div></div><!-- fragment --><p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. If you are using homebrew you can install it from there: </p><div class="fragment"><div class="line">brew install cpprestsdk</div></div><!-- fragment --><p>Otherwise, you may need to build it. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X">these instructions</a> to compile it. Current version of the library depends on Casablanca version 2.9.1.</p>
+<div class="fragment"><div class="line">brew install libxml2 ossp-uuid openssl</div></div><!-- fragment --><p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. If you are using homebrew you can install it from there: </p><div class="fragment"><div class="line">brew install cpprestsdk</div></div><!-- fragment --><p>Otherwise, you may need to build it. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X">these instructions</a> to compile it. Current version of the library depends on Casablanca version 2.9.1.</p>
 <p>Once this is complete, then:</p>
 <ul>
 <li>Clone the project using git: <div class="fragment"><div class="line">git clone https://github.com/Azure/azure-storage-cpp.git</div></div><!-- fragment --> The project is cloned to a folder called <code>azure-storage-cpp</code>. Always use the master branch, which contains the latest release.</li>
@@ -174,7 +174,7 @@ $(function() {
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 14 2018 17:08:01 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 5 2018 14:23:35 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

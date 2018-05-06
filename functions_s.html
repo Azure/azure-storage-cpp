@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">3.2.1</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -151,6 +151,9 @@ $(function() {
 <li>set_append_position()
 : <a class="el" href="classazure_1_1storage_1_1access__condition.html#a3b231b7cd773d3c7a51d8e0763aa5f0b">azure::storage::access_condition</a>
 </li>
+<li>set_attribute()
+: <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__element__wrapper.html#aa9418e09b71005fcb94aa923aeec078e">azure::storage::core::xml::xml_element_wrapper</a>
+</li>
 <li>set_authentication_scheme()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob__client.html#a52c2f8e86e6fb0c51686ab08f213ccf5">azure::storage::cloud_blob_client</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__client.html#a6bfc05a97c7658f96527711edfb7db1d">azure::storage::cloud_client</a>
@@ -163,6 +166,9 @@ $(function() {
 , <a class="el" href="classazure_1_1storage_1_1cloud__blob__shared__access__headers.html#a998125743f59a8f95d5d4159dc2282cf">azure::storage::cloud_blob_shared_access_headers</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__file__properties.html#a9656d32a7a7fc7261b8dc74db6a2d49f">azure::storage::cloud_file_properties</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__file__shared__access__headers.html#ad658cc20c72415ee139ad61010044738">azure::storage::cloud_file_shared_access_headers</a>
+</li>
+<li>set_child_text()
+: <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__element__wrapper.html#a8a3146f877d36b7ed73443ff9bf3796a">azure::storage::core::xml::xml_element_wrapper</a>
 </li>
 <li>set_client_request_id()
 : <a class="el" href="classazure_1_1storage_1_1operation__context.html#aada80c3bc9a16dfca625ddffc8bb030c">azure::storage::operation_context</a>
@@ -318,6 +324,12 @@ $(function() {
 <li>set_minute_metrics()
 : <a class="el" href="classazure_1_1storage_1_1service__properties.html#ab26f8ad04021d0d306abfe5a33afc26d">azure::storage::service_properties</a>
 , <a class="el" href="classazure_1_1storage_1_1service__properties__includes.html#a2882c83884b0bea4257863fc755c0680">azure::storage::service_properties_includes</a>
+</li>
+<li>set_namespace()
+: <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__element__wrapper.html#a9a1aaa114317eeb691b6cb4ababdd919">azure::storage::core::xml::xml_element_wrapper</a>
+</li>
+<li>set_namespace_declaration()
+: <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__element__wrapper.html#a897d9f77eb832c5576b18290eb9155d6">azure::storage::core::xml::xml_element_wrapper</a>
 </li>
 <li>set_next_marker()
 : <a class="el" href="classazure_1_1storage_1_1continuation__token.html#a827ecfe521e32367d65b305109b57087">azure::storage::continuation_token</a>
@@ -495,25 +507,25 @@ $(function() {
 </li>
 <li>start_copy()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a71060dedd5824f197cf077eb10348857">azure::storage::cloud_blob</a>
-, <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a15e7305960d30ae85618111bea35f1d9">azure::storage::cloud_file</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a116a5cf1322bc57bc790c6b3950072cd">azure::storage::cloud_file</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#ac286d17c832e81d343bfbe05ebc13b16">azure::storage::cloud_page_blob</a>
 </li>
 <li>start_copy_async()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a2ed4d6d079959f88a66a79389fdaac50">azure::storage::cloud_blob</a>
-, <a class="el" href="classazure_1_1storage_1_1cloud__file.html#ace4a11c1ebec932b2ca8832054f32b11">azure::storage::cloud_file</a>
+, <a class="el" href="classazure_1_1storage_1_1cloud__file.html#a2e82799407a438e7643c957d93989586">azure::storage::cloud_file</a>
 , <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a08ddc701bdeb22076eebd10d0464b28c">azure::storage::cloud_page_blob</a>
 </li>
 <li>start_copy_from_blob()
 : <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#af3d64ad09bca97615f0ec5b9fe0a742d">azure::storage::cloud_blob</a>
 </li>
 <li>start_copy_from_blob_async()
-: <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#aec6a5a6e68536689a2009581def89d10">azure::storage::cloud_blob</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__blob.html#a03aae281bd0a3e26f5866662403224cc">azure::storage::cloud_blob</a>
 </li>
 <li>start_incremental_copy()
 : <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a1cc0dda6c3773b1887a47e830520fbae">azure::storage::cloud_page_blob</a>
 </li>
 <li>start_incremental_copy_async()
-: <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a93bdd6d83d569cc014803be59e43d570">azure::storage::cloud_page_blob</a>
+: <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html#a1fa40d87432d8f94d8b4455d880b34f1">azure::storage::cloud_page_blob</a>
 </li>
 <li>start_offset()
 : <a class="el" href="classazure_1_1storage_1_1file__range.html#a1b5afb90e158c3afa1023c500f336840">azure::storage::file_range</a>
@@ -531,10 +543,10 @@ $(function() {
 : <a class="el" href="classazure_1_1storage_1_1copy__state.html#aae2a01096ca9b9814218faa290966481">azure::storage::copy_state</a>
 </li>
 <li>storage_credentials()
-: <a class="el" href="classazure_1_1storage_1_1storage__credentials.html#adb70a8da9cd4c05dd3697cb9d1a3c254">azure::storage::storage_credentials</a>
+: <a class="el" href="classazure_1_1storage_1_1storage__credentials.html#a70c22202a225d23ebcaa9b34bb92da85">azure::storage::storage_credentials</a>
 </li>
 <li>storage_exception()
-: <a class="el" href="classazure_1_1storage_1_1storage__exception.html#a015b6acca2a6ac4ce288ed7915f0ee5f">azure::storage::storage_exception</a>
+: <a class="el" href="classazure_1_1storage_1_1storage__exception.html#a6eee51fc7afccb4c9f22643fb1ed0550">azure::storage::storage_exception</a>
 </li>
 <li>storage_extended_error()
 : <a class="el" href="classazure_1_1storage_1_1storage__extended__error.html#a50dcc3673b034ae8f1b6b9171663a09e">azure::storage::storage_extended_error</a>
@@ -564,7 +576,7 @@ $(function() {
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 14 2018 17:08:02 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 5 2018 14:23:35 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

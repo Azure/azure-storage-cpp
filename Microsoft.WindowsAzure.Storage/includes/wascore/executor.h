@@ -351,7 +351,8 @@ namespace azure { namespace storage { namespace core {
         executor_impl(std::shared_ptr<storage_command_base> command, const request_options& options, operation_context context)
             : m_command(command), m_request_options(options), m_context(context), m_is_hashing_started(false),
             m_total_downloaded(0), m_retry_count(0), m_current_location(get_first_location(options.location_mode())),
-            m_current_location_mode(options.location_mode()), m_retry_policy(options.retry_policy().clone())
+            m_current_location_mode(options.location_mode()), m_retry_policy(options.retry_policy().clone()),
+            m_should_restart_hash_provider(false)
         {
         }
 
@@ -419,8 +420,18 @@ namespace azure { namespace storage { namespace core {
 
                         instance->m_total_downloaded = 0;
                         instance->m_is_hashing_started = true;
+                        instance->m_should_restart_hash_provider = false;
 
                         // TODO: Consider using hash_provider::is_enabled instead of m_is_hashing_started to signal when the hash provider has been closed
+                    }
+
+                    if (instance->m_should_restart_hash_provider)
+                    {
+                        if (instance->m_command->m_calculate_response_body_md5)
+                        {
+                            instance->m_hash_provider = hash_provider::create_md5_hash_provider();
+                        }
+                        instance->m_should_restart_hash_provider = false;
                     }
 
                     instance->m_response_streambuf = hash_wrapper_streambuf<concurrency::streams::ostream::traits::char_type>(instance->m_command->m_destination_stream.streambuf(), instance->m_hash_provider);
@@ -636,7 +647,7 @@ namespace azure { namespace storage { namespace core {
 
                         // Hash provider may be closed by Casablanca due to stream error. Close hash provider and force to recreation when retry.
                         instance->m_hash_provider.close();
-                        instance->m_is_hashing_started = false;
+                        instance->m_should_restart_hash_provider = true;
 
                         if (instance->m_response_streambuf)
                         {
@@ -831,6 +842,7 @@ namespace azure { namespace storage { namespace core {
         web::http::http_request m_request;
         request_result m_request_result;
         bool m_is_hashing_started;
+        bool m_should_restart_hash_provider;
         hash_provider m_hash_provider;
         hash_wrapper_streambuf<concurrency::streams::ostream::traits::char_type> m_response_streambuf;
         utility::size64_t m_total_downloaded;

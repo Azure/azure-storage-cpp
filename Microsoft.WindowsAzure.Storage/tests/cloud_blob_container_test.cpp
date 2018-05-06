@@ -297,6 +297,42 @@ SUITE(Blob)
         }
     }
 
+    TEST_FIXTURE(container_test_base, container_list_blobs_only_space_in_name)
+    {
+        m_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        check_container_no_stale_property(m_container);
+        std::map<utility::string_t, azure::storage::cloud_blob> blobs;
+
+        auto single_space_blob = m_container.get_block_blob_reference(_XPLATSTR(" "));
+
+        std::vector<uint8_t> buffer;
+        buffer.resize(1024);
+        auto stream_1 = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(buffer);
+        single_space_blob.upload_from_stream(stream_1, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        blobs[single_space_blob.name()] = single_space_blob;
+
+        auto double_space_blob = m_container.get_block_blob_reference(_XPLATSTR("  "));
+
+        buffer.resize(1024);
+        auto stream_2 = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(buffer);
+        double_space_blob.upload_from_stream(stream_2, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        blobs[double_space_blob.name()] = double_space_blob;
+
+        auto listing1 = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, azure::storage::blob_request_options());
+        for (auto iter = listing1.begin(); iter != listing1.end(); ++iter)
+        {
+            auto blob = blobs.find(iter->name());
+            CHECK(blob != blobs.end());
+
+            CHECK_UTF8_EQUAL(blob->second.uri().primary_uri().to_string(), iter->uri().primary_uri().to_string());
+            CHECK_UTF8_EQUAL(blob->second.uri().secondary_uri().to_string(), iter->uri().secondary_uri().to_string());
+
+            blobs.erase(blob);
+        }
+
+        CHECK_EQUAL(0U, blobs.size());
+    }
+
     TEST_FIXTURE(container_test_base, container_list_premium_blobs)
     {
         //preparation

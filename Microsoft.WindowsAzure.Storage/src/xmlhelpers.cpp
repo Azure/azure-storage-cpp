@@ -46,9 +46,10 @@
 #include "wascore/xmlstream.h"
 #else
 typedef int XmlNodeType;
-#define XmlNodeType_Element xmlpp::TextReader::xmlNodeType::Element
-#define XmlNodeType_Text xmlpp::TextReader::xmlNodeType::Text
-#define XmlNodeType_EndElement xmlpp::TextReader::xmlNodeType::EndElement
+#define XmlNodeType_Element xmlElementType::XML_ELEMENT_NODE
+#define XmlNodeType_Text xmlElementType::XML_TEXT_NODE
+#define XmlNodeType_EndElement xmlElementType::XML_ELEMENT_DECL
+#define XmlNodeType_Whitespace xmlElementType::XML_DTD_NODE //? not align with tinyxml?
 #endif
 
 using namespace web;
@@ -101,7 +102,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         if (m_data.empty())
             m_reader.reset();
         else
-            m_reader.reset(new xmlpp::TextReader(reinterpret_cast<const unsigned char*>(m_data.data()), static_cast<unsigned int>(m_data.size())));
+            m_reader.reset(new xml_text_reader_wrapper(reinterpret_cast<const unsigned char*>(m_data.data()), static_cast<unsigned int>(m_data.size())));
 #endif
     }
 
@@ -147,7 +148,10 @@ namespace azure { namespace storage { namespace core { namespace xml {
                 break;
 
             case XmlNodeType_Text:
-                handle_element(m_elementStack.back());
+            case XmlNodeType_Whitespace:
+                if (m_elementStack.size()) {
+                    handle_element(m_elementStack.back());
+                }
                 break;
 
             case XmlNodeType_EndElement:
@@ -199,7 +203,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         }
         return utility::string_t(pwszLocalName);
 #else
-        return utility::string_t(m_reader->get_local_name().raw());
+        return utility::string_t(m_reader->get_local_name());
 #endif
     }
 
@@ -236,7 +240,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
 
         return utility::string_t(pwszValue);
 #else
-        return utility::string_t(m_reader->get_value().raw());
+        return utility::string_t(m_reader->get_value());
 #endif
     }
 
@@ -314,8 +318,8 @@ namespace azure { namespace storage { namespace core { namespace xml {
             throw utility::details::create_system_error(error);
         }
 #else // LINUX
-        m_document.reset(new xmlpp::Document());
-        m_elementStack = std::stack<xmlpp::Element*>();
+        m_document.reset(new xml_document_wrapper());
+        m_elementStack = std::stack<xml_element_wrapper*>();
         m_stream = &stream;
 #endif
     }

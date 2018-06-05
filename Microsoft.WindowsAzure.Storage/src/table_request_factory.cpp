@@ -447,6 +447,9 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t changeset_boundary_name = core::generate_boundary_name(_XPLATSTR("changeset"));
         
         web::http::http_request request = table_base_request(web::http::methods::POST, uri_builder, timeout, context);
+        // Need to reset the response buffer before each batch operation is executed.
+        response_buffer.collection().resize(0);
+        response_buffer.seekpos(0, std::ios_base::out);
         request.set_response_stream(Concurrency::streams::ostream(response_buffer));
 
         web::http::http_headers& request_headers = request.headers();

@@ -386,6 +386,7 @@ DAT(error_storage_uri_empty, "Primary or secondary location URI must be supplied
 DAT(error_storage_uri_mismatch, "Primary and secondary location URIs must point to the same resource.")
 
 DAT(error_empty_batch_operation, "The batch operation cannot be empty.")
+DAT(error_batch_size_not_match_response, "The received batch result size does not match the size of the batch operations sent to the server.")
 DAT(error_batch_operation_partition_key_mismatch, "The batch operation cannot contain entities with different partition keys.")
 DAT(error_batch_operation_retrieve_count, "The batch operation cannot contain more than one retrieve operation.")
 DAT(error_batch_operation_retrieve_mix, "The batch operation cannot contain any other operations when it contains a retrieve operation.")

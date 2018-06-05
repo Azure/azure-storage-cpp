@@ -2732,9 +2732,11 @@ SUITE(Table)
             
             CHECK(output_document.is_object());
             CHECK(output_document.as_object().find(_XPLATSTR("DoubleProperty")) != output_document.as_object().cend());
-            CHECK_EQUAL(web::json::value::value_type::Number, output_document.as_object().find(_XPLATSTR("DoubleProperty"))->second.type());
-            CHECK(output_document.as_object().find(_XPLATSTR("DoubleProperty"))->second.is_double());
-            CHECK_EQUAL(double_value, output_document.as_object().find(_XPLATSTR("DoubleProperty"))->second.as_double());
+            auto num = output_document.as_object().find(_XPLATSTR("DoubleProperty"))->second;
+            CHECK_EQUAL(web::json::value::value_type::Number, num.type());
+            // Casablanca cannot take doubles like 0.0, 1.0, 2.00 to be double value, so if a number is seen as not a double but a integer, need to check that it is a whole number
+            CHECK(num.is_double() || (round(num.as_double()) == num.as_double()));
+            CHECK_EQUAL(double_value, num.as_double());
         }
     }
 

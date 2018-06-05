@@ -114,7 +114,7 @@ void blob_service_test_base::check_blob_equal(const azure::storage::cloud_blob& 
     CHECK_UTF8_EQUAL(expected.snapshot_qualified_uri().primary_uri().to_string(), actual.snapshot_qualified_uri().primary_uri().to_string());
     CHECK_UTF8_EQUAL(expected.snapshot_qualified_uri().secondary_uri().to_string(), actual.snapshot_qualified_uri().secondary_uri().to_string());
     check_blob_copy_state_equal(expected.copy_state(), actual.copy_state());
-    check_blob_properties_equal(expected.properties(), actual.properties());
+    check_blob_properties_equal(expected.properties(), actual.properties(), true);
 }
 
 void blob_service_test_base::check_blob_copy_state_equal(const azure::storage::copy_state& expected, const azure::storage::copy_state& actual)

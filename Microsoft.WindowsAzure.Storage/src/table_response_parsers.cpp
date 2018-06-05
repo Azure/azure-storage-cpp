@@ -226,6 +226,12 @@ namespace azure { namespace storage { namespace protocol {
             }
         }
 
+        if (batch_result.size() != batch_size) {
+            std::string str;
+            str.reserve(128);
+            str.append(protocol::error_batch_size_not_match_response).append(" Sent ").append(std::to_string(batch_size)).append(" batch operations and received ").append(std::to_string(batch_result.size())).append(" batch results.");
+            throw storage_exception(str, false);
+        }
         return batch_result;
     }
 

@@ -106,9 +106,9 @@ namespace azure { namespace storage { namespace core { namespace xml {
 #endif
     }
 
-    bool xml_reader::parse()
+    xml_reader::parse_result xml_reader::parse()
     {
-        if (m_streamDone) return false;
+        if (m_streamDone) return xml_reader::parse_result::cannot_continue;
         // Set this to true each time the parse routine is invoked. Most derived readers will only invoke parse once.
         m_continueParsing = true;
 
@@ -164,12 +164,24 @@ namespace azure { namespace storage { namespace core { namespace xml {
             }
         }
 
+        xml_reader::parse_result result = xml_reader::parse_result::can_continue;
         // If the loop was terminated because there was no more to read from the stream, set m_streamDone to true, so exit early
         // the next time parse is invoked.
-        if (m_continueParsing) m_streamDone = true;
-        // Return false if the end of the stream was reached and true if parsing was paused. The return value indicates whether
-        // parsing can be resumed.
-        return !m_continueParsing;
+        // if stream is not done, it means that the parsing is interuptted by pause().
+        // if the element stack is not empty when the stream is done, it means that the xml is not complete.
+        if (m_continueParsing)
+        {
+            m_streamDone = true;
+            if (m_elementStack.empty())
+            {
+                result = xml_reader::parse_result::cannot_continue;
+            }
+            else
+            {
+                result = xml_reader::parse_result::xml_not_complete;
+            }
+        }
+        return result;
     }
 
     utility::string_t xml_reader::get_parent_element_name(size_t pos)

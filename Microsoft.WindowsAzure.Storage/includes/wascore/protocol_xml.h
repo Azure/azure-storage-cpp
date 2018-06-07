@@ -21,6 +21,7 @@
 #include "was/blob.h"
 #include "was/queue.h"
 #include "was/file.h"
+#include "wascore/protocol.h"
 #include "wascore/xmlhelpers.h"
 
 #pragma push_macro("max")
@@ -112,13 +113,21 @@ namespace azure { namespace storage { namespace protocol {
 
         std::vector<cloud_blob_container_list_item> move_items()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_items);
         }
 
         utility::string_t move_next_marker()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_next_marker);
         }
 
@@ -223,19 +232,31 @@ namespace azure { namespace storage { namespace protocol {
 
         std::vector<cloud_blob_list_item> move_blob_items()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_blob_items);
         }
 
         std::vector<cloud_blob_prefix_list_item> move_blob_prefix_items()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_blob_prefix_items);
         }
 
         utility::string_t move_next_marker()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_next_marker);
         }
 
@@ -270,7 +291,11 @@ namespace azure { namespace storage { namespace protocol {
         // Extracts the result. This method can only be called once on this reader
         std::vector<page_range> move_result()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_page_list);
         }
 
@@ -296,7 +321,11 @@ namespace azure { namespace storage { namespace protocol {
         // Extracts the result. This method can only be called once on this reader
         std::vector<page_diff_range> move_result()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_page_list);
         }
 
@@ -322,7 +351,11 @@ namespace azure { namespace storage { namespace protocol {
         // Extracts the result. This method can only be called once on this reader
         std::vector<block_list_item> move_result()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_block_list);
         }
 
@@ -364,7 +397,11 @@ namespace azure { namespace storage { namespace protocol {
 
         shared_access_policies<Policy> move_policies()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_policies);
         }
 
@@ -491,13 +528,21 @@ namespace azure { namespace storage { namespace protocol {
 
         std::vector<cloud_queue_list_item> move_items()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_items);
         }
 
         utility::string_t move_next_marker()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_next_marker);
         }
 
@@ -579,7 +624,12 @@ namespace azure { namespace storage { namespace protocol {
 
         std::vector<cloud_message_list_item> move_items()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                // This is not a retryable exception because Get operation for messages changes server content.
+                throw storage_exception(protocol::error_xml_not_complete, false);
+            }
             return std::move(m_items);
         }
 
@@ -658,7 +708,11 @@ namespace azure { namespace storage { namespace protocol {
 
         int32_t get()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return m_quota;
         }
 
@@ -682,13 +736,21 @@ namespace azure { namespace storage { namespace protocol {
 
         std::vector<cloud_file_share_list_item> move_items()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_items);
         }
 
         utility::string_t move_next_marker()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_next_marker);
         }
 
@@ -719,13 +781,21 @@ namespace azure { namespace storage { namespace protocol {
 
         std::vector<list_file_and_directory_item> move_items()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_items);
         }
 
         utility::string_t move_next_marker()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_next_marker);
         }
 
@@ -758,7 +828,11 @@ namespace azure { namespace storage { namespace protocol {
         // Extracts the result. This method can only be called once on this reader
         std::vector<file_range> move_result()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_range_list);
         }
 
@@ -783,7 +857,11 @@ namespace azure { namespace storage { namespace protocol {
 
         service_properties move_properties()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_service_properties);
         }
 
@@ -833,7 +911,11 @@ namespace azure { namespace storage { namespace protocol {
 
         service_stats move_stats()
         {
-            parse();
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
             return std::move(m_service_stats);
         }
 

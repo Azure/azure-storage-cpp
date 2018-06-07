@@ -64,13 +64,34 @@ class xml_reader
 {
 public:
 
+    /// <summary>
+    /// An enumeration describing result of the parse() operation.
+    /// </summary>
+    enum parse_result
+    {
+        /// <summary>
+        /// Parsed is finished and cannot be continued.
+        /// </summary>
+        cannot_continue = 0,
+
+        /// <summary>
+        /// Parse is paused and can be continued.
+        /// </summary>
+        can_continue = 1,
+
+        /// <summary>
+        /// Exited because XML is not complete.
+        /// </summary>
+        xml_not_complete = 2,
+    };
+
     virtual ~xml_reader() {}
 
     /// <summary>
-    /// Parse the given xml string/stream. Returns true if it finished parsing the stream to the end, and false
-    /// if it was asked to exit early via pause()
+    /// Parse the given xml string/stream. Return value indicates if
+    /// the parsing was successful.
     /// </summary>
-    bool parse();
+    parse_result parse();
 
 protected:
 

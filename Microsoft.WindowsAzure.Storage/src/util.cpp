@@ -168,6 +168,21 @@ namespace azure { namespace storage {  namespace core {
         return true;
     }
 
+    bool has_whitespace_or_empty(const utility::string_t& value)
+    {
+        if (value.empty()) return true;
+
+        for (utility::string_t::const_iterator it = value.cbegin(); it != value.cend(); ++it)
+        {
+            if (isspace(*it))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     utility::string_t single_quote(const utility::string_t& value)
     {
         const utility::char_t SINGLE_QUOTE = _XPLATSTR('\'');
@@ -273,6 +288,13 @@ namespace azure { namespace storage {  namespace core {
         }
 
         return result;
+    }
+
+    utility::string_t str_trim_starting_trailing_whitespaces(const utility::string_t& str)
+    {
+        auto non_space_begin = std::find_if(str.begin(), str.end(), std::not1(std::ptr_fun<int, int>(isspace)));
+        auto non_space_end = std::find_if(str.rbegin(), str.rend(), std::not1(std::ptr_fun<int, int>(isspace))).base();
+        return utility::string_t(non_space_begin, non_space_end);
     }
 
     utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value)

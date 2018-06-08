@@ -68,6 +68,7 @@ namespace azure { namespace storage { namespace core {
     pplx::task<void> complete_after(std::chrono::milliseconds timeout);
     std::vector<utility::string_t> string_split(const utility::string_t& string, const utility::string_t& separator);
     bool is_empty_or_whitespace(const utility::string_t& value);
+    bool has_whitespace_or_empty(const utility::string_t& str);
     utility::string_t single_quote(const utility::string_t& value);
     bool is_nan(double value);
     bool is_finite(double value);
@@ -77,6 +78,7 @@ namespace azure { namespace storage { namespace core {
     utility::string_t convert_to_string(const std::vector<uint8_t>& value);
     utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value);
     utility::char_t utility_char_tolower(const utility::char_t& character);
+    utility::string_t str_trim_starting_trailing_whitespaces(const utility::string_t& str);
 
     template<typename T>
     utility::string_t convert_to_string(T value)

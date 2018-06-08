@@ -81,12 +81,23 @@ namespace azure { namespace storage { namespace protocol {
         web::http::http_headers& headers = request.headers();
         for (cloud_metadata::const_iterator it = metadata.cbegin(); it != metadata.cend(); ++it)
         {
+            if (core::has_whitespace_or_empty(it->first))
+            {
+                throw std::invalid_argument(protocol::error_empty_whitespace_metadata_name);
+            }
             if (core::is_empty_or_whitespace(it->second))
             {
                 throw std::invalid_argument(protocol::error_empty_metadata_value);
             }
-
-            headers.add(ms_header_metadata_prefix + it->first, it->second);
+            if (isspace(*it->second.begin()) || isspace(*it->second.rbegin()))
+            {
+                headers.add(ms_header_metadata_prefix + it->first, core::str_trim_starting_trailing_whitespaces(it->second));
+            }
+            else
+            {
+                headers.add(ms_header_metadata_prefix + it->first, it->second);
+            }
+            
         }
     }
 

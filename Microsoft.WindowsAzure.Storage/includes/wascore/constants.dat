@@ -420,6 +420,7 @@ DAT(error_free_uuid, "An error occurred freeing the UUID string.")
 DAT(error_parse_uuid, "An error occurred parsing the UUID.")
 
 DAT(error_empty_metadata_value, "The metadata value cannot be empty or consist entirely of whitespace.")
+DAT(error_empty_whitespace_metadata_name, "The metadata name cannot contain any whitespaces or be empty.")
 DAT(error_hash_on_closed_streambuf, "Hash is calculated when the streambuf is closed.")
 DAT(error_invalid_settings_form, "Settings must be of the form \"name=value\".")
 

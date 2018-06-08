@@ -406,6 +406,49 @@ SUITE(Blob)
         CHECK(blob.metadata().empty());
     }
 
+    TEST_FIXTURE(blob_test_base, blob_whitespace_metadata)
+    {
+        // Create with 3 pairs that has space in value.
+        auto blob = m_container.get_block_blob_reference(_XPLATSTR("blockblob"));
+        blob.metadata()[_XPLATSTR("key1")] = _XPLATSTR("   value1   ");
+        blob.metadata()[_XPLATSTR("key2")] = _XPLATSTR("   value2");
+        blob.metadata()[_XPLATSTR("key3")] = _XPLATSTR("value3   ");
+        blob.upload_text(utility::string_t());
+
+        auto same_blob = m_container.get_blob_reference(blob.name());
+        CHECK(same_blob.metadata().empty());
+        same_blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK_EQUAL(3U, same_blob.metadata().size());
+        CHECK_UTF8_EQUAL(_XPLATSTR("value1"), same_blob.metadata()[_XPLATSTR("key1")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value2"), same_blob.metadata()[_XPLATSTR("key2")]);
+        CHECK_UTF8_EQUAL(_XPLATSTR("value3"), same_blob.metadata()[_XPLATSTR("key3")]);
+
+        // Add 1 pair with only spaces in name
+        auto same_blob1 = m_container.get_blob_reference(blob.name());
+        same_blob1.metadata()[_XPLATSTR("   ")] = _XPLATSTR("value");
+        CHECK_THROW(same_blob1.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
+
+        // Add 1 pair with trailing spaces in name
+        auto same_blob2 = m_container.get_blob_reference(blob.name());
+        same_blob2.metadata()[_XPLATSTR("key1   ")] = _XPLATSTR("value");
+        CHECK_THROW(same_blob2.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
+
+        // Add 1 pair with beginning spaces in name
+        auto same_blob3 = m_container.get_blob_reference(blob.name());
+        same_blob3.metadata()[_XPLATSTR("   key")] = _XPLATSTR("value");
+        CHECK_THROW(same_blob3.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
+
+        // Add 1 pair with spaces in name
+        auto same_blob4 = m_container.get_blob_reference(blob.name());
+        same_blob4.metadata()[_XPLATSTR("key   key")] = _XPLATSTR("value");
+        CHECK_THROW(same_blob4.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
+
+        // Add 1 pair with empty name
+        auto same_blob5 = m_container.get_blob_reference(blob.name());
+        same_blob5.metadata()[_XPLATSTR("")] = _XPLATSTR("value");
+        CHECK_THROW(same_blob5.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::invalid_argument);
+    }
+
     TEST_FIXTURE(blob_test_base, blob_invalid_sas_and_snapshot)
     {
         azure::storage::blob_shared_access_policy policy;

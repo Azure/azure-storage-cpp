@@ -2,7 +2,7 @@ include_directories(${Boost_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR})
 include_directories(${AZURESTORAGE_INCLUDE_DIRS})
 
 # THE ORDER OF FILES IS VERY /VERY/ IMPORTANT
-if(UNIX)
+if(UNIX OR WIN32)
   set(SOURCES
      xml_wrapper.cpp
      xmlhelpers.cpp
@@ -65,14 +65,30 @@ if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
 if (APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS}")
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
+
+if(MSVC)
+  add_compile_options(/Yustdafx.h)
+  set_source_files_properties(stdafx.cpp PROPERTIES COMPILE_FLAGS "/Ycstdafx.h")
+
+  if (NOT CMAKE_GENERATOR MATCHES "Visual Studio .*")
+    set_property(SOURCE stdafx.cpp APPEND PROPERTY OBJECT_OUTPUTS "${CMAKE_CURRENT_BINARY_DIR}/stdafx.pch")
+    set_property(SOURCE ${SOURCES} APPEND PROPERTY OBJECT_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/stdafx.pch")
+  endif()
+
+  list(APPEND SOURCES stdafx.cpp)
 endif()
 
 add_library(${AZURESTORAGE_LIBRARY} ${SOURCES})
 
 target_link_libraries(${AZURESTORAGE_LIBRARIES})
+
+if(WIN32)
+  target_link_libraries(${AZURESTORAGE_LIBRARY} Ws2_32.lib rpcrt4.lib xmllite.lib bcrypt.lib)
+endif()
 
 # Portions specific to azure storage binary versioning and installation.
 if(UNIX)
@@ -80,9 +96,17 @@ if(UNIX)
     SOVERSION ${AZURESTORAGE_VERSION_MAJOR}
     VERSION ${AZURESTORAGE_VERSION_MAJOR}.${AZURESTORAGE_VERSION_MINOR})
 
-  install(
-    TARGETS ${AZURESTORAGE_LIBRARY}
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    )
+elseif(WIN32)
+  set_target_properties(${AZURESTORAGE_LIBRARY} PROPERTIES OUTPUT_NAME "wastorage")
 endif()
+
+install(FILES ${WAS_HEADERS} DESTINATION include/was)
+install(FILES ${WASCORE_HEADERS} DESTINATION include/wascore)
+install(FILES ${WASCORE_DATA} DESTINATION include/wascore)
+
+install(
+  TARGETS ${AZURESTORAGE_LIBRARY}
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)

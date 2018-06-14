@@ -120,7 +120,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
         {
 #else
         if (m_reader == nullptr)
-            return !m_continueParsing; // no XML document to read
+            return xml_reader::parse_result::cannot_continue; // no XML document to read
 
         while (m_continueParsing && m_reader->read())
         {

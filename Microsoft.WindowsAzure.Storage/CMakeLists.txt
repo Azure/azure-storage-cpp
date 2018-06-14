@@ -139,6 +139,15 @@ set (AZURESTORAGE_VERSION_MAJOR 4)
 set (AZURESTORAGE_VERSION_MINOR 0)
 set (AZURESTORAGE_VERSION_REVISION 0)
 
+# Set output directories.
+if(NOT DEFINED CMAKE_INSTALL_BINDIR)
+  set(CMAKE_INSTALL_BINDIR bin)
+endif()
+
+if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+  set(CMAKE_INSTALL_LIBDIR lib)
+endif()
+
 # Add sources per configuration
 add_subdirectory(src)
 

@@ -1,5 +1,7 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
+Breaking Changes in v5.0:
+- Dropped Nuget package with name 'wastorage'.
 
 Breaking Changes in v4.0:
 - `azure::storage::file::upload_properties` and `azure::storage::file::upload_properties_async` will no longer resize a file, even when properties contains length that is being set to 0 or other values.

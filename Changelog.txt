@@ -1,6 +1,14 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v5.0.0
+- Dropped the support for Nuget package with name 'wastorage', now this client library only release with Nuget name 'Microsoft.Azure.Storage.CPP'.
+- Added support for specifying installation destination when compiling with cmake to resolve feature request #183.
+- Enabled CMake on Windows.
+- Added check for metadata name that is empty or contains whitespaces to fail fast, and trimmed beginning/trailing whitespaces for metadata value.
+- Resolved an issue where partial xml body will not throw exception when being parsed.
+- Resolved an issue where retry for Table's batch operation always returns the first response.
+
 Changes in v4.0.0:
 - Fixed an issue where blob names that only contains space cannot be listed properly.
 - Added more compiler setting to unblock ApiScanning.

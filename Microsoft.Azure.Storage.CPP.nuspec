@@ -3,7 +3,7 @@
   <metadata>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <id>Microsoft.Azure.Storage.CPP</id>
-    <version>4.0.0</version>
+    <version>5.0.0</version>
     <title>Microsoft Azure Storage Client Library for C++</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
@@ -16,8 +16,8 @@
     <releaseNotes>Public release</releaseNotes>
     <tags>Microsoft Azure Storage Table Blob Queue File Scalable windowsazureofficial</tags>
     <dependencies>
-      <dependency id="Microsoft.Azure.Storage.CPP.v120" version="4.0.0" />
-      <dependency id="Microsoft.Azure.Storage.CPP.v140" version="4.0.0" />
+      <dependency id="Microsoft.Azure.Storage.CPP.v120" version="5.0.0" />
+      <dependency id="Microsoft.Azure.Storage.CPP.v140" version="5.0.0" />
     </dependencies>
   </metadata>
   <files>

@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['parse_5fresult',['parse_result',['../classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64',1,'azure::storage::core::xml::xml_reader']]],
   ['permissions',['permissions',['../classazure_1_1storage_1_1blob__shared__access__policy.html#aa1f9c565c4546e342ca5aab5d4c8dc2a',1,'azure::storage::blob_shared_access_policy::permissions()'],['../classazure_1_1storage_1_1file__shared__access__policy.html#ac5c629624b4260e358d78aa9a53c3d89',1,'azure::storage::file_shared_access_policy::permissions()'],['../classazure_1_1storage_1_1queue__shared__access__policy.html#a7bbd7cd1cfbb1a76db46f56479bfd4c6',1,'azure::storage::queue_shared_access_policy::permissions()'],['../classazure_1_1storage_1_1account__shared__access__policy.html#a01a4c30303ef46927c492e87b6c84f07',1,'azure::storage::account_shared_access_policy::permissions()'],['../classazure_1_1storage_1_1table__shared__access__policy.html#aa34920dd88a8369322fc27b036c41ab6',1,'azure::storage::table_shared_access_policy::permissions()']]],
   ['protocols',['protocols',['../classazure_1_1storage_1_1shared__access__policy.html#a3d1e6328073292afb65cb557f81fa474',1,'azure::storage::shared_access_policy']]]
 ];

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">4.0.0</span>
+   &#160;<span id="projectnumber">5.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -68,6 +68,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -80,23 +81,57 @@ $(function() {
 
 <p>Inherited by azure::storage::protocol::access_policy_reader&lt; Policy &gt;, azure::storage::protocol::block_list_reader, azure::storage::protocol::get_share_stats_reader, azure::storage::protocol::list_blobs_reader, azure::storage::protocol::list_containers_reader, azure::storage::protocol::list_file_ranges_reader, azure::storage::protocol::list_files_and_directories_reader, azure::storage::protocol::list_queues_reader, azure::storage::protocol::list_shares_reader, azure::storage::protocol::message_reader, azure::storage::protocol::page_diff_list_reader, azure::storage::protocol::page_list_reader, azure::storage::protocol::service_properties_reader, azure::storage::protocol::service_stats_reader, and azure::storage::protocol::storage_error_reader.</p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a928cd5881955b7c20ff078958fc08f64"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64">parse_result</a> { <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64ae209def31ceba6fbbe9820b9cbce2c71">cannot_continue</a> = 0, 
+<a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64a8c278124ae2f612db6dc4955c51ef438">can_continue</a> = 1, 
+<a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64ac1a4668c57535ef1c92b8d1a6391ffbb">xml_not_complete</a> = 2
+ }</td></tr>
+<tr class="memdesc:a928cd5881955b7c20ff078958fc08f64"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enumeration describing result of the <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#ab8dcb74b798a9c86a14fe1ffe2b2f75d" title="Parse the given xml string/stream. Return value indicates if the parsing was successful. ">parse()</a> operation.  <a href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64">More...</a><br /></td></tr>
+<tr class="separator:a928cd5881955b7c20ff078958fc08f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5e01180ff52d892737a89e8d73b1acdb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a5e01180ff52d892737a89e8d73b1acdb">parse</a> ()</td></tr>
-<tr class="memdesc:a5e01180ff52d892737a89e8d73b1acdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse the given xml string/stream. Returns true if it finished parsing the stream to the end, and false if it was asked to exit early via pause()  <a href="#a5e01180ff52d892737a89e8d73b1acdb">More...</a><br /></td></tr>
-<tr class="separator:a5e01180ff52d892737a89e8d73b1acdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8dcb74b798a9c86a14fe1ffe2b2f75d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64">parse_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#ab8dcb74b798a9c86a14fe1ffe2b2f75d">parse</a> ()</td></tr>
+<tr class="memdesc:ab8dcb74b798a9c86a14fe1ffe2b2f75d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse the given xml string/stream. Return value indicates if the parsing was successful.  <a href="#ab8dcb74b798a9c86a14fe1ffe2b2f75d">More...</a><br /></td></tr>
+<tr class="separator:ab8dcb74b798a9c86a14fe1ffe2b2f75d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>XML reader based on xmlllite </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a5e01180ff52d892737a89e8d73b1acdb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e01180ff52d892737a89e8d73b1acdb">&#9670;&nbsp;</a></span>parse()</h2>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a928cd5881955b7c20ff078958fc08f64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a928cd5881955b7c20ff078958fc08f64">&#9670;&nbsp;</a></span>parse_result</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool azure::storage::core::xml::xml_reader::parse </td>
+          <td class="memname">enum <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64">azure::storage::core::xml::xml_reader::parse_result</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>An enumeration describing result of the <a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#ab8dcb74b798a9c86a14fe1ffe2b2f75d" title="Parse the given xml string/stream. Return value indicates if the parsing was successful. ">parse()</a> operation. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a928cd5881955b7c20ff078958fc08f64ae209def31ceba6fbbe9820b9cbce2c71"></a>cannot_continue&#160;</td><td class="fielddoc"><p>Parsed is finished and cannot be continued. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a928cd5881955b7c20ff078958fc08f64a8c278124ae2f612db6dc4955c51ef438"></a>can_continue&#160;</td><td class="fielddoc"><p>Parse is paused and can be continued. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a928cd5881955b7c20ff078958fc08f64ac1a4668c57535ef1c92b8d1a6391ffbb"></a>xml_not_complete&#160;</td><td class="fielddoc"><p>Exited because XML is not complete. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab8dcb74b798a9c86a14fe1ffe2b2f75d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8dcb74b798a9c86a14fe1ffe2b2f75d">&#9670;&nbsp;</a></span>parse()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classazure_1_1storage_1_1core_1_1xml_1_1xml__reader.html#a928cd5881955b7c20ff078958fc08f64">parse_result</a> azure::storage::core::xml::xml_reader::parse </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -104,14 +139,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Parse the given xml string/stream. Returns true if it finished parsing the stream to the end, and false if it was asked to exit early via pause() </p>
+<p>Parse the given xml string/stream. Return value indicates if the parsing was successful. </p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat May 5 2018 14:23:34 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 21 2018 16:57:44 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

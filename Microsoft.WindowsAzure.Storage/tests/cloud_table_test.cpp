@@ -134,6 +134,11 @@ SUITE(Table)
 
         CHECK(property.str().size() > 0);
 
+        // Reset property
+        property = azure::storage::entity_property(); 
+        CHECK(property.property_type() != azure::storage::edm_type::binary);
+        CHECK(property.is_null());
+
         value = get_random_binary_data();
         property.set_value(value);
 

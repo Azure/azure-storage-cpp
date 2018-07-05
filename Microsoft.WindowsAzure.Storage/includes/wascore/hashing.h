@@ -168,25 +168,27 @@ namespace azure { namespace storage { namespace core {
     {
     public:
         hmac_sha256_hash_provider_impl(const std::vector<uint8_t>& key);
+        ~hmac_sha256_hash_provider_impl();
 
         void write(const uint8_t* data, size_t count) override;
         void close() override;
 
     private:
 
-        HMAC_CTX* m_hash_context;
+        HMAC_CTX* m_hash_context = nullptr;
     };
 
     class md5_hash_provider_impl : public cryptography_hash_provider_impl
     {
     public:
         md5_hash_provider_impl();
+        ~md5_hash_provider_impl();
 
         void write(const uint8_t* data, size_t count) override;
         void close() override;
 
     private:
-        MD5_CTX* m_hash_context;
+        MD5_CTX* m_hash_context = nullptr;
     };
 
 #endif

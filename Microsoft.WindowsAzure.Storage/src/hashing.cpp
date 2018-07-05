@@ -118,6 +118,18 @@ namespace azure { namespace storage { namespace core {
         HMAC_Init_ex(m_hash_context, &key[0], (int) key.size(), EVP_sha256(), NULL);
     }
 
+    hmac_sha256_hash_provider_impl::~hmac_sha256_hash_provider_impl()
+    {
+        if (m_hash_context != nullptr)
+        {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined (LIBRESSL_VERSION_NUMBER)
+            OPENSSL_free(m_hash_context);
+#else
+            HMAC_CTX_free(m_hash_context);
+#endif
+        }
+    }
+
     void hmac_sha256_hash_provider_impl::write(const uint8_t* data, size_t count)
     {   
         HMAC_Update(m_hash_context, data, count);
@@ -128,12 +140,9 @@ namespace azure { namespace storage { namespace core {
         unsigned int length = SHA256_DIGEST_LENGTH;
         m_hash.resize(length);
         HMAC_Final(m_hash_context, &m_hash[0], &length);
-    #if OPENSSL_VERSION_NUMBER < 0x10100000L || defined (LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined (LIBRESSL_VERSION_NUMBER)
         HMAC_CTX_cleanup(m_hash_context);
-        OPENSSL_free(m_hash_context);
-    #else
-        HMAC_CTX_free(m_hash_context);
-    #endif
+#endif
 
     }
 
@@ -142,6 +151,14 @@ namespace azure { namespace storage { namespace core {
         m_hash_context =(MD5_CTX*) OPENSSL_malloc(sizeof(MD5_CTX));
         memset(m_hash_context, 0, sizeof(*m_hash_context));
         MD5_Init(m_hash_context);
+    }
+
+    md5_hash_provider_impl::~md5_hash_provider_impl()
+    {
+        if (m_hash_context != nullptr)
+        {
+            OPENSSL_free(m_hash_context);
+        }
     }
 
     void md5_hash_provider_impl::write(const uint8_t* data, size_t count)
@@ -153,7 +170,6 @@ namespace azure { namespace storage { namespace core {
     {
         m_hash.resize(MD5_DIGEST_LENGTH);
         MD5_Final(m_hash.data(), m_hash_context);
-        OPENSSL_free(m_hash_context);
     }
 
 #endif

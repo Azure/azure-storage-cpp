@@ -265,6 +265,7 @@ Azure Storage Client Library for C++ 2.0.0 changes interfaces as follows:
 -  Renames `cloud_blob::start_copy_from_blob_async` to `cloud_blob::start_copy_async`
 
 ## Bug fixes
+
 You can find the bug fixes at [changelog.txt](https://github.com/Azure/azure-storage-cpp/blob/master/Changelog.txt).
 
 ## Next steps

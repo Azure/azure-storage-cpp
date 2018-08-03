@@ -22,6 +22,8 @@
 #include "wascore/constants.h"
 #include "wascore/resources.h"
 
+#include "cpprest/asyncrt_utils.h"
+
 namespace azure { namespace storage { namespace protocol {
 
     void preprocess_response_void(const web::http::http_response& response, const request_result& result, operation_context context)
@@ -157,7 +159,7 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t value;
         if (response.headers().match(ms_header_lease_time, value))
         {
-            int64_t seconds = utility::conversions::scan_string<int64_t>(value);
+            int64_t seconds = utility::conversions::details::scan_string<int64_t>(value);
             return std::chrono::seconds(seconds);
         }
         else
@@ -171,7 +173,7 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t value;
         if (response.headers().match(ms_header_approximate_messages_count, value))
         {
-            return utility::conversions::scan_string<int>(value);
+            return utility::conversions::details::scan_string<int>(value);
         }
 
         return -1;

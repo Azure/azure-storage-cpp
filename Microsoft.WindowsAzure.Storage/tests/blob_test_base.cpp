@@ -20,6 +20,7 @@
 #include "check_macros.h"
 
 #include "wascore/streams.h"
+#include "wascore/util.h"
 
 utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<uint8_t>& buffer)
 {
@@ -49,7 +50,7 @@ utility::string_t blob_service_test_base::get_random_container_name(size_t lengt
         return possible_chars[std::rand() % (sizeof(possible_chars) / sizeof(utility::char_t) - 1)];
     });
 
-    return utility::conversions::print_string(utility::datetime::utc_now().to_interval()) + name;
+    return azure::storage::core::convert_to_string(utility::datetime::utc_now().to_interval()) + name;
 }
 
 void test_base::check_parallelism(const azure::storage::operation_context& context, int expected_parallelism)

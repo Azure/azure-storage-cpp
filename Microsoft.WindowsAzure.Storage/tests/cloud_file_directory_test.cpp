@@ -19,6 +19,8 @@
 #include "file_test_base.h"
 #include "check_macros.h"
 
+#include "wascore/util.h"
+
 #pragma region Fixture
 
 #pragma endregion
@@ -309,15 +311,15 @@ SUITE(File)
         std::vector<azure::storage::cloud_file> files;
         for (int i = 0; i < get_random_int32() % 3 + 1; ++i)
         {
-            auto subdirectory = m_directory.get_subdirectory_reference(dir_prefix + utility::conversions::print_string(i));
+            auto subdirectory = m_directory.get_subdirectory_reference(dir_prefix + azure::storage::core::convert_to_string(i));
             subdirectory.create();
             directories.push_back(subdirectory);
 
-            auto file = m_directory.get_file_reference(file_prefix + utility::conversions::print_string(i));
+            auto file = m_directory.get_file_reference(file_prefix + azure::storage::core::convert_to_string(i));
             file.create(1);
             files.push_back(file);
 
-            m_directory.get_subdirectory_reference(exclude_prefix + utility::conversions::print_string(i)).create();
+            m_directory.get_subdirectory_reference(exclude_prefix + azure::storage::core::convert_to_string(i)).create();
         }
 
         int num_items_expected = directories.size() + files.size();

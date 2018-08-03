@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "check_macros.h"
 #include "test_base.h"
+
 #include "wascore/util.h"
 
 typedef std::function<azure::storage::result_segment<int>(const azure::storage::continuation_token &, size_t)> result_generator_type;

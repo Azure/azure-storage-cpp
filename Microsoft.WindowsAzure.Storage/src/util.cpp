@@ -290,6 +290,11 @@ namespace azure { namespace storage {  namespace core {
         return result;
     }
 
+    utility::string_t convert_to_string(const utility::string_t& source)
+    {
+        return source;
+    }
+
     utility::string_t str_trim_starting_trailing_whitespaces(const utility::string_t& str)
     {
         auto non_space_begin = std::find_if(str.begin(), str.end(), std::not1(std::ptr_fun<int, int>(isspace)));
@@ -519,9 +524,9 @@ namespace azure { namespace storage {  namespace core {
         {
             key.append(_XPLATSTR("1#"));
         }
-        key.append(utility::conversions::print_string(config.timeout().count()));
+        key.append(core::convert_to_string(config.timeout().count()));
         key.append(_XPLATSTR("#"));
-        key.append(utility::conversions::print_string(config.chunksize()));
+        key.append(core::convert_to_string(config.chunksize()));
         key.append(_XPLATSTR("#"));
 
         std::lock_guard<std::mutex> guard(s_mutex);

@@ -19,6 +19,9 @@
 #include "blob_test_base.h"
 #include "check_macros.h"
 
+#include "wascore/util.h"
+#include "cpprest/asyncrt_utils.h"
+
 #pragma region Fixture
 
 void container_test_base::check_public_access(azure::storage::blob_container_public_access_type access)
@@ -213,7 +216,7 @@ SUITE(Blob)
 
         for (int i = 0; i < 4; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_container.get_block_blob_reference(_XPLATSTR("blockblob") + index);
             blob.metadata()[_XPLATSTR("index")] = index;
             
@@ -226,7 +229,7 @@ SUITE(Blob)
 
         for (int i = 0; i < 3; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_container.get_page_blob_reference(_XPLATSTR("pageblob") + index);
             blob.metadata()[_XPLATSTR("index")] = index;
             
@@ -237,7 +240,7 @@ SUITE(Blob)
 
         for (int i = 0; i < 3; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_container.get_append_blob_reference(_XPLATSTR("appendblob") + index);
             blob.metadata()[_XPLATSTR("index")] = index;
 
@@ -263,7 +266,7 @@ SUITE(Blob)
 
             auto index_str = blob->second.metadata().find(_XPLATSTR("index"));
             CHECK(index_str != blob->second.metadata().end());
-            auto index = utility::conversions::scan_string<int>(index_str->second);
+            auto index = utility::conversions::details::scan_string<int>(index_str->second);
 
             switch (iter->type())
             {
@@ -345,7 +348,7 @@ SUITE(Blob)
 
         for (int i = 0; i < 3; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_blob_storage_container.get_block_blob_reference(_XPLATSTR("blockblob") + index);
             blob.metadata()[_XPLATSTR("index")] = index;
 
@@ -358,7 +361,7 @@ SUITE(Blob)
 
         for (int i = 0; i < 3; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_premium_container.get_page_blob_reference(_XPLATSTR("pageblob") + index);
             blob.metadata()[_XPLATSTR("index")] = index;
 
@@ -386,7 +389,7 @@ SUITE(Blob)
 
             auto index_str = blob->second.metadata().find(_XPLATSTR("index"));
             CHECK(index_str != blob->second.metadata().end());
-            auto index = utility::conversions::scan_string<int>(index_str->second);
+            auto index = utility::conversions::details::scan_string<int>(index_str->second);
 
             CHECK_EQUAL(index * 16 * 1024, iter->properties().size());
 
@@ -425,7 +428,7 @@ SUITE(Blob)
 
             auto index_str = blob->second.metadata().find(_XPLATSTR("index"));
             CHECK(index_str != blob->second.metadata().end());
-            auto index = utility::conversions::scan_string<int>(index_str->second);
+            auto index = utility::conversions::details::scan_string<int>(index_str->second);
 
             CHECK_EQUAL(index * 512, iter->properties().size());
 

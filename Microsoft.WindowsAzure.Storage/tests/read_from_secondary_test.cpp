@@ -20,6 +20,8 @@
 #include "check_macros.h"
 #include "blob_test_base.h"
 
+#include "wascore/util.h"
+
 class basic_always_retry_policy : public azure::storage::basic_retry_policy
 {
 public:
@@ -239,7 +241,7 @@ SUITE(Core)
     {
         for (int i = 0; i < 2; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_container.get_block_blob_reference(_XPLATSTR("blockblob") + index);
 
             blob.upload_text(blob.name(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);

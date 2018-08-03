@@ -19,13 +19,15 @@
 #include "blob_test_base.h"
 #include "check_macros.h"
 
+#include "wascore/util.h"
+
 #pragma region Fixture
 
 void blob_service_test_base_with_objects_to_delete::create_containers(const utility::string_t& prefix, std::size_t num, azure::storage::blob_container_public_access_type public_access_type)
 {
     for (std::size_t i = 0; i < num; ++i)
     {
-        auto index = utility::conversions::print_string(i);
+        auto index = azure::storage::core::convert_to_string(i);
         auto container = m_client.get_container_reference(prefix + index);
         m_containers_to_delete.push_back(container);
         container.metadata()[_XPLATSTR("index")] = index;
@@ -37,7 +39,7 @@ void blob_service_test_base_with_objects_to_delete::create_blobs(const azure::st
 {
     for (std::size_t i = 0; i < num; i++)
     {
-        auto index = utility::conversions::print_string(i);
+        auto index = azure::storage::core::convert_to_string(i);
         auto blob = container.get_block_blob_reference(prefix + index);
         m_blobs_to_delete.push_back(blob);
         blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
@@ -216,7 +218,7 @@ SUITE(Blob)
 
         for (int i = 0; i < 3; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_container.get_block_blob_reference(prefix + index);
             blob.upload_text(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blobs.push_back(blob);
@@ -224,7 +226,7 @@ SUITE(Blob)
 
         for (int i = 0; i < 2; i++)
         {
-            auto index = utility::conversions::print_string(i);
+            auto index = azure::storage::core::convert_to_string(i);
             auto blob = m_container.get_block_blob_reference(prefix2 + index);
             blob.upload_text(_XPLATSTR("test2"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blobs2.push_back(blob);

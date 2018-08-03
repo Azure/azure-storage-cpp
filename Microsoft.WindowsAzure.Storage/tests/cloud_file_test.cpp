@@ -20,6 +20,8 @@
 #include "check_macros.h"
 #include "blob_test_base.h"
 
+#include "wascore/util.h"
+
 #pragma region Fixture
 
 bool file_test_base::wait_for_copy(azure::storage::cloud_file& file)
@@ -480,7 +482,7 @@ SUITE(File)
             policy.set_start(utility::datetime::utc_now() - utility::datetime::from_minutes(5));
             policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
 
-            auto file = m_share.get_root_directory_reference().get_file_reference(_XPLATSTR("file") + utility::conversions::print_string((int)i));
+            auto file = m_share.get_root_directory_reference().get_file_reference(_XPLATSTR("file") + azure::storage::core::convert_to_string((int)i));
             file.create_if_not_exists(512U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
             file.properties().set_cache_control(_XPLATSTR("no-transform"));
             file.properties().set_content_disposition(_XPLATSTR("attachment"));

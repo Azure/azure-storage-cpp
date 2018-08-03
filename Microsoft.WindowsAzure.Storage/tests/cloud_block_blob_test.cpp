@@ -601,7 +601,7 @@ SUITE(Blob)
         for (uint16_t i = 0; i < 10; i++)
         {
             auto id = get_block_id(i);
-            auto utf8_body = utility::conversions::to_utf8string(utility::conversions::print_string(i));
+            auto utf8_body = utility::conversions::to_utf8string(azure::storage::core::convert_to_string(i));
             auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
             m_blob.upload_block(id, stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blocks.push_back(azure::storage::block_list_item(id));
@@ -686,7 +686,7 @@ SUITE(Blob)
         for (uint16_t i = 0; i < 10; i++)
         {
             auto id = get_block_id(i);
-            auto utf8_body = utility::conversions::to_utf8string(utility::conversions::print_string(i));
+            auto utf8_body = utility::conversions::to_utf8string(azure::storage::core::convert_to_string(i));
             auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
             m_blob.upload_block(id, stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blocks.push_back(azure::storage::block_list_item(id));
@@ -706,7 +706,7 @@ SUITE(Blob)
         CHECK_UTF8_EQUAL(_XPLATSTR("12356789"), m_blob.download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
 
         auto id = get_block_id(4);
-        auto utf8_body = utility::conversions::to_utf8string(utility::conversions::print_string(4));
+        auto utf8_body = utility::conversions::to_utf8string(azure::storage::core::convert_to_string(4));
         auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
         m_blob.upload_block(id, stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         blocks.insert(blocks.begin(), azure::storage::block_list_item(id));

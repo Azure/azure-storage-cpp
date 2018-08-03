@@ -19,6 +19,8 @@
 #include "file_test_base.h"
 #include "check_macros.h"
 
+#include "wascore/util.h"
+
 #pragma region Fixture
 
 #pragma endregion
@@ -237,7 +239,7 @@ SUITE(File)
             policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
             auto sas_token = m_share.get_shared_access_signature(policy);
 
-            auto file = m_share.get_root_directory_reference().get_file_reference(_XPLATSTR("file") + utility::conversions::print_string((int)i));
+            auto file = m_share.get_root_directory_reference().get_file_reference(_XPLATSTR("file") + azure::storage::core::convert_to_string((int)i));
             file.create_if_not_exists(512U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
             file.properties().set_cache_control(_XPLATSTR("no-transform"));
             file.properties().set_content_disposition(_XPLATSTR("attachment"));

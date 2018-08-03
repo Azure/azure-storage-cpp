@@ -16,8 +16,10 @@
 // -----------------------------------------------------------------------------------------
 
 #include "stdafx.h"
+
 #include "wascore/protocol.h"
 #include "wascore/constants.h"
+#include "cpprest/asyncrt_utils.h"
 
 namespace azure { namespace storage { namespace protocol {
 
@@ -122,12 +124,12 @@ namespace azure { namespace storage { namespace protocol {
         {
             auto slash = value.find(_XPLATSTR('/'));
             value = value.substr(slash + 1);
-            return utility::conversions::scan_string<utility::size64_t>(value);
+            return utility::conversions::details::scan_string<utility::size64_t>(value);
         }
 
         if (headers.match(ms_header_blob_content_length, value))
         {
-            return utility::conversions::scan_string<utility::size64_t>(value);
+            return utility::conversions::details::scan_string<utility::size64_t>(value);
         }
 
         return headers.content_length();
@@ -161,8 +163,8 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_size = parse_blob_size(response);
 
         auto& headers = response.headers();
-        properties.m_page_blob_sequence_number = utility::conversions::scan_string<int64_t>(get_header_value(headers, ms_header_blob_sequence_number));
-        properties.m_append_blob_committed_block_count = utility::conversions::scan_string<int>(get_header_value(headers, ms_header_blob_committed_block_count));
+        properties.m_page_blob_sequence_number = utility::conversions::details::scan_string<int64_t>(get_header_value(headers, ms_header_blob_sequence_number));
+        properties.m_append_blob_committed_block_count = utility::conversions::details::scan_string<int>(get_header_value(headers, ms_header_blob_committed_block_count));
         properties.m_cache_control = get_header_value(headers, web::http::header_names::cache_control);
         properties.m_content_disposition = get_header_value(headers, header_content_disposition);
         properties.m_content_encoding = get_header_value(headers, web::http::header_names::content_encoding);

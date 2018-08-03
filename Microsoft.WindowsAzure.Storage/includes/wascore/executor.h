@@ -481,7 +481,7 @@ namespace azure { namespace storage { namespace core {
                     {
                         utility::string_t str;
                         str.reserve(128);
-                        str.append(_XPLATSTR("Response received. Status code = ")).append(utility::conversions::print_string(response.status_code())).append(_XPLATSTR(". Reason = ")).append(response.reason_phrase());
+                        str.append(_XPLATSTR("Response received. Status code = ")).append(core::convert_to_string(response.status_code())).append(_XPLATSTR(". Reason = ")).append(response.reason_phrase());
                         logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                     }
 
@@ -671,7 +671,7 @@ namespace azure { namespace storage { namespace core {
                         {
                             utility::string_t str;
                             str.reserve(128);
-                            str.append(_XPLATSTR("Retrying failed operation, number of retries: ")).append(utility::conversions::print_string(instance->m_retry_count));
+                            str.append(_XPLATSTR("Retrying failed operation, number of retries: ")).append(core::convert_to_string(instance->m_retry_count));
                             logger::instance().log(instance->m_context, client_log_level::log_level_informational, str);
                         }
 

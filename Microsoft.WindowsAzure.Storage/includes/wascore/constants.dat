@@ -182,7 +182,7 @@ DAT(ms_header_archive_status, _XPLATSTR("x-ms-archive-status"))
 DAT(ms_header_tier_change_time, _XPLATSTR("x-ms-access-tier-change-time"))
 
 // header values
-DAT(header_value_storage_version, _XPLATSTR("2017-04-17"))
+DAT(header_value_storage_version, _XPLATSTR("2017-07-29"))
 DAT(header_value_true, _XPLATSTR("true"))
 DAT(header_value_false, _XPLATSTR("false"))
 DAT(header_value_locked, _XPLATSTR("locked"))
@@ -404,8 +404,7 @@ DAT(error_parse_int32, "An error occurred parsing the 32-bit integer.")
 DAT(error_entity_property_not_int64, "The type of the entity property is not 64-bit integer.")
 DAT(error_entity_property_not_string, "The type of the entity property is not string.")
 
-DAT(error_non_positive_time_to_live, "The time to live cannot be zero or negative.")
-DAT(error_large_time_to_live, "The time to live cannot be greater than 604800.")
+DAT(error_invalid_value_time_to_live, "The time to live cannot be zero or any negative number other than -1.")
 DAT(error_negative_initial_visibility_timeout, "The initial visibility timeout cannot be negative.")
 DAT(error_large_initial_visibility_timeout, "The initial visibility timeout cannot be greater than 604800.")
 DAT(error_negative_visibility_timeout, "The visibility timeout cannot be negative.")

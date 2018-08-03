@@ -856,6 +856,44 @@ SUITE(Queue)
         queue.delete_queue();
     }
 
+    TEST_FIXTURE(queue_service_test_base, Queue_Special_Message_TTL)
+    {
+        azure::storage::cloud_queue queue = get_queue();
+        {
+            utility::string_t content = get_random_string();
+            azure::storage::cloud_queue_message message;
+            std::chrono::seconds time_to_live;
+            std::chrono::seconds initial_visibility_timeout;
+            azure::storage::queue_request_options options;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
+            message.set_content(content);
+            time_to_live = std::chrono::seconds(-1);
+            initial_visibility_timeout = std::chrono::seconds(0);
+            queue.add_message(message, time_to_live, initial_visibility_timeout, options, context);
+            std::vector<azure::storage::cloud_queue_message> messages = queue.get_messages(1U, initial_visibility_timeout, options, context);
+            CHECK(content == messages[0].content_as_string());
+            CHECK(messages[0].expiration_time().is_initialized());
+        }
+
+        {
+            utility::string_t content = get_random_string();
+            azure::storage::cloud_queue_message message;
+            std::chrono::seconds time_to_live;
+            std::chrono::seconds initial_visibility_timeout;
+            azure::storage::queue_request_options options;
+            azure::storage::operation_context context;
+            print_client_request_id(context, _XPLATSTR(""));
+            message.set_content(content);
+            time_to_live = std::chrono::seconds(7 * 24 * 60 * 60 + 1);
+            initial_visibility_timeout = std::chrono::seconds(0);
+            queue.add_message(message, time_to_live, initial_visibility_timeout, options, context);
+            std::vector<azure::storage::cloud_queue_message> messages = queue.get_messages(1U, initial_visibility_timeout, options, context);
+            CHECK(content == messages[0].content_as_string());
+            CHECK(messages[0].expiration_time().is_initialized());
+        }
+    }
+
     TEST_FIXTURE(queue_service_test_base, Queue_Messages)
     {
         azure::storage::cloud_queue queue = get_queue();
@@ -1473,7 +1511,7 @@ SUITE(Queue)
             std::chrono::seconds initial_visibility_timeout;
 
             message.set_content(content);
-            time_to_live = std::chrono::seconds(-1);
+            time_to_live = std::chrono::seconds(-2);
             initial_visibility_timeout = std::chrono::seconds(0);
 
             CHECK_THROW(queue.add_message(message, time_to_live, initial_visibility_timeout, options, context), std::invalid_argument);
@@ -1486,18 +1524,6 @@ SUITE(Queue)
 
             message.set_content(content);
             time_to_live = std::chrono::seconds(0);
-            initial_visibility_timeout = std::chrono::seconds(0);
-
-            CHECK_THROW(queue.add_message(message, time_to_live, initial_visibility_timeout, options, context), std::invalid_argument);
-        }
-
-        {
-            azure::storage::cloud_queue_message message;
-            std::chrono::seconds time_to_live;
-            std::chrono::seconds initial_visibility_timeout;
-
-            message.set_content(content);
-            time_to_live = std::chrono::seconds(30 * 24 * 60 * 60);
             initial_visibility_timeout = std::chrono::seconds(0);
 
             CHECK_THROW(queue.add_message(message, time_to_live, initial_visibility_timeout, options, context), std::invalid_argument);

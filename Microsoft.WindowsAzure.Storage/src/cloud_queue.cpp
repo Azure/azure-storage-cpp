@@ -88,14 +88,9 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_queue::add_message_async(cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, queue_request_options& options, operation_context context)
     {
-        if (time_to_live.count() <= 0LL)
+        if ((time_to_live.count() <= 0LL) && (time_to_live.count() != -1LL))
         {
-            throw std::invalid_argument(protocol::error_non_positive_time_to_live);
-        }
-
-        if (time_to_live.count() > 604800LL)
-        {
-            throw std::invalid_argument(protocol::error_large_time_to_live);
+            throw std::invalid_argument(protocol::error_invalid_value_time_to_live);
         }
 
         if (initial_visibility_timeout.count() < 0LL)

@@ -155,7 +155,7 @@ namespace azure { namespace storage { namespace protocol {
 
     web::http::http_request add_message(const cloud_queue_message& message, std::chrono::seconds time_to_live, std::chrono::seconds initial_visibility_timeout, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
-        if (time_to_live.count() >= 0LL && time_to_live.count() != 604800LL)
+        if (time_to_live.count() >= -1LL && time_to_live.count() != 604800LL)
         {
             uri_builder.append_query(core::make_query_parameter(_XPLATSTR("messagettl"), time_to_live.count(), /* do_encoding */ false));
         }

@@ -20,7 +20,7 @@
 
 namespace azure { namespace storage {
 
-    const std::chrono::seconds max_time_to_live(7 * 24 * 60 * 60);
+    const std::chrono::seconds max_time_to_live(std::chrono::system_clock::duration::max().count());
 
     void cloud_queue_message::update_message_info(const cloud_queue_message& message_metadata)
     {

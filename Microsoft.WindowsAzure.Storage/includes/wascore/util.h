@@ -75,6 +75,7 @@ namespace azure { namespace storage { namespace core {
     bool is_integral(const utility::string_t& value);
     utility::datetime truncate_fractional_seconds(utility::datetime value);
     utility::string_t convert_to_string(double value);
+    utility::string_t convert_to_string(const utility::string_t& source);
     utility::string_t convert_to_string(const std::vector<uint8_t>& value);
     utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value);
     utility::char_t utility_char_tolower(const utility::char_t& character);

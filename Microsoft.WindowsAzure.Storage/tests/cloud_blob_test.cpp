@@ -22,6 +22,8 @@
 
 #include "cpprest/producerconsumerstream.h"
 
+#include "wascore/util.h"
+
 #pragma region Fixture
 
 bool blob_test_base::wait_for_copy(azure::storage::cloud_blob& blob)
@@ -495,7 +497,7 @@ SUITE(Blob)
             policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
             auto sas_token = m_container.get_shared_access_signature(policy);
 
-            auto blob = m_container.get_block_blob_reference(_XPLATSTR("blob") + utility::conversions::print_string((int)i));
+            auto blob = m_container.get_block_blob_reference(_XPLATSTR("blob") + azure::storage::core::convert_to_string((int)i));
             blob.properties().set_cache_control(_XPLATSTR("no-transform"));
             blob.properties().set_content_disposition(_XPLATSTR("attachment"));
             blob.properties().set_content_encoding(_XPLATSTR("gzip"));
@@ -518,7 +520,7 @@ SUITE(Blob)
             policy.set_start(utility::datetime::utc_now() - utility::datetime::from_minutes(5));
             policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
 
-            auto blob = m_container.get_block_blob_reference(_XPLATSTR("blob") + utility::conversions::print_string((int)i));
+            auto blob = m_container.get_block_blob_reference(_XPLATSTR("blob") + azure::storage::core::convert_to_string((int)i));
             blob.properties().set_cache_control(_XPLATSTR("no-transform"));
             blob.properties().set_content_disposition(_XPLATSTR("attachment"));
             blob.properties().set_content_encoding(_XPLATSTR("gzip"));

@@ -19,6 +19,8 @@
 #include "file_test_base.h"
 #include "check_macros.h"
 
+#include "wascore/util.h"
+
 utility::string_t file_service_test_base::get_random_share_name(size_t length)
 {
     utility::string_t name;
@@ -29,7 +31,7 @@ utility::string_t file_service_test_base::get_random_share_name(size_t length)
         return possible_chars[std::rand() % (sizeof(possible_chars) / sizeof(utility::char_t) - 1)];
     });
 
-    return utility::conversions::print_string(utility::datetime::utc_now().to_interval()) + name;
+    return azure::storage::core::convert_to_string(utility::datetime::utc_now().to_interval()) + name;
 }
 
 void file_service_test_base::check_equal(const azure::storage::cloud_file_share& source, const azure::storage::cloud_file_share& target)
@@ -67,7 +69,7 @@ void file_service_test_base_with_objects_to_delete::create_share(const utility::
 {
     for (size_t i = 0; i < num; ++i)
     {
-        auto index = utility::conversions::print_string(i);
+        auto index = azure::storage::core::convert_to_string(i);
         auto share = m_client.get_share_reference(prefix + index);
         m_shares_to_delete.push_back(share);
         share.metadata()[_XPLATSTR("index")] = index;

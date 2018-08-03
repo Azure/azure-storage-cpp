@@ -20,6 +20,8 @@
 #include "wascore/protocol_xml.h"
 #include "wascore/blobstreams.h"
 
+#include "cpprest/asyncrt_utils.h"
+
 namespace azure { namespace storage {
 
     pplx::task<void> cloud_append_blob::create_or_replace_async(const access_condition& condition, const blob_request_options& options, operation_context context)
@@ -60,7 +62,7 @@ namespace azure { namespace storage {
             auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
             properties->update_etag_and_last_modified(parsed_properties);
             properties->update_append_blob_committed_block_count(parsed_properties);
-            return utility::conversions::scan_string<int64_t>(protocol::get_header_value(response.headers(), protocol::ms_header_blob_append_offset));
+            return utility::conversions::details::scan_string<int64_t>(protocol::get_header_value(response.headers(), protocol::ms_header_blob_append_offset));
         });
         return core::istream_descriptor::create(block_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_append_block_size).then([command, context, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<int64_t>
         {

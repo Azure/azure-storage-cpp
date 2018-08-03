@@ -234,7 +234,7 @@ namespace azure { namespace storage { namespace protocol {
         add_file_properties(request, properties);
 
         add_optional_header(request.headers(), _XPLATSTR("x-ms-type"), _XPLATSTR("file"));
-        request.headers()[_XPLATSTR("x-ms-content-length")] = utility::conversions::print_string(length);
+        request.headers()[_XPLATSTR("x-ms-content-length")] = core::convert_to_string(length);
 
         return request;
     }
@@ -267,7 +267,7 @@ namespace azure { namespace storage { namespace protocol {
     {
         auto request = set_file_properties(properties, uri_builder, timeout, context);
 
-        request.headers()[_XPLATSTR("x-ms-content-length")] = utility::conversions::print_string(properties.length());
+        request.headers()[_XPLATSTR("x-ms-content-length")] = core::convert_to_string(properties.length());
         return request;
     }
     

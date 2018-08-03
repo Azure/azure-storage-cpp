@@ -20,6 +20,8 @@
 #include "wascore/protocol_json.h"
 #include "was/common.h"
 
+#include "cpprest/asyncrt_utils.h"
+
 namespace azure { namespace storage { namespace protocol {
 
     utility::string_t table_response_parsers::parse_etag(const web::http::http_response& response)
@@ -89,7 +91,7 @@ namespace azure { namespace storage { namespace protocol {
             std::string status_code_string = response_body.substr(status_code_begin, status_code_end - status_code_begin);
 
             // Extract the status code as an integer
-            int status_code = utility::conversions::scan_string<int>(utility::conversions::to_string_t(status_code_string));
+            int status_code = utility::conversions::details::scan_string<int>(utility::conversions::to_string_t(status_code_string));
 
             // Acceptable codes are 'Created' and 'NoContent'
             if (status_code == web::http::status_codes::OK || status_code == web::http::status_codes::Created || status_code == web::http::status_codes::Accepted || status_code == web::http::status_codes::NoContent || status_code == web::http::status_codes::PartialContent || status_code == web::http::status_codes::NotFound)
@@ -177,7 +179,7 @@ namespace azure { namespace storage { namespace protocol {
                 std::string status_code_string = response_body.substr(status_code_begin, status_code_end - status_code_begin);
 
                 // Extract the status code as an integer
-                int status_code = utility::conversions::scan_string<int>(utility::conversions::to_string_t(status_code_string));
+                int status_code = utility::conversions::details::scan_string<int>(utility::conversions::to_string_t(status_code_string));
 
                 // Acceptable codes are 'Created' and 'NoContent'
                 if (status_code == web::http::status_codes::OK || status_code == web::http::status_codes::Created || status_code == web::http::status_codes::Accepted || status_code == web::http::status_codes::NoContent || status_code == web::http::status_codes::PartialContent)

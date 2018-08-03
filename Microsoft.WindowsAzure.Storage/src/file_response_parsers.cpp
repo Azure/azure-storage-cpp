@@ -19,6 +19,8 @@
 #include "wascore/protocol.h"
 #include "wascore/constants.h"
 
+#include "cpprest/asyncrt_utils.h"
+
 namespace azure { namespace storage { namespace protocol {
 
     cloud_file_share_properties file_response_parsers::parse_file_share_properties(const web::http::http_response& response)
@@ -48,7 +50,7 @@ namespace azure { namespace storage { namespace protocol {
         {
             auto slash = value.find(_XPLATSTR('/'));
             value = value.substr(slash + 1);
-            return utility::conversions::scan_string<utility::size64_t>(value);
+            return utility::conversions::details::scan_string<utility::size64_t>(value);
         }
 
         return headers.content_length();

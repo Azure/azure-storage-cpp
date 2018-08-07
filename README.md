@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (5.0.0)
+# Azure Storage Client Library for C++ (5.1.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -20,10 +20,7 @@ The Azure Storage Client Library for C++ allows you to build applications agains
 
 # Getting started
 
-For the best development experience, we recommend that developers use the official Microsoft NuGet packages for libraries. NuGet packages are regularly updated with new functionality and hotfixes.
-Download the [NuGet Package](http://www.nuget.org/packages/Microsoft.Azure.Storage.CPP).
-
-Azure Storage Client Library for C++ is also avaiable on Vcpkg since v2.5.0. To get know more about Vcpkg, please visit https://github.com/Microsoft/vcpkg.
+For the best development experience, we recommend that developers use the [Vcpkg](https://github.com/Microsoft/vcpkg) as the cross-platform library manager.
 
 ## Requirements
 
@@ -56,9 +53,12 @@ cd azure-storage-cpp
 
 ### Via NuGet
 
-To install the binaries for the Azure Storage Client Library for C++, type the following into the [NuGet Package Manager console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console):
+To install the binaries for the Azure Storage Client Library for C++, you can export a NuGet package with Vcpkg and put it into your local NuGet feed. For more information about how to export a NuGet package, please see [Binary Export](https://github.com/Microsoft/vcpkg/blob/master/docs/specifications/export-command.md).
 
-`Install-Package Microsoft.Azure.Storage.CPP`
+Normally, exporting NuGet package is done with the following command:
+```
+C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azure.Storage.CPP --nuget-version=5.1.0
+```
 
 ### Via Vcpkg
 
@@ -76,7 +76,7 @@ Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visua
 
 ### C++ REST SDK
 
-The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.9.1. It can be installed through [NuGet](https://www.nuget.org/packages/cpprestsdk/2.9.1) or downloaded directly from [GitHub](https://github.com/Microsoft/cpprestsdk/releases/tag/v2.9.1).
+The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.10.3. It can be installed through Vcpkg (vcpkg install cpprestsdk) or downloaded directly from [GitHub](https://github.com/Microsoft/cpprestsdk/releases/tag/v2.10.3).
 
 ## Code Samples
 
@@ -88,7 +88,7 @@ To get started with the coding, please visit the following articles:
 To accomplish specific tasks, please find the code samples at [samples folder](Microsoft.WindowsAzure.Storage/samples).
 
 ## Getting Started on Linux
-As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux) to compile it. Current version of the library depends on Casablanca version 2.9.1.
+As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux) to compile it. Current version of the library depends on Casablanca version 2.10.3.
 
 Once this is complete, then:
 
@@ -165,7 +165,7 @@ If you are using homebrew you can install it from there:
 brew install cpprestsdk
 ```
 
-Otherwise, you may need to build it. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X) to compile it. Current version of the library depends on Casablanca version 2.9.1.
+Otherwise, you may need to build it. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X) to compile it. Current version of the library depends on Casablanca version 2.10.3.
 
 Once this is complete, then:
 

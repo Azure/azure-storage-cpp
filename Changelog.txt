@@ -1,6 +1,13 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v5.1.0
+- Stopped releasing public Nuget package starting from this version.
+- Default REST API version is 2017-07-29.
+- Added support to put messages with messagettl = -1, and lifted the cap for message time-to-live value.
+- Now compatible with Openssl 1.1.0.
+- Upgraded the version of dependency Casablanca to 2.10.3.
+
 Changes in v5.0.0
 - Dropped the support for Nuget package with name 'wastorage', now this client library only release with Nuget name 'Microsoft.Azure.Storage.CPP'.
 - Added support for specifying installation destination when compiling with cmake to resolve feature request #183.
@@ -21,6 +28,7 @@ Changes in v3.2.1:
 - Added tag `<requireLicenseAcceptance>true</requireLicenseAcceptance>` in .nuspec files and modified the author to `Microsoft` to comply to the new Microsoft Nuget package rule set. Note that this will require the Nuget package user to accept the license manually when newly installing or upgrading 3.2.1 version (and on) of this client library.
 
 Changes in v3.2:
+- Default REST API version is 2017-04-17.
 - Added support for blob archive feature, which includes following changes:
   - Added two new APIs for `cloud_blob` to support copying a blob to a new destination setting premium access tier, note that currently, only premium page blobs are supported so these two APIs should only be used for page blobs.
     - `utility::string_t start_copy(const web::http::uri& source, const azure::storage::premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)`.

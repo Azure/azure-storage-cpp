@@ -367,7 +367,7 @@ namespace azure { namespace storage { namespace core {
             // TODO: Reduce usage of auto variable types
 
             auto instance = std::make_shared<executor_impl>(command, options, context);
-            return pplx::details::do_while([instance]() -> pplx::task<bool>
+            return pplx::details::_do_while([instance]() -> pplx::task<bool>
             {
                 // 0. Begin request 
                 instance->validate_location_mode();

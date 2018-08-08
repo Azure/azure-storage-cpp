@@ -98,7 +98,7 @@ namespace azure { namespace storage {  namespace core {
         auto obuffer = ostream.streambuf();
         auto length_ptr = (length != std::numeric_limits<utility::size64_t>::max()) ? std::make_shared<utility::size64_t>(length) : nullptr;
         auto total_ptr = std::make_shared<utility::size64_t>(0);
-        return pplx::details::do_while([istream, obuffer, buffer_size, length_ptr, total_ptr, max_length] () -> pplx::task<bool>
+        return pplx::details::_do_while([istream, obuffer, buffer_size, length_ptr, total_ptr, max_length] () -> pplx::task<bool>
         {
             size_t read_length = buffer_size;
             if ((length_ptr != nullptr) && (*length_ptr < read_length))

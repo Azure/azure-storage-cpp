@@ -577,6 +577,8 @@ namespace azure { namespace storage {
         /// <param name="value">The byte array value.</param>
         void set_value(const std::vector<uint8_t>& value)
         {
+            m_property_type = edm_type::binary;
+            m_is_null = false;
             set_value_impl(value);
         }
 

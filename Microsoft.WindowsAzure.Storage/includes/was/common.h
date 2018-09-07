@@ -1709,6 +1709,23 @@ namespace azure { namespace storage {
         {
             m_logger = std::move(logger);
         }
+
+        /// <summary>
+        /// Sets a callback to enable custom setting of the ssl context, at construction time.
+        /// </summary>
+        /// <param name="callback">A user callback allowing for customization of the ssl context at construction time.</param>
+        void set_ssl_context_callback(const std::function<void(boost::asio::ssl::context&)>& callback)
+        {
+            m_ssl_context_callback = callback;
+        }
+
+        /// <summary>
+        /// Gets the user's callback to allow for customization of the ssl context.
+        /// </summary>
+        const std::function<void(boost::asio::ssl::context&)>& get_ssl_context_callback() const
+        {
+            return m_ssl_context_callback;
+        }
 #endif
 
     private:
@@ -1725,6 +1742,7 @@ namespace azure { namespace storage {
         pplx::extensibility::critical_section_t m_request_results_lock;
 #ifndef _WIN32
         boost::log::sources::severity_logger<boost::log::trivial::severity_level> m_logger;
+        std::function<void(boost::asio::ssl::context&)> m_ssl_context_callback; //No need to initialize as CPPRest does not initialize it.
 #endif
     };
 
@@ -1953,6 +1971,23 @@ namespace azure { namespace storage {
         void set_logger(boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger)
         {
             m_impl->set_logger(std::move(logger));
+        }
+
+        /// <summary>
+        /// Sets a callback to enable custom setting of the ssl context, at construction time.
+        /// </summary>
+        /// <param name="callback">A user callback allowing for customization of the ssl context at construction time.</param>
+        void set_ssl_context_callback(const std::function<void(boost::asio::ssl::context&)>& callback)
+        {
+            m_impl->set_ssl_context_callback(callback);
+        }
+
+        /// <summary>
+        /// Gets the user's callback to allow for customization of the ssl context.
+        /// </summary>
+        const std::function<void(boost::asio::ssl::context&)>& get_ssl_context_callback() const
+        {
+            return m_impl->get_ssl_context_callback();
         }
 #endif
 

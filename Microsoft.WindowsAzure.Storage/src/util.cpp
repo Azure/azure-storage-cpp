@@ -528,6 +528,13 @@ namespace azure { namespace storage {  namespace core {
         key.append(_XPLATSTR("#"));
         key.append(core::convert_to_string(config.chunksize()));
         key.append(_XPLATSTR("#"));
+        if (config.get_ssl_context_callback() != nullptr)
+        {
+            char buf[16];
+            sprintf(buf, "%p", (void*)&(config.get_ssl_context_callback()));
+            key.append(buf);
+            key.append(_XPLATSTR("#"));
+        }
 
         std::lock_guard<std::mutex> guard(s_mutex);
         auto iter = s_http_clients.find(key);

@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "blob_test_base.h"
 #include "check_macros.h"
+#include "wascore/util.h"
 
 SUITE(Core)
 {
@@ -214,6 +215,28 @@ SUITE(Core)
         azure::storage::set_wastorage_ambient_delayed_scheduler(nullptr);
         CHECK_EQUAL(false, failed);
         CHECK_EQUAL(false, throwException);
+    }
+
+#else
+    TEST_FIXTURE(test_base, ssl_context_callback)
+    {
+        // Test the ssl context is set to the dependency.
+        auto client = test_config::instance().account().create_cloud_blob_client();
+        CHECK_EQUAL(_XPLATSTR("https"), client.base_uri().primary_uri().scheme());// Needs to invoke ssl check for this test.
+        azure::storage::operation_context context;
+        context.set_ssl_context_callback([](boost::asio::ssl::context& context)-> void {
+            throw std::runtime_error("dummy exception"); });
+        auto container = client.get_container_reference(_XPLATSTR("this-container-does-not-exist"));
+        CHECK_THROW(container.exists(azure::storage::blob_request_options(), context), std::runtime_error);
+
+        // Test reusable client can be reused.
+        web::http::client::http_client_config config;
+        config.set_ssl_context_callback([](boost::asio::ssl::context& context)-> void {
+            throw std::runtime_error("dummy exception"); });
+        auto first_client = azure::storage::core::http_client_reusable::get_http_client(azure::storage::storage_uri(_XPLATSTR("http://www.nonexistenthost.com/test1")).primary_uri(), config);
+        auto second_client = azure::storage::core::http_client_reusable::get_http_client(azure::storage::storage_uri(_XPLATSTR("http://www.nonexistenthost.com/test1")).primary_uri(), config);
+        // check the client is identical.
+        CHECK_EQUAL(first_client, second_client);
     }
 #endif
 }

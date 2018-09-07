@@ -463,6 +463,12 @@ namespace azure { namespace storage { namespace core {
                 {
                     config.set_chunksize(http_buffer_size);
                 }
+#ifndef _WIN32
+                if (instance->m_context._get_impl()->get_ssl_context_callback() != nullptr)
+                {
+                    config.set_ssl_context_callback(instance->m_context._get_impl()->get_ssl_context_callback());
+                }
+#endif
 
                 // 5-6. Potentially upload data and get response
 #ifdef _WIN32

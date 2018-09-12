@@ -1,6 +1,9 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v5.0.1
+- Resolved an issue where default CMake version 2.8 on Ubuntu 14.04 cannot build this client library.
+
 Changes in v5.0.0
 - Dropped the support for Nuget package with name 'wastorage', now this client library only release with Nuget name 'Microsoft.Azure.Storage.CPP'.
 - Added support for specifying installation destination when compiling with cmake to resolve feature request #183.

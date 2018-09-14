@@ -1,6 +1,12 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v5.1.1
+- Added an API: `azure::storage::operation_context::set_ssl_context_callback`. User can use this API to customize SSL callback in order to change the location of the SSL cert, etc. This is a Linux only API.
+
+Changes in v5.0.1
+- Resolved an issue where default CMake version 2.8 on Ubuntu 14.04 cannot build this client library.
+
 Changes in v5.1.0
 - Stopped releasing public Nuget package starting from this version.
 - Default REST API version is 2017-07-29.

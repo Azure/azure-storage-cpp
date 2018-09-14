@@ -1,6 +1,8 @@
-# Azure Storage Client Library for C++ (5.1.0)
+# Azure Storage Client Library for C++ (5.1.1)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
+
+There is an alternative client library that requires minimum dependency, which provides basic object storage that Blob service offers. Please see [azure-storage-cpplite](https://github.com/Azure/azure-storage-cpplite) for more information.
 
 # Features
 
@@ -147,7 +149,9 @@ vi ../../samples/SamplesCommon/samples_common.h # modify connection string to in
 ./samplesqueues           # run the queues sample
 ```
 
-Please note the current build script is only tested on Ubuntu 14.04. Please update the script accordingly for other distributions.
+Please note the current build script is only tested on Ubuntu 16.04. Please update the script accordingly for other distributions.
+
+Please note that starting from 2.10.0, Casablanca requires a minimum version of CMake v3.1, so the default CMake on Ubuntu 14.04 cannot support Casablanca build. User can upgrade CMake by themselves to build Casablanca.
 
 ## Getting Started on OSX
 

@@ -102,6 +102,7 @@ var searchData=
   ['set_5fserver_5ftimeout',['set_server_timeout',['../classazure_1_1storage_1_1request__options.html#a8b2b6e574c4b090f8619ae908848cd25',1,'azure::storage::request_options']]],
   ['set_5fservice_5ftype',['set_service_type',['../classazure_1_1storage_1_1account__shared__access__policy.html#ad7a93bd08eabad2b0a3da18e889ed1e1',1,'azure::storage::account_shared_access_policy']]],
   ['set_5fsingle_5fblob_5fupload_5fthreshold_5fin_5fbytes',['set_single_blob_upload_threshold_in_bytes',['../classazure_1_1storage_1_1blob__request__options.html#a70edd2d728fdf472fdd810f79b89aaee',1,'azure::storage::blob_request_options']]],
+  ['set_5fssl_5fcontext_5fcallback',['set_ssl_context_callback',['../classazure_1_1storage_1_1operation__context.html#aa3d1100a0c688fe3cc5b45eefc6c14ab',1,'azure::storage::operation_context']]],
   ['set_5fstandard_5fblob_5ftier',['set_standard_blob_tier',['../classazure_1_1storage_1_1cloud__block__blob.html#a8b59920f018e911608d5081ffb3f4816',1,'azure::storage::cloud_block_blob']]],
   ['set_5fstandard_5fblob_5ftier_5fasync',['set_standard_blob_tier_async',['../classazure_1_1storage_1_1cloud__block__blob.html#ac96e207b73a5bbc1d661cea40e971f26',1,'azure::storage::cloud_block_blob']]],
   ['set_5fstart',['set_start',['../classazure_1_1storage_1_1shared__access__policy.html#acbe444363ca0535c82063985b8821b91',1,'azure::storage::shared_access_policy']]],

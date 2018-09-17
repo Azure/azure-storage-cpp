@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Microsoft Azure Storage Client Library for C++: Azure Storage Client Library for C++ (5.1.0)</title>
+<title>Microsoft Azure Storage Client Library for C++: Azure Storage Client Library for C++ (5.1.1)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">5.1.0</span>
+   &#160;<span id="projectnumber">5.1.1</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -64,10 +64,11 @@ $(function() {
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Azure Storage Client Library for C++ (5.1.0) </div>  </div>
+<div class="title">Azure Storage Client Library for C++ (5.1.1) </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see <a href="http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/">Introduction to Microsoft Azure Storage</a>.</p>
+<p>There is an alternative client library that requires minimum dependency, which provides basic object storage that Blob service offers. Please see <a href="https://github.com/Azure/azure-storage-cpplite">azure-storage-cpplite</a> for more information.</p>
 <h1>Features</h1>
 <ul>
 <li>Tables<ul>
@@ -117,7 +118,28 @@ $(function() {
 <p>Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visual Studio 2013 and Visual Studio 2015. In case you have the need to use Visual Studio 2012, please get <a href="http://www.nuget.org/packages/wastorage/2.0.0">version 2.0.0</a>.</p>
 <h2>Dependencies</h2>
 <h3>C++ REST SDK</h3>
-<p>The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") 2.10.3. It can be installed through Vcpkg (vcpkg install cpprestsdk) or downloaded directly from <a href="https://github.com/Microsoft/cpprestsdk/releases/tag/v2.10.3">GitHub</a>.</p>
+<p>The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") It can be installed through Vcpkg (vcpkg install cpprestsdk) or downloaded directly from <a href="https://github.com/Microsoft/cpprestsdk/releases/">GitHub</a>.</p>
+<p>The validated Casablanca version for each major or recent release on different platforms can be found in the following chart:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">azure-storage-cpp's version  </th><th class="markdownTableHeadNone">Casablanca version for Windows  </th><th class="markdownTableHeadNone">Casablanca version for Linux   </th></tr>
+<tr class="markdownTableBody" class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">1.0.0  </td><td class="markdownTableBodyNone">2.4.0  </td><td class="markdownTableBodyNone">2.4.0   </td></tr>
+<tr class="markdownTableBody" class="markdownTableRowEven">
+<td class="markdownTableBodyNone">2.0.0  </td><td class="markdownTableBodyNone">2.4.0  </td><td class="markdownTableBodyNone">2.4.0   </td></tr>
+<tr class="markdownTableBody" class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">3.0.0  </td><td class="markdownTableBodyNone">2.9.1  </td><td class="markdownTableBodyNone">2.9.1   </td></tr>
+<tr class="markdownTableBody" class="markdownTableRowEven">
+<td class="markdownTableBodyNone">4.0.0  </td><td class="markdownTableBodyNone">2.9.1  </td><td class="markdownTableBodyNone">2.9.1   </td></tr>
+<tr class="markdownTableBody" class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">5.0.0  </td><td class="markdownTableBodyNone">2.9.1  </td><td class="markdownTableBodyNone">2.9.1   </td></tr>
+<tr class="markdownTableBody" class="markdownTableRowEven">
+<td class="markdownTableBodyNone">5.0.1  </td><td class="markdownTableBodyNone">2.9.1  </td><td class="markdownTableBodyNone">2.9.1   </td></tr>
+<tr class="markdownTableBody" class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">5.1.0  </td><td class="markdownTableBodyNone">2.10.4  </td><td class="markdownTableBodyNone">2.10.3   </td></tr>
+<tr class="markdownTableBody" class="markdownTableRowEven">
+<td class="markdownTableBodyNone">5.1.1  </td><td class="markdownTableBodyNone">2.10.4  </td><td class="markdownTableBodyNone">2.10.3   </td></tr>
+</table>
 <h2>Code Samples</h2>
 <p>To get started with the coding, please visit the following articles:</p><ul>
 <li><a href="https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-blobs/">How to use Blob Storage from C++</a></li>
@@ -126,7 +148,7 @@ $(function() {
 </ul>
 <p>To accomplish specific tasks, please find the code samples at <a href="Microsoft.WindowsAzure.Storage/samples">samples folder</a>.</p>
 <h2>Getting Started on Linux</h2>
-<p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux">these instructions</a> to compile it. Current version of the library depends on Casablanca version 2.10.3.</p>
+<p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux">these instructions</a> to compile it.</p>
 <p>Once this is complete, then:</p>
 <ul>
 <li>Clone the project using git: <div class="fragment"><div class="line">git clone https://github.com/Azure/azure-storage-cpp.git</div></div><!-- fragment --> The project is cloned to a folder called <code>azure-storage-cpp</code>. Always use the master branch, which contains the latest release.</li>
@@ -138,11 +160,12 @@ $(function() {
 <li>Build the test code: <div class="fragment"><div class="line">CASABLANCA_DIR=&lt;path to Casablanca&gt; CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON</div><div class="line">make</div></div><!-- fragment --></li>
 <li>Run unit tests <div class="fragment"><div class="line">cd Binaries</div><div class="line">vi test_configurations.json # modify test config file to include your storage account credentials</div><div class="line">./azurestoragetest</div></div><!-- fragment --></li>
 </ul>
-<p>To build sample code: </p><div class="fragment"><div class="line">CASABLANCA_DIR=&lt;path to Casablanca&gt; CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON</div><div class="line">make</div></div><!-- fragment --><p> To run the samples: </p><div class="fragment"><div class="line">cd Binaries</div><div class="line">vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials</div><div class="line">./samplesblobs            # run the blobs sample</div><div class="line">./samplesjson             # run the tables sample with JSON payload</div><div class="line">./samplestables           # run the tables sample</div><div class="line">./samplesqueues           # run the queues sample</div></div><!-- fragment --><p>Please note the current build script is only tested on Ubuntu 14.04. Please update the script accordingly for other distributions.</p>
+<p>To build sample code: </p><div class="fragment"><div class="line">CASABLANCA_DIR=&lt;path to Casablanca&gt; CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON</div><div class="line">make</div></div><!-- fragment --><p> To run the samples: </p><div class="fragment"><div class="line">cd Binaries</div><div class="line">vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials</div><div class="line">./samplesblobs            # run the blobs sample</div><div class="line">./samplesjson             # run the tables sample with JSON payload</div><div class="line">./samplestables           # run the tables sample</div><div class="line">./samplesqueues           # run the queues sample</div></div><!-- fragment --><p>Please note the current build script is only tested on Ubuntu 16.04. Please update the script accordingly for other distributions.</p>
+<p>Please note that starting from 2.10.0, Casablanca requires a minimum version of CMake v3.1, so the default CMake on Ubuntu 14.04 cannot support Casablanca build. User can upgrade CMake by themselves to build Casablanca. If default CMake (2.8) for Ubuntu 14.04 must be used, 5.0.1 with Casablanca version v2.9.1 is recommended.</p>
 <h2>Getting Started on OSX</h2>
 <p><em>Note that OSX is not officially supported yet, but it has been seen to work, YMMV. This build has been tested to work when the dependencies are installed via homebrew, YMMV if using FINK or MacPorts</em></p>
 <p>Install dependecies with homebrew:</p>
-<div class="fragment"><div class="line">brew install libxml2 ossp-uuid openssl</div></div><!-- fragment --><p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. If you are using homebrew you can install it from there: </p><div class="fragment"><div class="line">brew install cpprestsdk</div></div><!-- fragment --><p>Otherwise, you may need to build it. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X">these instructions</a> to compile it. Current version of the library depends on Casablanca version 2.10.3.</p>
+<div class="fragment"><div class="line">brew install libxml2 ossp-uuid openssl</div></div><!-- fragment --><p>As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. If you are using homebrew you can install it from there: </p><div class="fragment"><div class="line">brew install cpprestsdk</div></div><!-- fragment --><p>Otherwise, you may need to build it. Follow <a href="https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Mac-OS-X">these instructions</a> to compile it.</p>
 <p>Once this is complete, then:</p>
 <ul>
 <li>Clone the project using git: <div class="fragment"><div class="line">git clone https://github.com/Azure/azure-storage-cpp.git</div></div><!-- fragment --> The project is cloned to a folder called <code>azure-storage-cpp</code>. Always use the master branch, which contains the latest release.</li>
@@ -172,7 +195,7 @@ $(function() {
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Aug 16 2018 11:31:57 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 17 2018 12:17:15 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

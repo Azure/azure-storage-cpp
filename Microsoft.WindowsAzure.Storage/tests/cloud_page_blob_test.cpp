@@ -32,6 +32,8 @@ void page_blob_test_base::check_page_ranges_equal(const std::vector<azure::stora
     }
 }
 
+static std::string ACTIVE_LEASE_ERROR_MESSAGE = "There is currently a lease on the blob and no lease ID was specified in the request.";
+
 #pragma endregion
 
 SUITE(Blob)
@@ -718,37 +720,74 @@ SUITE(Blob)
     }
 
     // Validate set standard blob tier for block blob on blob storage account.
-    TEST_FIXTURE(page_blob_test_base, page_blob_premium_tier)
+    TEST_FIXTURE(premium_page_blob_test_base, page_blob_premium_tier)
     {
         // preparation
-        m_premium_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
-        auto blob = m_premium_container.get_page_blob_reference(_XPLATSTR("pageblob"));
         azure::storage::blob_request_options options;
         // check default tier is p10
-        blob.create(1024);
-        blob.download_attributes();
-        CHECK(azure::storage::premium_blob_tier::p10 == blob.properties().premium_blob_tier());
+        m_blob.create(1024);
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p10 == m_blob.properties().premium_blob_tier());
 
         // check create page blob sets the tier to be p20
-        blob.create(1024, azure::storage::premium_blob_tier::p20, 0, azure::storage::access_condition(), options, azure::storage::operation_context());
-        CHECK(azure::storage::premium_blob_tier::p20 == blob.properties().premium_blob_tier());
-        blob.download_attributes();
-        CHECK(azure::storage::premium_blob_tier::p20 == blob.properties().premium_blob_tier());
+        m_blob.create(1024, azure::storage::premium_blob_tier::p20, 0, azure::storage::access_condition(), options, azure::storage::operation_context());
+        CHECK(azure::storage::premium_blob_tier::p20 == m_blob.properties().premium_blob_tier());
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p20 == m_blob.properties().premium_blob_tier());
 
         // test can convert p20 to p30, p30 to p40.
-        blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p30, azure::storage::access_condition(), options, azure::storage::operation_context());
+        m_blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p30, azure::storage::access_condition(), options, azure::storage::operation_context());
         // validate local has been updated.
-        CHECK(azure::storage::premium_blob_tier::p30 == blob.properties().premium_blob_tier());
+        CHECK(azure::storage::premium_blob_tier::p30 == m_blob.properties().premium_blob_tier());
         // validate server has been updated
-        blob.download_attributes();
-        CHECK(azure::storage::premium_blob_tier::p30 == blob.properties().premium_blob_tier());
-        blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p40, azure::storage::access_condition(), options, azure::storage::operation_context());
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p30 == m_blob.properties().premium_blob_tier());
+        m_blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p40, azure::storage::access_condition(), options, azure::storage::operation_context());
         // validate local has been updated.
-        CHECK(azure::storage::premium_blob_tier::p40 == blob.properties().premium_blob_tier());
+        CHECK(azure::storage::premium_blob_tier::p40 == m_blob.properties().premium_blob_tier());
         // validate server has been updated
-        blob.download_attributes();
-        CHECK(azure::storage::premium_blob_tier::p40 == blob.properties().premium_blob_tier());
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p40 == m_blob.properties().premium_blob_tier());
+    }
 
-        m_blob_storage_container.delete_container_if_exists();
+    TEST_FIXTURE(premium_page_blob_test_base, set_blob_tier_with_lease)
+    {
+        // preparation
+        azure::storage::blob_request_options options;
+        // check default tier is p10
+        m_blob.create(1024);
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p10 == m_blob.properties().premium_blob_tier());
+
+        // acquire a lease
+        auto lease_id = m_blob.acquire_lease(azure::storage::lease_time(), _XPLATSTR(""));
+
+        // set the acquired lease to access condition.
+        azure::storage::access_condition condition;
+        condition.set_lease_id(lease_id);
+
+        // check create page blob sets the tier to be p20
+        m_blob.create(1024, azure::storage::premium_blob_tier::p20, 0, condition, options, azure::storage::operation_context());
+        CHECK(azure::storage::premium_blob_tier::p20 == m_blob.properties().premium_blob_tier());
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p20 == m_blob.properties().premium_blob_tier());
+
+        // test can convert p20 to p30, p30 to p40.
+        m_blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p30, condition, options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::premium_blob_tier::p30 == m_blob.properties().premium_blob_tier());
+        // validate server has been updated
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p30 == m_blob.properties().premium_blob_tier());
+        m_blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p40, condition, options, azure::storage::operation_context());
+        // validate local has been updated.
+        CHECK(azure::storage::premium_blob_tier::p40 == m_blob.properties().premium_blob_tier());
+        // validate server has been updated
+        m_blob.download_attributes();
+        CHECK(azure::storage::premium_blob_tier::p40 == m_blob.properties().premium_blob_tier());
+
+        // validate no lease id would report failure.
+        CHECK_STORAGE_EXCEPTION(m_blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p30, azure::storage::access_condition(), options, azure::storage::operation_context()), ACTIVE_LEASE_ERROR_MESSAGE);
+        CHECK(azure::storage::premium_blob_tier::p40 == m_blob.properties().premium_blob_tier());
     }
 }

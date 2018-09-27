@@ -157,6 +157,8 @@ public:
         try
         {
             m_container.delete_container_if_exists(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            m_premium_container.delete_container_if_exists(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+            m_blob_storage_container.delete_container_if_exists(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         }
         catch (const azure::storage::storage_exception&)
         {
@@ -196,6 +198,40 @@ protected:
     void check_access(const utility::string_t& sas_token, uint8_t permissions, const azure::storage::cloud_blob_shared_access_headers& headers, const azure::storage::cloud_blob& original_blob);
     void check_lease_access(azure::storage::cloud_blob& blob, azure::storage::lease_state state, const utility::string_t& lease_id, bool fake);
     static void check_blob_no_stale_property(azure::storage::cloud_blob& blob);
+};
+
+class premium_page_blob_test_base : public container_test_base
+{
+public:
+
+    premium_page_blob_test_base()
+    {
+        m_premium_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        m_blob = m_premium_container.get_page_blob_reference(_XPLATSTR("pageblob"));
+    }
+
+    ~premium_page_blob_test_base()
+    {
+    }
+protected:
+    azure::storage::cloud_page_blob m_blob;
+};
+
+class premium_block_blob_test_base : public container_test_base
+{
+public:
+
+    premium_block_blob_test_base()
+    {
+        m_blob_storage_container.create(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), m_context);
+        m_blob = m_blob_storage_container.get_block_blob_reference(_XPLATSTR("blockblob"));
+    }
+
+    ~premium_block_blob_test_base()
+    {
+    }
+protected:
+    azure::storage::cloud_block_blob m_blob;
 };
 
 class block_blob_test_base : public blob_test_base

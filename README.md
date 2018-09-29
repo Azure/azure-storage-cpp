@@ -104,6 +104,8 @@ To get started with the coding, please visit the following articles:
 To accomplish specific tasks, please find the code samples at [samples folder](Microsoft.WindowsAzure.Storage/samples).
 
 ## Getting Started on Linux
+
+### Getting Started on Ubuntu
 As mentioned above, the Azure Storage Client Library for C++ depends on Casablanca. Follow [these instructions](https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Linux) to compile it.
 
 Once this is complete, then:
@@ -166,6 +168,99 @@ vi ../../samples/SamplesCommon/samples_common.h # modify connection string to in
 Please note the current build script is only tested on Ubuntu 16.04. Please update the script accordingly for other distributions.
 
 Please note that starting from 2.10.0, Casablanca requires a minimum version of CMake v3.1, so the default CMake on Ubuntu 14.04 cannot support Casablanca build. User can upgrade CMake by themselves to build Casablanca. If default CMake (2.8) for Ubuntu 14.04 must be used, 5.0.1 with Casablanca version v2.9.1 is recommended.
+
+### Getting Started on SLES12
+
+*Please note the folloing build script is only tested on SLES12 SP3. The script may need to be updated accordingly for other distributions.*
+
+Before building the Azure Storage Client Library on C++, some prerequisites need to be installed first:
+- Install prerequisites:
+```bash
+sudo zypper install git gcc-c++ boost-devel cmake libopenssl-devel libxml2-devel libuuid-devel
+```
+
+The Azure Storage Client Library for C++ depends on Casablanca, following are instructions to build and install Casablanca:
+
+- Clone the project using git:
+```bash
+git clone https://github.com/Microsoft/cpprestsdk.git
+```
+
+- Checkout the version on which Azure Storage Client Library for C++ depends:
+```bash
+git checkout tags/v2.10.3 -b v2.10.3
+```
+
+- Build the project in Release mode
+```bash
+cd cpprestsdk/Release
+mkdir build.release
+cd build.release
+CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF
+sudo make install
+```
+
+To build the Azure Storage Client Library for C++ project:
+
+- Clone the project using git:
+```bash
+git clone https://github.com/Azure/azure-storage-cpp.git
+```
+The project is cloned to a folder called `azure-storage-cpp`. Always use the master branch, which contains the latest release.
+
+- Build the SDK in Release mode:
+```bash
+cd azure-storage-cpp/Microsoft.WindowsAzure.Storage
+mkdir build.release
+cd build.release
+CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+```
+
+The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
+
+The Azure Storage Client Library for C++ project depends on Unitest++ for unit test:
+
+To build and install Unitest++:
+- Clone the project using git: 
+```bash
+git clone https://github.com/unittest-cpp/unittest-cpp.git
+```
+
+- Build and install the project:
+```bash
+cd unittest-cpp/builds/
+CXX=g++-4.8 cmake ..
+sudo make install
+```
+
+Build and run unit test against Azure Storage Client Library for C++:
+- Build the test code:
+```bash
+CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+make
+```
+- Run unit tests
+```bash
+cd Binaries
+vi test_configurations.json # modify test config file to include your storage account credentials
+./azurestoragetest
+```
+
+To build sample code:
+```bash
+CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
+make
+```
+To run the samples:
+```bash
+cd Binaries
+vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
+./samplesblobs            # run the blobs sample
+./samplesjson             # run the tables sample with JSON payload
+./samplestables           # run the tables sample
+./samplesqueues           # run the queues sample
+```
 
 ## Getting Started on OSX
 

@@ -985,8 +985,11 @@ SUITE(Core)
         auto error_details = op.request_results().back().extended_error().details();
         auto source_ip = error_details[_XPLATSTR("SourceIP")];
 
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(source_ip));
-        sas_token = account.get_shared_access_signature(policy);
-        azure::storage::cloud_blob_client(account.blob_endpoint(), azure::storage::storage_credentials(sas_token)).list_containers(_XPLATSTR("prefix"));
+        if (!source_ip.empty())
+        {
+            policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(source_ip));
+            sas_token = account.get_shared_access_signature(policy);
+            azure::storage::cloud_blob_client(account.blob_endpoint(), azure::storage::storage_credentials(sas_token)).list_containers(_XPLATSTR("prefix"));
+        }
     }
 }

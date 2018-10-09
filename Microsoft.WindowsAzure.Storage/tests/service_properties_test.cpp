@@ -166,6 +166,7 @@ void test_service_properties(const Client& client, const Options& options, azure
     add_cors_rule_2(temp_props.cors());
 
     client.upload_service_properties(props, azure::storage::service_properties_includes::all(), options, context);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     check_service_properties(props, client.download_service_properties(options, context));
 
     {
@@ -173,6 +174,7 @@ void test_service_properties(const Client& client, const Options& options, azure
         includes.set_logging(true);
         client.upload_service_properties(temp_props, includes, options, context);
         add_logging_2(props.logging());
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
         add_logging_1(temp_props.logging());
     }
@@ -182,6 +184,7 @@ void test_service_properties(const Client& client, const Options& options, azure
         includes.set_hour_metrics(true);
         client.upload_service_properties(temp_props, includes, options, context);
         add_metrics_2(props.hour_metrics());
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
         add_metrics_1(temp_props.hour_metrics());
     }
@@ -191,6 +194,7 @@ void test_service_properties(const Client& client, const Options& options, azure
         includes.set_minute_metrics(true);
         client.upload_service_properties(temp_props, includes, options, context);
         add_metrics_1(props.minute_metrics());
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
         add_metrics_2(temp_props.minute_metrics());
     }
@@ -200,6 +204,7 @@ void test_service_properties(const Client& client, const Options& options, azure
         includes.set_cors(true);
         client.upload_service_properties(temp_props, includes, options, context);
         props.cors().erase(props.cors().begin());
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
         temp_props.cors().clear();
     }
@@ -213,6 +218,7 @@ void test_service_properties(const Client& client, const Options& options, azure
         add_metrics_1(props.hour_metrics());
         add_metrics_2(props.minute_metrics());
         props.cors().clear();
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
     }
 
@@ -227,6 +233,7 @@ void test_service_properties(const Client& client, const Options& options, azure
         add_metrics_3(props.hour_metrics());
         add_metrics_4(props.minute_metrics());
         props.cors().clear();
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
     }
 
@@ -234,6 +241,7 @@ void test_service_properties(const Client& client, const Options& options, azure
     if (default_version_supported)
     {
         client.upload_service_properties(props, azure::storage::service_properties_includes::all(), options, context);
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
     }
     else
@@ -257,6 +265,7 @@ void test_service_properties(const azure::storage::cloud_file_client& client, co
     add_cors_rule_2(temp_props.cors());
 
     client.upload_service_properties(props, azure::storage::service_properties_includes::file(), options, context);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     check_service_properties(props, client.download_service_properties(options, context));
 
     {
@@ -264,6 +273,7 @@ void test_service_properties(const azure::storage::cloud_file_client& client, co
         includes.set_hour_metrics(true);
         client.upload_service_properties(temp_props, includes, options, context);
         add_metrics_2(props.hour_metrics());
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
         add_metrics_1(temp_props.hour_metrics());
     }
@@ -273,6 +283,7 @@ void test_service_properties(const azure::storage::cloud_file_client& client, co
         includes.set_minute_metrics(true);
         client.upload_service_properties(temp_props, includes, options, context);
         add_metrics_1(props.minute_metrics());
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
         add_metrics_2(temp_props.minute_metrics());
     }
@@ -282,6 +293,7 @@ void test_service_properties(const azure::storage::cloud_file_client& client, co
         includes.set_cors(true);
         client.upload_service_properties(temp_props, includes, options, context);
         props.cors().erase(props.cors().begin());
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
         temp_props.cors().clear();
     }
@@ -295,6 +307,7 @@ void test_service_properties(const azure::storage::cloud_file_client& client, co
         add_metrics_1(props.hour_metrics());
         add_metrics_2(props.minute_metrics());
         props.cors().clear();
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
     }
 
@@ -309,6 +322,7 @@ void test_service_properties(const azure::storage::cloud_file_client& client, co
         add_metrics_3(props.hour_metrics());
         add_metrics_4(props.minute_metrics());
         props.cors().clear();
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
     }
 
@@ -316,7 +330,9 @@ void test_service_properties(const azure::storage::cloud_file_client& client, co
     if (default_version_supported)
     {
         client.upload_service_properties(props, azure::storage::service_properties_includes::all(), options, context);
+        std::this_thread::sleep_for(std::chrono::seconds(3));
         check_service_properties(props, client.download_service_properties(options, context));
+        std::cout << "upload default service properties successfully" << std::endl;
     }
     else
     {

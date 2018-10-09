@@ -1577,6 +1577,7 @@ namespace azure { namespace storage {
             {
                 m_etag = std::move(other.m_etag);
                 m_last_modified = std::move(other.m_last_modified);
+                m_server_encrypted = std::move(other.m_server_encrypted);
             }
             return *this;
         }
@@ -2307,6 +2308,7 @@ namespace azure { namespace storage {
                 m_cache_control = std::move(other.m_cache_control);
                 m_content_md5 = std::move(other.m_content_md5);
                 m_content_disposition = std::move(other.m_content_disposition);
+                m_server_encrypted = std::move(other.m_server_encrypted);
             }
             return *this;
         }

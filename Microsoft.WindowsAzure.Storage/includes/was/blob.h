@@ -1219,6 +1219,11 @@ namespace azure { namespace storage {
                 m_append_blob_committed_block_count = std::move(other.m_append_blob_committed_block_count);
                 m_server_encrypted = std::move(other.m_server_encrypted);
                 m_is_incremental_copy = std::move(other.m_is_incremental_copy);
+                m_standard_blob_tier = std::move(other.m_standard_blob_tier);
+                m_premium_blob_tier = std::move(other.m_premium_blob_tier);
+                m_archive_status = std::move(other.m_archive_status);
+                m_access_tier_inferred = std::move(other.m_access_tier_inferred);
+                m_access_tier_change_time = std::move(other.m_access_tier_change_time);
             }
             return *this;
         }

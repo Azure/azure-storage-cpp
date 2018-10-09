@@ -843,10 +843,11 @@ SUITE(Blob)
         m_blob.download_attributes();
         CHECK(azure::storage::standard_blob_tier::hot == m_blob.properties().standard_blob_tier());
 
-        // test standard storage cannot set archive.
-        CHECK_STORAGE_EXCEPTION(m_blob.set_standard_blob_tier(azure::storage::standard_blob_tier::archive, azure::storage::access_condition(), options, azure::storage::operation_context()), ARCHIVE_BLOB_IN_STANDARD_ACCOUNT_ERR_MSG);
-        // validate local has not been updated.
-        CHECK(azure::storage::standard_blob_tier::hot == m_blob.properties().standard_blob_tier());
+        // test standard storage can set archive.
+        m_blob.set_standard_blob_tier(azure::storage::standard_blob_tier::archive, azure::storage::access_condition(), options, azure::storage::operation_context());
+        // validate server has been updated
+        m_blob.download_attributes();
+        CHECK(azure::storage::standard_blob_tier::archive == m_blob.properties().standard_blob_tier());
     }
 
     // Validate set standard blob tier for block blob on blob storage account.

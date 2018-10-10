@@ -1,6 +1,13 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v5.2.0
+- Resolved an issue where listing blobs for blob tier returning faulty result when built with VS2013.
+- Resolved an issue where listing files or directories returning faulty server encryption status when built with VS2013.
+- Added support to set blob tier with lease conditions.
+- Added detailed guideline on how to build on SLES12 SP3, and fixed CMake build script accordingly.
+- Fixed randomly failed test cases.
+
 Changes in v5.1.1
 - Added an API: `azure::storage::operation_context::set_ssl_context_callback`. User can use this API to customize SSL callback in order to change the location of the SSL cert, etc. This is a Linux only API.
 

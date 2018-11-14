@@ -118,6 +118,20 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   else()
     add_definitions(-D_NO_WASTORAGE_API)
   endif()
+
+  if(ENABLE_MT)
+    set(CompilerFlags
+            CMAKE_CXX_FLAGS
+            CMAKE_CXX_FLAGS_DEBUG
+            CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_C_FLAGS
+            CMAKE_C_FLAGS_DEBUG
+            CMAKE_C_FLAGS_RELEASE
+    )
+    foreach(CompilerFlag ${CompilerFlags})
+      string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+    endforeach()
+  endif()
 else()
   message("-- Unknown compiler, success is doubtful.")
 endif()
@@ -159,3 +173,4 @@ endif()
 if(BUILD_SAMPLES)
   add_subdirectory(samples)
 endif()
+

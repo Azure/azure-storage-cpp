@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------------
-// <copyright file="cloud_blob.cpp" company="Microsoft">
+// <copyright file="executor.cpp" company="Microsoft">
 //    Copyright 2013 Microsoft Corporation
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,10 +32,18 @@ namespace azure { namespace storage { namespace core {
         auto instance = std::make_shared<executor_impl>(command, options, context);
         return pplx::details::_do_while([instance]() -> pplx::task<bool>
         {
+            //Start the timer to track timeout.
+            if (instance->m_command->m_use_timeout)
+            {
+                // Timer will be stopped when instance is out of scope, so no need to stop here.
+                instance->m_command->m_timer_handler->start_timer(instance->m_request_options.maximum_execution_time());
+            }
             // 0. Begin request 
+            instance->assert_canceled();
             instance->validate_location_mode();
 
             // 1. Build request
+            instance->assert_canceled();
             instance->m_start_time = utility::datetime::utc_now();
             instance->m_uri_builder = web::http::uri_builder(instance->m_command->m_request_uri.get_location_uri(instance->m_current_location));
             instance->m_request = instance->m_command->m_build_request(instance->m_uri_builder, instance->m_request_options.server_timeout(), instance->m_context);
@@ -50,6 +58,7 @@ namespace azure { namespace storage { namespace core {
             }
 
             // 2. Set Headers
+            instance->assert_canceled();
             auto& client_request_id = instance->m_context.client_request_id();
             if (!client_request_id.empty())
             {
@@ -109,9 +118,11 @@ namespace azure { namespace storage { namespace core {
             }
 
             // 3. Sign Request
+            instance->assert_canceled();
             instance->m_command->m_sign_request(instance->m_request, instance->m_context);
 
             // 4. Set HTTP client configuration
+            instance->assert_canceled();
             web::http::client::http_client_config config;
             if (instance->m_context.proxy().is_specified())
             {
@@ -134,17 +145,18 @@ namespace azure { namespace storage { namespace core {
 #endif
 
             // 5-6. Potentially upload data and get response
+            instance->assert_canceled();
 #ifdef _WIN32
             web::http::client::http_client client(instance->m_request.request_uri().authority(), config);
-            return client.request(instance->m_request).then([instance](pplx::task<web::http::http_response> get_headers_task)->pplx::task<web::http::http_response>
+            return client.request(instance->m_request, instance->m_command->get_cancellation_token()).then([instance](pplx::task<web::http::http_response> get_headers_task)->pplx::task<web::http::http_response>
 #else
             std::shared_ptr<web::http::client::http_client> client = core::http_client_reusable::get_http_client(instance->m_request.request_uri().authority(), config);
-            return client->request(instance->m_request).then([instance](pplx::task<web::http::http_response> get_headers_task) -> pplx::task<web::http::http_response>
+            return client->request(instance->m_request, instance->m_command->get_cancellation_token()).then([instance](pplx::task<web::http::http_response> get_headers_task)->pplx::task<web::http::http_response>
 #endif // _WIN32
             {
                 // Headers are ready. It should be noted that http_client will
                 // continue to download the response body in parallel.
-                auto response = get_headers_task.get();
+                web::http::http_response response = get_headers_task.get();
 
                 if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
                 {
@@ -183,6 +195,7 @@ namespace azure { namespace storage { namespace core {
                     // the response, so re-throwing is the right thing.
                     if (e.what() != NULL && e.what()[0] != '\0')
                     {
+                        instance->assert_canceled();
                         throw;
                     }
 
@@ -211,13 +224,14 @@ namespace azure { namespace storage { namespace core {
                             logger::instance().log(instance->m_context, client_log_level::log_level_warning, _XPLATSTR("Failed request ID = ") + instance->m_request_result.service_request_id());
                         }
 
+                        instance->assert_canceled();
                         throw storage_exception(utility::conversions::to_utf8string(response.reason_phrase()));
                     });
                 }
             }).then([instance](pplx::task<web::http::http_response> get_body_task) -> pplx::task<void>
             {
                 // 9. Evaluate response & parse results
-                auto response = get_body_task.get();
+                web::http::http_response response = get_body_task.get();
 
                 if (instance->m_command->m_destination_stream)
                 {
@@ -226,6 +240,7 @@ namespace azure { namespace storage { namespace core {
                     if (content_length != -1 && current_total_downloaded != content_length)
                     {
                         // The download was interrupted before it could complete
+                        instance->assert_canceled();
                         throw storage_exception(protocol::error_incorrect_length);
                     }
                 }
@@ -298,6 +313,22 @@ namespace azure { namespace storage { namespace core {
                         throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
                     }
 
+                    // If operation is canceled.
+                    if (instance->m_command->get_cancellation_token().is_canceled())
+                    {
+                        if (logger::instance().should_log(instance->m_context, client_log_level::log_level_informational))
+                        {
+                            logger::instance().log(instance->m_context, client_log_level::log_level_informational, _XPLATSTR("Exception thrown while operation canceled: ") + utility::conversions::to_string_t(e.what()));
+                        }
+
+                        // deal with canceling situation if the exception is protocol::error_operation_canceled, while throwing exception that is already thrown before canceling.
+                        if (std::string(e.what()) == protocol::error_operation_canceled)
+                        {
+                            instance->assert_canceled();
+                        }
+                        throw storage_exception(e.what(), instance->m_request_result, capture_inner_exception(e), false);
+                    }
+
                     // An exception occurred and thus the request might be retried. Ask the retry policy.
                     retry_context context(instance->m_retry_count++, instance->m_request_result, instance->get_next_location(), instance->m_current_location_mode);
                     retry_info retry(instance->m_retry_policy.evaluate(context, instance->m_context));
@@ -366,4 +397,4 @@ namespace azure { namespace storage { namespace core {
         });
     }
 
-}} // namespace azure::storage::core
+}}} // namespace azure::storage::core

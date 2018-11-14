@@ -3,6 +3,7 @@ include_directories(../includes ${AZURESTORAGE_INCLUDE_DIRS} ${UnitTest++_INCLUD
 # THE ORDER OF FILES IS VERY /VERY/ IMPORTANT
 if(UNIX)
   set(SOURCES
+     timer_handler_test.cpp
      blob_lease_test.cpp
      blob_streams_test.cpp
      blob_test_base.cpp

@@ -58,7 +58,7 @@ namespace azure { namespace storage { namespace core {
             {
                 try
                 {
-                    this_pointer->m_blob->upload_block_async(block_id, buffer->stream(), buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context).then([this_pointer] (pplx::task<void> upload_task)
+                    this_pointer->m_blob->upload_block_async_impl(block_id, buffer->stream(), buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context, this_pointer->m_cancellation_token, this_pointer->m_use_request_level_timeout, this_pointer->m_timer_handler).then([this_pointer] (pplx::task<void> upload_task)
                     {
                         std::lock_guard<async_semaphore> guard(this_pointer->m_semaphore, std::adopt_lock);
                         try
@@ -93,7 +93,7 @@ namespace azure { namespace storage { namespace core {
                 this_pointer->m_blob->properties().set_content_md5(this_pointer->m_total_hash_provider.hash());
             }
 
-            return this_pointer->m_blob->upload_block_list_async(this_pointer->m_block_list, this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
+            return this_pointer->m_blob->upload_block_list_async_impl(this_pointer->m_block_list, this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context, this_pointer->m_cancellation_token, this_pointer->m_use_request_level_timeout,this_pointer->m_timer_handler);
         });
     }
 
@@ -126,7 +126,7 @@ namespace azure { namespace storage { namespace core {
             {
                 try
                 {
-                    this_pointer->m_blob->upload_pages_async(buffer->stream(), offset, buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context).then([this_pointer] (pplx::task<void> upload_task)
+                    this_pointer->m_blob->upload_pages_async_impl(buffer->stream(), offset, buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context, this_pointer->m_cancellation_token, this_pointer->m_use_request_level_timeout, this_pointer->m_timer_handler).then([this_pointer] (pplx::task<void> upload_task)
                     {
                         std::lock_guard<async_semaphore> guard(this_pointer->m_semaphore, std::adopt_lock);
                         try
@@ -159,7 +159,7 @@ namespace azure { namespace storage { namespace core {
             return _sync().then([this_pointer] (bool) -> pplx::task<void>
             {
                 this_pointer->m_blob->properties().set_content_md5(this_pointer->m_total_hash_provider.hash());
-                return this_pointer->m_blob->upload_properties_async(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
+                return this_pointer->m_blob->upload_properties_async_impl(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context, this_pointer->m_cancellation_token, this_pointer->m_use_request_level_timeout, this_pointer->m_timer_handler);
             });
         }
         else
@@ -196,7 +196,8 @@ namespace azure { namespace storage { namespace core {
                 {
                     this_pointer->m_condition.set_append_position(offset);
                     auto previous_results_count = this_pointer->m_context.request_results().size();
-                    this_pointer->m_blob->append_block_async(buffer->stream(), buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context).then([this_pointer, previous_results_count](pplx::task<int64_t> upload_task)
+                    pplx::task<int64_t> task;
+                    this_pointer->m_blob->append_block_async_impl(buffer->stream(), buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context, this_pointer->m_cancellation_token, this_pointer->m_use_request_level_timeout, this_pointer->m_timer_handler).then([this_pointer, previous_results_count](pplx::task<int64_t> upload_task)
                     {
                         std::lock_guard<async_semaphore> guard(this_pointer->m_semaphore, std::adopt_lock);
                         try
@@ -248,7 +249,7 @@ namespace azure { namespace storage { namespace core {
             return _sync().then([this_pointer](bool) -> pplx::task<void>
             {
                 this_pointer->m_blob->properties().set_content_md5(this_pointer->m_total_hash_provider.hash());
-                return this_pointer->m_blob->upload_properties_async(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
+                return this_pointer->m_blob->upload_properties_async_impl(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context, this_pointer->m_cancellation_token, this_pointer->m_use_request_level_timeout, this_pointer->m_timer_handler);
             });
         }
         else

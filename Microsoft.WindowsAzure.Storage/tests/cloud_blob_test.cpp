@@ -1034,4 +1034,84 @@ SUITE(Blob)
         CHECK_THROW(blob.download_text(condition, azure::storage::blob_request_options(), context), azure::storage::storage_exception);
         CHECK_EQUAL(web::http::status_codes::BadRequest, context.request_results().back().http_status_code());
     }
+
+    TEST_FIXTURE(blob_test_base, blob_concurrent_download_cancellation_timeout)
+    {
+        utility::size64_t length = 260 * 1024 * 1024;
+        std::vector<uint8_t> buffer;
+        buffer.resize(length);
+        fill_buffer_and_get_md5(buffer);
+        auto blob_name = get_random_string(20);
+        auto blob = m_container.get_block_blob_reference(blob_name);
+        blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), length);
+
+        {
+            concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
+            auto cancel_token_src = pplx::cancellation_token_source();
+            auto options = azure::storage::blob_request_options();
+            options.set_parallelism_factor(4);
+            options.set_maximum_execution_time(std::chrono::milliseconds(10000));
+            // cancel the cancellation prior to the operation
+            cancel_token_src.cancel();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = blob.download_to_stream_async(output_buffer, azure::storage::access_condition(), options, m_context, cancel_token_src.get_token());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL(OPERATION_CANCELED, ex_msg);
+        }
+
+        {
+            concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
+            auto cancel_token_src = pplx::cancellation_token_source();
+            auto options = azure::storage::blob_request_options();
+            options.set_parallelism_factor(4);
+            options.set_maximum_execution_time(std::chrono::milliseconds(10000));
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = blob.download_to_stream_async(output_buffer, azure::storage::access_condition(), options, m_context, cancel_token_src.get_token());
+                std::this_thread::sleep_for(std::chrono::milliseconds(300)); //sleep for sometime before canceling the request and see result.
+                cancel_token_src.cancel();
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL(OPERATION_CANCELED, ex_msg);
+        }
+
+        {
+            concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
+            auto options = azure::storage::blob_request_options();
+            options.set_parallelism_factor(4);
+            options.set_maximum_execution_time(std::chrono::milliseconds(1000));
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = blob.download_to_stream_async(output_buffer, azure::storage::access_condition(), options, m_context);
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
+        }
+    }
 }

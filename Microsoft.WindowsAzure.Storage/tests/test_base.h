@@ -20,6 +20,12 @@
 #include "was/common.h"
 #include "was/storage_account.h"
 
+#if defined(_WIN32)
+#define OPERATION_CANCELED "operation canceled"
+#else
+#define OPERATION_CANCELED "Operation canceled"
+#endif
+
 class test_config
 {
 public:

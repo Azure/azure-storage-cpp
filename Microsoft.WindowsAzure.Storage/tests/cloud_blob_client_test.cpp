@@ -279,4 +279,66 @@ SUITE(Blob)
         client.set_authentication_scheme(azure::storage::authentication_scheme::shared_key_lite);
         client.list_containers_segmented(utility::string_t(), azure::storage::container_listing_details::none, 1, azure::storage::continuation_token(), azure::storage::blob_request_options(), m_context);
     }
+
+    TEST_FIXTURE(blob_test_base, list_containers_cancellation_timeout)
+    {
+        {
+            auto cancel_token_src = pplx::cancellation_token_source();
+            // cancel the cancellation prior to the operation
+            cancel_token_src.cancel();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_client.list_containers_segmented_async(_XPLATSTR(""), azure::storage::container_listing_details::none, 100000, azure::storage::continuation_token(), azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL(OPERATION_CANCELED, ex_msg);
+        }
+
+        {
+            auto options = azure::storage::blob_request_options();
+            options.set_maximum_execution_time(std::chrono::milliseconds(1));
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_client.list_containers_segmented_async(_XPLATSTR(""), azure::storage::container_listing_details::none, 100000, azure::storage::continuation_token(), options, azure::storage::operation_context());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
+        }
+
+        {
+            auto cancel_token_src = pplx::cancellation_token_source();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_client.list_containers_segmented_async(_XPLATSTR(""), azure::storage::container_listing_details::none, 100000, azure::storage::continuation_token(), azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+                // cancel the cancellation after the operation
+                cancel_token_src.cancel();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("", ex_msg);
+        }
+    }
 }

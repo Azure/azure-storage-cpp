@@ -457,6 +457,19 @@ namespace azure { namespace storage {
         /// Merges the specified value.
         /// </summary>
         /// <param name="value">The value.</param>
+        void merge(const option_with_default<T>& value)
+        {
+            if (!m_has_value)
+            {
+                *this = value;
+                this->m_has_value = value.has_value();
+            }
+        }
+
+        /// <summary>
+        /// Merges the specified value.
+        /// </summary>
+        /// <param name="value">The value.</param>
         /// <param name="fallback_value">The fallback value.</param>
         void merge(const option_with_default<T>& value, const T& fallback_value)
         {
@@ -621,7 +634,7 @@ namespace azure { namespace storage {
         WASTORAGE_API request_result(utility::datetime start_time, storage_location target_location, const web::http::http_response& response, web::http::status_code http_status_code, storage_extended_error extended_error);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 r-value reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -774,15 +787,6 @@ namespace azure { namespace storage {
         void set_extended_error(storage_extended_error value)
         {
             m_extended_error = std::move(value);
-        }
-
-        /// <summary>
-        /// Gets if the request is server encrypted.
-        /// </summary>
-        /// <returns><c>true</c> if a request is encrypted.</returns>
-        bool request_server_encrypted()
-        {
-            return m_request_server_encrypted;
         }
 
     private:

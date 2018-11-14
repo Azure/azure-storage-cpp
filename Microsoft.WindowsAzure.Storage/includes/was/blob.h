@@ -19,6 +19,7 @@
 
 #include "limits"
 #include "service_client.h"
+#include "wascore/timer_handler.h"
 
 #pragma push_macro("max")
 #undef max
@@ -47,6 +48,10 @@ namespace azure { namespace storage {
     namespace core
     {
         class cloud_append_blob_ostreambuf;
+        class basic_cloud_block_blob_ostreambuf;
+        class basic_cloud_page_blob_ostreambuf;
+        class basic_cloud_append_blob_ostreambuf;
+        class basic_cloud_blob_istreambuf;
     }
 
     /// <summary>
@@ -2577,7 +2582,24 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::container_result_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
+        pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+        {
+            return list_containers_segmented_async(prefix, includes, max_results, token, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to return a result segment containing a collection of <see cref="azure::storage::cloud_blob_container" /> objects.
+        /// </summary>
+        /// <param name="prefix">The container name prefix.</param>
+        /// <param name="includes">An <see cref="azure::storage::container_listing_details::values" /> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned 
+        /// in the result segment, up to the per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::container_result_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<container_result_segment> list_containers_segmented_async(const utility::string_t& prefix, container_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Returns an <see cref="azure::storage::list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items.
@@ -2653,7 +2675,25 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_blob_item_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
+        pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+        {
+            return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, token, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items in the container.
+        /// </summary>
+        /// <param name="prefix">The blob name prefix.</param>
+        /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
+        /// <param name="includes">An <see cref="azure::storage::blob_listing_details::values" /> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
+        /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
+        /// <param name="token">An <see cref="azure::storage::continuation_token" /> returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_blob_item_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Gets the service properties for the Blob service client.
@@ -2690,7 +2730,19 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_properties" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<service_properties> download_service_properties_async(const blob_request_options& options, operation_context context) const;
+        pplx::task<service_properties> download_service_properties_async(const blob_request_options& options, operation_context context) const
+        {
+            return download_service_properties_async(options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get the properties of the service.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_properties" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<service_properties> download_service_properties_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Sets the service properties for the Blob service client.
@@ -2733,7 +2785,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes, const blob_request_options& options, operation_context context) const;
+        pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes, const blob_request_options& options, operation_context context) const
+        {
+            return upload_service_properties_async(properties, includes, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to set the service properties for the Blob service client.
+        /// </summary>
+        /// <param name="properties">The <see cref="azure::storage::service_properties" /> for the Blob service client.</param>
+        /// <param name="includes">An <see cref="azure::storage::service_properties_includes" /> enumeration describing which items to include when setting service properties.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_service_properties_async(const service_properties& properties, const service_properties_includes& includes, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Gets the service stats for the Blob service client.
@@ -2770,7 +2836,19 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<service_stats> download_service_stats_async(const blob_request_options& options, operation_context context) const;
+        pplx::task<service_stats> download_service_stats_async(const blob_request_options& options, operation_context context) const
+        {
+            return download_service_stats_async(options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get the stats of the service.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<service_stats> download_service_stats_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Returns a reference to an <see cref="azure::storage::cloud_blob_container" /> object.
@@ -2839,6 +2917,7 @@ namespace azure { namespace storage {
     class cloud_blob_container
     {
     public:
+
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_blob_container" /> class.
         /// </summary>
@@ -3025,7 +3104,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return download_attributes_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to retrieve the container's attributes.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Sets the container's user-defined metadata.
@@ -3062,7 +3154,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_metadata_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to set the container's user-defined metadata.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Acquires a lease on the container.
@@ -3109,7 +3214,22 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return acquire_lease_async(duration, proposed_lease_id, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to acquire a lease on the container.
+        /// </summary>
+        /// <param name="duration">An <see cref="azure::storage::lease_time" /> representing the span of time for which to acquire the lease.</param>
+        /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Renews a lease on the container.
@@ -3146,7 +3266,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return renew_lease_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to renew a lease on the container.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Changes the lease ID for a lease on the container.
@@ -3189,7 +3322,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return change_lease_async(proposed_lease_id, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to change the lease ID for a lease on the container.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Releases a lease on the container.
@@ -3226,7 +3373,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return release_lease_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to release a lease on the container.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Breaks the current lease on the container.
@@ -3269,7 +3429,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return break_lease_async(break_period, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to break the current lease on the container.
+        /// </summary>
+        /// <param name="break_period">An <see cref="azure::storage::lease_break_period" /> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Creates the container.
@@ -3307,7 +3481,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> create_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context);
+        pplx::task<void> create_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context)
+        {
+            return create_async(public_access, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to create the container.
+        /// </summary>
+        /// <param name="public_access">An <see cref="azure::storage::blob_container_public_access_type" /> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> create_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Creates the container if it does not already exist.
@@ -3346,7 +3533,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<bool> create_if_not_exists_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context);
+        pplx::task<bool> create_if_not_exists_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context)
+        {
+            return create_if_not_exists_async(public_access, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to create the container if it does not already exist and specify the level of public access to the container's data.
+        /// </summary>
+        /// <param name="public_access">An <see cref="azure::storage::blob_container_public_access_type" /> value that specifies whether data in the container may be accessed publicly and what level of access is to be allowed.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<bool> create_if_not_exists_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Deletes the container.
@@ -3383,7 +3583,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> delete_container_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> delete_container_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return delete_container_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to delete the container.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> delete_container_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Deletes the container if it already exists.
@@ -3424,7 +3637,21 @@ namespace azure { namespace storage {
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns><c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.</returns>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<bool> delete_container_if_exists_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<bool> delete_container_if_exists_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return delete_container_if_exists_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to delete the container if it already exists.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns><c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.</returns>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<bool> delete_container_if_exists_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Returns an <see cref="azure::storage::list_blob_item_iterator" /> that can be used to to lazily enumerate a collection of blob items in the container.
@@ -3522,7 +3749,26 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_blob_item_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
+        pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+        {
+            return list_blobs_segmented_async(prefix, use_flat_blob_listing, includes, max_results, token, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
+        /// in the container.
+        /// </summary>
+        /// <param name="prefix">The blob name prefix.</param>
+        /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
+        /// <param name="includes">An <see cref="azure::storage::blob_listing_details::values" /> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
+        /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_blob_item_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Sets permissions for the container.
@@ -3563,7 +3809,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_permissions_async(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_permissions_async(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_permissions_async(permissions, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to set permissions for the container.
+        /// </summary>
+        /// <param name="permissions">The permissions to apply to the container.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_permissions_async(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Gets the permissions settings for the container.
@@ -3602,7 +3862,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::blob_container_permissions" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<blob_container_permissions> download_permissions_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<blob_container_permissions> download_permissions_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return download_permissions_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get permissions settings for the container.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::blob_container_permissions" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<blob_container_permissions> download_permissions_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Checks existence of the container.
@@ -3641,7 +3914,19 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
         pplx::task<bool> exists_async(const blob_request_options& options, operation_context context)
         {
-            return exists_async(false, options, context);
+            return exists_async(options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to check the existence of the container.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        pplx::task<bool> exists_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return exists_async_impl(false, options, context, cancellation_token);
         }
 
         /// <summary>
@@ -3710,7 +3995,7 @@ namespace azure { namespace storage {
     private:
 
         void init(storage_credentials credentials);
-        WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<bool> exists_async_impl(bool primary_only, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         cloud_blob_client m_client;
         utility::string_t m_name;
@@ -3908,7 +4193,25 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_blob_item_segment" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const;
+        pplx::task<list_blob_item_segment> list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+        {
+            return list_blobs_segmented_async(use_flat_blob_listing, includes, max_results, token, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to return an <see cref="azure::storage::list_blob_item_segment" /> containing a collection of blob items
+        /// in the container.
+        /// </summary>
+        /// <param name="use_flat_blob_listing">Indicates whether to list blobs in a flat listing, or whether to list blobs hierarchically, by virtual directory.</param>
+        /// <param name="includes">An <see cref="azure::storage::blob_listing_details::values" /> enumeration describing which items to include in the listing.</param>
+        /// <param name="max_results">A non-negative integer value that indicates the maximum number of results to be returned at a time, up to the 
+        /// per-operation limit of 5000. If this value is 0, the maximum possible number of results will be returned, up to 5000.</param>    
+        /// <param name="token">A continuation token returned by a previous listing operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::list_blob_item_segment" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<list_blob_item_segment> list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Gets the Blob service client for the virtual directory.
@@ -4124,7 +4427,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::istream" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<concurrency::streams::istream> open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<concurrency::streams::istream> open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return open_read_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to open a stream for reading from the blob.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::istream" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<concurrency::streams::istream> open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Checks existence of the blob.
@@ -4163,7 +4479,19 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<bool> exists_async(const blob_request_options& options, operation_context context)
         {
-            return exists_async(false, options, context);
+            return exists_async(options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to check the existence of the blob.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<bool> exists_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return exists_async_impl(false, options, context, cancellation_token);
         }
 
         /// <summary>
@@ -4201,7 +4529,23 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return download_attributes_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to populate a blob's properties and metadata.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return download_attributes_async_impl(condition, options, context, cancellation_token);
+        }
 
         /// <summary>
         /// Updates the blob's metadata.
@@ -4238,7 +4582,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_metadata_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to update the blob's metadata.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Updates the blob's properties.
@@ -4274,8 +4631,25 @@ namespace azure { namespace storage {
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_properties_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_properties_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_properties_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to update the blob's properties.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> upload_properties_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return upload_properties_async_impl(condition, options, context, cancellation_token, true);
+        }
 
         /// <summary>
         /// Deletes the blob.
@@ -4314,7 +4688,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> delete_blob_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<void> delete_blob_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return delete_blob_async(snapshots_option, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to delete the blob.
+        /// </summary>
+        /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> delete_blob_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Deletes the blob if it already exists.
@@ -4355,7 +4743,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<bool> delete_blob_if_exists_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<bool> delete_blob_if_exists_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return delete_blob_if_exists_async(snapshots_option, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to delete the blob if it already exists.
+        /// </summary>
+        /// <param name="snapshots_option">Indicates whether to delete only the blob, to delete the blob and all snapshots, or to delete only snapshots.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<bool> delete_blob_if_exists_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Acquires a lease on the blob.
@@ -4402,7 +4804,22 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return acquire_lease_async(duration, proposed_lease_id, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to acquire a lease on the blob.
+        /// </summary>
+        /// <param name="duration">An <see cref="azure::storage::lease_time" /> representing the span of time for which to acquire the lease.</param>
+        /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const azure::storage::lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Renews a lease on the blob.
@@ -4441,7 +4858,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return renew_lease_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to renew a lease on the blob.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Changes the lease ID on the blob.
@@ -4486,7 +4916,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return change_lease_async(proposed_lease_id, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to change the lease ID on the blob.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Releases the lease on the blob.
@@ -4525,7 +4969,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return release_lease_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to release the lease on the blob.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Breaks the current lease on the blob.
@@ -4568,7 +5025,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return break_lease_async(break_period, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to break the current lease on the blob.
+        /// </summary>
+        /// <param name="break_period">An <see cref="azure::storage::lease_break_period" /> representing the amount of time to allow the lease to remain.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access conditions for the blob, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::chrono::seconds" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<std::chrono::seconds> break_lease_async(const azure::storage::lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Downloads the contents of a blob to a stream.
@@ -4611,7 +5082,21 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> download_to_stream_async(concurrency::streams::ostream target, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return download_range_to_stream_async(target, std::numeric_limits<utility::size64_t>::max(), 0, condition, options, context);
+            return download_to_stream_async(target, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to download the contents of a blob to a stream.
+        /// </summary>
+        /// <param name="target">The target stream.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> download_to_stream_async(concurrency::streams::ostream target, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return download_range_to_stream_async(target, std::numeric_limits<utility::size64_t>::max(), 0, condition, options, context, cancellation_token);
         }
 
         /// <summary>
@@ -4661,7 +5146,23 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> download_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> download_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return download_range_to_stream_async(target, offset, length, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to download a range of bytes in a blob to a stream.
+        /// </summary>
+        /// <param name="target">The target stream.</param>
+        /// <param name="offset">The offset at which to begin downloading the blob, in bytes.</param>
+        /// <param name="length">The length of the data to download from the blob, in bytes.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> download_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Downloads the contents of a blob to a file.
@@ -4702,7 +5203,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> download_to_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> download_to_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return download_to_file_async(path, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to download the contents of a blob to a file.
+        /// </summary>
+        /// <param name="path">The target file.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> download_to_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
@@ -4992,7 +5507,26 @@ namespace azure { namespace storage {
         /// </remarks>
         pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
         {
-            return start_copy_async_impl(source, premium_blob_tier::unknown, source_condition, destination_condition, options, context);
+            return start_copy_async(source, source_condition, destination_condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return start_copy_async_impl(source, premium_blob_tier::unknown, source_condition, destination_condition, options, context, cancellation_token);
         }
 
         /// <summary>
@@ -5008,7 +5542,26 @@ namespace azure { namespace storage {
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
+        pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async(source, source_condition, destination_condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Initiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
@@ -5023,7 +5576,26 @@ namespace azure { namespace storage {
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
+        pplx::task<utility::string_t> start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async(source, source_condition, destination_condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source file.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Aborts an ongoing blob copy operation.
@@ -5064,7 +5636,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<void> abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return abort_copy_async(copy_id, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to abort an ongoing blob copy operation.
+        /// </summary>
+        /// <param name="copy_id">A string identifying the copy operation.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Creates a snapshot of the blob.
@@ -5105,7 +5691,22 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_blob" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<azure::storage::cloud_blob> create_snapshot_async(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<azure::storage::cloud_blob> create_snapshot_async(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return create_snapshot_async(metadata, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to create a snapshot of the blob.
+        /// </summary>
+        /// <param name="metadata">A collection of name-value pairs defining the metadata of the snapshot.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::cloud_blob" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<azure::storage::cloud_blob> create_snapshot_async(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Gets the <see cref="azure::storage::cloud_blob_client" /> object that represents the Blob service.
@@ -5254,14 +5855,17 @@ namespace azure { namespace storage {
         /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         /// <remarks>
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context);
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         void assert_no_snapshot() const;
+
+        WASTORAGE_API pplx::task<void> download_attributes_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timer = false, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
 
         void set_type(blob_type value)
         {
@@ -5277,8 +5881,9 @@ namespace azure { namespace storage {
     private:
 
         void init(utility::string_t snapshot_time, storage_credentials credentials);
-        WASTORAGE_API pplx::task<bool> exists_async(bool primary_only, const blob_request_options& options, operation_context context);
-        WASTORAGE_API pplx::task<void> download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, bool update_properties = false);
+        WASTORAGE_API pplx::task<bool> exists_async_impl(bool primary_only, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
+        WASTORAGE_API pplx::task<void> download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, bool update_properties, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+        WASTORAGE_API pplx::task<void> upload_properties_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
 
         utility::string_t m_name;
         utility::string_t m_snapshot_time;
@@ -5288,6 +5893,8 @@ namespace azure { namespace storage {
         friend class cloud_blob_container;
         friend class cloud_blob_directory;
         friend class list_blob_item;
+        friend class core::basic_cloud_page_blob_ostreambuf;
+        friend class core::basic_cloud_append_blob_ostreambuf;
     };
 
     /// <summary>
@@ -5418,7 +6025,25 @@ namespace azure { namespace storage {
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
         /// <para>To avoid overwriting and instead throw an error if the blob exists, please pass in an <see cref="azure::storage::access_condition"/>
         /// parameter generated using <see cref="azure::storage::access_condition::generate_if_not_exists_condition"/></para>
-        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return open_write_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to open a stream for writing to the block blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
+        /// <para>To avoid overwriting and instead throw an error if the blob exists, please pass in an <see cref="azure::storage::access_condition"/>
+        /// parameter generated using <see cref="azure::storage::access_condition::generate_if_not_exists_condition"/></para>
+        pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return open_write_async_impl(condition, options, context, cancellation_token, true);
+        }
 
         /// <summary>
         /// Returns an enumerable collection of the blob's blocks, using the specified block list filter.
@@ -5463,7 +6088,23 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::block_list_item" />, that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::vector<block_list_item>> download_block_list_async(block_listing_filter listing_filter, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<std::vector<block_list_item>> download_block_list_async(block_listing_filter listing_filter, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return download_block_list_async(listing_filter, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to return an enumerable collection of the blob's blocks, 
+        /// using the specified block list filter.
+        /// </summary>
+        /// <param name="listing_filter">One of the enumeration values that indicates whether to return
+        /// committed blocks, uncommitted blocks, or both.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::block_list_item" />, that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<std::vector<block_list_item>> download_block_list_async(block_listing_filter listing_filter, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Downloads the blob's contents as a string.
@@ -5502,7 +6143,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return download_text_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to download the blob's contents as a string.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Sets standard account's blob tier.
@@ -5525,7 +6179,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> set_standard_blob_tier_async(const standard_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context);
+        pplx::task<void> set_standard_blob_tier_async(const standard_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)
+        {
+            return set_standard_blob_tier_async(tier, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to set standard account's blob tier.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::standard_blob_tier" /> enum that represents the blob tier to be set.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> set_standard_blob_tier_async(const standard_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Uploads a single block.
@@ -5578,7 +6246,27 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return upload_block_async(block_id, block_data, content_md5, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a single block.
+        /// </summary>
+        /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
+        /// <param name="block_data">A stream that provides the data for the block.</param>
+        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
+        /// on the blob. May be an empty string.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+        {
+            return upload_block_async_impl(block_id, block_data, content_md5, condition, options, context, cancellation_token, true);
+        }
 
         /// <summary>
         /// Uploads a list of blocks to a new or existing blob. 
@@ -5619,7 +6307,24 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_block_list_async(const std::vector<block_list_item>& block_list, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_block_list_async(const std::vector<block_list_item>& block_list, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_block_list_async(block_list, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a list of blocks to a new or existing blob. 
+        /// </summary>
+        /// <param name="block_list">An enumerable collection of block IDs, as Base64-encoded strings.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> upload_block_list_async(const std::vector<block_list_item>& block_list, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return upload_block_list_async_impl(block_list, condition, options, context, cancellation_token, true);
+        }
 
         /// <summary>
         /// Uploads a stream to a block blob. If the blob already exists on the service, it will be overwritten.
@@ -5708,8 +6413,23 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_from_stream_async(source, length, condition, options, context, pplx::cancellation_token::none());
+        }
 
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a stream to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="source">The stream providing the blob content.</param>
+        /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
+        
         /// <summary>
         /// Uploads a file to a block blob. If the blob already exists on the service, it will be overwritten.
         /// </summary>
@@ -5749,7 +6469,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_from_file_async(path, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a file to a block blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Uploads a string of text to a blob. If the blob already exists on the service, it will be overwritten.
@@ -5790,7 +6524,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_text_async(content, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Uploads a string of text to a blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="content">A string containing the text to upload.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
     private:
 
@@ -5806,8 +6554,13 @@ namespace azure { namespace storage {
             set_type(blob_type::block_blob);
         }
 
+        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout = false, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+        WASTORAGE_API pplx::task<void> upload_block_async_impl(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr) const;
+        WASTORAGE_API pplx::task<void> upload_block_list_async_impl(const std::vector<block_list_item>& block_list, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+
         friend class cloud_blob_container;
         friend class cloud_blob_directory;
+        friend class core::basic_cloud_block_blob_ostreambuf;
 };
 
     /// <summary>
@@ -5958,7 +6711,20 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return open_write_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to open a stream for writing to an existing page blob.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Initiates an asynchronous operation to open a stream for writing to a new page blob.
@@ -5978,8 +6744,27 @@ namespace azure { namespace storage {
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<concurrency::streams::ostream> open_write_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return open_write_async(size, sequence_number, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to open a stream for writing to a new page blob.
+        /// </summary>
+        /// <param name="size">The size of the write operation, in bytes. The size must be a multiple of 512.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
+        pplx::task<concurrency::streams::ostream> open_write_async(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return open_write_async_impl(size, sequence_number, condition, options, context, cancellation_token, true);
+        }
 
         /// <summary>
         /// Clears pages from a page blob.
@@ -6024,7 +6809,22 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> clear_pages_async(int64_t start_offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> clear_pages_async(int64_t start_offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return clear_pages_async(start_offset, length, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to clear pages from a page blob.
+        /// </summary>
+        /// <param name="start_offset">The offset at which to begin clearing pages, in bytes. The offset must be a multiple of 512.</param>
+        /// <param name="length">The length of the data range to be cleared, in bytes. The length must be a multiple of 512.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> clear_pages_async(int64_t start_offset, int64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Gets a collection of valid page ranges and their starting and ending bytes.
@@ -6113,7 +6913,22 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_range" />, that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::vector<page_range>> download_page_ranges_async(utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<std::vector<page_range>> download_page_ranges_async(utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return download_page_ranges_async(offset, length, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes.
+        /// </summary>
+        /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_range" />, that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<std::vector<page_range>> download_page_ranges_async(utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Gets a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
@@ -6210,7 +7025,23 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_diff_range" />, that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<std::vector<page_diff_range>> download_page_ranges_diff_async(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<std::vector<page_diff_range>> download_page_ranges_diff_async(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return download_page_ranges_diff_async(previous_snapshot_time, offset, length, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get a collection of valid page ranges and their starting and ending bytes, only pages that were changed between target blob and previous snapshot.
+        /// </summary>
+        /// <param name="previous_snapshot_time">An snapshot time that represents previous snapshot.</param>
+        /// <param name="offset">The starting offset of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="length">The length of the data range over which to list page ranges, in bytes. Must be a multiple of 512.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="std::vector" />, of type <see cref="azure::storage::page_diff_range" />, that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<std::vector<page_diff_range>> download_page_ranges_diff_async(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
 
         /// <summary>
@@ -6264,7 +7095,27 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_pages_async(source, start_offset, content_md5, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to write pages to a page blob.
+        /// </summary>
+        /// <param name="source">A stream providing the page data.</param>
+        /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
+        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
+        /// on the blob. May be an empty string.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return upload_pages_async_impl(source, start_offset, content_md5, condition, options, context, cancellation_token, true);
+        }
 
         /// <summary>
         /// Uploads a stream to a page blob. If the blob already exists on the service, it will be overwritten.
@@ -6357,7 +7208,23 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_from_stream_async(source, length, sequence_number, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a stream to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="source">The stream providing the blob content.</param>
+        /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Uploads a file to a page blob. If the blob already exists on the service, it will be overwritten.
@@ -6400,7 +7267,22 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_from_file_async(const utility::string_t &path, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_from_file_async(path, sequence_number, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a file to a page blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Creates a page blob.
@@ -6472,7 +7354,23 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> create_async(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> create_async(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return create_async(size, tier, sequence_number, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to create a page blob.
+        /// </summary>
+        /// <param name="size">The maximum size of the page blob, in bytes.</param>
+        /// <param name="tier">A <see cref="azure::storage::premium_blob_tier" /> object that represents the tier of the page blob to be created.</param>
+        /// <param name="sequence_number">A user-controlled number to track request sequence, whose value must be between 0 and 2^63 - 1.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> create_async(utility::size64_t size, const premium_blob_tier tier, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Resizes the page blob to the specified size.
@@ -6513,7 +7411,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> resize_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> resize_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return resize_async(size, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to resize the page blob to the specified size.
+        /// </summary>
+        /// <param name="size">The size of the page blob, in bytes.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> resize_async(utility::size64_t size, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Sets the page blob's sequence number.
@@ -6553,8 +7465,23 @@ namespace azure { namespace storage {
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return set_sequence_number_async(sequence_number, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to set the page blob's sequence number.
+        /// </summary>
+        /// <param name="sequence_number">A value of type <see cref="azure::storage::sequence_number" />, indicating the operation to perform on the sequence number.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> set_sequence_number_async(const azure::storage::sequence_number& sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Begin to copy a snapshot of the source page blob and metadata to a destination page blob.
@@ -6653,12 +7580,30 @@ namespace azure { namespace storage {
         /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
         /// <remarks>
         /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return start_incremental_copy_async(source, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The source page blob object specified a snapshot.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const cloud_page_blob& source, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Initiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
@@ -6672,7 +7617,25 @@ namespace azure { namespace storage {
         /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return start_incremental_copy_async(source, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a snapshot of the source page blob and metadata to a destination page blob.
+        /// </summary>
+        /// <param name="source">The URI of a snapshot of source page blob.</param>
+        /// <param name="condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// The destination of an incremental copy must either not exist, or must have been created with a previous incremental copy from the same source blob.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_incremental_copy_async(const web::http::uri& source, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Sets premium account's page blob tier.
@@ -6695,7 +7658,21 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> set_premium_blob_tier_async(const premium_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context);
+        pplx::task<void> set_premium_blob_tier_async(const premium_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context)
+        {
+            return set_premium_blob_tier_async(tier, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to set premium account's blob tier.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::premium_blob_tier" /> enum that represents the blob tier to be set.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> set_premium_blob_tier_async(const premium_blob_tier tier, const access_condition & condition, const blob_request_options & options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
@@ -6732,7 +7709,27 @@ namespace azure { namespace storage {
         /// </remarks>
         pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
         {
-            return start_copy_async_impl(source, tier, source_condition, destination_condition, options, context);
+            return start_copy_async(source, tier, source_condition, destination_condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="tier">An enum that represents the <see cref="azure::storage::premium_blob_tier" /> for the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return start_copy_async_impl(source, tier, source_condition, destination_condition, options, context, cancellation_token);
         }
     private:
 
@@ -6748,8 +7745,12 @@ namespace azure { namespace storage {
             set_type(blob_type::page_blob);
         }
 
+        WASTORAGE_API pplx::task<void> upload_pages_async_impl(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async_impl(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+
         friend class cloud_blob_container;
         friend class cloud_blob_directory;
+        friend class core::basic_cloud_page_blob_ostreambuf;
     };
 
     /// <summary>
@@ -6850,7 +7851,24 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> create_or_replace_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> create_or_replace_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return create_or_replace_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to create an empty append blob. If the blob already exists, this will replace it. To avoid overwriting and instead throw an error, please pass in an <see cref="azure::storage::access_condition"/>
+        /// parameter generated using <see cref="azure::storage::access_condition::generate_if_not_exists_condition"/>
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> create_or_replace_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return create_or_replace_async_impl(condition, options, context, cancellation_token);
+        }
 
         /// <summary>
         /// Commits a new block of data to the end of the blob.
@@ -6901,8 +7919,26 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const;
+        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        {
+            return append_block_async(block_data, content_md5, condition, options, context, pplx::cancellation_token::none());
+        }
 
+        /// <summary>
+        /// Initiates an asynchronous operation to commit a new block of data to the end of the blob.
+        /// </summary>
+        /// <param name="block_data">A stream that provides the data for the block.</param>
+        /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
+        /// for the block. May be an empty string. </param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+        {
+            return append_block_async_impl(block_data, content_md5, condition, options, context, cancellation_token, true);
+        }
         /// <summary>
         /// Downloads the blob's contents as a string.
         /// </summary>
@@ -6940,7 +7976,20 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return download_text_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to download the blob's contents as a string.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Opens a stream for writing to the append blob.
@@ -6983,7 +8032,24 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async(bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<concurrency::streams::ostream> open_write_async(bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return open_write_async(create_new, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to open a stream for writing to the append blob.
+        /// </summary>
+        /// <param name="create_new">Use <c>true</c> to create a new append blob or overwrite an existing one, <c>false</c> to append to an existing blob.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="concurrency::streams::ostream" /> that represents the current operation.</returns>
+        pplx::task<concurrency::streams::ostream> open_write_async(bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return open_write_async_impl(create_new, condition, options, context, cancellation_token, true);
+        }
 
         /// <summary>
         /// Uploads a stream to an append blob. If the blob already exists on the service, it will be overwritten.
@@ -7120,7 +8186,29 @@ namespace azure { namespace storage {
         /// and see if setting this flag to <c>true</c> is acceptable for you.</para>
         /// <para>If you want to append data to an already existing blob, please look at append_from_stream_async method.</para>
         /// </remarks>
-        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_from_stream_async(source, length, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a stream to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="source">The stream providing the blob content.</param>
+        /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        /// <remarks>
+        /// <para>This API should be used strictly in a single writer scenario because the API internally uses the
+        /// append-offset conditional header to avoid duplicate blocks.
+        /// If you are guaranteed to have a single writer scenario, please look at <see cref="azure::storage::blob_request_options::absorb_conditional_errors_on_retry"/>
+        /// and see if setting this flag to <c>true</c> is acceptable for you.</para>
+        /// <para>If you want to append data to an already existing blob, please look at append_from_stream_async method.</para>
+        /// </remarks>
+        WASTORAGE_API pplx::task<void> upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Uploads a file to the append blob. If the blob already exists on the service, it will be overwritten.
@@ -7185,7 +8273,28 @@ namespace azure { namespace storage {
         /// and see if setting this flag to <c>true</c> is acceptable for you.</para>
         /// <para>If you want to append data to an already existing blob, please look at append_from_file_async method.</para>
         /// </remarks>
-        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_from_file_async(path, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to upload a file to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        /// <remarks>
+        /// <para>This API should be used strictly in a single writer scenario because the API internally uses the
+        /// append-offset conditional header to avoid duplicate blocks.
+        /// If you are guaranteed to have a single writer scenario, please look at <see cref="azure::storage::blob_request_options::absorb_conditional_errors_on_retry"/>
+        /// and see if setting this flag to <c>true</c> is acceptable for you.</para>
+        /// <para>If you want to append data to an already existing blob, please look at append_from_file_async method.</para>
+        /// </remarks>
+        WASTORAGE_API pplx::task<void> upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Uploads a string of text to the append blob. If the blob already exists on the service, it will be overwritten.
@@ -7250,7 +8359,28 @@ namespace azure { namespace storage {
         /// and see if setting this flag to <c>true</c> is acceptable for you.</para>
         /// <para>If you want to append data to an already existing blob, please look at append_text_async method.</para>
         /// </remarks>
-        WASTORAGE_API pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return upload_text_async(content, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Uploads a string of text to the append blob. If the blob already exists on the service, it will be overwritten.
+        /// </summary>
+        /// <param name="content">A string containing the text to upload.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        /// <remarks>
+        /// <para>This API should be used strictly in a single writer scenario because the API internally uses the
+        /// append-offset conditional header to avoid duplicate blocks.
+        /// If you are guaranteed to have a single writer scenario, please look at <see cref="azure::storage::blob_request_options::absorb_conditional_errors_on_retry"/>
+        /// and see if setting this flag to <c>true</c> is acceptable for you.</para>
+        /// <para>If you want to append data to an already existing blob, please look at append_text_async method.</para>
+        /// </remarks>
+        WASTORAGE_API pplx::task<void> upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Appends a stream to an append blob. This API should be used strictly in a single writer scenario because the API internally uses the
@@ -7347,7 +8477,23 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API  pplx::task<void> append_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> append_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return append_from_stream_async(source, length, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to append a stream to an append blob. This API should be used strictly in a single writer scenario because the API internally uses the
+        /// append-offset conditional header to avoid duplicate blocks which does not work in a multiple writer scenario.
+        /// </summary>
+        /// <param name="source">A <see cref="concurrency::streams::istream"/> object providing the blob content.</param>
+        /// <param name="length">The number of bytes to write from the source stream at its current position.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API  pplx::task<void> append_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Appends a file to an append blob. This API should be used strictly in a single writer scenario because the API internally uses the
@@ -7392,7 +8538,22 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> append_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> append_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return append_from_file_async(path, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to append a file to an append blob. This API should be used strictly in a single writer scenario because the API internally uses the
+        /// append-offset conditional header to avoid duplicate blocks which does not work in a multiple writer scenario.
+        /// </summary>
+        /// <param name="path">The file providing the blob content.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> append_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Appends a string of text to an append blob. This API should be used strictly in a single writer scenario 
@@ -7437,7 +8598,22 @@ namespace azure { namespace storage {
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> append_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> append_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context)
+        {
+            return append_text_async(content, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to append a string of text to an append blob. This API should be used strictly in a single writer scenario 
+        /// because the API internally uses the append-offset conditional header to avoid duplicate blocks which does not work in a multiple writer scenario.
+        /// </summary>
+        /// <param name="content">A string containing the text to append.</param>
+        /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> append_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
     private:
 
@@ -7463,11 +8639,16 @@ namespace azure { namespace storage {
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context);
+        pplx::task<void> upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+        WASTORAGE_API pplx::task<int64_t> append_block_async_impl(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr) const;
+        WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async_impl(bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+        WASTORAGE_API pplx::task<void> create_or_replace_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
 
         friend class cloud_blob_container;
         friend class cloud_blob_directory;
+        friend class core::basic_cloud_append_blob_ostreambuf;
     };
 
     /// <summary>

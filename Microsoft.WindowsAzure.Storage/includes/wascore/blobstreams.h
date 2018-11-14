@@ -29,11 +29,12 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        basic_cloud_blob_istreambuf(std::shared_ptr<cloud_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
+        basic_cloud_blob_istreambuf(std::shared_ptr<cloud_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout)
             : basic_istreambuf<concurrency::streams::ostream::traits::char_type>(),
             m_blob(blob), m_condition(condition), m_options(options), m_context(context),
             m_current_blob_offset(0), m_next_blob_offset(0), m_buffer_size(options.stream_read_size_in_bytes()),
-            m_next_buffer_size(options.stream_read_size_in_bytes()), m_buffer(std::ios_base::in)
+            m_next_buffer_size(options.stream_read_size_in_bytes()), m_buffer(std::ios_base::in),
+            m_cancellation_token(cancellation_token), m_use_request_level_timeout(use_request_level_timeout)
         {
             if (!options.disable_content_md5_validation() && !m_blob->properties().content_md5().empty())
             {
@@ -161,6 +162,8 @@ namespace azure { namespace storage { namespace core {
         off_type m_next_blob_offset;
         size_t m_buffer_size;
         size_t m_next_buffer_size;
+        bool m_use_request_level_timeout;
+        const pplx::cancellation_token m_cancellation_token;
         concurrency::streams::container_buffer<std::vector<char_type>> m_buffer;
     };
 
@@ -168,8 +171,8 @@ namespace azure { namespace storage { namespace core {
     class cloud_blob_istreambuf : public concurrency::streams::streambuf<basic_cloud_blob_istreambuf::char_type>
     {
     public:
-        cloud_blob_istreambuf(std::shared_ptr<cloud_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
-            : concurrency::streams::streambuf<basic_cloud_blob_istreambuf::char_type>(std::make_shared<basic_cloud_blob_istreambuf>(blob, condition, options, context))
+        cloud_blob_istreambuf(std::shared_ptr<cloud_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout)
+            : concurrency::streams::streambuf<basic_cloud_blob_istreambuf::char_type>(std::make_shared<basic_cloud_blob_istreambuf>(blob, condition, options, context, cancellation_token, use_request_level_timeout))
         {
         }
     };
@@ -177,9 +180,9 @@ namespace azure { namespace storage { namespace core {
     class basic_cloud_blob_ostreambuf : public basic_cloud_ostreambuf
     {
     public:
-        basic_cloud_blob_ostreambuf(const access_condition &condition, const blob_request_options& options, operation_context context)
+        basic_cloud_blob_ostreambuf(const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
             : basic_cloud_ostreambuf(),
-            m_condition(condition), m_options(options), m_context(context), m_semaphore(options.parallelism_factor())
+            m_condition(condition), m_options(options), m_context(context), m_semaphore(options.parallelism_factor()), m_cancellation_token(cancellation_token), m_use_request_level_timeout(use_request_level_timeout), m_timer_handler(timer_handler)
         {
             m_buffer_size = options.stream_write_size_in_bytes();
             m_next_buffer_size = options.stream_write_size_in_bytes();
@@ -203,14 +206,16 @@ namespace azure { namespace storage { namespace core {
         blob_request_options m_options;
         operation_context m_context;
         async_semaphore m_semaphore;
-
+        bool m_use_request_level_timeout;
+        const pplx::cancellation_token m_cancellation_token;
+        std::shared_ptr<core::timer_handler> m_timer_handler;
     };
 
     class basic_cloud_block_blob_ostreambuf : public basic_cloud_blob_ostreambuf
     {
     public:
-        basic_cloud_block_blob_ostreambuf(std::shared_ptr<cloud_block_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
-            : basic_cloud_blob_ostreambuf(condition, options, context),
+        basic_cloud_block_blob_ostreambuf(std::shared_ptr<cloud_block_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+            : basic_cloud_blob_ostreambuf(condition, options, context, cancellation_token, use_request_level_timeout, timer_handler),
             m_blob(blob), m_block_id_prefix(utility::uuid_to_string(utility::new_uuid()))
         {
         }
@@ -255,8 +260,8 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        cloud_block_blob_ostreambuf(std::shared_ptr<cloud_block_blob> blob,const access_condition &condition, const blob_request_options& options, operation_context context)
-            : concurrency::streams::streambuf<basic_cloud_block_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_block_blob_ostreambuf>(blob, condition, options, context))
+        cloud_block_blob_ostreambuf(std::shared_ptr<cloud_block_blob> blob,const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+            : concurrency::streams::streambuf<basic_cloud_block_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_block_blob_ostreambuf>(blob, condition, options, context, cancellation_token, use_request_level_timeout, timer_handler))
         {
         }
     };
@@ -265,8 +270,8 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        basic_cloud_page_blob_ostreambuf(std::shared_ptr<cloud_page_blob> blob, utility::size64_t blob_size, const access_condition &condition, const blob_request_options& options, operation_context context)
-            : basic_cloud_blob_ostreambuf(condition, options, context),
+        basic_cloud_page_blob_ostreambuf(std::shared_ptr<cloud_page_blob> blob, utility::size64_t blob_size, const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+            : basic_cloud_blob_ostreambuf(condition, options, context, cancellation_token, use_request_level_timeout, timer_handler),
             m_blob(blob), m_blob_size(blob_size), m_current_blob_offset(0)
         {
         }
@@ -322,8 +327,8 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        cloud_page_blob_ostreambuf(std::shared_ptr<cloud_page_blob> blob, utility::size64_t blob_size, const access_condition &condition, const blob_request_options& options, operation_context context)
-            : concurrency::streams::streambuf<basic_cloud_page_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_page_blob_ostreambuf>(blob, blob_size, condition, options, context))
+        cloud_page_blob_ostreambuf(std::shared_ptr<cloud_page_blob> blob, utility::size64_t blob_size, const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+            : concurrency::streams::streambuf<basic_cloud_page_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_page_blob_ostreambuf>(blob, blob_size, condition, options, context, cancellation_token, use_request_level_timeout, timer_handler))
         {
         }
     };
@@ -331,8 +336,8 @@ namespace azure { namespace storage { namespace core {
     class basic_cloud_append_blob_ostreambuf : public basic_cloud_blob_ostreambuf
     {
     public:
-        basic_cloud_append_blob_ostreambuf(std::shared_ptr<cloud_append_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
-            : basic_cloud_blob_ostreambuf(condition, options, context),
+        basic_cloud_append_blob_ostreambuf(std::shared_ptr<cloud_append_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+            : basic_cloud_blob_ostreambuf(condition, options, context, cancellation_token, use_request_level_timeout, timer_handler),
             m_blob(blob), m_current_blob_offset(condition.append_position() == -1 ? blob->properties().size() : condition.append_position())
         {
             m_semaphore = async_semaphore(1);
@@ -375,8 +380,8 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        cloud_append_blob_ostreambuf(std::shared_ptr<cloud_append_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context)
-            : concurrency::streams::streambuf<basic_cloud_append_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_append_blob_ostreambuf>(blob, condition, options, context))
+        cloud_append_blob_ostreambuf(std::shared_ptr<cloud_append_blob> blob, const access_condition &condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+            : concurrency::streams::streambuf<basic_cloud_append_blob_ostreambuf::char_type>(std::make_shared<basic_cloud_append_blob_ostreambuf>(blob, condition, options, context, cancellation_token, use_request_level_timeout, timer_handler))
         {
         }
     };

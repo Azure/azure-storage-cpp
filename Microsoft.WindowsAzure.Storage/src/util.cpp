@@ -21,10 +21,6 @@
 #include "wascore/constants.h"
 #include "wascore/resources.h"
 
-#ifndef _WIN32
-#include "pplx/threadpool.h"
-#endif
-
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <float.h>
@@ -32,6 +28,7 @@
 #include <rpc.h>
 #include <agents.h>
 #else
+#include "pplx/threadpool.h"
 #include <chrono>
 #include <thread>
 #endif
@@ -81,7 +78,7 @@ namespace azure { namespace storage {  namespace core {
         return std::numeric_limits<utility::size64_t>::max();
     }
 
-    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length, utility::size64_t max_length)
+    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length, utility::size64_t max_length, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler)
     {
         size_t buffer_size(protocol::default_buffer_size);
         utility::size64_t istream_length = length == std::numeric_limits<utility::size64_t>::max() ? get_remaining_stream_length(istream) : length;
@@ -98,12 +95,19 @@ namespace azure { namespace storage {  namespace core {
         auto obuffer = ostream.streambuf();
         auto length_ptr = (length != std::numeric_limits<utility::size64_t>::max()) ? std::make_shared<utility::size64_t>(length) : nullptr;
         auto total_ptr = std::make_shared<utility::size64_t>(0);
-        return pplx::details::_do_while([istream, obuffer, buffer_size, length_ptr, total_ptr, max_length] () -> pplx::task<bool>
+        return pplx::details::_do_while([istream, obuffer, buffer_size, length_ptr, total_ptr, max_length, cancellation_token, timer_handler] () -> pplx::task<bool>
         {
             size_t read_length = buffer_size;
             if ((length_ptr != nullptr) && (*length_ptr < read_length))
             {
                 read_length = static_cast<size_t>(*length_ptr);
+            }
+
+            // need to cancel the potentially heavy read/write operation if cancellation token is canceled.
+            if (cancellation_token.is_canceled())
+            {
+                assert_timed_out_by_timer(timer_handler);
+                throw storage_exception(protocol::error_operation_canceled);
             }
 
             return istream.read(obuffer, read_length).then([length_ptr, total_ptr, max_length] (size_t count) -> bool
@@ -300,6 +304,14 @@ namespace azure { namespace storage {  namespace core {
         auto non_space_begin = std::find_if(str.begin(), str.end(), std::not1(std::ptr_fun<int, int>(isspace)));
         auto non_space_end = std::find_if(str.rbegin(), str.rend(), std::not1(std::ptr_fun<int, int>(isspace))).base();
         return utility::string_t(non_space_begin, non_space_end);
+    }
+
+    void assert_timed_out_by_timer(std::shared_ptr<core::timer_handler> timer_handler)
+    {
+        if (timer_handler != nullptr && timer_handler->is_canceled_by_timeout())
+        {
+            throw storage_exception(protocol::error_client_timeout, false);
+        }
     }
 
     utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value)
@@ -549,6 +561,7 @@ namespace azure { namespace storage {  namespace core {
             return iter->second;
         }
     }
+
 #endif
 
 }}} // namespace azure::storage::core

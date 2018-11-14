@@ -386,6 +386,12 @@ DAT(error_md5_options_mismatch, "When uploading a blob in a single request, stor
 DAT(error_storage_uri_empty, "Primary or secondary location URI must be supplied.")
 DAT(error_storage_uri_mismatch, "Primary and secondary location URIs must point to the same resource.")
 
+#if defined(_WIN32)
+DAT(error_operation_canceled, "operation canceled")
+#else
+DAT(error_operation_canceled, "Operation canceled")
+#endif
+
 DAT(error_empty_batch_operation, "The batch operation cannot be empty.")
 DAT(error_batch_size_not_match_response, "The received batch result size does not match the size of the batch operations sent to the server.")
 DAT(error_batch_operation_partition_key_mismatch, "The batch operation cannot contain entities with different partition keys.")

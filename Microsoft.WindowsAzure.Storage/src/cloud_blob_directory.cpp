@@ -97,9 +97,9 @@ namespace azure { namespace storage {
         return m_container.list_blobs(m_name, use_flat_blob_listing, includes, max_results, options, context);
     }
 
-    pplx::task<list_blob_item_segment> cloud_blob_directory::list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+    pplx::task<list_blob_item_segment> cloud_blob_directory::list_blobs_segmented_async(bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
-        return m_container.list_blobs_segmented_async(m_name, use_flat_blob_listing, includes, max_results, token, options, context);
+        return m_container.list_blobs_segmented_async(m_name, use_flat_blob_listing, includes, max_results, token, options, context, cancellation_token);
     }
 
 }} // namespace azure::storage

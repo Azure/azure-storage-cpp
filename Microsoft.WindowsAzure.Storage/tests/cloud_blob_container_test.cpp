@@ -504,7 +504,7 @@ SUITE(Blob)
     /// Test the blob name with corner characters.
     TEST_FIXTURE(blob_test_base, corner_blob_name)
     {
-        // Initialize the chareset to generate random blob name.
+        // Initialize the char-set to generate random blob name.
         std::vector<utility::char_t> charset;
         utility::string_t characters = _XPLATSTR("`~!@#$%^&*()_+[{]}|;:\'\",<>?");
         for (size_t i = 0; i < characters.size(); ++i)
@@ -523,11 +523,283 @@ SUITE(Blob)
             auto listing = list_all_blobs(blob_name, azure::storage::blob_listing_details::all, 0, azure::storage::blob_request_options());
             CHECK(listing.size() == 1);
 
-            // check the consistance of blob content.
+            // check the consistence of blob content.
             auto download_content = blob.download_text();
             CHECK(content == download_content);
 
             blob.delete_blob();
+        }
+    }
+
+    //Test the timeout/cancellation token of cloud_blob_container
+    TEST_FIXTURE(container_test_base, container_create_delete_cancellation_timeout)
+    {
+        {
+            auto rand_container_name = get_random_string(20U);
+            auto container = m_client.get_container_reference(rand_container_name);
+            auto cancel_token_src = pplx::cancellation_token_source();
+            // cancel the cancellation prior to the operation
+            cancel_token_src.cancel();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = container.create_async(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL(OPERATION_CANCELED, ex_msg);
+            CHECK(!container.exists(azure::storage::blob_request_options(), azure::storage::operation_context()));
+        }
+
+        {
+            auto rand_container_name = get_random_string(20U);
+            auto container = m_client.get_container_reference(rand_container_name);
+            auto cancel_token_src = pplx::cancellation_token_source();
+
+            std::string ex_msg;
+
+            try
+            {
+                // cancel the cancellation after the operation
+                auto task_result = container.create_async(azure::storage::blob_container_public_access_type::off, azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+                cancel_token_src.cancel();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("", ex_msg);
+            CHECK(container.exists(azure::storage::blob_request_options(), azure::storage::operation_context()));
+            container.delete_container_if_exists();
+        }
+
+        {
+            auto rand_container_name = get_random_string(20U);
+            auto container = m_client.get_container_reference(rand_container_name);
+            // set the timeout to 1 millisecond, which should ALWAYS trigger the timeout exception.
+            auto options = azure::storage::blob_request_options();
+            options.set_maximum_execution_time(std::chrono::milliseconds(1));
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = container.create_async(azure::storage::blob_container_public_access_type::off, options, azure::storage::operation_context());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
+            CHECK(!container.exists(azure::storage::blob_request_options(), azure::storage::operation_context()));
+        }
+
+        {
+            auto rand_container_name = get_random_string(20U);
+            auto container = m_client.get_container_reference(rand_container_name);
+            // set the timeout to 100,000 millisecond, which should NEVER trigger the timeout exception.
+            auto options = azure::storage::blob_request_options();
+            options.set_maximum_execution_time(std::chrono::milliseconds(100000));
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = container.create_async(azure::storage::blob_container_public_access_type::off, options, azure::storage::operation_context());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("", ex_msg);
+            CHECK(container.exists(azure::storage::blob_request_options(), azure::storage::operation_context()));
+            container.delete_container_if_exists();
+        }
+    }
+
+    TEST_FIXTURE(container_test_base, container_attributes_cancellation_timeout)
+    {
+        m_container.create();
+
+        {
+            auto cancel_token_src = pplx::cancellation_token_source();
+            // cancel the cancellation prior to the operation
+            cancel_token_src.cancel();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_container.download_attributes_async(azure::storage::access_condition(), azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL(OPERATION_CANCELED, ex_msg);
+        }
+
+        {
+            auto cancel_token_src = pplx::cancellation_token_source();
+            // cancel the cancellation prior to the operation
+            cancel_token_src.cancel();
+
+            std::string ex_msg;
+
+            auto permissions = azure::storage::blob_container_permissions();
+            permissions.set_public_access(azure::storage::blob_container_public_access_type::container);
+
+            try
+            {
+                auto task_result = m_container.upload_permissions_async(permissions, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context, cancel_token_src.get_token());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL(OPERATION_CANCELED, ex_msg);
+            CHECK(azure::storage::blob_container_public_access_type::off == m_container.properties().public_access());
+        }
+
+        {
+            auto options = azure::storage::blob_request_options();
+            options.set_maximum_execution_time(std::chrono::milliseconds(1));
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_container.download_attributes_async(azure::storage::access_condition(), options, azure::storage::operation_context());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
+        }
+
+        {
+            auto options = azure::storage::blob_request_options();
+            options.set_maximum_execution_time(std::chrono::milliseconds(1));
+            std::string ex_msg;
+
+            auto permissions = azure::storage::blob_container_permissions();
+            permissions.set_public_access(azure::storage::blob_container_public_access_type::container);
+
+            try
+            {
+                auto task_result = m_container.upload_permissions_async(permissions, azure::storage::access_condition(), options, m_context);
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
+            CHECK(azure::storage::blob_container_public_access_type::off == m_container.properties().public_access());
+        }
+
+        {
+            auto cancel_token_src = pplx::cancellation_token_source();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_container.download_attributes_async(azure::storage::access_condition(), azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+                // cancel the cancellation after the operation
+                cancel_token_src.cancel();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("", ex_msg);
+        }
+    }
+
+    TEST_FIXTURE(container_test_base, container_list_blobs_cancellation_timeout)
+    {
+        m_container.create();
+
+        {
+            auto cancel_token_src = pplx::cancellation_token_source();
+            // cancel the cancellation prior to the operation
+            cancel_token_src.cancel();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_container.list_blobs_segmented_async(_XPLATSTR(""), false, azure::storage::blob_listing_details::values::none, 100000, azure::storage::continuation_token(), azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL(OPERATION_CANCELED, ex_msg);
+        }
+
+        {
+            auto options = azure::storage::blob_request_options();
+            options.set_maximum_execution_time(std::chrono::milliseconds(1));
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_container.list_blobs_segmented_async(_XPLATSTR(""), false, azure::storage::blob_listing_details::values::none, 100000, azure::storage::continuation_token(), options, azure::storage::operation_context());
+                task_result.get();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
+        }
+
+        {
+            auto cancel_token_src = pplx::cancellation_token_source();
+
+            std::string ex_msg;
+
+            try
+            {
+                auto task_result = m_container.list_blobs_segmented_async(_XPLATSTR(""), false, azure::storage::blob_listing_details::values::none, 100000, azure::storage::continuation_token(), azure::storage::blob_request_options(), azure::storage::operation_context(), cancel_token_src.get_token());
+                task_result.get();
+                // cancel the cancellation after the operation
+                cancel_token_src.cancel();
+            }
+            catch (azure::storage::storage_exception& e)
+            {
+                ex_msg = std::string(e.what());
+            }
+
+            CHECK_EQUAL("", ex_msg);
         }
     }
 }

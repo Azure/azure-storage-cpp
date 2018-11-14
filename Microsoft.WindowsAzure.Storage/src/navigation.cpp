@@ -323,7 +323,7 @@ namespace azure { namespace storage { namespace core {
         }
 
         web::http::uri_builder builder(uri);
-        builder.append_path(path, true);
+        builder.append_path_raw(path, true);
         return builder.to_uri();
     }
 

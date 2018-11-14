@@ -144,9 +144,9 @@ namespace azure { namespace storage {
             m_authentication_handler = value;
         }
 
-        WASTORAGE_API pplx::task<service_properties> download_service_properties_base_async(const request_options& modified_options, operation_context context) const;
-        WASTORAGE_API pplx::task<void> upload_service_properties_base_async(const service_properties& properties, const service_properties_includes& includes, const request_options& modified_options, operation_context context) const;
-        WASTORAGE_API pplx::task<service_stats> download_service_stats_base_async(const request_options& modified_options, operation_context context) const;
+        WASTORAGE_API pplx::task<service_properties> download_service_properties_base_async(const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none()) const;
+        WASTORAGE_API pplx::task<void> upload_service_properties_base_async(const service_properties& properties, const service_properties_includes& includes, const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none()) const;
+        WASTORAGE_API pplx::task<service_stats> download_service_stats_base_async(const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none()) const;
 
     private:
 

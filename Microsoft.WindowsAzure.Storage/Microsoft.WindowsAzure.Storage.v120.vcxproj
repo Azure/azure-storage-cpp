@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="includes\wascore\filestream.h" />
     <ClInclude Include="includes\wascore\protocol_json.h" />
+    <ClInclude Include="includes\wascore\timer_handler.h" />
     <ClInclude Include="includes\wascore\xml_wrapper.h" />
     <ClInclude Include="includes\was\auth.h" />
     <ClInclude Include="includes\was\blob.h" />
@@ -203,6 +204,7 @@
   <ItemGroup>
     <ClCompile Include="src\cloud_append_blob.cpp" />
     <ClCompile Include="src\cloud_common.cpp" />
+    <ClCompile Include="src\timer_handler.cpp" />
     <ClCompile Include="src\authentication.cpp" />
     <ClCompile Include="src\basic_types.cpp" />
     <ClCompile Include="src\blob_request_factory.cpp" />

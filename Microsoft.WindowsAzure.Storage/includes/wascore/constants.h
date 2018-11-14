@@ -46,7 +46,7 @@ namespace azure { namespace storage { namespace protocol {
     // that Casablanca 2.2.0 on Linux can accept, which is derived from 
     // the maximum value for a signed long on g++, divided by 1000.
     // Choosing to set it to 24 days to align with .NET.
-    const std::chrono::seconds default_maximum_execution_time(24 * 24 * 60 * 60);
+    const std::chrono::milliseconds default_maximum_execution_time(24 * 24 * 60 * 60 * 1000);
     // the following value is used to exit the network connection if there is no activity in network.
     const std::chrono::seconds default_noactivity_timeout(60);
     // For the following value, "0" means "don't send a timeout to the service"

@@ -571,7 +571,7 @@ SUITE(Blob)
 
     TEST_FIXTURE(block_blob_test_base, block_blob_write_stream_maximum_execution_time)
     {
-        std::chrono::seconds duration(10);
+        std::chrono::milliseconds duration(300);
 
         azure::storage::blob_request_options options;
         options.set_maximum_execution_time(duration);

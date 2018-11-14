@@ -26,6 +26,7 @@
 #include "was/auth.h"
 #include "wascore/constants.h"
 #include "wascore/resources.h"
+#include "wascore/timer_handler.h"
 
 #pragma push_macro("max")
 #undef max
@@ -41,7 +42,7 @@ namespace azure { namespace storage { namespace core {
         {
         }
         
-        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = std::numeric_limits<utility::size64_t>::max(), utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max())
+        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = std::numeric_limits<utility::size64_t>::max(), utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max(), const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none())
         {
             if (length == std::numeric_limits<utility::size64_t>::max())
             {
@@ -71,7 +72,7 @@ namespace azure { namespace storage { namespace core {
                 temp_stream = temp_buffer.create_ostream();
             }
 
-            return stream_copy_async(stream, temp_stream, length, max_length).then([temp_buffer, provider] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
+            return stream_copy_async(stream, temp_stream, length, max_length, cancellation_token).then([temp_buffer, provider] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
             {
                 provider.close();
                 return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(temp_buffer.collection()), buffer_task.get(), provider.hash());
@@ -157,9 +158,14 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        explicit storage_command_base(const storage_uri& request_uri)
-            : m_request_uri(request_uri), m_location_mode(command_location_mode::primary_only)
+        explicit storage_command_base(const storage_uri& request_uri, const pplx::cancellation_token& cancellation_token, const bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+            : m_request_uri(request_uri), m_location_mode(command_location_mode::primary_only),
+            m_cancellation_token(cancellation_token), m_use_timeout(use_timeout), m_timer_handler(timer_handler)
         {
+            if (m_use_timeout)
+            {
+                m_timer_handler = std::make_shared<core::timer_handler>(m_cancellation_token);
+            }
         }
 
         void set_request_body(istream_descriptor value)
@@ -230,6 +236,30 @@ namespace azure { namespace storage { namespace core {
             }
         }
 
+        bool is_canceled()
+        {
+            if (m_use_timeout)
+            {
+                return m_timer_handler->is_canceled();
+            }
+            else
+            {
+                return m_cancellation_token.is_canceled();
+            }
+        }
+
+        const pplx::cancellation_token get_cancellation_token() const
+        {
+            if (m_use_timeout)
+            {
+                return m_timer_handler->get_cancellation_token();
+            }
+            else
+            {
+                return m_cancellation_token;
+            }
+        }
+
     private:
 
         virtual void preprocess_response(const web::http::http_response&, const request_result&, operation_context) = 0;
@@ -240,6 +270,10 @@ namespace azure { namespace storage { namespace core {
         concurrency::streams::ostream m_destination_stream;
         bool m_calculate_response_body_md5;
         command_location_mode m_location_mode;
+
+        const pplx::cancellation_token m_cancellation_token;
+        std::shared_ptr<timer_handler> m_timer_handler;
+        bool m_use_timeout;
 
         std::function<web::http::http_request(web::http::uri_builder&, const std::chrono::seconds&, operation_context)> m_build_request;
         std::function<void(web::http::http_request&, operation_context)> m_sign_request;
@@ -253,8 +287,8 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        explicit storage_command(const storage_uri& request_uri)
-            : storage_command_base(request_uri)
+        explicit storage_command(const storage_uri& request_uri, const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none(), const bool use_timeout = false, std::shared_ptr<core::timer_handler> timer_handler = nullptr)
+            : storage_command_base(request_uri, cancellation_token, use_timeout, timer_handler)
         {
         }
 
@@ -306,8 +340,8 @@ namespace azure { namespace storage { namespace core {
     {
     public:
 
-        explicit storage_command(const storage_uri& request_uri)
-            : storage_command_base(request_uri)
+        explicit storage_command(const storage_uri& request_uri, const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none(), const bool use_timeout = false, std::shared_ptr<core::timer_handler> timer_handler = nullptr)
+            : storage_command_base(request_uri, cancellation_token, use_timeout, timer_handler)
         {
         }
 
@@ -356,18 +390,18 @@ namespace azure { namespace storage { namespace core {
         {
         }
 
-        static pplx::task<void> execute_async(std::shared_ptr<storage_command_base> command, const request_options& options, operation_context context);
+        WASTORAGE_API static pplx::task<void> execute_async(std::shared_ptr<storage_command_base> command, const request_options& options, operation_context context);
  
     private:
 
-        std::chrono::seconds remaining_time() const
+        std::chrono::milliseconds remaining_time() const
         {
-            if (m_request_options.operation_expiry_time().is_initialized())
+            if (m_request_options.operation_expiry_time().time_since_epoch().count())
             {
-                auto now = utility::datetime::utc_now();
-                if (m_request_options.operation_expiry_time().to_interval() > now.to_interval())
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(m_request_options.operation_expiry_time() - std::chrono::system_clock::now());
+                if (duration.count() > 0)
                 {
-                    return std::chrono::seconds(m_request_options.operation_expiry_time() - now);
+                    return duration;
                 }
                 else
                 {
@@ -375,7 +409,17 @@ namespace azure { namespace storage { namespace core {
                 }
             }
 
-            return std::chrono::seconds();
+            return std::chrono::milliseconds();
+        }
+
+        void assert_canceled() const
+        {
+            //Throw timeout if timeout is the reason of canceling.
+            core::assert_timed_out_by_timer(m_command->m_timer_handler);
+            if (m_command->is_canceled())
+            {
+                throw storage_exception(protocol::error_operation_canceled);
+            }
         }
 
         static storage_location get_first_location(location_mode mode)

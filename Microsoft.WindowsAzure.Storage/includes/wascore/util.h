@@ -25,6 +25,7 @@
 #include "cpprest/streams.h"
 
 #include "was/core.h"
+#include "wascore/timer_handler.h"
 
 #pragma push_macro("max")
 #undef max
@@ -64,7 +65,7 @@ namespace azure { namespace storage { namespace core {
 
     utility::string_t make_query_parameter(const utility::string_t& parameter_name, const utility::string_t& parameter_value, bool do_encoding = true);
     utility::size64_t get_remaining_stream_length(concurrency::streams::istream stream);
-    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length, utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max());
+    pplx::task<utility::size64_t> stream_copy_async(concurrency::streams::istream istream, concurrency::streams::ostream ostream, utility::size64_t length, utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max(), const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none(), std::shared_ptr<core::timer_handler> timer_handler = nullptr);
     pplx::task<void> complete_after(std::chrono::milliseconds timeout);
     std::vector<utility::string_t> string_split(const utility::string_t& string, const utility::string_t& separator);
     bool is_empty_or_whitespace(const utility::string_t& value);
@@ -80,6 +81,7 @@ namespace azure { namespace storage { namespace core {
     utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value);
     utility::char_t utility_char_tolower(const utility::char_t& character);
     utility::string_t str_trim_starting_trailing_whitespaces(const utility::string_t& str);
+    void assert_timed_out_by_timer(std::shared_ptr<core::timer_handler> timer_handler);
 
     template<typename T>
     utility::string_t convert_to_string(T value)

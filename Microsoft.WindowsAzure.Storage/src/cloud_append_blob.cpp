@@ -24,7 +24,7 @@
 
 namespace azure { namespace storage {
 
-    pplx::task<void> cloud_append_blob::create_or_replace_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::create_or_replace_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -32,7 +32,7 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized(), timer_handler);
         command->set_build_request(std::bind(protocol::put_append_blob, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
@@ -44,7 +44,7 @@ namespace azure { namespace storage {
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<int64_t> cloud_append_blob::append_block_async(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<int64_t> cloud_append_blob::append_block_async_impl(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler) const
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -53,7 +53,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
         bool needs_md5 = content_md5.empty() && modified_options.use_transactional_md5();
 
-        auto command = std::make_shared<core::storage_command<int64_t>>(uri());
+        auto command = std::make_shared<core::storage_command<int64_t>>(uri(), cancellation_token, (modified_options.is_maximum_execution_time_customized() && use_timeout), timer_handler);
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)->int64_t
         {
@@ -64,7 +64,7 @@ namespace azure { namespace storage {
             properties->update_append_blob_committed_block_count(parsed_properties);
             return utility::conversions::details::scan_string<int64_t>(protocol::get_header_value(response.headers(), protocol::ms_header_blob_append_offset));
         });
-        return core::istream_descriptor::create(block_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_append_block_size).then([command, context, content_md5, modified_options, condition] (core::istream_descriptor request_body) -> pplx::task<int64_t>
+        return core::istream_descriptor::create(block_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_append_block_size, command->get_cancellation_token()).then([command, context, content_md5, modified_options, condition, cancellation_token, options](core::istream_descriptor request_body) -> pplx::task<int64_t>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
             command->set_build_request(std::bind(protocol::append_block, md5, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -73,12 +73,12 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<utility::string_t> cloud_append_blob::download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<utility::string_t> cloud_append_blob::download_text_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         auto properties = m_properties;
 
         concurrency::streams::container_buffer<std::vector<uint8_t>> buffer;
-        return download_to_stream_async(buffer.create_ostream(), condition, options, context).then([buffer, properties] () mutable -> utility::string_t
+        return download_to_stream_async(buffer.create_ostream(), condition, options, context, cancellation_token).then([buffer, properties] () mutable -> utility::string_t
         {
             if (properties->content_type() != protocol::header_value_content_type_utf8)
             {
@@ -90,7 +90,7 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<concurrency::streams::ostream> cloud_append_blob::open_write_async(bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<concurrency::streams::ostream> cloud_append_blob::open_write_async_impl(bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -99,7 +99,7 @@ namespace azure { namespace storage {
         pplx::task<void> create_task;
         if (create_new)
         {
-            create_task = create_or_replace_async(condition, modified_options, context);
+            create_task = create_or_replace_async_impl(condition, modified_options, context, cancellation_token, timer_handler);
         }
         else
         {
@@ -112,7 +112,7 @@ namespace azure { namespace storage {
         }
 
         auto instance = std::make_shared<cloud_append_blob>(*this);
-        return create_task.then([instance, condition, modified_options, context]()
+        return create_task.then([instance, condition, modified_options, context, cancellation_token, use_request_level_timeout, timer_handler]()
         {
             auto modified_condition = access_condition::generate_lease_condition(condition.lease_id());
             if (condition.max_size() != -1)
@@ -125,16 +125,23 @@ namespace azure { namespace storage {
                 modified_condition.set_append_position(condition.append_position());
             }
 
-            return core::cloud_append_blob_ostreambuf(instance, modified_condition, modified_options, context).create_ostream();
+            return core::cloud_append_blob_ostreambuf(instance, modified_condition, modified_options, context, cancellation_token, use_request_level_timeout, timer_handler).create_ostream();
         });
     }
 
-    pplx::task<void> cloud_append_blob::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
-        return upload_from_stream_internal_async(source, length, true, condition, options, context);
+
+        if (options.is_maximum_execution_time_customized())
+        {
+            std::shared_ptr<core::timer_handler> timer_handler = std::make_shared<core::timer_handler>(cancellation_token);
+            timer_handler->start_timer(options.maximum_execution_time()); // azure::storage::core::timer_handler will automatically stop the timer when destructed.
+            return upload_from_stream_internal_async(source, length, true, condition, options, context, timer_handler->get_cancellation_token(), timer_handler).then([timer_handler/*timer_handler MUST be captured*/]() {});
+        }
+        return upload_from_stream_internal_async(source, length, true, condition, options, context, cancellation_token);
     }
 
-    pplx::task<void> cloud_append_blob::upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -156,21 +163,21 @@ namespace azure { namespace storage {
             throw std::invalid_argument(protocol::error_stream_short);
         }
 
-        return open_write_async(create_new, condition, modified_options, context).then([source, length](concurrency::streams::ostream blob_stream) -> pplx::task<void>
+        return open_write_async_impl(create_new, condition, modified_options, context, cancellation_token, false, timer_handler).then([source, length, cancellation_token, timer_handler](concurrency::streams::ostream blob_stream) -> pplx::task<void>
         {
-            return core::stream_copy_async(source, blob_stream, length).then([blob_stream](utility::size64_t) -> pplx::task<void>
+            return core::stream_copy_async(source, blob_stream, length, std::numeric_limits<utility::size64_t>::max(), cancellation_token, timer_handler).then([blob_stream](utility::size64_t) -> pplx::task<void>
             {
                 return blob_stream.close();
             });
         });
     }
 
-    pplx::task<void> cloud_append_blob::upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::upload_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         auto instance = std::make_shared<cloud_append_blob>(*this);
-        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context](concurrency::streams::istream stream) -> pplx::task<void>
+        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context, cancellation_token](concurrency::streams::istream stream) -> pplx::task<void>
         {
-            return instance->upload_from_stream_async(stream, condition, options, context).then([stream](pplx::task<void> upload_task) -> pplx::task<void>
+            return instance->upload_from_stream_async(stream, std::numeric_limits<utility::size64_t>::max(), condition, options, context, cancellation_token).then([stream](pplx::task<void> upload_task) -> pplx::task<void>
             {
                 return stream.close().then([upload_task]()
                 {
@@ -180,26 +187,32 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<void> cloud_append_blob::upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::upload_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         auto utf8_body = utility::conversions::to_utf8string(content);
         auto length = utf8_body.size();
         auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
         m_properties->set_content_type(protocol::header_value_content_type_utf8);
-        return upload_from_stream_async(stream, length, condition, options, context);
+        return upload_from_stream_async(stream, length, condition, options, context, cancellation_token);
     }
 
-    pplx::task<void> cloud_append_blob::append_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::append_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
-        return upload_from_stream_internal_async(source, length, false, condition, options, context);
+        if (options.is_maximum_execution_time_customized())
+        {
+            std::shared_ptr<core::timer_handler> timer_handler = std::make_shared<core::timer_handler>(cancellation_token);
+            timer_handler->start_timer(options.maximum_execution_time()); // azure::storage::core::timer_handler will automatically stop the timer when destructed.
+            return upload_from_stream_internal_async(source, length, false, condition, options, context, timer_handler->get_cancellation_token()).then([timer_handler/*timer_handler MUST be captured*/]() {});
+        }
+        return upload_from_stream_internal_async(source, length, false, condition, options, context, cancellation_token);
     }
 
-    pplx::task<void> cloud_append_blob::append_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::append_from_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         auto instance = std::make_shared<cloud_append_blob>(*this);
-        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context](concurrency::streams::istream stream) -> pplx::task<void>
+        return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context, cancellation_token](concurrency::streams::istream stream) -> pplx::task<void>
         {
-            return instance->append_from_stream_async(stream, condition, options, context).then([stream](pplx::task<void> upload_task) -> pplx::task<void>
+            return instance->append_from_stream_async(stream, std::numeric_limits<utility::size64_t>::max(), condition, options, context, cancellation_token).then([stream](pplx::task<void> upload_task) -> pplx::task<void>
             {
                 return stream.close().then([upload_task]()
                 {
@@ -209,12 +222,12 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<void> cloud_append_blob::append_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_append_blob::append_text_async(const utility::string_t& content, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         auto utf8_body = utility::conversions::to_utf8string(content);
         auto length = utf8_body.size();
         auto stream = concurrency::streams::bytestream::open_istream(std::move(utf8_body));
         m_properties->set_content_type(protocol::header_value_content_type_utf8);
-        return append_from_stream_async(stream, length, condition, options, context);
+        return append_from_stream_async(stream, length, condition, options, context, cancellation_token);
     }
 }} // namespace azure::storage

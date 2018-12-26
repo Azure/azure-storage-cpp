@@ -83,7 +83,7 @@ namespace azure { namespace storage { namespace core {
         auto remaining = count;
         while (remaining > 0)
         {
-            auto write_size = m_buffer_size - m_buffer.in_avail();
+            auto write_size = m_buffer_size - static_cast<size_t>(m_buffer.size());
             if (write_size > remaining)
             {
                 write_size = remaining;

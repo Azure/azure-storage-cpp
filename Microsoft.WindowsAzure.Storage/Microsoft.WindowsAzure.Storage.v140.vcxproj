@@ -98,7 +98,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/we4100 /Zm186 %(AdditionalOptions) /bigobj</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>includes</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>

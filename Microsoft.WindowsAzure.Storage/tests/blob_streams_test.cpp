@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "blob_test_base.h"
 #include "check_macros.h"
+#include "wascore/hashing.h"
 
 size_t seek_read_and_compare(concurrency::streams::istream stream, std::vector<uint8_t> buffer_to_compare, utility::size64_t offset, size_t count, size_t expected_read_count)
 {
@@ -178,6 +179,60 @@ void seek_and_write_putn(concurrency::streams::ostream stream, const std::vector
 
 SUITE(Blob)
 {
+	TEST_FIXTURE(block_blob_test_base, blob_write_stream_upload_and_download)
+	{
+        azure::storage::core::hash_provider provider = azure::storage::core::hash_provider::create_md5_hash_provider();
+
+        std::vector<uint8_t> buffer;
+        size_t buffersize = 3 * 1024 * 1024;
+        buffer.resize(buffersize);
+        
+        auto wstream = m_blob.open_write();
+
+        std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
+        {
+            return (uint8_t)(std::rand() % (int)UINT8_MAX);
+        });
+        
+        provider.write(buffer.data(), buffersize);
+        
+        concurrency::streams::container_buffer<std::vector<uint8_t>> input_buffer(buffer);
+        
+        wstream.write(input_buffer, buffersize);
+        
+        std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
+        {
+            return (uint8_t)(std::rand() % (int)UINT8_MAX);
+        });
+        provider.write(buffer.data(), buffersize);
+        input_buffer = concurrency::streams::container_buffer<std::vector<uint8_t>>(buffer);
+        wstream.write(input_buffer, buffersize);
+
+        std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
+        {
+            return (uint8_t)(std::rand() % (int)UINT8_MAX);
+        });
+        provider.write(buffer.data(), buffersize);
+        input_buffer = concurrency::streams::container_buffer<std::vector<uint8_t>>(buffer);
+        wstream.write(input_buffer, buffersize);
+
+        provider.close();
+        auto origin_md5 = provider.hash();
+
+        wstream.flush().wait();
+        wstream.close().wait();
+
+        azure::storage::blob_request_options options;
+        concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
+        m_blob.download_to_stream(output_buffer.create_ostream(), azure::storage::access_condition(), options, m_context);
+
+        provider = azure::storage::core::hash_provider::create_md5_hash_provider();
+        provider.write(output_buffer.collection().data(), (size_t)(output_buffer.size()));
+        provider.close();
+        auto downloaded_md5 = provider.hash();
+        CHECK(origin_md5 == downloaded_md5);
+    }
+
     TEST_FIXTURE(block_blob_test_base, blob_read_stream_download)
     {
         azure::storage::blob_request_options options;

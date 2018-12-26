@@ -71,9 +71,10 @@ namespace azure { namespace storage { namespace core {
                         }
                     });
                 }
-                catch (...)
+                catch (const std::exception&)
                 {
                     this_pointer->m_semaphore.unlock();
+                    this_pointer->m_currentException = std::current_exception();
                 }
             }
             else

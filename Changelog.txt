@@ -1,6 +1,14 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v6.0.0
+- Upgraded CPPRest to latest version: 2.10.10.
+- Resolved a potential memory leak issue in xml_wrapper.cpp.
+- Resolved an issue where getting range would update the blob/file MD5 unexpectedly.
+- Added an option in CMake to build azure-storage-cpp using /MT 
+- Resolved an issue where the first forward slash in the front of the blob name will always be trimmed.
+- Supported cancellation token and millisecond level timeout in C++ client library.
+
 Changes in v5.2.0
 - Resolved an issue where listing blobs for blob tier returning faulty result when built with VS2013.
 - Resolved an issue where listing files or directories returning faulty server encryption status when built with VS2013.

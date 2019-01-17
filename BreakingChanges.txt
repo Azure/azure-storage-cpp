@@ -1,5 +1,10 @@
 Azure Storage Client Library for C++
 History of Breaking Changes
+
+Breaking Changes in v6.0:
+- `azure::storage::blob_request_options` now accept max_execution_time as `std::chrono::milliseconds`. However, previous `std::chrono::seconds` can automatically converted to `std::chrono::milliseconds`. There can be behavioral change since the precision has changed.
+- Resolved an issue where the first forward slash in the front of the blob name will always be trimmed. This would cause blobs with name trimmed prior to this release no longer reachable with the same input.
+
 Breaking Changes in v5.0:
 - Dropped Nuget package with name 'wastorage'.
 

@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (5.2.0)
+# Azure Storage Client Library for C++ (6.0.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -53,13 +53,31 @@ git clone https://github.com/Azure/azure-storage-cpp.git
 cd azure-storage-cpp
 ```
 
+To build with source code, there are three ways:
+
+**Via Vcpkg**
+You can manage the dependencies with Vcpkg, and use Visual Studio 2015 update 3 or Visual Studio 2017 for development environment. Simply install Casablanca via Vcpkg will setup everything needed.
+```
+C:\src\vcpkg> .\vcpkg install cpprestsdk
+```
+
+**Via NuGet**
+Because Casablanca does not release NuGet packages anywhere anymore, Starting from 5.1.0, this repository cannot be built with pre-built Casablanca NuGet packages. However, you can export your own version of Casablanca NuGet packages to install dependencies of this project:
+```
+C:\src\vcpkg> .\vcpkg install cpprestsdk
+C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.10
+```
+
+**Manage dependencies by yourself**
+It is not recommended to manage dependencies by yourself. However, you can still build Casablanca by yourself and specify the include directories and link binaries.
+
 ### Via NuGet
 
 To install the binaries for the Azure Storage Client Library for C++, you can export a NuGet package with Vcpkg and put it into your local NuGet feed. For more information about how to export a NuGet package, please see [Binary Export](https://github.com/Microsoft/vcpkg/blob/master/docs/specifications/export-command.md).
 
 Normally, exporting NuGet package is done with the following command:
 ```
-C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azure.Storage.CPP --nuget-version=5.1.0
+C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azure.Storage.CPP --nuget-version=6.0.0
 ```
 
 ### Via Vcpkg
@@ -94,6 +112,7 @@ The validated Casablanca version for each major or recent release on different p
 | 5.1.0                       | 2.10.6                         | 2.10.3                       |
 | 5.1.1                       | 2.10.6                         | 2.10.3                       |
 | 5.2.0                       | 2.10.6                         | 2.10.3                       |
+| 6.0.0                       | 2.10.10                        | 2.10.10                      |
 
 ## Code Samples
 
@@ -189,7 +208,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.3 -b v2.10.3
+git checkout tags/v2.10.10 -b v2.10.10
 ```
 
 - Build the project in Release mode
@@ -298,7 +317,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.3 -b v2.10.3
+git checkout tags/v2.10.10 -b v2.10.10
 ```
 
 - Build the project in Release mode
@@ -413,7 +432,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.3 -b v2.10.3
+git checkout tags/v2.10.10 -b v2.10.10
 ```
 
 - Build the project in Release mode

@@ -10,7 +10,7 @@ rem Set the toolset
 set toolset=%4
 
 rem Get the casablanca version
-set casaver=2.10.6
+set casaver=2.10.10
 
 rem Build the packages.config file
 @echo 

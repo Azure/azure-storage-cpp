@@ -340,6 +340,18 @@ SUITE(Blob)
             auto listing = list_all_blobs(utility::string_t(), azure::storage::blob_listing_details::all, 0, options);
             check_blob_properties_equal(blob.properties(), listing.front().properties(), true);
         }
+
+        {
+            blob.properties().set_content_md5(_XPLATSTR(""));
+            blob.upload_properties(azure::storage::access_condition(), options, m_context);
+
+            auto same_blob = m_container.get_page_blob_reference(blob.name());
+            auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
+            azure::storage::blob_request_options options;
+            options.set_use_transactional_md5(true);
+            same_blob.download_range_to_stream(stream, 0, 128, azure::storage::access_condition(), options, azure::storage::operation_context());
+            check_blob_properties_equal(blob.properties(), same_blob.properties(), true);
+        }
     }
 
     TEST_FIXTURE(blob_test_base, blob_type)

@@ -26,8 +26,6 @@
 #include "was/file.h"
 #include "was/blob.h"
 
-extern const utility::string_t dummy_md5;//(_XPLATSTR("MDAwMDAwMDA="));
-
 class file_service_test_base : public test_base
 {
 public:

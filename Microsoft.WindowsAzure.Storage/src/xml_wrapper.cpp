@@ -65,12 +65,24 @@ bool xml_text_reader_wrapper::is_empty_element()
 
 std::string xml_text_reader_wrapper::get_local_name()
 {
-    return xml_char_to_string(xmlTextReaderLocalName(m_reader));
+    auto xml_char = xmlTextReaderLocalName(m_reader);
+    auto result = xml_char_to_string(xml_char);
+    if (xml_char != nullptr)
+    {
+        xmlFree(xml_char);
+    }
+    return result;
 }
 
 std::string xml_text_reader_wrapper::get_value()
 {
-    return xml_char_to_string(xmlTextReaderValue(m_reader));
+    auto xml_char = xmlTextReaderValue(m_reader);
+    auto result = xml_char_to_string(xml_char);
+    if (xml_char != nullptr)
+    {
+        xmlFree(xml_char);
+    }
+    return result;
 }
 
 bool xml_text_reader_wrapper::move_to_first_attribute()

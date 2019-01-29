@@ -1133,7 +1133,6 @@ SUITE(Blob)
         fill_buffer_and_get_md5(buffer);
         {
             auto options = azure::storage::blob_request_options();
-            options.set_maximum_execution_time(std::chrono::milliseconds(200));
             options.set_maximum_execution_time(std::chrono::milliseconds(10));
             auto cancel_token_src = pplx::cancellation_token_source();
 

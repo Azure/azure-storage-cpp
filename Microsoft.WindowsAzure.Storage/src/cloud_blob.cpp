@@ -267,7 +267,7 @@ namespace azure { namespace storage {
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
-        std::chrono::time_point<std::chrono::steady_clock> first_time_point;
+        std::chrono::steady_clock::time_point first_time_point;
 
         if (options.is_maximum_execution_time_customized())
         {

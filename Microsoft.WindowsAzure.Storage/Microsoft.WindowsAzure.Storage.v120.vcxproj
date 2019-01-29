@@ -202,6 +202,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\executor.cpp" />
     <ClCompile Include="src\cloud_append_blob.cpp" />
     <ClCompile Include="src\cloud_common.cpp" />
     <ClCompile Include="src\timer_handler.cpp" />

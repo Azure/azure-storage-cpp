@@ -168,6 +168,13 @@ namespace azure { namespace storage { namespace core {
             }
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+
+        // Prevents the compiler from generating default assignment operator.
+        storage_command_base& operator=(storage_command_base& other) = delete;
+
+#endif
+
         void set_request_body(istream_descriptor value)
         {
             m_request_body = value;

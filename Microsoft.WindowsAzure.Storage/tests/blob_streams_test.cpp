@@ -189,29 +189,17 @@ SUITE(Blob)
         
         auto wstream = m_blob.open_write();
 
-        std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
-        {
-            return (uint8_t)(std::rand() % (int)UINT8_MAX);
-        });
-        
-        provider.write(buffer.data(), buffersize);
-        
-        concurrency::streams::container_buffer<std::vector<uint8_t>> input_buffer(buffer);
-        
-        wstream.write(input_buffer, buffersize);
-        
-        std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
-        {
-            return (uint8_t)(std::rand() % (int)UINT8_MAX);
-        });
+        fill_buffer(buffer);        
+        provider.write(buffer.data(), buffersize);        
+        concurrency::streams::container_buffer<std::vector<uint8_t>> input_buffer(buffer);        
+        wstream.write(input_buffer, buffersize);        
+
+        fill_buffer(buffer);
         provider.write(buffer.data(), buffersize);
         input_buffer = concurrency::streams::container_buffer<std::vector<uint8_t>>(buffer);
         wstream.write(input_buffer, buffersize);
 
-        std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
-        {
-            return (uint8_t)(std::rand() % (int)UINT8_MAX);
-        });
+        fill_buffer(buffer);
         provider.write(buffer.data(), buffersize);
         input_buffer = concurrency::streams::container_buffer<std::vector<uint8_t>>(buffer);
         wstream.write(input_buffer, buffersize);

@@ -45,6 +45,7 @@ public:
 protected:
 
     static web::http::uri defiddler(const web::http::uri& uri);
+    static void fill_buffer(std::vector<uint8_t>& buffer);
     static utility::string_t fill_buffer_and_get_md5(std::vector<uint8_t>& buffer);
     static utility::string_t fill_buffer_and_get_md5(std::vector<uint8_t>& buffer, size_t offset, size_t count);
     static utility::string_t get_random_container_name(size_t length = 10);

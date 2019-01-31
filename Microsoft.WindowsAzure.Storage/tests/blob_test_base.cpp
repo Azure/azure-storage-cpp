@@ -27,6 +27,14 @@ utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<ui
     return fill_buffer_and_get_md5(buffer, 0, buffer.size());
 }
 
+void blob_service_test_base::fill_buffer(std::vector<uint8_t>& buffer)
+{
+    std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
+    {
+        return (uint8_t)(std::rand() % (int)UINT8_MAX);
+    });
+}
+
 utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<uint8_t>& buffer, size_t offset, size_t count)
 {
     std::generate_n(buffer.begin(), buffer.size(), [] () -> uint8_t

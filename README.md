@@ -214,6 +214,7 @@ git checkout tags/v2.10.10 -b v2.10.10
 - Build the project in Release mode
 ```bash
 cd cpprestsdk/Release
+git submodule update --init
 mkdir build.release
 cd build.release
 CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF
@@ -323,6 +324,7 @@ git checkout tags/v2.10.10 -b v2.10.10
 - Build the project in Release mode
 ```bash
 cd cpprestsdk/Release
+git submodule update --init
 mkdir build.release
 cd build.release
 cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF
@@ -438,6 +440,7 @@ git checkout tags/v2.10.10 -b v2.10.10
 - Build the project in Release mode
 ```bash
 cd cpprestsdk/Release
+git submodule update --init
 mkdir build.release
 cd build.release
 cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">5.2.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -86,9 +86,9 @@ Inheritance diagram for azure::storage::core::storage_command&lt; void &gt;:</di
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5c621167767ca4e1024d2dc847ce10ca"><td class="memItemLeft" align="right" valign="top"><a id="a5c621167767ca4e1024d2dc847ce10ca"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>storage_command</b> (const <a class="el" href="classazure_1_1storage_1_1storage__uri.html">storage_uri</a> &amp;request_uri)</td></tr>
-<tr class="separator:a5c621167767ca4e1024d2dc847ce10ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeab0c4a8355290603112d23adf638d22"><td class="memItemLeft" align="right" valign="top"><a id="aeab0c4a8355290603112d23adf638d22"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>storage_command</b> (const <a class="el" href="classazure_1_1storage_1_1storage__uri.html">storage_uri</a> &amp;request_uri, const pplx::cancellation_token &amp;cancellation_token=pplx::cancellation_token::none(), const bool use_timeout=false, std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">core::timer_handler</a> &gt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">timer_handler</a>=nullptr)</td></tr>
+<tr class="separator:aeab0c4a8355290603112d23adf638d22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab690c4b86f2be61b2c99c9112e17eadc"><td class="memItemLeft" align="right" valign="top"><a id="ab690c4b86f2be61b2c99c9112e17eadc"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set_preprocess_response</b> (std::function&lt; void(const web::http::http_response &amp;, const <a class="el" href="classazure_1_1storage_1_1request__result.html">request_result</a> &amp;, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>)&gt; value)</td></tr>
 <tr class="separator:ab690c4b86f2be61b2c99c9112e17eadc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -96,9 +96,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>set_preprocess_respon
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set_postprocess_response</b> (std::function&lt; pplx::task&lt; void &gt;(const web::http::http_response &amp;, const <a class="el" href="classazure_1_1storage_1_1request__result.html">request_result</a> &amp;, const <a class="el" href="classazure_1_1storage_1_1core_1_1ostream__descriptor.html">ostream_descriptor</a> &amp;, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a>)&gt; value)</td></tr>
 <tr class="separator:aa6b940df368271395f56fa91b8e978ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classazure_1_1storage_1_1core_1_1storage__command__base.html">azure::storage::core::storage_command_base</a></td></tr>
-<tr class="memitem:ab2d47ca4c747f0f37b248af35b77c267 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memItemLeft" align="right" valign="top"><a id="ab2d47ca4c747f0f37b248af35b77c267"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>storage_command_base</b> (const <a class="el" href="classazure_1_1storage_1_1storage__uri.html">storage_uri</a> &amp;request_uri)</td></tr>
-<tr class="separator:ab2d47ca4c747f0f37b248af35b77c267 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2367d7d0b6cc6091ae19314886e0071 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memItemLeft" align="right" valign="top"><a id="ae2367d7d0b6cc6091ae19314886e0071"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>storage_command_base</b> (const <a class="el" href="classazure_1_1storage_1_1storage__uri.html">storage_uri</a> &amp;request_uri, const pplx::cancellation_token &amp;cancellation_token, const bool use_timeout, std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">core::timer_handler</a> &gt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">timer_handler</a>)</td></tr>
+<tr class="separator:ae2367d7d0b6cc6091ae19314886e0071 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8caaaec0177d58311d0f621f2710eac6 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memItemLeft" align="right" valign="top"><a id="a8caaaec0177d58311d0f621f2710eac6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set_request_body</b> (<a class="el" href="classazure_1_1storage_1_1core_1_1istream__descriptor.html">istream_descriptor</a> value)</td></tr>
 <tr class="separator:a8caaaec0177d58311d0f621f2710eac6 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,11 +123,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>set_recover_request</
 <tr class="memitem:a2e3359725dbf236d5119d8f3c6b0d819 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memItemLeft" align="right" valign="top"><a id="a2e3359725dbf236d5119d8f3c6b0d819"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set_location_mode</b> (command_location_mode value, storage_location lock_location=storage_location::unspecified)</td></tr>
 <tr class="separator:a2e3359725dbf236d5119d8f3c6b0d819 inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad19fb79b5e4bda6ea15726d2aa4d66aa inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memItemLeft" align="right" valign="top"><a id="ad19fb79b5e4bda6ea15726d2aa4d66aa"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_canceled</b> ()</td></tr>
+<tr class="separator:ad19fb79b5e4bda6ea15726d2aa4d66aa inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4596ea30e49a0168c22a03f902d5b0bd inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memItemLeft" align="right" valign="top"><a id="a4596ea30e49a0168c22a03f902d5b0bd"></a>
+const pplx::cancellation_token&#160;</td><td class="memItemRight" valign="bottom"><b>get_cancellation_token</b> () const</td></tr>
+<tr class="separator:a4596ea30e49a0168c22a03f902d5b0bd inherit pub_methods_classazure_1_1storage_1_1core_1_1storage__command__base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 19 2018 17:05:16 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Feb 1 2019 11:23:10 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

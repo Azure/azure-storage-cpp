@@ -24,6 +24,7 @@ var searchData=
   ['is_5ffile',['is_file',['../classazure_1_1storage_1_1list__file__and__directory__item.html#ac228f32c733408d19ad8a886e4304013',1,'azure::storage::list_file_and_directory_item']]],
   ['is_5fincremental_5fcopy',['is_incremental_copy',['../classazure_1_1storage_1_1cloud__blob__properties.html#a1355e943900b7401a185e81bdb2a6ed0',1,'azure::storage::cloud_blob_properties']]],
   ['is_5finitialized',['is_initialized',['../classazure_1_1storage_1_1cloud__storage__account.html#a5c16851a5dcbfc31923b35bde2ffadea',1,'azure::storage::cloud_storage_account']]],
+  ['is_5fmaximum_5fexecution_5ftime_5fcustomized',['is_maximum_execution_time_customized',['../classazure_1_1storage_1_1request__options.html#aec24a10a6cbe9497095c80359ca7a67e',1,'azure::storage::request_options']]],
   ['is_5fnull',['is_null',['../classazure_1_1storage_1_1entity__property.html#ab380c4ef62bf69eb2d17a174c560772f',1,'azure::storage::entity_property']]],
   ['is_5fresponse_5favailable',['is_response_available',['../classazure_1_1storage_1_1request__result.html#a45c5cd274caa87423d565c876274c33c',1,'azure::storage::request_result']]],
   ['is_5fsas',['is_sas',['../classazure_1_1storage_1_1storage__credentials.html#ab301d1498b24e12134411dc734a47bf2',1,'azure::storage::storage_credentials']]],

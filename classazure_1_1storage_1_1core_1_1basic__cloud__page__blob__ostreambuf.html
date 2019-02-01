@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Microsoft Azure Storage Client Library for C++
-   &#160;<span id="projectnumber">5.2.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">The Microsoft Azure Storage Client Library for C++ is a library for working with the Azure Storage Services in C++.</div>
   </td>
@@ -88,9 +88,9 @@ Inheritance diagram for azure::storage::core::basic_cloud_page_blob_ostreambuf:<
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:adeec1408adc66d62bab753c39ad42a75"><td class="memItemLeft" align="right" valign="top"><a id="adeec1408adc66d62bab753c39ad42a75"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>basic_cloud_page_blob_ostreambuf</b> (std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &gt; blob, utility::size64_t blob_size, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="separator:adeec1408adc66d62bab753c39ad42a75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bbcae4ef9990e8eed77054ed79052e1"><td class="memItemLeft" align="right" valign="top"><a id="a6bbcae4ef9990e8eed77054ed79052e1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>basic_cloud_page_blob_ostreambuf</b> (std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1cloud__page__blob.html">cloud_page_blob</a> &gt; blob, utility::size64_t blob_size, const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context, const pplx::cancellation_token &amp;cancellation_token, bool use_request_level_timeout, std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">core::timer_handler</a> &gt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">timer_handler</a>)</td></tr>
+<tr class="separator:a6bbcae4ef9990e8eed77054ed79052e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32c698081e58935eb4ff7d590f378f49"><td class="memItemLeft" align="right" valign="top"><a id="a32c698081e58935eb4ff7d590f378f49"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>can_seek</b> () const</td></tr>
 <tr class="separator:a32c698081e58935eb4ff7d590f378f49"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -104,9 +104,9 @@ utility::size64_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b>
 pos_type&#160;</td><td class="memItemRight" valign="bottom"><b>seekpos</b> (pos_type pos, std::ios_base::openmode direction)</td></tr>
 <tr class="separator:ae2b952f5b1b05fbf01aeebdfba2d463f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf.html">azure::storage::core::basic_cloud_blob_ostreambuf</a></td></tr>
-<tr class="memitem:a2d7db433c0cea1af64b3cbfc87d31478 inherit pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf"><td class="memItemLeft" align="right" valign="top"><a id="a2d7db433c0cea1af64b3cbfc87d31478"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>basic_cloud_blob_ostreambuf</b> (const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context)</td></tr>
-<tr class="separator:a2d7db433c0cea1af64b3cbfc87d31478 inherit pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a2614a6994fd73b206f50282b0bdfdf inherit pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf"><td class="memItemLeft" align="right" valign="top"><a id="a0a2614a6994fd73b206f50282b0bdfdf"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>basic_cloud_blob_ostreambuf</b> (const <a class="el" href="classazure_1_1storage_1_1access__condition.html">access_condition</a> &amp;condition, const <a class="el" href="classazure_1_1storage_1_1blob__request__options.html">blob_request_options</a> &amp;options, <a class="el" href="classazure_1_1storage_1_1operation__context.html">operation_context</a> context, const pplx::cancellation_token &amp;cancellation_token, bool use_request_level_timeout, std::shared_ptr&lt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">core::timer_handler</a> &gt; <a class="el" href="classazure_1_1storage_1_1core_1_1timer__handler.html">timer_handler</a>)</td></tr>
+<tr class="separator:a0a2614a6994fd73b206f50282b0bdfdf inherit pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8987c21146ab8cb1b94dc10acccdf698 inherit pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf"><td class="memItemLeft" align="right" valign="top"><a id="a8987c21146ab8cb1b94dc10acccdf698"></a>
 pplx::task&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_sync</b> ()</td></tr>
 <tr class="separator:a8987c21146ab8cb1b94dc10acccdf698 inherit pub_methods_classazure_1_1storage_1_1core_1_1basic__cloud__blob__ostreambuf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -192,7 +192,7 @@ typedef concurrency::streams::details::streambuf_state_manager&lt; concurrency::
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Oct 19 2018 17:05:16 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Feb 1 2019 11:23:08 for Microsoft Azure Storage Client Library for C++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

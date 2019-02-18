@@ -140,7 +140,7 @@ namespace azure { namespace storage { namespace core {
         temp_buffer.seekpos(0, std::ios_base::out);
 
         auto this_pointer = std::dynamic_pointer_cast<basic_cloud_blob_istreambuf>(shared_from_this());
-        return m_blob->download_range_to_stream_async(temp_buffer.create_ostream(), m_current_blob_offset, read_size, m_condition, m_options, m_context).then([this_pointer, temp_buffer] (pplx::task<void> download_task) -> pplx::task<bool>
+        return m_blob->download_range_to_stream_async(temp_buffer.create_ostream(), m_current_blob_offset, read_size, m_condition, m_options, m_context, m_cancellation_token).then([this_pointer, temp_buffer] (pplx::task<void> download_task) -> pplx::task<bool>
         {
             try
             {

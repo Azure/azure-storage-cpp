@@ -163,21 +163,21 @@ namespace azure { namespace storage {
         return protocol::get_blob_sas_token(stored_policy_identifier, policy, headers, _XPLATSTR("b"), resource_str, service_client().credentials());
     }
 
-    pplx::task<concurrency::streams::istream> cloud_blob::open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<concurrency::streams::istream> cloud_blob::open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type(), false);
 
         auto instance = std::make_shared<cloud_blob>(*this);
-        return instance->download_attributes_async(condition, modified_options, context).then([instance, condition, modified_options, context] () -> concurrency::streams::istream
+        return instance->download_attributes_async_impl(condition, modified_options, context, cancellation_token, true).then([instance, condition, modified_options, context, cancellation_token] () -> concurrency::streams::istream
         {
             auto modified_condition = azure::storage::access_condition::generate_if_match_condition(instance->properties().etag());
             modified_condition.set_lease_id(condition.lease_id());
-            return core::cloud_blob_istreambuf(instance, modified_condition, modified_options, context).create_istream();
+            return core::cloud_blob_istreambuf(instance, modified_condition, modified_options, context, cancellation_token, true).create_istream();
         });
     }
 
-    pplx::task<void> cloud_blob::download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob::download_attributes_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timer, std::shared_ptr<core::timer_handler> timer_handler)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
@@ -186,21 +186,22 @@ namespace azure { namespace storage {
         auto metadata = m_metadata;
         auto copy_state = m_copy_state;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized() && use_timer, timer_handler);
         command->set_build_request(std::bind(protocol::get_blob_properties, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties, metadata, copy_state] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties, metadata, copy_state](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_all(protocol::blob_response_parsers::parse_blob_properties(response));
             *metadata = protocol::parse_metadata(response);
             *copy_state = protocol::response_parsers::parse_copy_state(response);
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob::upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob::upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -208,18 +209,19 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::set_blob_metadata, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob::upload_properties_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob::upload_properties_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -227,26 +229,27 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, (modified_options.is_maximum_execution_time_customized() && use_timeout), timer_handler);
         command->set_build_request(std::bind(protocol::set_blob_properties, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
-            
+
             auto parsed_properties = protocol::blob_response_parsers::parse_blob_properties(response);
             properties->update_etag_and_last_modified(parsed_properties);
             properties->update_page_blob_sequence_number(parsed_properties);
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob::delete_blob_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob::delete_blob_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::delete_blob, snapshots_option, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
 
@@ -256,20 +259,32 @@ namespace azure { namespace storage {
             protocol::preprocess_response_void(response, result, context);
             properties->initialization();
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<bool> cloud_blob::delete_blob_if_exists_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<bool> cloud_blob::delete_blob_if_exists_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
+        std::chrono::steady_clock::time_point first_time_point;
+
+        if (options.is_maximum_execution_time_customized())
+        {
+            first_time_point = std::chrono::steady_clock::now();
+        }
 
         auto instance = std::make_shared<cloud_blob>(*this);
-        return exists_async(true, modified_options, context).then([instance, snapshots_option, condition, modified_options, context] (bool exists_result) -> pplx::task<bool>
+        return exists_async_impl(true, modified_options, context, cancellation_token).then([instance, condition, modified_options, snapshots_option, context, cancellation_token, options, first_time_point](bool exists_result) mutable ->pplx::task<bool>
         {
             if (exists_result)
             {
-                return instance->delete_blob_async(snapshots_option, condition, modified_options, context).then([] (pplx::task<void> delete_task) -> bool
+                if (modified_options.is_maximum_execution_time_customized())
+                {
+                    auto new_max_execution_time = modified_options.maximum_execution_time() - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - first_time_point);
+                    modified_options.set_maximum_execution_time(new_max_execution_time);
+                }
+                return instance->delete_blob_async(snapshots_option, condition, modified_options, context, cancellation_token).then([](pplx::task<void> delete_task) -> bool
                 {
                     try
                     {
@@ -299,7 +314,7 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<utility::string_t> cloud_blob::acquire_lease_async(const lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<utility::string_t> cloud_blob::acquire_lease_async(const lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -307,19 +322,20 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
         
-        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob, protocol::header_value_lease_acquire, proposed_lease_id, duration, lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             return protocol::parse_lease_id(response);
         });
+
         return core::executor<utility::string_t>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob::renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<void> cloud_blob::renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         if (condition.lease_id().empty())
         {
@@ -332,18 +348,19 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob, protocol::header_value_lease_renew, utility::string_t(), lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<utility::string_t> cloud_blob::change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         if (condition.lease_id().empty())
         {
@@ -356,19 +373,20 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob, protocol::header_value_lease_change, proposed_lease_id, lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             return protocol::parse_lease_id(response);
         });
+
         return core::executor<utility::string_t>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob::release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<void> cloud_blob::release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         if (condition.lease_id().empty())
         {
@@ -381,18 +399,19 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob, protocol::header_value_lease_release, utility::string_t(), lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<std::chrono::seconds> cloud_blob::break_lease_async(const lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<std::chrono::seconds> cloud_blob::break_lease_async(const lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -400,15 +419,16 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<std::chrono::seconds>>(uri());
+        auto command = std::make_shared<core::storage_command<std::chrono::seconds>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob, protocol::header_value_lease_break, utility::string_t(), lease_time(), break_period, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> std::chrono::seconds
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> std::chrono::seconds
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             return protocol::parse_lease_time(response);
         });
+
         return core::executor<std::chrono::seconds>::execute_async(command, modified_options, context);
     }
 
@@ -423,7 +443,7 @@ namespace azure { namespace storage {
         concurrency::streams::ostream::pos_type m_target_offset;
     };
 
-    pplx::task<void> cloud_blob::download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, bool update_properties)
+    pplx::task<void> cloud_blob::download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, bool update_properties, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -440,7 +460,7 @@ namespace azure { namespace storage {
         download_info->m_reset_target = false;
         download_info->m_target_offset = target.can_seek() ? target.tell() : static_cast<Concurrency::streams::basic_ostream<unsigned char>::pos_type>(0);
 
-        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri());
+        std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, false, timer_handler);
         std::weak_ptr<core::storage_command<void>> weak_command(command);
         command->set_build_request([offset, length, modified_options, condition, current_snapshot_time, download_info](web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context) -> web::http::http_request
         {
@@ -579,14 +599,21 @@ namespace azure { namespace storage {
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob::download_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob::download_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
+        std::shared_ptr<core::timer_handler> timer_handler = std::make_shared<core::timer_handler>(cancellation_token);
+
+        if (options.is_maximum_execution_time_customized())
+        {
+            timer_handler->start_timer(options.maximum_execution_time());// azure::storage::core::timer_handler will automatically stop the timer when destructed.
+        }
+
         if (options.parallelism_factor() > 1)
         {
             auto instance = std::make_shared<cloud_blob>(*this);
             // if download a whole blob, enable download strategy(download 32MB first).
             utility::size64_t single_blob_download_threshold(protocol::default_single_blob_download_threshold);
-            // If tranactional md5 validation is set, first range should be 4MB.
+            // If transactional md5 validation is set, first range should be 4MB.
             if (options.use_transactional_md5())
             {
                 single_blob_download_threshold = protocol::default_single_block_download_threshold;
@@ -608,7 +635,7 @@ namespace azure { namespace storage {
             // download first range.
             // if 416 thrown, it's an empty blob. need to download attributes.
             // otherwise, properties must be updated for further parallel download.
-            return instance->download_single_range_to_stream_async(target, offset, length < single_blob_download_threshold ? length : single_blob_download_threshold, condition, options, context, true).then([=](pplx::task<void> download_task)
+            return instance->download_single_range_to_stream_async(target, offset, length < single_blob_download_threshold ? length : single_blob_download_threshold, condition, options, context, true, timer_handler->get_cancellation_token(), timer_handler).then([=](pplx::task<void> download_task)
             {
                 try
                 {
@@ -620,7 +647,7 @@ namespace azure { namespace storage {
                     if (e.result().http_status_code() == web::http::status_codes::RangeNotSatisfiable
                         && offset == 0)
                     {
-                        return instance->download_attributes_async(condition, options, context);
+                        return instance->download_attributes_async_impl(condition, options, context, timer_handler->get_cancellation_token(), false, timer_handler);
                     }
                     else
                     {
@@ -651,7 +678,7 @@ namespace azure { namespace storage {
                     modified_condition.set_if_match_etag(instance->properties().etag());
                 }
 
-                return pplx::task_from_result().then([instance, offset, target, target_offset, target_length, single_blob_download_threshold, modified_condition, options, context]()
+                return pplx::task_from_result().then([instance, offset, target, target_offset, target_length, single_blob_download_threshold, modified_condition, options, context, timer_handler]()
                 {
                     auto semaphore = std::make_shared<core::async_semaphore>(options.parallelism_factor());
                     // lock to the target ostream
@@ -670,12 +697,12 @@ namespace azure { namespace storage {
                         {
                             current_length = target_offset + target_length - current_offset;
                         }
-                        semaphore->lock_async().then([instance, &mutex, semaphore, condition_variable, &condition_variable_mutex, &writer, offset, target, smallest_offset, current_offset, current_length, modified_condition, options, context]()
+                        semaphore->lock_async().then([instance, &mutex, semaphore, condition_variable, &condition_variable_mutex, &writer, offset, target, smallest_offset, current_offset, current_length, modified_condition, options, context, timer_handler]()
                         {
                             concurrency::streams::container_buffer<std::vector<uint8_t>> buffer;
                             auto segment_ostream = buffer.create_ostream();
-                            // if trasaction MD5 is enabled, it will be checked inside each download_single_range_to_stream_async.
-                            instance->download_single_range_to_stream_async(segment_ostream, current_offset, current_length, modified_condition, options, context)
+                            // if transaction MD5 is enabled, it will be checked inside each download_single_range_to_stream_async.
+                            instance->download_single_range_to_stream_async(segment_ostream, current_offset, current_length, modified_condition, options, context, false, timer_handler->get_cancellation_token(), timer_handler)
                                 .then([buffer, segment_ostream, semaphore, condition_variable, &condition_variable_mutex, smallest_offset, offset, current_offset, current_length, &mutex, target, &writer, options](pplx::task<void> download_task)
                             {
                                 segment_ostream.close().then([download_task](pplx::task<void> close_task)
@@ -702,6 +729,7 @@ namespace azure { namespace storage {
                                         pplx::extensibility::scoped_rw_lock_t guard(mutex);
                                         if (*smallest_offset == current_offset)
                                         {
+                                            // Below is the IO operation that may block for a relatively long time. However, this operation does not provide a interface to interrupt, so no cancellation support.
                                             target.streambuf().putn_nocopy(buffer.collection().data(), buffer.collection().size()).wait();
                                             *smallest_offset += protocol::transactional_md5_block_size;
                                             condition_variable->notify_all();
@@ -747,7 +775,19 @@ namespace azure { namespace storage {
                             });
                         });
                     }
-                    semaphore->wait_all_async().wait();
+                    // If the cancellation token is canceled, the lock will be in lock status when the exception is thrown, so need to unlock it in case it blocks other async processes
+                    try
+                    {
+                        semaphore->wait_all_async().get();
+                    }
+                    catch (const storage_exception& ex)
+                    {
+                        if (std::string(ex.what()) == protocol::error_operation_canceled)
+                        {
+                            semaphore->unlock();
+                        }
+                        throw ex;
+                    }
                     std::unique_lock<std::mutex> locker(condition_variable_mutex);
                     condition_variable->wait(locker, [smallest_offset, &mutex, target_offset, target_length]()
                     {
@@ -755,20 +795,20 @@ namespace azure { namespace storage {
                         return *smallest_offset >= target_offset + target_length;
                     });
                 });
-            });
+            }).then([timer_handler/*timer_handler MUST be captured*/]() {});
         }
         else
         {
-            return download_single_range_to_stream_async(target, offset, length, condition, options, context, true);
+            return download_single_range_to_stream_async(target, offset, length, condition, options, context, true, cancellation_token, timer_handler).then([timer_handler/*timer_handler MUST be captured*/]() {});;
         }
     }
 
-    pplx::task<void> cloud_blob::download_to_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob::download_to_file_async(const utility::string_t &path, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         auto instance = std::make_shared<cloud_blob>(*this);
-        return concurrency::streams::file_stream<uint8_t>::open_ostream(path).then([instance, condition, options, context] (concurrency::streams::ostream stream) -> pplx::task<void>
+        return concurrency::streams::file_stream<uint8_t>::open_ostream(path).then([instance, condition, options, context, cancellation_token] (concurrency::streams::ostream stream) -> pplx::task<void>
         {
-            return instance->download_to_stream_async(stream, condition, options, context).then([stream] (pplx::task<void> upload_task) -> pplx::task<void>
+            return instance->download_to_stream_async(stream, condition, options, context, cancellation_token).then([stream] (pplx::task<void> upload_task) -> pplx::task<void>
             {
                 return stream.close().then([upload_task]()
                 {
@@ -778,7 +818,7 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<bool> cloud_blob::exists_async(bool primary_only, const blob_request_options& options, operation_context context)
+    pplx::task<bool> cloud_blob::exists_async_impl(bool primary_only, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -787,11 +827,11 @@ namespace azure { namespace storage {
         auto metadata = m_metadata;
         auto copy_state = m_copy_state;
 
-        auto command = std::make_shared<core::storage_command<bool>>(uri());
+        auto command = std::make_shared<core::storage_command<bool>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::get_blob_properties, snapshot_time(), access_condition(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(primary_only ? core::command_location_mode::primary_only : core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties, metadata, copy_state] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
+        command->set_preprocess_response([properties, metadata, copy_state](const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (response.status_code() == web::http::status_codes::NotFound)
             {
@@ -807,7 +847,7 @@ namespace azure { namespace storage {
         return core::executor<bool>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -816,10 +856,10 @@ namespace azure { namespace storage {
         auto properties = m_properties;
         auto copy_state = m_copy_state;
 
-        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::copy_blob, source, get_premium_access_tier_string(tier), source_condition, metadata(), destination_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties, copy_state, tier] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties, copy_state, tier](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
@@ -831,12 +871,12 @@ namespace azure { namespace storage {
         return core::executor<utility::string_t>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         web::http::uri raw_source_uri = source.snapshot_qualified_uri().primary_uri();
         web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
 
-        return start_copy_async(source_uri, source_condition, destination_condition, options, context);
+        return start_copy_async(source_uri, source_condition, destination_condition, options, context, cancellation_token);
     }
 
     pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source)
@@ -844,29 +884,29 @@ namespace azure { namespace storage {
         return start_copy_async(source, file_access_condition(), access_condition(), blob_request_options(), operation_context());
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         UNREFERENCED_PARAMETER(source_condition);
         web::http::uri raw_source_uri = source.uri().primary_uri();
         web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
 
-        return start_copy_async(source_uri, access_condition(), destination_condition, options, context);
+        return start_copy_async(source_uri, access_condition(), destination_condition, options, context, cancellation_token);
     }
 
-    pplx::task<void> cloud_blob::abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<void> cloud_blob::abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::abort_copy_blob, copy_id, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<cloud_blob> cloud_blob::create_snapshot_async(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<cloud_blob> cloud_blob::create_snapshot_async(cloud_metadata metadata, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -878,10 +918,10 @@ namespace azure { namespace storage {
         auto snapshot_metadata = std::make_shared<cloud_metadata>(std::move(metadata));
         auto resulting_metadata = snapshot_metadata->empty() ? m_metadata : snapshot_metadata;
 
-        auto command = std::make_shared<core::storage_command<cloud_blob>>(uri());
+        auto command = std::make_shared<core::storage_command<cloud_blob>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::snapshot_blob, *snapshot_metadata, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([snapshot_name, snapshot_container, resulting_metadata, properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> cloud_blob
+        command->set_preprocess_response([snapshot_name, snapshot_container, resulting_metadata, properties](const web::http::http_response& response, const request_result& result, operation_context context) -> cloud_blob
         {
             protocol::preprocess_response_void(response, result, context);
             auto snapshot_time = protocol::get_header_value(response, protocol::ms_header_snapshot);

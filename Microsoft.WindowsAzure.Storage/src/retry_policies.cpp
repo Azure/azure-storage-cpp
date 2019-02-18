@@ -42,6 +42,7 @@ namespace azure { namespace storage {
     retry_info basic_common_retry_policy::evaluate(const retry_context& retry_context, operation_context context)
     {
         UNREFERENCED_PARAMETER(context);
+
         if (retry_context.current_retry_count() >= m_max_attempts)
         {
             return retry_info();

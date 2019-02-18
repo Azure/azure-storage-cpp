@@ -1540,7 +1540,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the start time of the requeset.
+        /// Sets the start time of the request.
         /// </summary>
         /// <param name="start_time">The start time of the request.</param>
         void set_start_time(utility::datetime start_time)
@@ -1558,7 +1558,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the end time of the requeset.
+        /// Sets the end time of the request.
         /// </summary>
         /// <param name="start_time">The end time of the request.</param>
         void set_end_time(utility::datetime end_time)
@@ -2544,11 +2544,11 @@ namespace azure { namespace storage {
     {
     public:
 
-        // TODO: Optimize request_options to make copying and duplicating these objects unnecesary (maybe make it immutable)
+        // TODO: Optimize request_options to make copying and duplicating these objects unnecessary (maybe make it immutable)
         // TODO: Consider not overwriting unset values in request_options with the service's defaults because it is a confusing interface (the service's defaults would be used only when the user does not supply a request_options parameter)
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 r-value reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -2631,7 +2631,7 @@ namespace azure { namespace storage {
         /// Gets the maximum execution time across all potential retries.
         /// </summary>
         /// <returns>The maximum execution time.</returns>
-        const std::chrono::seconds maximum_execution_time() const
+        const std::chrono::milliseconds maximum_execution_time() const
         {
             return m_maximum_execution_time;
         }
@@ -2640,9 +2640,23 @@ namespace azure { namespace storage {
         /// Sets the maximum execution time across all potential retries.
         /// </summary>
         /// <param name="maximum_execution_time">The maximum execution time.</param>
-        void set_maximum_execution_time(std::chrono::seconds maximum_execution_time)
+        /// <remarks>
+        /// This option will not control the total execution time in async open read/open write operations. It will be set in 
+        /// each underline request of read/write/close operation to make sure those request is finished within this time, or
+        /// timeout if otherwise.
+        /// </remarks>
+        void set_maximum_execution_time(const std::chrono::milliseconds& maximum_execution_time)
         {
             m_maximum_execution_time = maximum_execution_time;
+        }
+
+        /// <summary>
+        /// Gets if the maximum execution time is set by customer.
+        /// </summary>
+        /// <returns>True if the maximum execution time is set by customer. False otherwise</returns>
+        bool is_maximum_execution_time_customized() const
+        {
+            return m_maximum_execution_time.has_value();
         }
 
         /// <summary>
@@ -2691,7 +2705,7 @@ namespace azure { namespace storage {
         /// Gets the expiry time across all potential retries for the request.
         /// </summary>
         /// <returns>The expiry time.</returns>
-        utility::datetime operation_expiry_time() const
+        std::chrono::time_point<std::chrono::system_clock> operation_expiry_time() const
         {
             return m_operation_expiry_time;
         }
@@ -2724,25 +2738,25 @@ namespace azure { namespace storage {
 
             if (apply_expiry)
             {
-                auto expiry_in_seconds = static_cast<std::chrono::seconds>(m_maximum_execution_time).count();
-                if (!m_operation_expiry_time.is_initialized() && (expiry_in_seconds > 0))
+                auto expiry_in_milliseconds = static_cast<std::chrono::milliseconds>(m_maximum_execution_time);
+                if ((m_operation_expiry_time.time_since_epoch().count() == 0) && (expiry_in_milliseconds.count() > 0))
                 {
                     // This should not be copied from the other options, since
                     // this value should never have a default. Only if it has
                     // not been initialized by the copy constructor, now is the
                     // time to initialize it.
-                    m_operation_expiry_time = utility::datetime::utc_now() + utility::datetime::from_seconds(static_cast<unsigned int>(expiry_in_seconds));
+                    m_operation_expiry_time = std::chrono::system_clock::now() + expiry_in_milliseconds;
                 }
             }
         }
 
     private:
 
-        utility::datetime m_operation_expiry_time;
+        std::chrono::time_point<std::chrono::system_clock> m_operation_expiry_time;
         azure::storage::retry_policy m_retry_policy;
         option_with_default<std::chrono::seconds> m_noactivity_timeout;
         option_with_default<std::chrono::seconds> m_server_timeout;
-        option_with_default<std::chrono::seconds> m_maximum_execution_time;
+        option_with_default<std::chrono::milliseconds> m_maximum_execution_time;
         option_with_default<azure::storage::location_mode> m_location_mode;
         option_with_default<size_t> m_http_buffer_size;
     };

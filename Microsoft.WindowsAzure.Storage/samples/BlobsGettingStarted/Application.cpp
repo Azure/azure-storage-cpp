@@ -114,6 +114,34 @@ namespace azure { namespace storage { namespace samples {
             // Download append blob as text
             utility::string_t append_text = append_blob.download_text();
             ucout << _XPLATSTR("Append Text: ") << append_text << std::endl;
+
+            // Cancellation token
+            pplx::cancellation_token_source source; // This is used to cancel the request.
+            auto download_text_task = append_blob.download_text_async(azure::storage::access_condition(), azure::storage::blob_request_options(), azure::storage::operation_context(), source.get_token());
+            source.cancel();// This call will cancel download_text_task
+            try
+            {
+                auto downloaded_text = download_text_task.get();
+                ucout << _XPLATSTR("Text downloaded successfully unexpectedly, text is: ") << downloaded_text << std::endl;
+            }
+            catch (const azure::storage::storage_exception& e)
+            {
+                ucout << _XPLATSTR("Operation should be cancelled, the error message is: ") << e.what() << std::endl;
+            }
+
+            // Millisecond level timeout
+            azure::storage::blob_request_options options;
+            options.set_maximum_execution_time(std::chrono::milliseconds(1));
+            try
+            {
+                download_text_task = append_blob.download_text_async(azure::storage::access_condition(), options, azure::storage::operation_context());
+                auto downloaded_text = download_text_task.get();
+                ucout << _XPLATSTR("Text downloaded successfully unexpectedly, text is: ") << downloaded_text << std::endl;
+            }
+            catch (const azure::storage::storage_exception& e)
+            {
+                ucout << _XPLATSTR("Operation should be timed-out, the error message is: ") << e.what() << std::endl;
+            }
             
             // Delete the blob
             append_blob.delete_blob();

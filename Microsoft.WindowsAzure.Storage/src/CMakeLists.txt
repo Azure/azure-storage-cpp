@@ -4,6 +4,8 @@ include_directories(${AZURESTORAGE_INCLUDE_DIRS})
 # THE ORDER OF FILES IS VERY /VERY/ IMPORTANT
 if(UNIX OR WIN32)
   set(SOURCES
+     timer_handler.cpp
+     executor.cpp
      xml_wrapper.cpp
      xmlhelpers.cpp
      response_parsers.cpp

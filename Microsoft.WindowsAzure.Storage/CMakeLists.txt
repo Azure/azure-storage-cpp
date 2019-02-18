@@ -118,6 +118,20 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   else()
     add_definitions(-D_NO_WASTORAGE_API)
   endif()
+
+  if(ENABLE_MT)
+    set(CompilerFlags
+            CMAKE_CXX_FLAGS
+            CMAKE_CXX_FLAGS_DEBUG
+            CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_C_FLAGS
+            CMAKE_C_FLAGS_DEBUG
+            CMAKE_C_FLAGS_RELEASE
+    )
+    foreach(CompilerFlag ${CompilerFlags})
+      string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+    endforeach()
+  endif()
 else()
   message("-- Unknown compiler, success is doubtful.")
 endif()
@@ -135,8 +149,8 @@ set(AZURESTORAGE_LIBRARY azurestorage)
 set(AZURESTORAGE_LIBRARIES ${AZURESTORAGE_LIBRARY} ${CASABLANCA_LIBRARY} ${Boost_LIBRARIES} ${Boost_FRAMEWORK} ${OPENSSL_LIBRARIES} ${UUID_LIBRARIES} ${LibXML2_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 
 # Set version numbers centralized
-set (AZURESTORAGE_VERSION_MAJOR 5)
-set (AZURESTORAGE_VERSION_MINOR 2)
+set (AZURESTORAGE_VERSION_MAJOR 6)
+set (AZURESTORAGE_VERSION_MINOR 0)
 set (AZURESTORAGE_VERSION_REVISION 0)
 
 # Set output directories.
@@ -159,3 +173,4 @@ endif()
 if(BUILD_SAMPLES)
   add_subdirectory(samples)
 endif()
+

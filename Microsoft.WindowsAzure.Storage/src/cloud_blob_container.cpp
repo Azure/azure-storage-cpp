@@ -128,7 +128,7 @@ namespace azure { namespace storage {
         return cloud_blob_directory(std::move(directory_name), *this);
     }
 
-    pplx::task<void> cloud_blob_container::download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob_container::download_attributes_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -136,7 +136,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
         auto metadata = m_metadata;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::get_blob_container_properties, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
@@ -146,47 +146,50 @@ namespace azure { namespace storage {
             *properties = protocol::blob_response_parsers::parse_blob_container_properties(response);
             *metadata = protocol::parse_metadata(response);
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob_container::upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob_container::upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::set_blob_container_metadata, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob_container::acquire_lease_async(const lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<utility::string_t> cloud_blob_container::acquire_lease_async(const lease_time& duration, const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_acquire, proposed_lease_id, duration, lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return protocol::parse_lease_id(response);
         });
+
         return core::executor<utility::string_t>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob_container::renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<void> cloud_blob_container::renew_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         if (condition.lease_id().empty())
         {
@@ -198,18 +201,19 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_renew, utility::string_t(), lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob_container::change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<utility::string_t> cloud_blob_container::change_lease_async(const utility::string_t& proposed_lease_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         if (condition.lease_id().empty())
         {
@@ -221,19 +225,20 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_change, proposed_lease_id, lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return protocol::parse_lease_id(response);
         });
+
         return core::executor<utility::string_t>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob_container::release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<void> cloud_blob_container::release_lease_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         if (condition.lease_id().empty())
         {
@@ -245,66 +250,80 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_release, utility::string_t(), lease_time(), lease_break_period(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<std::chrono::seconds> cloud_blob_container::break_lease_async(const lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context) const
+    pplx::task<std::chrono::seconds> cloud_blob_container::break_lease_async(const lease_break_period& break_period, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<std::chrono::seconds>>(uri());
+        auto command = std::make_shared<core::storage_command<std::chrono::seconds>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::lease_blob_container, protocol::header_value_lease_break, utility::string_t(), lease_time(), break_period, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> std::chrono::seconds
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> std::chrono::seconds
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
             return protocol::parse_lease_time(response);
         });
+
         return core::executor<std::chrono::seconds>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob_container::create_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob_container::create_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::create_blob_container, public_access, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties, public_access] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties, public_access](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->m_public_access = public_access;
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<bool> cloud_blob_container::create_if_not_exists_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context)
+    pplx::task<bool> cloud_blob_container::create_if_not_exists_async(blob_container_public_access_type public_access, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
+        std::chrono::steady_clock::time_point first_time_point;
+
+        if (modified_options.is_maximum_execution_time_customized())
+        {
+            first_time_point = std::chrono::steady_clock::now();
+        }
 
         auto instance = std::make_shared<cloud_blob_container>(*this);
-        return exists_async(true, modified_options, context).then([instance, public_access, modified_options, context] (bool exists_result) -> pplx::task<bool>
+        return exists_async_impl(true, modified_options, context, cancellation_token).then([instance, public_access, modified_options, context, first_time_point, cancellation_token, options] (bool exists_result) mutable -> pplx::task<bool>
         {
             if (!exists_result)
             {
-                return instance->create_async(public_access, modified_options, context).then([] (pplx::task<void> create_task) -> bool
+                if (modified_options.is_maximum_execution_time_customized())
+                {
+                    auto new_max_execution_time = modified_options.maximum_execution_time() - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - first_time_point);
+                    modified_options.set_maximum_execution_time(new_max_execution_time);
+                }
+                return instance->create_async(public_access, modified_options, context, cancellation_token).then([] (pplx::task<void> create_task) -> bool
                 {
                     try
                     {
@@ -334,12 +353,12 @@ namespace azure { namespace storage {
         });
     }
 
-    pplx::task<void> cloud_blob_container::delete_container_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob_container::delete_container_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::delete_blob_container, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
 
@@ -349,20 +368,32 @@ namespace azure { namespace storage {
             protocol::preprocess_response_void(response, result, context);
             properties->initialization();
         });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<bool> cloud_blob_container::delete_container_if_exists_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<bool> cloud_blob_container::delete_container_if_exists_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
+        std::chrono::steady_clock::time_point first_time_point;
+
+        if (options.is_maximum_execution_time_customized())
+        {
+            first_time_point = std::chrono::steady_clock::now();
+        }
 
         auto instance = std::make_shared<cloud_blob_container>(*this);
-        return exists_async(true, modified_options, context).then([instance, condition, modified_options, context] (bool exists_result) -> pplx::task<bool>
+        return exists_async_impl(true, modified_options, context, cancellation_token).then([instance, condition, modified_options, context, first_time_point, cancellation_token, options](bool exists_result) mutable -> pplx::task<bool>
         {
             if (exists_result)
             {
-                return instance->delete_container_async(condition, modified_options, context).then([] (pplx::task<void> delete_task) -> bool
+                if (modified_options.is_maximum_execution_time_customized())
+                {
+                    auto new_max_execution_time = modified_options.maximum_execution_time() - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - first_time_point);
+                    modified_options.set_maximum_execution_time(new_max_execution_time);
+                }
+                return instance->delete_container_async(condition, modified_options, context, cancellation_token).then([](pplx::task<void> delete_task) -> bool
                 {
                     try
                     {
@@ -387,7 +418,7 @@ namespace azure { namespace storage {
             }
             else
             {
-                return pplx::task_from_result<bool>(false);
+                return pplx::task_from_result(false);
             }
         });
     }
@@ -403,7 +434,7 @@ namespace azure { namespace storage {
             max_results, 0);
     }
 
-    pplx::task<list_blob_item_segment> cloud_blob_container::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context) const
+    pplx::task<list_blob_item_segment> cloud_blob_container::list_blobs_segmented_async(const utility::string_t& prefix, bool use_flat_blob_listing, blob_listing_details::values includes, int max_results, const continuation_token& token, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -421,7 +452,7 @@ namespace azure { namespace storage {
             delimiter = service_client().directory_delimiter();
         }
 
-        auto command = std::make_shared<core::storage_command<list_blob_item_segment>>(uri());
+        auto command = std::make_shared<core::storage_command<list_blob_item_segment>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::list_blobs, prefix, delimiter, includes, max_results, token, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
@@ -451,10 +482,11 @@ namespace azure { namespace storage {
 
             return pplx::task_from_result(list_blob_item_segment(std::move(list_blob_items), std::move(next_token)));
         });
+
         return core::executor<list_blob_item_segment>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_blob_container::upload_permissions_async(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<void> cloud_blob_container::upload_permissions_async(const blob_container_permissions& permissions, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -464,33 +496,34 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<void>>(uri());
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::set_blob_container_acl, permissions.public_access(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context)
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
-        return core::istream_descriptor::create(stream).then([command, context, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
+
+        return core::istream_descriptor::create(stream, false, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, context, modified_options, cancellation_token, options](core::istream_descriptor request_body) -> pplx::task<void>
         {
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });
     }
 
-    pplx::task<blob_container_permissions> cloud_blob_container::download_permissions_async(const access_condition& condition, const blob_request_options& options, operation_context context)
+    pplx::task<blob_container_permissions> cloud_blob_container::download_permissions_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
 
         auto properties = m_properties;
 
-        auto command = std::make_shared<core::storage_command<blob_container_permissions>>(uri());
+        auto command = std::make_shared<core::storage_command<blob_container_permissions>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::get_blob_container_acl, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties] (const web::http::http_response& response, const request_result& result, operation_context context) -> blob_container_permissions
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> blob_container_permissions
         {
             protocol::preprocess_response_void(response, result, context);
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
@@ -508,10 +541,11 @@ namespace azure { namespace storage {
 
             return pplx::task_from_result<blob_container_permissions>(permissions);
         });
+
         return core::executor<blob_container_permissions>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<bool> cloud_blob_container::exists_async(bool primary_only, const blob_request_options& options, operation_context context)
+    pplx::task<bool> cloud_blob_container::exists_async_impl(bool primary_only, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
@@ -519,11 +553,11 @@ namespace azure { namespace storage {
         auto properties = m_properties;
         auto metadata = m_metadata;
 
-        auto command = std::make_shared<core::storage_command<bool>>(uri());
+        auto command = std::make_shared<core::storage_command<bool>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::get_blob_container_properties, access_condition(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(primary_only ? core::command_location_mode::primary_only : core::command_location_mode::primary_or_secondary);
-        command->set_preprocess_response([properties, metadata] (const web::http::http_response& response, const request_result& result, operation_context context) -> bool
+        command->set_preprocess_response([properties, metadata](const web::http::http_response& response, const request_result& result, operation_context context) -> bool
         {
             if (response.status_code() == web::http::status_codes::NotFound)
             {

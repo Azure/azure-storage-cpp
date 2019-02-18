@@ -113,6 +113,26 @@ SUITE(File)
         CHECK_EQUAL(0U, same_file.metadata().size());
     }
 
+    TEST_FIXTURE(file_test_base, file_properties)
+    {
+        m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        m_file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        CHECK_EQUAL(1024U, m_file.properties().length());
+
+        {
+            m_file.properties().set_content_md5(_XPLATSTR(""));
+            m_file.upload_properties();
+            CHECK(_XPLATSTR("") == m_file.properties().content_md5());
+
+            auto same_file = m_file.get_parent_share_reference().get_directory_reference(m_directory.name()).get_file_reference(m_file.name());
+            auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
+            azure::storage::file_request_options options;
+            options.set_use_transactional_md5(true);
+            same_file.download_range_to_stream(stream, 0, 128, azure::storage::file_access_condition(), options, m_context);
+            CHECK(_XPLATSTR("") == same_file.properties().content_md5());
+        }
+    }
+
     TEST_FIXTURE(file_test_base, file_properties_resize_wont_work)
     {
         m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);

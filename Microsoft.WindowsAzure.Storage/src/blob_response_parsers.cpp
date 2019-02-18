@@ -171,8 +171,9 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_content_language = get_header_value(headers, web::http::header_names::content_language);
         properties.m_content_type = get_header_value(headers, web::http::header_names::content_type);
         properties.m_type = parse_blob_type(get_header_value(headers, ms_header_blob_type));
+        // When content_range is not empty, it means the request is Get Blob with range specified, then 'Content-MD5' header should not be used.
         properties.m_content_md5 = get_header_value(headers, ms_header_blob_content_md5);
-        if (properties.m_content_md5.empty())
+        if (properties.m_content_md5.empty() && get_header_value(headers, web::http::header_names::content_range).empty())
         {
             properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
         }

@@ -22,9 +22,9 @@
 
 namespace azure { namespace storage {
 
-    pplx::task<service_properties> cloud_client::download_service_properties_base_async(const request_options& modified_options, operation_context context) const
+    pplx::task<service_properties> cloud_client::download_service_properties_base_async(const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
-        auto command = std::make_shared<core::storage_command<service_properties>>(base_uri());
+        auto command = std::make_shared<core::storage_command<service_properties>>(base_uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::get_service_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
@@ -37,30 +37,30 @@ namespace azure { namespace storage {
         return core::executor<service_properties>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_client::upload_service_properties_base_async(const service_properties& properties, const service_properties_includes& includes, const request_options& modified_options, operation_context context) const
+    pplx::task<void> cloud_client::upload_service_properties_base_async(const service_properties& properties, const service_properties_includes& includes, const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         protocol::service_properties_writer writer;
         concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(writer.write(properties, includes)));
 
-        auto command = std::make_shared<core::storage_command<void>>(base_uri());
+        auto command = std::make_shared<core::storage_command<void>>(base_uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::set_service_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-        return core::istream_descriptor::create(stream).then([command, context, modified_options] (core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(stream, false, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, context, modified_options, cancellation_token] (core::istream_descriptor request_body) -> pplx::task<void>
         {
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });
     }
 
-    pplx::task<service_stats> cloud_client::download_service_stats_base_async(const request_options& modified_options, operation_context context) const
+    pplx::task<service_stats> cloud_client::download_service_stats_base_async(const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
         if (modified_options.location_mode() == location_mode::primary_only)
         {
             throw storage_exception("download_service_stats cannot be run with a 'primary_only' location mode.");
         }
 
-        auto command = std::make_shared<core::storage_command<service_stats>>(base_uri());
+        auto command = std::make_shared<core::storage_command<service_stats>>(base_uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
         command->set_build_request(std::bind(protocol::get_service_stats, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);

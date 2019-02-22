@@ -90,7 +90,7 @@ C:\src\vcpkg> .\vcpkg install azure-storage-cpp
 ```
 
 #### Visual Studio Version
-Starting from version 2.1.0, Azure Storage Client Library for C++ supports Visual Studio 2013 and Visual Studio 2015. In case you have the need to use Visual Studio 2012, please get [version 2.0.0](http://www.nuget.org/packages/wastorage/2.0.0).
+Starting from version 6.1.0, Azure Storage Client Library for C++ supports Visual Studio 2015 and Visual Studio 2017. In case you have the need to use Visual Studio 2013, please get [version 6.0.0](https://github.com/Azure/azure-storage-cpp/releases/tag/v6.0.0), to use Visual Studio 2012, please get [version 2.0.0](http://www.nuget.org/packages/wastorage/2.0.0).
 
 ## Dependencies
 

@@ -111,6 +111,24 @@ SUITE(Blob)
         CHECK_UTF8_EQUAL(m_container.uri().secondary_uri().to_string(), directory.container().uri().secondary_uri().to_string());
     }
 
+    TEST_FIXTURE(container_test_base, download_account_properties_container)
+    {
+        auto properties = m_container.download_account_properties();
+        CHECK(!properties.sku_name().empty());
+        CHECK(!properties.account_kind().empty());
+
+        azure::storage::blob_shared_access_policy access_policy;
+        access_policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        access_policy.set_permissions(azure::storage::account_shared_access_policy::read);
+
+        azure::storage::storage_credentials sas_credentials(m_container.get_shared_access_signature(access_policy));
+        azure::storage::cloud_blob_container sas_container(m_container.uri(), sas_credentials);
+
+        properties = sas_container.download_account_properties();
+        CHECK(!properties.sku_name().empty());
+        CHECK(!properties.account_kind().empty());
+    }
+
     TEST_FIXTURE(container_test_base, container_create_delete)
     {
         CHECK(!m_container.exists(azure::storage::blob_request_options(), m_context));

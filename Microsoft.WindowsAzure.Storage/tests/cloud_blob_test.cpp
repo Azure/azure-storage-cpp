@@ -354,6 +354,25 @@ SUITE(Blob)
         }
     }
 
+    TEST_FIXTURE(blob_test_base, download_account_properties_blob)
+    {
+        auto blob = m_container.get_blob_reference(_XPLATSTR("tmpblob"));
+        auto properties = m_container.get_blob_reference(_XPLATSTR("tmpblob")).download_account_properties();
+        CHECK(!properties.sku_name().empty());
+        CHECK(!properties.account_kind().empty());
+
+        azure::storage::blob_shared_access_policy access_policy;
+        access_policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        access_policy.set_permissions(azure::storage::account_shared_access_policy::read);
+
+        azure::storage::storage_credentials sas_credentials(blob.get_shared_access_signature(access_policy));
+        azure::storage::cloud_blob sas_blob(blob.uri(), sas_credentials);
+        
+        properties = sas_blob.download_account_properties();
+        CHECK(!properties.sku_name().empty());
+        CHECK(!properties.account_kind().empty());
+    }
+
     TEST_FIXTURE(blob_test_base, blob_type)
     {
         auto page_blob = m_container.get_page_blob_reference(_XPLATSTR("pageblob"));

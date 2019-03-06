@@ -32,6 +32,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request get_service_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_service_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_service_stats(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_account_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     void add_optional_header(web::http::http_headers& headers, const utility::string_t& header, const utility::string_t& value);
     void add_metadata(web::http::http_request& request, const cloud_metadata& metadata);
 
@@ -212,6 +213,7 @@ namespace azure { namespace storage { namespace protocol {
 
         static cloud_blob_container_properties parse_blob_container_properties(const web::http::http_response& response);
         static cloud_blob_properties parse_blob_properties(const web::http::http_response& response);
+        static account_properties parse_account_properties(const web::http::http_response& response);
     };
 
     class table_response_parsers

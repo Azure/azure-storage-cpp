@@ -153,6 +153,34 @@ SUITE(Blob)
         CHECK(container.is_valid());
     }
 
+    TEST_FIXTURE(blob_service_test_base, download_account_properties_service)
+    {
+        auto properties = m_client.download_account_properties();
+        CHECK((properties.sku_name() == _XPLATSTR("Standard_RAGRS")) || (properties.sku_name() == _XPLATSTR("Standard_LRS")));
+        CHECK((properties.account_kind() == _XPLATSTR("Storage")) || (properties.account_kind() == _XPLATSTR("StorageV2")));
+
+        properties = m_premium_client.download_account_properties();
+        CHECK((properties.sku_name() == _XPLATSTR("Premium_RAGRS")) || (properties.sku_name() == _XPLATSTR("Premium_LRS")));
+        CHECK((properties.account_kind() == _XPLATSTR("Storage")) || (properties.account_kind() == _XPLATSTR("StorageV2")));
+
+        properties = m_blob_storage_client.download_account_properties();
+        CHECK((properties.sku_name() == _XPLATSTR("Standard_RAGRS")) || (properties.sku_name() == _XPLATSTR("Standard_LRS")));
+        CHECK(properties.account_kind() == _XPLATSTR("BlobStorage"));
+
+        azure::storage::account_shared_access_policy access_policy;
+        access_policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        access_policy.set_permissions(azure::storage::account_shared_access_policy::read);
+        access_policy.set_service_type(azure::storage::account_shared_access_policy::service_types::blob);
+        access_policy.set_resource_type(azure::storage::account_shared_access_policy::resource_types::service);
+
+        azure::storage::storage_credentials account_sas_credentials(test_config::instance().account().get_shared_access_signature(access_policy));
+        azure::storage::cloud_blob_client sas_client(test_config::instance().account().blob_endpoint(), account_sas_credentials);
+        
+        properties = sas_client.download_account_properties();
+        CHECK((properties.sku_name() == _XPLATSTR("Standard_RAGRS")) || (properties.sku_name() == _XPLATSTR("Standard_LRS")));
+        CHECK((properties.account_kind() == _XPLATSTR("Storage")) || (properties.account_kind() == _XPLATSTR("StorageV2")));
+    }
+
     TEST_FIXTURE(blob_service_test_base_with_objects_to_delete, list_containers_with_prefix)
     {
         auto prefix = get_random_container_name();

@@ -112,6 +112,14 @@ namespace azure { namespace storage {
         return download_service_stats_base_async(modified_options, context, cancellation_token);
     }
 
+    pplx::task<account_properties> cloud_blob_client::download_account_properties_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(default_request_options(), blob_type::unspecified);
+
+        return download_account_properties_base_async(base_uri(), modified_options, context, cancellation_token);
+    }
+
     cloud_blob_container cloud_blob_client::get_root_container_reference() const
     {
         return get_container_reference(protocol::root_container);
@@ -120,6 +128,20 @@ namespace azure { namespace storage {
     cloud_blob_container cloud_blob_client::get_container_reference(utility::string_t container_name) const
     {
         return cloud_blob_container(std::move(container_name), *this);
+    }
+
+    pplx::task<account_properties> cloud_blob_client::download_account_properties_base_async(const storage_uri& uri, const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    {
+        auto command = std::make_shared<core::storage_command<account_properties>>(uri, cancellation_token, modified_options.is_maximum_execution_time_customized());
+        command->set_build_request(std::bind(protocol::get_account_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(authentication_handler());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary);
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<account_properties>, account_properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_postprocess_response([](const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<account_properties>
+        {
+            return pplx::task_from_result<account_properties>(protocol::blob_response_parsers::parse_account_properties(response));
+        });
+        return core::executor<account_properties>::execute_async(command, modified_options, context);
     }
 
     void cloud_blob_client::set_authentication_scheme(azure::storage::authentication_scheme value)

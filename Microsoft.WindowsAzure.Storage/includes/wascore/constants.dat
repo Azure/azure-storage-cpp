@@ -75,6 +75,7 @@ DAT(table_query_next_table_name, _XPLATSTR("NextTableName"))
 DAT(queue_query_next_marker, _XPLATSTR("marker"))
 
 // resource types
+DAT(resource_account, _XPLATSTR("account"))
 DAT(resource_service, _XPLATSTR("service"))
 DAT(resource_container, _XPLATSTR("container"))
 DAT(resource_blob, _XPLATSTR("blob"))
@@ -180,9 +181,11 @@ DAT(ms_header_access_tier, _XPLATSTR("x-ms-access-tier"))
 DAT(ms_header_access_tier_inferred, _XPLATSTR("x-ms-access-tier-inferred"))
 DAT(ms_header_archive_status, _XPLATSTR("x-ms-archive-status"))
 DAT(ms_header_tier_change_time, _XPLATSTR("x-ms-access-tier-change-time"))
+DAT(ms_header_sku_name, _XPLATSTR("x-ms-sku-name"))
+DAT(ms_header_account_kind, _XPLATSTR("x-ms-account-kind"))
 
 // header values
-DAT(header_value_storage_version, _XPLATSTR("2017-07-29"))
+DAT(header_value_storage_version, _XPLATSTR("2018-03-28"))
 DAT(header_value_true, _XPLATSTR("true"))
 DAT(header_value_false, _XPLATSTR("false"))
 DAT(header_value_locked, _XPLATSTR("locked"))

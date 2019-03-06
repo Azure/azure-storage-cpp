@@ -68,6 +68,14 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
+    web::http::http_request get_account_properties(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(uri_query_resource_type, resource_account);
+        uri_builder.append_query(uri_query_component, component_properties);
+        web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
+        return request;
+    }
+
     void add_optional_header(web::http::http_headers& headers, const utility::string_t& header, const utility::string_t& value)
     {
         if (!value.empty())

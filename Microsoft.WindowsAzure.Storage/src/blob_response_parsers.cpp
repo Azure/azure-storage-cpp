@@ -195,4 +195,14 @@ namespace azure { namespace storage { namespace protocol {
         return properties;
     }
 
+    account_properties blob_response_parsers::parse_account_properties(const web::http::http_response& response)
+    {
+        account_properties properties;
+
+        properties.m_sku_name = get_header_value(response, protocol::ms_header_sku_name);
+        properties.m_account_kind = get_header_value(response, protocol::ms_header_account_kind);
+
+        return properties;
+    }
+
 }}} // namespace azure::storage::protocol

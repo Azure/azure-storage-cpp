@@ -102,6 +102,74 @@ namespace azure { namespace storage {
     };
 
     /// <summary>
+    /// Represents account properties for blob service.
+    /// </summary>
+    class account_properties
+    {
+    public:
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_properties" /> class.
+        /// </summary>
+        account_properties()
+        {
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::account_properties" /> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::account_properties" /> object.</param>
+        account_properties(account_properties&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to an <see cref="azure::storage::account_properties" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::account_properties" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::account_properties" /> object with properties set.</returns>
+        account_properties& operator=(account_properties&& other)
+        {
+            if (this != &other)
+            {
+                m_sku_name = std::move(other.m_sku_name);
+                m_account_kind = std::move(other.m_account_kind);
+            }
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Gets the account SKU type based on GeoReplication state.
+        /// </summary>
+        /// <value>"Standard_LRS", "Standard_ZRS", "Standard_GRS", "Standard_RAGRS", "Premium_LRS", or "Premium_ZRS"</value>
+        const utility::string_t& sku_name() const
+        {
+            return m_sku_name;
+        }
+
+        /// <summary>
+        /// Gets the account kind.
+        /// </summary>
+        /// <value>"Storage", "StorageV2", or "BlobStorage"</value>
+        const utility::string_t& account_kind() const
+        {
+            return m_account_kind;
+        }
+
+    private:
+
+        utility::string_t m_sku_name;
+        utility::string_t m_account_kind;
+        friend class protocol::blob_response_parsers;
+    };
+
+    /// <summary>
     /// Represents a shared access policy, which specifies the start time, expiry time, 
     /// and permissions for a shared access signature for a blob or container.
     /// </summary>
@@ -2851,6 +2919,55 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<service_stats> download_service_stats_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
+        ///  Gets the account properties the Blob service client.
+        /// </summary>
+        /// <returns>The <see cref="azure::storage::account_properties" /> for the Blob service client.</returns>
+        account_properties download_account_properties() const
+        {
+            return download_account_properties_async().get();
+        }
+
+        /// <summary>
+        /// Gets the account properties the Blob service client.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The <see cref="azure::storage::account_properties" /> for the Blob service client.</returns>
+        account_properties download_account_properties(const blob_request_options& options, operation_context context) const
+        {
+            return download_account_properties_async(options, context).get();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get the account properties of the service.
+        /// </summary>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::account_properties" /> that represents the current operation.</returns>
+        pplx::task<account_properties> download_account_properties_async() const
+        {
+            return download_account_properties_async(blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get the account properties of the service.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::account_properties" /> that represents the current operation.</returns>
+        pplx::task<account_properties> download_account_properties_async(const blob_request_options& options, operation_context context) const
+        {
+            return download_account_properties_async(options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get the account properties of the service.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<account_properties> download_account_properties_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
+
+        /// <summary>
         /// Returns a reference to an <see cref="azure::storage::cloud_blob_container" /> object.
         /// </summary>
         /// <returns>A reference to the root container, of type <see cref="azure::storage::cloud_blob_container" />.</returns>
@@ -2896,6 +3013,7 @@ namespace azure { namespace storage {
         }
 
     private:
+        pplx::task<account_properties> download_account_properties_base_async(const storage_uri& uri, const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         void initialize()
         {
@@ -2909,7 +3027,10 @@ namespace azure { namespace storage {
 
         blob_request_options m_default_request_options;
         utility::string_t m_directory_delimiter;
-    };
+
+        friend class cloud_blob_container;
+        friend class cloud_blob;
+    }; //cloud_blob_client
 
     /// <summary>
     /// Represents a container in the Windows Azure Blob service.
@@ -3168,6 +3289,55 @@ namespace azure { namespace storage {
         /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         WASTORAGE_API pplx::task<void> upload_metadata_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
+        
+        /// <summary>
+        /// Gets properties for the account this container resides on.
+        /// </summary>
+        /// <returns>The <see cref="azure::storage::account_properties" /> for the Blob service client.</returns>
+        account_properties download_account_properties() const
+        {
+            return download_account_properties_async().get();
+        }
+
+        /// <summary>
+        /// Gets properties for the account this container resides on.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The <see cref="azure::storage::account_properties" /> for the Blob service client.</returns>
+        account_properties download_account_properties(const blob_request_options& options, operation_context context) const
+        {
+            return download_account_properties_async(options, context).get();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get properties for the account this container resides on.
+        /// </summary>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::account_properties" /> that represents the current operation.</returns>
+        pplx::task<account_properties> download_account_properties_async() const
+        {
+            return download_account_properties_async(blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get properties for the account this container resides on.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::account_properties" /> that represents the current operation.</returns>
+        pplx::task<account_properties> download_account_properties_async(const blob_request_options& options, operation_context context) const
+        {
+            return download_account_properties_async(options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get properties for the account this container resides on.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<account_properties> download_account_properties_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Acquires a lease on the container.
@@ -4002,7 +4172,7 @@ namespace azure { namespace storage {
         storage_uri m_uri;
         std::shared_ptr<cloud_metadata> m_metadata;
         std::shared_ptr<cloud_blob_container_properties> m_properties;
-    };
+    }; // End of cloud_blob_container
 
     /// <summary>
     /// Represents a virtual directory of blobs, designated by a delimiter character.
@@ -4650,6 +4820,55 @@ namespace azure { namespace storage {
         {
             return upload_properties_async_impl(condition, options, context, cancellation_token, true);
         }
+
+        /// <summary>
+        /// Gets properties for the account this blob resides on.
+        /// </summary>
+        /// <returns>The <see cref="azure::storage::account_properties" /> for the Blob service client.</returns>
+        account_properties download_account_properties() const
+        {
+            return download_account_properties_async().get();
+        }
+
+        /// <summary>
+        /// Gets properties for the account this blob resides on.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The <see cref="azure::storage::account_properties" /> for the Blob service client.</returns>
+        account_properties download_account_properties(const blob_request_options& options, operation_context context) const
+        {
+            return download_account_properties_async(options, context).get();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get properties for the account this blob resides on.
+        /// </summary>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::account_properties" /> that represents the current operation.</returns>
+        pplx::task<account_properties> download_account_properties_async() const
+        {
+            return download_account_properties_async(blob_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get properties for the account this blob resides on.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::account_properties" /> that represents the current operation.</returns>
+        pplx::task<account_properties> download_account_properties_async(const blob_request_options& options, operation_context context) const
+        {
+            return download_account_properties_async(options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get properties for the account this blob resides on.
+        /// </summary>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="azure::storage::service_stats" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<account_properties> download_account_properties_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
         /// <summary>
         /// Deletes the blob.
@@ -8766,7 +8985,6 @@ namespace azure { namespace storage {
         cloud_metadata m_metadata;
         copy_state m_copy_state;
     };
-
 }} // namespace azure::storage
 
 #pragma pop_macro("max")

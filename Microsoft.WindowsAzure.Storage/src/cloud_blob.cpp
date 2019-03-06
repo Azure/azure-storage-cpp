@@ -244,6 +244,14 @@ namespace azure { namespace storage {
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
+    pplx::task<account_properties> cloud_blob::download_account_properties_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    {
+        blob_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options(), blob_type::unspecified);
+
+        return service_client().download_account_properties_base_async(uri(), modified_options, context, cancellation_token);
+    }
+
     pplx::task<void> cloud_blob::delete_blob_async(delete_snapshots_option snapshots_option, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);

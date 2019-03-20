@@ -1,8 +1,8 @@
-#Azure Storage Client Library for C++ 2.0.0: What’s new and sample code
+# Azure Storage Client Library for C++ 2.0.0: What’s new and sample code
 
 This article introduces the changes in Microsoft Azure Storage Client Library for C++ 2.0.0 and provides some code samples. You can also check the GitHub [readme.md](https://github.com/Azure/azure-storage-cpp/blob/master/README.md) and [changelog.log](https://github.com/Azure/azure-storage-cpp/blob/master/Changelog.txt) files for more details.
 
-##New storage blob type
+## New storage blob type
 
 By default, Azure Storage Client Library for C++ 2.0.0 uses REST API version 2015-2-21. This version of the Azure Storage service includes several important features that you can find at [2015-2 version blog link]. The C++ client library supports one key feature, the new storage blob type called *Append Blob*.
 
@@ -66,7 +66,7 @@ The following sample code shows the use of Append Blob.
 	            ucout << U("Error: ") << e.what() << std::endl;
 	        }
 
-##Range-based for-loop to list objects
+## Range-based for-loop to list objects
 
 For versions earlier than 2.0.0, you can list blobs via the following method.
 
@@ -101,7 +101,7 @@ With version 2.0.0, you can also use a range-based for-loop to list blobs.
 
 For more details about listing APIs of the C++ client library, visit [Efficiently use Listing APIs in Microsoft Azure Storage Client Library for C++](https://azure.microsoft.com/documentation/articles/storage-c-plus-plus-enumeration/).
 
-##Handling query parameters in the resource URI
+## Handling query parameters in the resource URI
 
 With versions earlier than 2.0.0, the C++ client library will *keep* only the following parameters and ignore the others when handling the Azure Storage resource URI:
 
@@ -225,16 +225,17 @@ Note that with this behavior change, the C++ client library will throw an `std::
             web::http::uri(U("https://myaccount-secondary.queue.core.windows.net/myqueue?sp=raup&sv=2012-02-12&se=2013-05-14T18%3A23%3A15Z&st=2013-05-14T17%3A23%3A15Z&sig=mysignature")));
         azure::storage::cloud_queue queue2(sas_uri, sas_credentials);
 
-##Renamed interfaces
+## Renamed interfaces
 
 Azure Storage Client Library for C++ 2.0.0 changes interfaces as follows:
 -  Renames `cloud_blob::start_copy_from_blob` to `cloud_blob::start_copy`
 -  Renames `cloud_blob::start_copy_from_blob_async` to `cloud_blob::start_copy_async`
 
-##Bug fixes
+## Bug fixes
+
 You can find the bug fixes at [changelog.txt](https://github.com/Azure/azure-storage-cpp/blob/master/Changelog.txt).
 
-##Next steps
+## Next steps
 
 For more information about Azure Storage and the client library for C++, see the following resources:
 -  [How to use Blob Storage from C++](http://azure.microsoft.com/documentation/articles/storage-c-plus-plus-how-to-use-blobs/)

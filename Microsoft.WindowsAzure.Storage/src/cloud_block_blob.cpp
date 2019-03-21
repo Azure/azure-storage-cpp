@@ -150,6 +150,11 @@ namespace azure { namespace storage {
         // Before this line, 'length = max' means "no length was given by the user."  After this line, 'length = max' means "no length was given, and the stream is not seekable."
         if (length == std::numeric_limits<utility::size64_t>::max())
         {
+            if (remaining_stream_length == std::numeric_limits<utility::size64_t>::max())
+            {
+                throw storage_exception(protocol::error_stream_length_unknown);
+            }
+
             length = remaining_stream_length;
         }
 

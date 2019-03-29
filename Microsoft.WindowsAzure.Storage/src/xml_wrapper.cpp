@@ -41,7 +41,7 @@ xml_text_reader_wrapper::xml_text_reader_wrapper(const unsigned char * buffer, u
 
 xml_text_reader_wrapper::~xml_text_reader_wrapper()
 {
-    if (!m_reader)
+    if (m_reader != nullptr)
     {
         xmlFreeTextReader(m_reader);
         m_reader = nullptr;

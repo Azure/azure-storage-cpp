@@ -153,11 +153,6 @@ namespace azure { namespace storage {
         // Before this line, 'length = max' means "no length was given by the user."  After this line, 'length = max' means "no length was given, and the stream is not seekable."
         if (length == std::numeric_limits<utility::size64_t>::max())
         {
-            if (remaining_stream_length == std::numeric_limits<utility::size64_t>::max())
-            {
-                throw storage_exception(protocol::error_stream_length_unknown);
-            }
-
             length = remaining_stream_length;
         }
         
@@ -182,6 +177,12 @@ namespace azure { namespace storage {
         auto instance = std::make_shared<cloud_append_blob>(*this);
         return concurrency::streams::file_stream<uint8_t>::open_istream(path).then([instance, condition, options, context, cancellation_token](concurrency::streams::istream stream) -> pplx::task<void>
         {
+            utility::size64_t remaining_stream_length = core::get_remaining_stream_length(stream);
+            if (remaining_stream_length == std::numeric_limits<utility::size64_t>::max())
+            {
+                throw storage_exception(protocol::error_stream_length_unknown);
+            }
+
             return instance->upload_from_stream_async(stream, std::numeric_limits<utility::size64_t>::max(), condition, options, context, cancellation_token).then([stream](pplx::task<void> upload_task) -> pplx::task<void>
             {
                 return stream.close().then([upload_task]()

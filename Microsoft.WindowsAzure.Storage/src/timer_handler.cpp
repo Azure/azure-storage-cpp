@@ -40,7 +40,19 @@ namespace azure {    namespace storage {    namespace core {
         {
             m_cancellation_token.deregister_callback(m_cancellation_token_registration);
         }
+
+#ifdef _WIN32
         stop_timer();
+#else // LINUX
+        try
+        {
+            stop_timer();
+        }
+        catch (boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::system::system_error> > &e)
+        {
+        }
+#endif
+
     }
 
     void timer_handler::start_timer(const std::chrono::milliseconds& time)

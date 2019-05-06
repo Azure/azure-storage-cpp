@@ -56,7 +56,7 @@ namespace azure { namespace storage { namespace core {
     public:
         basic_cloud_ostreambuf()
             : basic_ostreambuf<concurrency::streams::ostream::traits::char_type>(),
-            m_current_streambuf_offset(0), m_committed(false)
+            m_current_streambuf_offset(0), m_committed(false), m_buffer_size(0), m_next_buffer_size(0)
         {
         }
 

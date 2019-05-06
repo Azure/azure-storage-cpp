@@ -355,7 +355,8 @@ namespace azure { namespace storage { namespace core { namespace xml {
         }
 #else // LINUX
         auto result = m_document->write_to_string();
-        *m_stream << reinterpret_cast<const char *>(result.c_str());
+        if (m_stream != nullptr)
+            *m_stream << reinterpret_cast<const char *>(result.c_str());
 
 #endif
     }

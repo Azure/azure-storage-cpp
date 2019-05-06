@@ -808,7 +808,7 @@ namespace azure { namespace storage {
             /// Initializes a new instance of the <see cref="azure::storage::service_properties::metrics_properties" /> class.
             /// </summary>
             metrics_properties()
-                : m_include_apis(false), m_retention_enabled(false), m_retention_days(0)
+                : m_enabled(false), m_include_apis(false), m_retention_enabled(false), m_retention_days(0)
             {
             }
 
@@ -953,7 +953,7 @@ namespace azure { namespace storage {
             /// <summary>
             /// Initializes a new instance of the <see cref="azure::storage::service_properties::cors_rule" /> class.
             /// </summary>
-            cors_rule()
+            cors_rule() : m_max_age(0)
             {
             }
 
@@ -1736,7 +1736,7 @@ namespace azure { namespace storage {
         web::http::http_headers m_user_headers;
         utility::datetime m_start_time;
         utility::datetime m_end_time;
-        client_log_level m_log_level;
+        client_log_level m_log_level = client_log_level::log_level_off;
         web::web_proxy m_proxy;
         std::vector<request_result> m_request_results;
         pplx::extensibility::critical_section_t m_request_results_lock;

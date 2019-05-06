@@ -207,7 +207,12 @@ public:
     virtual ~xml_writer() {}
 
 protected:
+
+#ifdef _WIN32
     xml_writer()
+#else // LINUX
+    xml_writer() :m_stream(nullptr)
+#endif
     {
     }
 

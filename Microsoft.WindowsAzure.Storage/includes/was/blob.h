@@ -1251,6 +1251,10 @@ namespace azure { namespace storage {
             m_server_encrypted(false),
             m_is_incremental_copy(false)
         {
+            m_standard_blob_tier = azure::storage::standard_blob_tier::unknown;
+            m_premium_blob_tier = azure::storage::premium_blob_tier::unknown;
+            m_archive_status = azure::storage::archive_status::unknown;
+            m_access_tier_inferred = false;
         }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900

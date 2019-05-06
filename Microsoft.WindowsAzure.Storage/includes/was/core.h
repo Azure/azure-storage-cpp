@@ -595,7 +595,8 @@ namespace azure { namespace storage {
             : m_is_response_available(false),
             m_target_location(storage_location::unspecified),
             m_http_status_code(0),
-            m_content_length(std::numeric_limits<utility::size64_t>::max())
+            m_content_length(std::numeric_limits<utility::size64_t>::max()),
+            m_request_server_encrypted(false)
         {
         }
 
@@ -610,7 +611,8 @@ namespace azure { namespace storage {
             m_target_location(target_location),
             m_end_time(utility::datetime::utc_now()),
             m_http_status_code(0),
-            m_content_length(std::numeric_limits<utility::size64_t>::max())
+            m_content_length(std::numeric_limits<utility::size64_t>::max()),
+            m_request_server_encrypted(false)
         {
         }
 

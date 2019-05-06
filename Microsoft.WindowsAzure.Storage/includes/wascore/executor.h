@@ -160,7 +160,7 @@ namespace azure { namespace storage { namespace core {
 
         explicit storage_command_base(const storage_uri& request_uri, const pplx::cancellation_token& cancellation_token, const bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler)
             : m_request_uri(request_uri), m_location_mode(command_location_mode::primary_only),
-            m_cancellation_token(cancellation_token), m_use_timeout(use_timeout), m_timer_handler(timer_handler)
+            m_cancellation_token(cancellation_token), m_calculate_response_body_md5(false), m_use_timeout(use_timeout), m_timer_handler(timer_handler)
         {
             if (m_use_timeout)
             {

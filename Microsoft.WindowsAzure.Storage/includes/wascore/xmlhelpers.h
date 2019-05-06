@@ -207,7 +207,7 @@ public:
     virtual ~xml_writer() {}
 
 protected:
-    xml_writer()
+    xml_writer() :m_stream(nullptr)
     {
     }
 

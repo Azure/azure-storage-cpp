@@ -66,20 +66,25 @@ bool xml_text_reader_wrapper::is_empty_element()
 std::string xml_text_reader_wrapper::get_local_name()
 {
     auto xml_char = xmlTextReaderLocalName(m_reader);
-    auto result = xml_char_to_string(xml_char);
+    std::string result; 
+
     if (xml_char != nullptr)
     {
+        result = xml_char_to_string(xml_char);
         xmlFree(xml_char);
     }
+
     return result;
 }
 
 std::string xml_text_reader_wrapper::get_value()
 {
     auto xml_char = xmlTextReaderValue(m_reader);
-    auto result = xml_char_to_string(xml_char);
+    std::string result;
+
     if (xml_char != nullptr)
     {
+        result = xml_char_to_string(xml_char);
         xmlFree(xml_char);
     }
     return result;

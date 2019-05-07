@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (6.0.0)
+# Azure Storage Client Library for C++ (6.1.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -65,7 +65,7 @@ C:\src\vcpkg> .\vcpkg install cpprestsdk
 Because Casablanca does not release NuGet packages anywhere anymore, Starting from 5.1.0, this repository cannot be built with pre-built Casablanca NuGet packages. However, you can export your own version of Casablanca NuGet packages to install dependencies of this project:
 ```
 C:\src\vcpkg> .\vcpkg install cpprestsdk
-C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.10
+C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.13
 ```
 
 **Manage dependencies by yourself**
@@ -113,6 +113,7 @@ The validated Casablanca version for each major or recent release on different p
 | 5.1.1                       | 2.10.6                         | 2.10.3                       |
 | 5.2.0                       | 2.10.6                         | 2.10.3                       |
 | 6.0.0                       | 2.10.10                        | 2.10.10                      |
+| 6.1.0                       | 2.10.13                        | 2.10.13                      |
 
 ## Code Samples
 
@@ -208,7 +209,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.10 -b v2.10.10
+git checkout tags/v2.10.13 -b v2.10.13
 ```
 
 - Build the project in Release mode
@@ -318,7 +319,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.10 -b v2.10.10
+git checkout tags/v2.10.13 -b v2.10.13
 ```
 
 - Build the project in Release mode
@@ -434,7 +435,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.10 -b v2.10.10
+git checkout tags/v2.10.13 -b v2.10.13
 ```
 
 - Build the project in Release mode

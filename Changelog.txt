@@ -1,6 +1,16 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v6.1.0
+- Default REST API version is 2018-03-28.
+- Upgraded CPPRest to latest version: 2.10.13.
+- Added following new API for `cloud_blob_client`, `cloud_blob_container` and `cloud_blob` to support to get Azure Storage Account properties.
+    - `pplx::task<account_properties> download_account_properties_async(const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)`.
+- Resolved a memory leak issue on Linux platform in xml_wrapper.cpp.
+- Added support to build with Visual Studio 2017.
+- Resolved an issue where it has chance to report an error when trying to upload to block blob with `cloud_block_blob::open_write`.
+- Resolved an issue on unexpected behavior when trying to upload from a local file whose length is longer than value of maximum int32 to block blob, append blob, page blob or Azure Storage file.
+
 Changes in v6.0.0
 - Upgraded CPPRest to latest version: 2.10.10.
 - Resolved a memory leak issue on Linux platform in xml_wrapper.cpp.

@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{25D342C3-6CDA-44DD-A16A-32A19B692785}</ProjectGuid>
+    <ProjectGuid>{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MicrosoftWindowsAzureStorage</RootNamespace>
   </PropertyGroup>

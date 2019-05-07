@@ -10,15 +10,15 @@ rem Set the toolset
 set toolset=%4
 
 rem Get the casablanca version
-set casaver=2.10.10
+set casaver=2.10.13
 
 rem Build the packages.config file
 @echo 
 set packagesfile=%buildroot%packages.config
 echo ^<?xml version=^"1.0^" encoding=^"utf-8^"?^> > "%packagesfile%"
 echo ^<packages^> >> "%packagesfile%"
-if "%toolset%" == "v120" echo   ^<package id=^"casablanca.v120^" version=^"%casaver%^" targetFramework=^"Native^" /^> >> "%packagesfile%"
 if "%toolset%" == "v140" echo   ^<package id=^"casablanca.v140^" version=^"%casaver%^" targetFramework=^"Native^" /^> >> "%packagesfile%"
+if "%toolset%" == "v141" echo   ^<package id=^"casablanca.v141^" version=^"%casaver%^" targetFramework=^"Native^" /^> >> "%packagesfile%"
 echo ^</packages^> >> "%packagesfile%"
 
 rem Copy the packages.config file to code/test folder
@@ -30,19 +30,19 @@ if exist "%buildroot%test_configurations_%testconfigset%.json" copy "%buildroot%
 
 rem Inject the package information to the .vcxproj file.
 
-rem v120
-if "%toolset%" == "v120" (
-  Echo Writing nuget package information to Microsoft.WindowsAzure.Storage.v120.vcxproj file.
-  CALL :InjectPackageInfoProd "%coderoot%Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v120.vcxproj" v120 %casaver% "Microsoft.WindowsAzure.Storage.v120.vcxproj"
-  Echo Writing nuget package information to Microsoft.WindowsAzure.Storage.UnitTests.v120.vcxproj file.
-  CALL :InjectPackageInfoTest "%coderoot%Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v120.vcxproj" v120 %casaver% "Microsoft.WindowsAzure.Storage.UnitTests.v120.vcxproj"
-)
 rem v140
 if "%toolset%" == "v140" (
   Echo Writing nuget package information to Microsoft.WindowsAzure.Storage.v140.vcxproj file.
   CALL :InjectPackageInfoProd "%coderoot%Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v140.vcxproj" v140 %casaver% "Microsoft.WindowsAzure.Storage.v140.vcxproj"
   Echo Writing nuget package information to Microsoft.WindowsAzure.Storage.UnitTests.v140.vcxproj file.
   CALL :InjectPackageInfoTest "%coderoot%Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v140.vcxproj" v140 %casaver% "Microsoft.WindowsAzure.Storage.UnitTests.v140.vcxproj"
+)
+rem v141
+if "%toolset%" == "v141" (
+  Echo Writing nuget package information to Microsoft.WindowsAzure.Storage.v141.vcxproj file.
+  CALL :InjectPackageInfoProd "%coderoot%Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v141.vcxproj" v141 %casaver% "Microsoft.WindowsAzure.Storage.v141.vcxproj"
+  Echo Writing nuget package information to Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj file.
+  CALL :InjectPackageInfoTest "%coderoot%Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj" v141 %casaver% "Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj"
 )
 
 rem Copy Unitest++

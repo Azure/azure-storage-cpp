@@ -131,6 +131,7 @@ var searchData=
   ['should_5fretry',['should_retry',['../classazure_1_1storage_1_1retry__info.html#a746aefaaec56a18de1427c97af76371f',1,'azure::storage::retry_info']]],
   ['single_5fblob_5fupload_5fthreshold_5fin_5fbytes',['single_blob_upload_threshold_in_bytes',['../classazure_1_1storage_1_1blob__request__options.html#a550584700789d8124a43d0f332e69651',1,'azure::storage::blob_request_options']]],
   ['size',['size',['../classazure_1_1storage_1_1cloud__blob__properties.html#ab69de2606ee13a13fdafe64cd57e01a5',1,'azure::storage::cloud_blob_properties::size()'],['../classazure_1_1storage_1_1block__list__item.html#a62fe0688d17f930a0410005fef71dcf4',1,'azure::storage::block_list_item::size()'],['../classazure_1_1storage_1_1cloud__file__properties.html#a94dfdcb6350d650d357e1e5c99005c77',1,'azure::storage::cloud_file_properties::size()']]],
+  ['sku_5fname',['sku_name',['../classazure_1_1storage_1_1account__properties.html#aee08a19c9c0d8f4161877aee9e9ccf72',1,'azure::storage::account_properties']]],
   ['snapshot_5fqualified_5furi',['snapshot_qualified_uri',['../classazure_1_1storage_1_1cloud__blob.html#a063543983624d2ebbe043005271df9bb',1,'azure::storage::cloud_blob']]],
   ['snapshot_5ftime',['snapshot_time',['../classazure_1_1storage_1_1cloud__blob.html#a7b4835a152dbde58cb796440b8c925c5',1,'azure::storage::cloud_blob']]],
   ['snapshots',['snapshots',['../structazure_1_1storage_1_1blob__listing__details.html#aceeac9a2f3c1077ecb811dc0f9548bc9a29021e16f34e9ba4a9b1800672a830c4',1,'azure::storage::blob_listing_details']]],

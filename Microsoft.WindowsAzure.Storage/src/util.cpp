@@ -264,6 +264,11 @@ namespace azure { namespace storage {  namespace core {
         return true;
     }
 
+    bool starts_with_http_schema(const utility::string_t& value)
+    {
+        return value.find(_XPLATSTR("http")) == 0;
+    }
+
     utility::datetime truncate_fractional_seconds(utility::datetime value)
     {
         utility::datetime result;

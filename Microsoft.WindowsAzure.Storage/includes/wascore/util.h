@@ -74,6 +74,7 @@ namespace azure { namespace storage { namespace core {
     bool is_nan(double value);
     bool is_finite(double value);
     bool is_integral(const utility::string_t& value);
+    bool starts_with_http_schema(const utility::string_t& value);
     utility::datetime truncate_fractional_seconds(utility::datetime value);
     utility::string_t convert_to_string(double value);
     utility::string_t convert_to_string(const utility::string_t& source);

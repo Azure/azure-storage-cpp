@@ -248,15 +248,26 @@ namespace azure { namespace storage {
         return core::executor<std::vector<page_range>>::execute_async(command, modified_options, context);
     }
     
-    pplx::task<std::vector<page_diff_range>> cloud_page_blob::download_page_ranges_diff_async(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    pplx::task<std::vector<page_diff_range>> cloud_page_blob::download_page_ranges_diff_async(utility::string_t previous_snapshot, utility::size64_t offset, utility::size64_t length, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
     {
+        utility::string_t previous_snapshot_time = _XPLATSTR("");
+        utility::string_t previous_snapshot_url = _XPLATSTR("");
+        if (core::starts_with_http_schema(previous_snapshot))
+        {
+            previous_snapshot_url = previous_snapshot;
+        }
+        else
+        {
+            previous_snapshot_time = previous_snapshot;
+        }
+
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<std::vector<page_diff_range>>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::get_page_ranges_diff, previous_snapshot_time, offset, length, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::get_page_ranges_diff, previous_snapshot_time, previous_snapshot_url, offset, length, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> std::vector<page_diff_range>

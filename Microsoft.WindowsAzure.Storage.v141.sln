@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.v141", "Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v141.vcxproj", "{25D342C3-6CDA-44DD-A16A-32A19B692785}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.v141", "Microsoft.WindowsAzure.Storage\Microsoft.WindowsAzure.Storage.v141.vcxproj", "{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.WindowsAzure.Storage.UnitTests.v141", "Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj", "{BC8759CC-C115-4E27-9545-D25E2CDA9412}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42} = {A8E200A6-910E-44F4-9E8E-C37E45B7AD42}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest++.vsnet2005", "Microsoft.WindowsAzure.Storage\tests\UnitTest++\UnitTest++.vsnet2005.vcxproj", "{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,20 +20,34 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Debug|x64.ActiveCfg = Debug|x64
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Debug|x64.Build.0 = Debug|x64
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Debug|x86.ActiveCfg = Debug|Win32
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Debug|x86.Build.0 = Debug|Win32
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Release|x64.ActiveCfg = Release|x64
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Release|x64.Build.0 = Release|x64
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Release|x86.ActiveCfg = Release|Win32
-		{25D342C3-6CDA-44DD-A16A-32A19B692785}.Release|x86.Build.0 = Release|Win32
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Debug|x64.ActiveCfg = Debug|x64
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Debug|x64.Build.0 = Debug|x64
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Debug|x86.ActiveCfg = Debug|Win32
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Debug|x86.Build.0 = Debug|Win32
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Release|x64.ActiveCfg = Release|x64
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Release|x64.Build.0 = Release|x64
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Release|x86.ActiveCfg = Release|Win32
+		{A8E200A6-910E-44F4-9E8E-C37E45B7AD42}.Release|x86.Build.0 = Release|Win32
+		{BC8759CC-C115-4E27-9545-D25E2CDA9412}.Debug|x64.ActiveCfg = Debug|Win32
+		{BC8759CC-C115-4E27-9545-D25E2CDA9412}.Debug|x86.ActiveCfg = Debug|Win32
+		{BC8759CC-C115-4E27-9545-D25E2CDA9412}.Debug|x86.Build.0 = Debug|Win32
+		{BC8759CC-C115-4E27-9545-D25E2CDA9412}.Release|x64.ActiveCfg = Release|Win32
+		{BC8759CC-C115-4E27-9545-D25E2CDA9412}.Release|x86.ActiveCfg = Release|Win32
+		{BC8759CC-C115-4E27-9545-D25E2CDA9412}.Release|x86.Build.0 = Release|Win32
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Debug|x64.ActiveCfg = Debug|x64
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Debug|x64.Build.0 = Debug|x64
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Debug|x86.ActiveCfg = Debug|Win32
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Debug|x86.Build.0 = Debug|Win32
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Release|x64.ActiveCfg = Release|x64
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Release|x64.Build.0 = Release|x64
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Release|x86.ActiveCfg = Release|Win32
+		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		        SolutionGuid = {EFC9951D-9CFA-4AF9-8EA2-0DE2E2A03DF5}
 		SolutionGuid = {657A09C9-C87D-40F4-B9C2-A41DE55BB7A2}
+		        SolutionGuid = {EFC9951D-9CFA-4AF9-8EA2-0DE2E2A03DF5}
 	EndGlobalSection
 EndGlobal

@@ -209,9 +209,10 @@ DAT(ms_header_file_last_write_time, _XPLATSTR("x-ms-file-last-write-time"))
 DAT(ms_header_file_change_time, _XPLATSTR("x-ms-file-change-time"))
 DAT(ms_header_file_id, _XPLATSTR("x-ms-file-id"))
 DAT(ms_header_file_parent_id, _XPLATSTR("x-ms-file-parent-id"))
+DAT(ms_header_previous_snapshot_url, _XPLATSTR("x-ms-previous-snapshot-url"))
 
 // header values
-DAT(header_value_storage_version, _XPLATSTR("2019-02-02"))
+DAT(header_value_storage_version, _XPLATSTR("2019-07-07"))
 DAT(header_value_true, _XPLATSTR("true"))
 DAT(header_value_false, _XPLATSTR("false"))
 DAT(header_value_locked, _XPLATSTR("locked"))

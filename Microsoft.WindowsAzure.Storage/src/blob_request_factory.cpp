@@ -330,12 +330,19 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_page_ranges_diff(utility::string_t previous_snapshot_time, utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_page_ranges_diff(const utility::string_t& previous_snapshot_time, const utility::string_t& previous_snapshot_url, utility::size64_t offset, utility::size64_t length, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
-        add_previous_snapshot_time(uri_builder, previous_snapshot_time);
+        if (!previous_snapshot_time.empty())
+        {
+            add_previous_snapshot_time(uri_builder, previous_snapshot_time);
+        }
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
+        if (!previous_snapshot_url.empty())
+        {
+            request.headers().add(ms_header_previous_snapshot_url, previous_snapshot_url);
+        }
         add_range(request, offset, length);
         add_access_condition(request, condition);
         return request;

@@ -185,7 +185,7 @@ DAT(ms_header_sku_name, _XPLATSTR("x-ms-sku-name"))
 DAT(ms_header_account_kind, _XPLATSTR("x-ms-account-kind"))
 
 // header values
-DAT(header_value_storage_version, _XPLATSTR("2018-03-28"))
+DAT(header_value_storage_version, _XPLATSTR("2018-11-09"))
 DAT(header_value_true, _XPLATSTR("true"))
 DAT(header_value_false, _XPLATSTR("false"))
 DAT(header_value_locked, _XPLATSTR("locked"))

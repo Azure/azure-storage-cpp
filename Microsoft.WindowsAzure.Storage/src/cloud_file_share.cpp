@@ -268,10 +268,22 @@ namespace azure { namespace storage {
     pplx::task<int32_t> cloud_file_share::download_share_usage_aysnc(const file_access_condition& condition, const file_request_options& options, operation_context context) const
     {
         UNREFERENCED_PARAMETER(condition);
+
+        return download_share_usage_in_bytes_async(condition, options, context).then([](int64_t size_in_bytes) -> pplx::task<int32_t>
+        {
+            const int64_t bytes_per_gigabyte = 1024LL * 1024 * 1024;
+            int32_t size_in_gb = static_cast<int32_t>((size_in_bytes + bytes_per_gigabyte - 1) / bytes_per_gigabyte);
+            return pplx::task_from_result<int32_t>(size_in_gb);
+        });
+    }
+
+    pplx::task<int64_t> cloud_file_share::download_share_usage_in_bytes_async(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+    {
+        UNREFERENCED_PARAMETER(condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
-        auto command = std::make_shared<core::storage_command<int32_t>>(uri());
+        auto command = std::make_shared<core::storage_command<int64_t>>(uri());
         command->set_build_request(std::bind(protocol::get_file_share_stats, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([](const web::http::http_response& response, const request_result& result, operation_context context)
@@ -280,7 +292,7 @@ namespace azure { namespace storage {
             protocol::get_share_stats_reader reader(response.body());
             return reader.get();
         });
-        return core::executor<int32_t>::execute_async(command, modified_options, context);
+        return core::executor<int64_t>::execute_async(command, modified_options, context);
     }
 
     utility::string_t cloud_file_share::get_shared_access_signature(const file_shared_access_policy& policy, const utility::string_t& stored_policy_identifier, const cloud_file_shared_access_headers& headers) const

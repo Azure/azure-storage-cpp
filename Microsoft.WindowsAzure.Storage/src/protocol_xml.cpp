@@ -815,7 +815,7 @@ namespace azure { namespace storage { namespace protocol {
 
     void get_share_stats_reader::handle_element(const utility::string_t& element_name)
     {
-        if (element_name == _XPLATSTR("ShareUsage"))
+        if (element_name == _XPLATSTR("ShareUsageBytes"))
         {
             extract_current_element(m_quota);
             return;

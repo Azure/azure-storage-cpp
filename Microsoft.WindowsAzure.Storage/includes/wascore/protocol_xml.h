@@ -706,7 +706,7 @@ namespace azure { namespace storage { namespace protocol {
         {
         }
 
-        int32_t get()
+        int64_t get()
         {
             auto result = parse();
             if (result == xml_reader::parse_result::xml_not_complete)
@@ -722,7 +722,7 @@ namespace azure { namespace storage { namespace protocol {
         virtual void handle_element(const utility::string_t& element_name);
         virtual void handle_end_element(const utility::string_t& element_name);
 
-        int32_t m_quota;
+        int64_t m_quota;
     };
 
     class list_shares_reader : public core::xml::xml_reader

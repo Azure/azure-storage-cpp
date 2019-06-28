@@ -197,9 +197,11 @@ SUITE(File)
 
     TEST_FIXTURE(file_share_test_base, share_stats)
     {
-        m_share.create_if_not_exists(azure::storage::file_request_options(), m_context);
+        m_share.create(azure::storage::file_request_options(), m_context);
         auto quota = m_share.download_share_usage(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         CHECK_EQUAL(0, quota);
+		auto quota_in_bytes = m_share.download_share_usage_in_bytes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+		CHECK_EQUAL(0, quota_in_bytes);
     }
 
     // share level sas test

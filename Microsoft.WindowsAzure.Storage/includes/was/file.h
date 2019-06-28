@@ -1258,6 +1258,7 @@ namespace azure { namespace storage {
         /// Retrieves the share's statistics.
         /// </summary>
         /// <returns>The size number in gigabyte of used data for this share.</returns>
+        /// <remarks>This method is deprecated in favor of download_shared_usage_in_bytes.</remarks>
         int32_t download_share_usage() const
         {
             return download_share_usage_async().get();
@@ -1270,6 +1271,7 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The size number in gigabyte of used data for this share.</returns>
+        /// <remarks>This method is deprecated in favor of download_shared_usage_in_bytes.</remarks>
         int32_t download_share_usage(const file_access_condition& condition, const file_request_options& options, operation_context context) const
         {
             return download_share_usage_aysnc(condition, options, context).get();
@@ -1279,6 +1281,7 @@ namespace azure { namespace storage {
         /// Intitiates an asynchronous operation to retrieve the share's statistics.
         /// </summary>
         /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        /// <remarks>This method is deprecated in favor of download_shared_usage_in_bytes_async.</remarks>
         pplx::task<int32_t> download_share_usage_async() const
         {
             return download_share_usage_aysnc(file_access_condition(), file_request_options(), operation_context());
@@ -1291,7 +1294,47 @@ namespace azure { namespace storage {
         /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        /// <remarks>This method is deprecated in favor of download_shared_usage_in_bytes_async.</remarks>
         WASTORAGE_API pplx::task<int32_t> download_share_usage_aysnc(const file_access_condition& condition, const file_request_options& options, operation_context context) const;
+
+        /// <summary>
+        /// Retrieves the share's statistics.
+        /// </summary>
+        /// <returns>The size number in byte of used data for this share.</returns>
+        int64_t download_share_usage_in_bytes() const
+        {
+            return download_share_usage_in_bytes_async().get();
+        }
+
+        /// <summary>
+        /// Retrieves the share's statistics.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The size number in byte of used data for this share.</returns>
+        int64_t download_share_usage_in_bytes(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return download_share_usage_in_bytes_async(condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to retrieve the share's statistics.
+        /// </summary>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        pplx::task<int64_t> download_share_usage_in_bytes_async() const
+        {
+            return download_share_usage_in_bytes_async(file_access_condition(), file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to retrieve the share's statistics.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<int64_t> download_share_usage_in_bytes_async(const file_access_condition& condition, const file_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Gets permissions settings for the share.

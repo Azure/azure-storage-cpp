@@ -80,7 +80,7 @@ namespace azure { namespace storage {
         resource_str.append(name());
 
         // Future resource type changes from "c" => "container"
-        return protocol::get_blob_sas_token(stored_policy_identifier, policy, cloud_blob_shared_access_headers(), _XPLATSTR("c"), resource_str, service_client().credentials());
+        return protocol::get_blob_sas_token(stored_policy_identifier, policy, cloud_blob_shared_access_headers(), _XPLATSTR("c"), resource_str, utility::string_t(), service_client().credentials());
     }
 
     cloud_blob cloud_blob_container::get_blob_reference(utility::string_t blob_name) const

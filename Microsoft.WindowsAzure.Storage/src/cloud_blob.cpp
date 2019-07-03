@@ -160,7 +160,7 @@ namespace azure { namespace storage {
         resource_str.append(_XPLATSTR("/"));
         resource_str.append(name());
 
-        return protocol::get_blob_sas_token(stored_policy_identifier, policy, headers, _XPLATSTR("b"), resource_str, service_client().credentials());
+        return protocol::get_blob_sas_token(stored_policy_identifier, policy, headers, is_snapshot() ? _XPLATSTR("bs") : _XPLATSTR("b"), resource_str, snapshot_time(), service_client().credentials());
     }
 
     pplx::task<concurrency::streams::istream> cloud_blob::open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)

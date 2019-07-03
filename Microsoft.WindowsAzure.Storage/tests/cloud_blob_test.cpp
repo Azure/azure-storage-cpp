@@ -632,6 +632,14 @@ SUITE(Blob)
         CHECK_THROW(snapshot1.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::logic_error);
         CHECK_THROW(snapshot1.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), std::logic_error);
 
+        azure::storage::blob_shared_access_policy policy;
+        auto permissions = azure::storage::blob_shared_access_policy::read;
+        policy.set_permissions(permissions);
+        policy.set_start(utility::datetime::utc_now() - utility::datetime::from_minutes(5));
+        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(30));
+        auto sas_token = snapshot1.get_shared_access_signature(policy);
+        check_access(sas_token, permissions, azure::storage::cloud_blob_shared_access_headers(), snapshot1);
+
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
         auto snapshot2 = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);

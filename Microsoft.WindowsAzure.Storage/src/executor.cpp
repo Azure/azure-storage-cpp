@@ -124,10 +124,8 @@ namespace azure { namespace storage { namespace core {
             // 4. Set HTTP client configuration
             instance->assert_canceled();
             web::http::client::http_client_config config;
-            if (instance->m_context.proxy().is_specified())
-            {
-                config.set_proxy(instance->m_context.proxy());
-            }
+
+            config.set_proxy(instance->m_context.proxy());
 
             instance->remaining_time();
             config.set_timeout(instance->m_request_options.noactivity_timeout());

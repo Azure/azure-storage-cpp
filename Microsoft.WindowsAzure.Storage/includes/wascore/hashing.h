@@ -27,9 +27,9 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #endif
 #define NOMINMAX
+#include <winsock2.h>
 #include <Windows.h>
 #include <BCrypt.h>
-#include <winsock2.h>
 #else
 #include <openssl/sha.h>
 #include <openssl/md5.h>

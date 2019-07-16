@@ -68,6 +68,17 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
+    void bearer_token_authentication_handler::sign_request(web::http::http_request& request, operation_context context) const
+    {
+        web::http::http_headers& headers = request.headers();
+        headers.add(ms_header_date, utility::datetime::utc_now().to_string());
+
+        if (m_credentials.is_bearer_token())
+        {
+            headers.add(web::http::header_names::authorization, _XPLATSTR("Bearer ") + m_credentials.bearer_token());
+        }
+    }
+
     void canonicalizer_helper::append_resource(bool query_only_comp)
     {
         m_result.append(_XPLATSTR("/"));

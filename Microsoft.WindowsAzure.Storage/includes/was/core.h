@@ -257,17 +257,40 @@ namespace azure { namespace storage {
             }
         }
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
-        // have implicitly-declared move constructor and move assignment operator.
+        class bearer_token_credential
+        {
+        public:
+            explicit bearer_token_credential(utility::string_t bearer_token = utility::string_t()) : m_bearer_token(std::move(bearer_token))
+            {
+            }
+
+        public:
+            utility::string_t m_bearer_token;
+            
+        private:
+            pplx::extensibility::reader_writer_lock_t m_mutex;
+
+            friend class storage_credentials;
+        };
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified bearer token.
+        /// </summary>
+        /// <param name="token">A <see cref="azure::storage::storage_credentials::bearer_token_credential" /> class containing bearer token.</param>
+        template<class T, typename std::enable_if<std::is_same<typename std::decay<T>::type, bearer_token_credential>::value>::type* = nullptr>
+        explicit storage_credentials(T&& token) : m_bearer_token_credential(std::make_shared<bearer_token_credential>())
+        {
+            m_bearer_token_credential->m_bearer_token = std::forward<T>(token).m_bearer_token;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class based on an existing instance.
         /// </summary>
         /// <param name="other">An existing <see cref="azure::storage::storage_credentials" /> object.</param>
-        storage_credentials(storage_credentials&& other)
+        template<class T, typename std::enable_if<std::is_same<typename std::decay<T>::type, storage_credentials>::value>::type* = nullptr>
+        storage_credentials(T&& other)
         {
-            *this = std::move(other);
+            *this = std::forward<T>(other);
         }
 
         /// <summary>
@@ -275,18 +298,20 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="other">An existing <see cref="azure::storage::storage_credentials" /> object to use to set properties.</param>
         /// <returns>An <see cref="azure::storage::storage_credentials" /> object with properties set.</returns>
-        storage_credentials& operator=(storage_credentials&& other)
+        template<class T, typename std::enable_if<std::is_same<typename std::decay<T>::type, storage_credentials>::value>::type* = nullptr>
+        storage_credentials& operator=(T&& other)
         {
             if (this != &other)
             {
-                m_sas_token = std::move(other.m_sas_token);
-                m_sas_token_with_api_version = std::move(other.m_sas_token_with_api_version);
-                m_account_name = std::move(other.m_account_name);
-                m_account_key = std::move(other.m_account_key);
+                m_sas_token = std::forward<T>(other).m_sas_token;
+                m_sas_token_with_api_version = std::forward<T>(other).m_sas_token_with_api_version;
+                m_account_name = std::forward<T>(other).m_account_name;
+                m_account_key = std::forward<T>(other).m_account_key;
+                std::atomic_store_explicit(&m_bearer_token_credential, std::atomic_load_explicit(&other.m_bearer_token_credential, std::memory_order_acquire), std::memory_order_release);
+                auto ptr = std::forward<T>(other).m_bearer_token_credential;
             }
             return *this;
         }
-#endif
 
         /// <summary>
         /// Transforms a resource URI into a shared access signature URI, by appending a shared access token.
@@ -333,12 +358,48 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the bearer token for the credentials.
+        /// </summary>
+        /// <returns>The bearer token</returns>
+        utility::string_t bearer_token() const
+        {
+            auto token_ptr = std::atomic_load_explicit(&m_bearer_token_credential, std::memory_order_acquire);
+            pplx::extensibility::scoped_read_lock_t guard(token_ptr->m_mutex);
+            return token_ptr->m_bearer_token;
+        }
+
+        /// <summary>
+        /// Sets the bearer token for the credentials.
+        /// </summary>
+        /// <param name="bearer_token">A string that contains bearer token.</param>
+        void set_bearer_token(utility::string_t bearer_token)
+        {
+            auto token_ptr = std::atomic_load_explicit(&m_bearer_token_credential, std::memory_order_acquire);
+            if (!token_ptr)
+            {
+                auto new_credential = std::make_shared<bearer_token_credential>();
+                new_credential->m_bearer_token = std::move(bearer_token);
+                /* Compares m_bearer_token_credential and token_ptr(nullptr).
+                 * If they are equivalent, assigns new_credential into m_bearer_token_credential and returns true.
+                 * If they are not equivalent, assigns m_bearer_token_credential into token_ptr and returns false.
+                 */
+                bool set = std::atomic_compare_exchange_strong_explicit(&m_bearer_token_credential, &token_ptr, new_credential, std::memory_order_release, std::memory_order_acquire);
+                if (set) {
+                    return;
+                }
+                bearer_token = std::move(new_credential->m_bearer_token);
+            }
+            pplx::extensibility::scoped_rw_lock_t guard(token_ptr->m_mutex);
+            token_ptr->m_bearer_token = std::move(bearer_token);
+        }
+
+        /// <summary>
         /// Indicates whether the credentials are for anonymous access.
         /// </summary>
         /// <returns><c>true</c> if the credentials are for anonymous access; otherwise, <c>false</c>.</returns>
         bool is_anonymous() const
         {
-            return m_sas_token.empty() && m_account_name.empty();
+            return m_sas_token.empty() && m_account_name.empty() && !is_bearer_token();
         }
 
         /// <summary>
@@ -347,7 +408,7 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are a shared access signature token; otherwise, <c>false</c>.</returns>
         bool is_sas() const
         {
-            return !m_sas_token.empty() && m_account_name.empty();
+            return !m_sas_token.empty() && m_account_name.empty() && !is_bearer_token();
         }
 
         /// <summary>
@@ -356,7 +417,21 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are a shared key; otherwise, <c>false</c>.</returns>
         bool is_shared_key() const
         {
-            return m_sas_token.empty() && !m_account_name.empty();
+            return m_sas_token.empty() && !m_account_name.empty() && !is_bearer_token();
+        }
+
+        /// <summary>
+        /// Indicates whether the credentials are a bearer token.
+        /// </summary>
+        /// <returns><c>true</c> if the credentials are a bearer token; otherwise <c>false</c>.</returns>
+        bool is_bearer_token() const {
+            auto token_ptr = std::atomic_load_explicit(&m_bearer_token_credential, std::memory_order_acquire);
+            if (!token_ptr)
+            {
+                return false;
+            }
+            pplx::extensibility::scoped_read_lock_t guard(token_ptr->m_mutex);
+            return !token_ptr->m_bearer_token.empty();
         }
 
     private:
@@ -365,6 +440,9 @@ namespace azure { namespace storage {
         utility::string_t m_sas_token_with_api_version;
         utility::string_t m_account_name;
         std::vector<uint8_t> m_account_key;
+        // We use std::atomic_{load/store/...} functions specialized for std::shared_ptr<T> to access this member, since std::atomic<std::shared_ptr<T>> is not available until C++20.
+        // These become deprecated since C++20, but still compile.
+        std::shared_ptr<bearer_token_credential> m_bearer_token_credential;
     };
 
     /// <summary>

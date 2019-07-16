@@ -454,6 +454,7 @@ SUITE(Core)
         CHECK_EQUAL(true, creds.is_anonymous());
         CHECK_EQUAL(false, creds.is_sas());
         CHECK_EQUAL(false, creds.is_shared_key());
+        CHECK_EQUAL(false, creds.is_bearer_token());
 
         web::http::uri uri(test_uri);
         CHECK_UTF8_EQUAL(test_uri, creds.transform_uri(uri).to_string());
@@ -468,6 +469,7 @@ SUITE(Core)
         CHECK_EQUAL(false, creds.is_anonymous());
         CHECK_EQUAL(false, creds.is_sas());
         CHECK_EQUAL(true, creds.is_shared_key());
+        CHECK_EQUAL(false, creds.is_bearer_token());
 
         web::http::uri uri(test_uri);
         CHECK_UTF8_EQUAL(test_uri, creds.transform_uri(uri).to_string());
@@ -486,6 +488,7 @@ SUITE(Core)
             CHECK(!creds.is_anonymous());
             CHECK(creds.is_sas());
             CHECK(!creds.is_shared_key());
+            CHECK(!creds.is_bearer_token());
 
             web::http::uri uri(test_uri);
             CHECK_UTF8_EQUAL(test_uri + _XPLATSTR("?") + token_with_api_version, creds.transform_uri(uri).to_string());
@@ -500,10 +503,71 @@ SUITE(Core)
             CHECK(!creds.is_anonymous());
             CHECK(creds.is_sas());
             CHECK(!creds.is_shared_key());
+            CHECK(!creds.is_bearer_token());
 
             web::http::uri uri(test_uri);
             CHECK_UTF8_EQUAL(test_uri + _XPLATSTR("?") + token_with_api_version, creds.transform_uri(uri).to_string());
         }
+    }
+
+    TEST_FIXTURE(test_base, storage_credentials_oauth)
+    {
+        utility::string_t token_str = get_random_string(1024);
+        azure::storage::storage_credentials::bearer_token_credential token_cred;
+        token_cred.m_bearer_token = token_str;
+
+        azure::storage::storage_credentials creds(token_cred);
+        CHECK(!creds.is_anonymous());
+        CHECK(!creds.is_sas());
+        CHECK(!creds.is_shared_key());
+        CHECK(creds.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds.bearer_token(), token_str);
+        CHECK_UTF8_EQUAL(token_cred.m_bearer_token, token_str);
+
+        azure::storage::storage_credentials creds2(std::move(token_cred));
+        CHECK(creds2.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds2.bearer_token(), token_str);
+        CHECK(token_cred.m_bearer_token.empty());
+
+        azure::storage::storage_credentials creds3(creds);
+        CHECK(creds.is_bearer_token());
+        CHECK(creds3.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds.bearer_token(), token_str);
+        CHECK_UTF8_EQUAL(creds3.bearer_token(), token_str);
+        azure::storage::storage_credentials creds4(std::move(creds3));
+        CHECK(creds4.is_bearer_token());
+        CHECK(!creds3.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds4.bearer_token(), token_str);
+
+        creds3 = creds4;
+        CHECK(creds3.is_bearer_token());
+        CHECK(creds4.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds3.bearer_token(), token_str);
+        CHECK_UTF8_EQUAL(creds4.bearer_token(), token_str);
+
+        const azure::storage::storage_credentials& creds4cr = creds4;
+        creds3 = std::move(creds4cr);
+        CHECK(creds3.is_bearer_token());
+        CHECK(creds4.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds3.bearer_token(), token_str);
+        CHECK_UTF8_EQUAL(creds4.bearer_token(), token_str);
+
+        creds3 = std::move(creds4);
+        CHECK(creds3.is_bearer_token());
+        CHECK(!creds4.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds3.bearer_token(), token_str);
+
+        const azure::storage::storage_credentials creds6 = creds3;
+        azure::storage::storage_credentials creds7;
+        creds7 = creds6;
+        token_str = get_random_string(512);
+        creds7.set_bearer_token(token_str);
+        CHECK(creds3.is_bearer_token());
+        CHECK(creds6.is_bearer_token());
+        CHECK(creds7.is_bearer_token());
+        CHECK_UTF8_EQUAL(creds3.bearer_token(), token_str);
+        CHECK_UTF8_EQUAL(creds6.bearer_token(), token_str);
+        CHECK_UTF8_EQUAL(creds7.bearer_token(), token_str);
     }
 
     TEST_FIXTURE(test_base, storage_credentials_empty_key)
@@ -537,6 +601,7 @@ SUITE(Core)
         CHECK_EQUAL(false, creds2.is_anonymous());
         CHECK_EQUAL(false, creds2.is_sas());
         CHECK_EQUAL(true, creds2.is_shared_key());
+        CHECK_EQUAL(false, creds2.is_bearer_token());
     }
 
     TEST_FIXTURE(test_base, cloud_storage_account_devstore)

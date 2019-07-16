@@ -437,6 +437,34 @@ namespace azure { namespace storage { namespace protocol {
         storage_credentials m_credentials;
     };
 
+    /// <summary>
+    /// A helper class for signing a request with bearer token.
+    /// </summary>
+    class bearer_token_authentication_handler : public authentication_handler
+    {
+    public:
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::bearer_token_authentication_handler" /> class.
+        /// </summary>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use to sign the request.</param>
+        explicit bearer_token_authentication_handler(storage_credentials credentials)
+            : m_credentials(std::move(credentials))
+        {
+        }
+
+        /// <summary>
+        /// Sign the specified request for authentication via bearer token.
+        /// </summary>
+        /// <param name="request">The request to be signed.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        WASTORAGE_API void sign_request(web::http::http_request& request, operation_context context) const override;
+
+    private:
+
+        storage_credentials m_credentials;
+    };
+
 #pragma endregion
 
 #pragma region Shared Access Signatures

@@ -170,6 +170,10 @@ namespace azure { namespace storage {
         {
             set_authentication_handler(std::make_shared<protocol::sas_authentication_handler>(std::move(creds)));
         }
+        else if (creds.is_bearer_token())
+        {
+            set_authentication_handler(std::make_shared<protocol::bearer_token_authentication_handler>(std::move(creds)));
+        }
         else
         {
             set_authentication_handler(std::make_shared<protocol::authentication_handler>());

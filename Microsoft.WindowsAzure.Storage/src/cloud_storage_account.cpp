@@ -47,6 +47,7 @@ namespace azure { namespace storage {
     const utility::char_t *default_queue_hostname_prefix(_XPLATSTR("queue"));
     const utility::char_t *default_table_hostname_prefix(_XPLATSTR("table"));
     const utility::char_t *default_file_hostname_prefix(_XPLATSTR("file"));
+    const utility::char_t *oauth_access_token_setting_string(_XPLATSTR("OAuthAccessToken"));
 
     storage_uri construct_default_endpoint(const utility::string_t& scheme, const utility::string_t& account_name, const utility::string_t& hostname_prefix, const utility::string_t& endpoint_suffix)
     {
@@ -446,6 +447,14 @@ namespace azure { namespace storage {
                 result.append(shared_access_signature_setting_string);
                 result.append(_XPLATSTR("="));
                 result.append((export_secrets ? m_credentials.sas_token() : _XPLATSTR("[key hidden]")));
+            }
+
+            if (m_credentials.is_bearer_token())
+            {
+                result.append(_XPLATSTR(";"));
+                result.append(oauth_access_token_setting_string);
+                result.append(_XPLATSTR("="));
+                result.append((export_secrets ? m_credentials.bearer_token() : _XPLATSTR("[key hidden]")));
             }
         }
 

@@ -513,7 +513,7 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_container_properties(response));
         });
 
-        return core::istream_descriptor::create(stream, false, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, context, modified_options, cancellation_token, options](core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(stream, checksum_type::none, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, context, modified_options, cancellation_token, options](core::istream_descriptor request_body) -> pplx::task<void>
         {
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);

@@ -30,7 +30,7 @@ namespace azure { namespace storage { namespace protocol {
         core::hash_provider provider = core::hash_provider::create_hmac_sha256_hash_provider(credentials.account_key());
         provider.write(reinterpret_cast<const uint8_t*>(utf8_string_to_hash.data()), utf8_string_to_hash.size());
         provider.close();
-        return provider.hash();
+        return provider.hash().hmac_sha256();
     }
 
     void sas_authentication_handler::sign_request(web::http::http_request& request, operation_context context) const

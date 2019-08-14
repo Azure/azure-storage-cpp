@@ -446,6 +446,7 @@ namespace azure { namespace storage {
         utility::size64_t m_total_written_to_destination_stream;
         utility::size64_t m_response_length;
         utility::string_t m_response_md5;
+        utility::string_t m_response_crc64;
         utility::string_t m_locked_etag;
         bool m_reset_target;
         concurrency::streams::ostream::pos_type m_target_offset;
@@ -510,12 +511,31 @@ namespace azure { namespace storage {
                 current_condition = condition;
             }
 
-            return protocol::get_blob(current_offset, current_length, modified_options.use_transactional_md5() && !download_info->m_are_properties_populated, current_snapshot_time, current_condition, uri_builder, timeout, context);
+            checksum_type needs_checksum = checksum_type::none;
+            if (modified_options.use_transactional_md5() && !download_info->m_are_properties_populated)
+            {
+                needs_checksum = checksum_type::md5;
+            }
+            else if (modified_options.use_transactional_crc64())
+            {
+                needs_checksum = checksum_type::crc64;
+            }
+
+            return protocol::get_blob(current_offset, current_length, needs_checksum, current_snapshot_time, current_condition, uri_builder, timeout, context);
         });
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
         command->set_destination_stream(target);
-        command->set_calculate_response_body_md5(!modified_options.disable_content_md5_validation());
+        checksum_type calculate_checksum_type = modified_options.disable_content_md5_validation() ? checksum_type::none : checksum_type::md5;
+        if (modified_options.use_transactional_md5())
+        {
+            calculate_checksum_type = modified_options.disable_content_md5_validation() ? checksum_type::none : checksum_type::md5;
+        }
+        else if (modified_options.use_transactional_crc64())
+        {
+            calculate_checksum_type = modified_options.disable_content_crc64_validation() ? checksum_type::none : checksum_type::crc64;
+        }
+        command->set_calculate_response_body_checksum(calculate_checksum_type);
         command->set_recover_request([target, download_info](utility::size64_t total_written_to_destination_stream, operation_context context) -> bool
         {
             if (download_info->m_reset_target)
@@ -573,10 +593,15 @@ namespace azure { namespace storage {
 
                 download_info->m_response_length = result.content_length();
                 download_info->m_response_md5 = result.content_md5();
+                download_info->m_response_crc64 = result.content_crc64();
 
                 if (modified_options.use_transactional_md5() && !modified_options.disable_content_md5_validation() && download_info->m_response_md5.empty())
                 {
                     throw storage_exception(protocol::error_missing_md5);
+                }
+                if (!modified_options.use_transactional_md5() && modified_options.use_transactional_crc64() && !modified_options.disable_content_crc64_validation() && download_info->m_response_crc64.empty())
+                {
+                    throw storage_exception(protocol::error_missing_crc64);
                 }
 
                 // Lock to the current storage location when resuming a failed download. This is locked 
@@ -597,9 +622,13 @@ namespace azure { namespace storage {
 
             command->set_location_mode(core::command_location_mode::primary_or_secondary);
 
-            if (!download_info->m_response_md5.empty() && !descriptor.content_md5().empty() && download_info->m_response_md5 != descriptor.content_md5())
+            if (!download_info->m_response_md5.empty() && descriptor.content_checksum().is_md5() && download_info->m_response_md5 != descriptor.content_checksum().md5())
             {
                 throw storage_exception(protocol::error_md5_mismatch);
+            }
+            if (!download_info->m_response_crc64.empty() && !descriptor.content_checksum().is_crc64() && download_info->m_response_crc64 != descriptor.content_checksum().crc64())
+            {
+                throw storage_exception(protocol::error_crc64_mismatch);
             }
 
             return pplx::task_from_result();
@@ -616,13 +645,13 @@ namespace azure { namespace storage {
             timer_handler->start_timer(options.maximum_execution_time());// azure::storage::core::timer_handler will automatically stop the timer when destructed.
         }
 
-        if (options.parallelism_factor() > 1)
+        if (options.parallelism_factor() > 1 || options.use_transactional_crc64())
         {
             auto instance = std::make_shared<cloud_blob>(*this);
             // if download a whole blob, enable download strategy(download 32MB first).
             utility::size64_t single_blob_download_threshold(protocol::default_single_blob_download_threshold);
             // If transactional md5 validation is set, first range should be 4MB.
-            if (options.use_transactional_md5())
+            if (options.use_transactional_md5() || options.use_transactional_crc64())
             {
                 single_blob_download_threshold = protocol::default_single_block_download_threshold;
             }

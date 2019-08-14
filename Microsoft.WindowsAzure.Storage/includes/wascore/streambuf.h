@@ -254,7 +254,7 @@ namespace azure { namespace storage { namespace core {
             });
         }
 
-        utility::string_t hash() const
+        checksum hash() const
         {
             return m_hash_provider.hash();
         }

@@ -388,9 +388,9 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(modified_properties);
             properties->m_content_md5 = modified_properties.content_md5();
         });
-        return core::istream_descriptor::create(stream, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_range_size).then([command, context, start_offset, content_md5, modified_options](core::istream_descriptor request_body)->pplx::task<void>
+        return core::istream_descriptor::create(stream, needs_md5 ? checksum_type::md5 : checksum_type::none, std::numeric_limits<utility::size64_t>::max(), protocol::max_range_size).then([command, context, start_offset, content_md5, modified_options](core::istream_descriptor request_body)->pplx::task<void>
         {
-            const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
+            const utility::string_t& md5 = content_md5.empty() ? request_body.content_checksum().md5() : content_md5;
             auto end_offset = start_offset + request_body.length() - 1;
             file_range range(start_offset, end_offset);
             command->set_build_request(std::bind(protocol::put_file_range, range, file_range_write::update, md5, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -459,7 +459,7 @@ namespace azure { namespace storage {
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
         command->set_destination_stream(target);
-        command->set_calculate_response_body_md5(!modified_options.disable_content_md5_validation());
+        command->set_calculate_response_body_checksum(modified_options.disable_content_md5_validation() ? checksum_type::none : checksum_type::md5);
         command->set_recover_request([target, download_info](utility::size64_t total_written_to_destination_stream, operation_context context) -> bool
         {
             if (download_info->m_reset_target)
@@ -551,7 +551,7 @@ namespace azure { namespace storage {
 
             command->set_location_mode(core::command_location_mode::primary_or_secondary);
 
-            if (!download_info->m_response_md5.empty() && !descriptor.content_md5().empty() && download_info->m_response_md5 != descriptor.content_md5())
+            if (!download_info->m_response_md5.empty() && !descriptor.content_checksum().md5().empty() && download_info->m_response_md5 != descriptor.content_checksum().md5())
             {
                 throw storage_exception(protocol::error_md5_mismatch);
             }

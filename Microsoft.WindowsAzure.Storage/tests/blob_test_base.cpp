@@ -22,30 +22,48 @@
 #include "wascore/streams.h"
 #include "wascore/util.h"
 
+
+void blob_service_test_base::fill_buffer(std::vector<uint8_t>& buffer)
+{
+    fill_buffer(buffer, 0, buffer.size());
+}
+
+void blob_service_test_base::fill_buffer(std::vector<uint8_t>& buffer, size_t offset, size_t count)
+{
+    std::generate_n(buffer.begin() + offset, count, []() -> uint8_t
+    {
+        return std::rand();
+    });
+}
+
 utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<uint8_t>& buffer)
 {
     return fill_buffer_and_get_md5(buffer, 0, buffer.size());
 }
 
-void blob_service_test_base::fill_buffer(std::vector<uint8_t>& buffer)
-{
-    std::generate_n(buffer.begin(), buffer.size(), []() -> uint8_t
-    {
-        return (uint8_t)(std::rand() % (int)UINT8_MAX);
-    });
-}
-
 utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<uint8_t>& buffer, size_t offset, size_t count)
 {
-    std::generate_n(buffer.begin(), buffer.size(), [] () -> uint8_t
-    {
-        return (uint8_t)(std::rand() % (int)UINT8_MAX);
-    });
+    fill_buffer(buffer, offset, count);
 
     azure::storage::core::hash_provider provider = azure::storage::core::hash_provider::create_md5_hash_provider();
     provider.write(buffer.data() + offset, count);
     provider.close();
-    return provider.hash();
+    return provider.hash().md5();
+}
+
+utility::string_t blob_service_test_base::fill_buffer_and_get_crc64(std::vector<uint8_t>& buffer)
+{
+    return fill_buffer_and_get_crc64(buffer, 0, buffer.size());
+}
+
+utility::string_t blob_service_test_base::fill_buffer_and_get_crc64(std::vector<uint8_t>& buffer, size_t offset, size_t count)
+{
+    fill_buffer(buffer, offset, count);
+
+    azure::storage::core::hash_provider provider = azure::storage::core::hash_provider::create_crc64_hash_provider();
+    provider.write(buffer.data() + offset, count);
+    provider.close();
+    return provider.hash().crc64();
 }
 
 utility::string_t blob_service_test_base::get_random_container_name(size_t length)

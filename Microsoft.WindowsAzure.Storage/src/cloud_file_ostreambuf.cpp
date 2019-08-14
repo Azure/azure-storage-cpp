@@ -48,7 +48,7 @@ namespace azure { namespace storage { namespace core {
         {
             if (this_pointer->m_total_hash_provider.is_enabled())
             {
-                this_pointer->m_file->properties().set_content_md5(this_pointer->m_total_hash_provider.hash());
+                this_pointer->m_file->properties().set_content_md5(this_pointer->m_total_hash_provider.hash().md5());
                 return this_pointer->m_file->upload_properties_async(this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context);
             }
 
@@ -74,7 +74,7 @@ namespace azure { namespace storage { namespace core {
             {
                 try
                 {
-                    this_pointer->m_file->write_range_async(buffer->stream(), offset, buffer->content_md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context).then([this_pointer](pplx::task<void> upload_task)
+                    this_pointer->m_file->write_range_async(buffer->stream(), offset, buffer->content_checksum().md5(), this_pointer->m_condition, this_pointer->m_options, this_pointer->m_context).then([this_pointer](pplx::task<void> upload_task)
                     {
                         std::lock_guard<async_semaphore> guard(this_pointer->m_semaphore, std::adopt_lock);
                         try

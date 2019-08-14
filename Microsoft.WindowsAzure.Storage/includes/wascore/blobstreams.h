@@ -191,6 +191,10 @@ namespace azure { namespace storage { namespace core {
             {
                 m_transaction_hash_provider = hash_provider::create_md5_hash_provider();
             }
+            else if (options.use_transactional_crc64())
+            {
+                m_transaction_hash_provider = hash_provider::create_crc64_hash_provider();
+            }
 
             if (options.store_blob_content_md5())
             {

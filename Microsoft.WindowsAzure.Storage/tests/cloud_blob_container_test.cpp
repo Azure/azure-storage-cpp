@@ -267,7 +267,7 @@ SUITE(Blob)
 
             std::vector<uint8_t> buffer;
             buffer.resize((i + 1) * 8 * 1024);
-            fill_buffer_and_get_md5(buffer);
+            fill_buffer(buffer);
             auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(buffer);
             blob.append_block(stream, utility::string_t(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
             blobs[blob.name()] = blob;

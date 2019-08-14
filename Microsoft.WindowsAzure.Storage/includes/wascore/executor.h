@@ -42,7 +42,7 @@ namespace azure { namespace storage { namespace core {
         {
         }
         
-        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, bool calculate_md5 = false, utility::size64_t length = std::numeric_limits<utility::size64_t>::max(), utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max(), const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none())
+        static pplx::task<istream_descriptor> create(concurrency::streams::istream stream, checksum_type calculate_checksum = checksum_type::none, utility::size64_t length = std::numeric_limits<utility::size64_t>::max(), utility::size64_t max_length = std::numeric_limits<utility::size64_t>::max(), const pplx::cancellation_token& cancellation_token = pplx::cancellation_token::none())
         {
             if (length == std::numeric_limits<utility::size64_t>::max())
             {
@@ -54,16 +54,25 @@ namespace azure { namespace storage { namespace core {
                 throw std::invalid_argument(protocol::error_stream_length);
             }
 
-            if (!calculate_md5 && stream.can_seek())
+            if (calculate_checksum == checksum_type::none && stream.can_seek())
             {
-                return pplx::task_from_result(istream_descriptor(stream, length, utility::string_t()));
+                return pplx::task_from_result(istream_descriptor(stream, length, checksum(checksum_none)));
             }
 
-            hash_provider provider = calculate_md5 ? core::hash_provider::create_md5_hash_provider() : core::hash_provider();
+            hash_provider provider = core::hash_provider();
+
+            if (calculate_checksum == checksum_type::md5)
+            {
+                provider = core::hash_provider::create_md5_hash_provider();
+            }
+            else if (calculate_checksum == checksum_type::crc64)
+            {
+                provider = core::hash_provider::create_crc64_hash_provider();
+            }
             concurrency::streams::container_buffer<std::vector<uint8_t>> temp_buffer;
             concurrency::streams::ostream temp_stream;
 
-            if (calculate_md5)
+            if (calculate_checksum != checksum_type::none)
             {
                 temp_stream = hash_wrapper_streambuf<concurrency::streams::ostream::traits::char_type>(temp_buffer, provider).create_ostream();
             }
@@ -94,9 +103,9 @@ namespace azure { namespace storage { namespace core {
             return m_length;
         }
 
-        const utility::string_t& content_md5() const
+        const checksum& content_checksum() const
         {
-            return m_content_md5;
+            return m_content_checksum;
         }
 
         void rewind()
@@ -106,14 +115,14 @@ namespace azure { namespace storage { namespace core {
 
     private:
         
-        istream_descriptor(concurrency::streams::istream stream, utility::size64_t length, utility::string_t content_md5)
-            : m_stream(stream), m_offset(stream.tell()), m_length(length), m_content_md5(std::move(content_md5))
+        istream_descriptor(concurrency::streams::istream stream, utility::size64_t length, checksum content_checksum)
+            : m_stream(stream), m_offset(stream.tell()), m_length(length), m_content_checksum(std::move(content_checksum))
         {
         }
 
         concurrency::streams::istream m_stream;
         concurrency::streams::istream::pos_type m_offset;
-        utility::string_t m_content_md5;
+        checksum m_content_checksum;
         utility::size64_t m_length;
     };
 
@@ -126,8 +135,8 @@ namespace azure { namespace storage { namespace core {
         {
         }
 
-        ostream_descriptor(utility::size64_t length, utility::string_t content_md5)
-            : m_length(length), m_content_md5(std::move(content_md5))
+        ostream_descriptor(utility::size64_t length, checksum content_checksum)
+            : m_length(length), m_content_checksum(std::move(content_checksum))
         {
         }
 
@@ -136,14 +145,14 @@ namespace azure { namespace storage { namespace core {
             return m_length;
         }
 
-        const utility::string_t& content_md5() const
+        const checksum& content_checksum() const
         {
-            return m_content_md5;
+            return m_content_checksum;
         }
 
     private:
         
-        utility::string_t m_content_md5;
+        checksum m_content_checksum;
         utility::size64_t m_length;
     };
 
@@ -160,7 +169,7 @@ namespace azure { namespace storage { namespace core {
 
         explicit storage_command_base(const storage_uri& request_uri, const pplx::cancellation_token& cancellation_token, const bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler)
             : m_request_uri(request_uri), m_location_mode(command_location_mode::primary_only),
-            m_cancellation_token(cancellation_token), m_calculate_response_body_md5(false), m_use_timeout(use_timeout), m_timer_handler(timer_handler)
+            m_cancellation_token(cancellation_token), m_calculate_response_body_checksum(checksum_type::none), m_use_timeout(use_timeout), m_timer_handler(timer_handler)
         {
             if (m_use_timeout)
             {
@@ -190,9 +199,9 @@ namespace azure { namespace storage { namespace core {
             m_destination_stream = value;
         }
 
-        void set_calculate_response_body_md5(bool value)
+        void set_calculate_response_body_checksum(checksum_type value)
         {
-            m_calculate_response_body_md5 = value;
+            m_calculate_response_body_checksum = value;
         }
 
         void set_build_request(std::function<web::http::http_request(web::http::uri_builder&, const std::chrono::seconds&, operation_context)> value)
@@ -275,7 +284,7 @@ namespace azure { namespace storage { namespace core {
         storage_uri m_request_uri;
         istream_descriptor m_request_body;
         concurrency::streams::ostream m_destination_stream;
-        bool m_calculate_response_body_md5;
+        checksum_type m_calculate_response_body_checksum;
         command_location_mode m_location_mode;
 
         const pplx::cancellation_token m_cancellation_token;

@@ -45,7 +45,7 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
     utility::string_t md5_header;
     context.set_sending_request([&md5_header] (web::http::http_request& request, azure::storage::operation_context)
     {
-        if (!request.headers().match(_XPLATSTR("x-ms-blob-content-md5"), md5_header))
+        if (!request.headers().match(azure::storage::protocol::ms_header_blob_content_md5, md5_header))
         {
             md5_header.clear();
         }
@@ -113,10 +113,11 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
 
     azure::storage::blob_request_options download_options(options);
     download_options.set_use_transactional_md5(false);
+    download_options.set_use_transactional_crc64(false);
 
     concurrency::streams::container_buffer<std::vector<uint8_t>> output_buffer;
     blob.download_to_stream(output_buffer.create_ostream(), azure::storage::access_condition(), download_options, context);
-    CHECK_ARRAY_EQUAL(buffer.data() + buffer_offset, output_buffer.collection().data(),(int) target_blob_size);
+    CHECK_ARRAY_EQUAL(buffer.data() + buffer_offset, output_buffer.collection().data(), int(target_blob_size));
 
     context.set_sending_request(std::function<void(web::http::http_request &, azure::storage::operation_context)>());
     return context;

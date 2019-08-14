@@ -44,7 +44,7 @@ namespace azure { namespace storage { namespace core {
             return base->total_written();
         }
 
-        utility::string_t hash() const
+        checksum hash() const
         {
             const basic_hash_wrapper_streambuf<_CharType>* base = static_cast<basic_hash_wrapper_streambuf<_CharType>*>(Concurrency::streams::streambuf<_CharType>::get_base().get());
             return base->hash();
@@ -143,10 +143,10 @@ namespace azure { namespace storage { namespace core {
         class buffer_to_upload
         {
         public:
-            buffer_to_upload(concurrency::streams::container_buffer<std::vector<char_type>> buffer, const utility::string_t& content_md5)
+            buffer_to_upload(concurrency::streams::container_buffer<std::vector<char_type>> buffer, const checksum& content_checksum)
                 : m_size(buffer.size()),
                 m_stream(concurrency::streams::container_stream<std::vector<char_type>>::open_istream(std::move(buffer.collection()))),
-                m_content_md5(content_md5)
+                m_content_checksum(content_checksum)
             {
             }
 
@@ -165,9 +165,9 @@ namespace azure { namespace storage { namespace core {
                 return m_size == 0;
             }
 
-            const utility::string_t& content_md5() const
+            const checksum& content_checksum() const
             {
-                return m_content_md5;
+                return m_content_checksum;
             }
 
         private:
@@ -175,7 +175,7 @@ namespace azure { namespace storage { namespace core {
             // Note: m_size must be initialized before m_stream, and thus must be listed first in this list.
             // This is because we use std::move to initialize m_stream, but we need to get the size first.
             utility::size64_t m_size;
-            utility::string_t m_content_md5;
+            checksum m_content_checksum;
             concurrency::streams::istream m_stream;
         };
 

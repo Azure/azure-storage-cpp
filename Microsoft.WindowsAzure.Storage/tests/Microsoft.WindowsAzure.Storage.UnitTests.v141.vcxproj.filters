@@ -140,6 +140,9 @@
     <ClCompile Include="cloud_file_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="checksum_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="test_configurations.json" />

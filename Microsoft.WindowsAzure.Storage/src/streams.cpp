@@ -44,15 +44,22 @@ namespace azure { namespace storage { namespace core {
 
     std::shared_ptr<basic_cloud_ostreambuf::buffer_to_upload> basic_cloud_ostreambuf::prepare_buffer()
     {
-        utility::string_t block_md5;
+        checksum block_checksum;
         if (m_transaction_hash_provider.is_enabled())
         {
             m_transaction_hash_provider.close();
-            block_md5 = m_transaction_hash_provider.hash();
-            m_transaction_hash_provider = hash_provider::create_md5_hash_provider();
+            block_checksum = m_transaction_hash_provider.hash();
+            if (block_checksum.is_md5())
+            {
+                m_transaction_hash_provider = hash_provider::create_md5_hash_provider();
+            }
+            else if (block_checksum.is_crc64())
+            {
+                m_transaction_hash_provider = hash_provider::create_crc64_hash_provider();
+            }
         }
 
-        auto buffer = std::make_shared<basic_cloud_ostreambuf::buffer_to_upload>(m_buffer, block_md5);
+        auto buffer = std::make_shared<basic_cloud_ostreambuf::buffer_to_upload>(m_buffer, block_checksum);
         m_buffer = concurrency::streams::container_buffer<std::vector<char_type>>();
         m_buffer_size = m_next_buffer_size;
         return buffer;

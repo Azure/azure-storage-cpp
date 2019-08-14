@@ -1774,8 +1774,10 @@ namespace azure { namespace storage {
         blob_request_options()
             : request_options(),
             m_use_transactional_md5(false),
+            m_use_transactional_crc64(false),
             m_store_blob_content_md5(false),
             m_disable_content_md5_validation(false),
+            m_disable_content_crc64_validation(false),
             m_parallelism_factor(1),
             m_single_blob_upload_threshold(protocol::default_single_blob_upload_threshold),
             m_stream_write_size(protocol::default_stream_write_size),
@@ -1808,8 +1810,10 @@ namespace azure { namespace storage {
             {
                 request_options::operator=(std::move(other));
                 m_use_transactional_md5 = std::move(other.m_use_transactional_md5);
+                m_use_transactional_crc64 = std::move(other.m_use_transactional_crc64);
                 m_store_blob_content_md5 = std::move(other.m_store_blob_content_md5);
                 m_disable_content_md5_validation = std::move(other.m_disable_content_md5_validation);
+                m_disable_content_crc64_validation = std::move(other.m_disable_content_crc64_validation);
                 m_parallelism_factor = std::move(other.m_parallelism_factor);
                 m_single_blob_upload_threshold = std::move(other.m_single_blob_upload_threshold);
                 m_stream_write_size = std::move(other.m_stream_write_size);
@@ -1842,8 +1846,14 @@ namespace azure { namespace storage {
                 m_store_blob_content_md5.merge(other.m_store_blob_content_md5);
             }
 
-            m_use_transactional_md5.merge(other.m_use_transactional_md5);
+            // MD5 overrides CRC64 in the same scope. While explicit CRC64 overrides default MD5.
+            if (!m_use_transactional_crc64.has_value() || !m_use_transactional_crc64)
+            {
+                m_use_transactional_md5.merge(other.m_use_transactional_md5);
+            }
+            m_use_transactional_crc64.merge(other.m_use_transactional_crc64);
             m_disable_content_md5_validation.merge(other.m_disable_content_md5_validation);
+            m_disable_content_crc64_validation.merge(other.m_disable_content_crc64_validation);
             m_parallelism_factor.merge(other.m_parallelism_factor);
             m_single_blob_upload_threshold.merge(other.m_single_blob_upload_threshold);
             m_stream_write_size.merge(other.m_stream_write_size);
@@ -1867,6 +1877,24 @@ namespace azure { namespace storage {
         void set_use_transactional_md5(bool value)
         {
             m_use_transactional_md5 = value;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the content-CRC64 hash will be calculated and validated for the request.
+        /// </summary>
+        /// <returns><c>true</c> if the content-CRC64 hash will be calculated and validated for the request; otherwise, <c>false</c>.</returns>
+        bool use_transactional_crc64() const
+        {
+            return m_use_transactional_crc64;
+        }
+
+        /// <summary>
+        /// Indicates whether to calculate and validate the content-CRC64 hash for the request.
+        /// </summary>
+        /// <param name="value"><c>true</c> to calculate and validate the content-CRC64 hash for the request; otherwise, <c>false</c>.</param>
+        void set_use_transactional_crc64(bool value)
+        {
+            m_use_transactional_crc64 = value;
         }
 
         /// <summary>
@@ -1903,6 +1931,24 @@ namespace azure { namespace storage {
         void set_disable_content_md5_validation(bool value)
         {
             m_disable_content_md5_validation = value;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether content-CRC64 validation will be disabled when downloading blobs.
+        /// </summary>
+        /// <returns><c>true</c> to disable content-CRC64 validation; otherwise, <c>false</c>.</returns>
+        bool disable_content_crc64_validation() const
+        {
+            return m_disable_content_crc64_validation;
+        }
+
+        /// <summary>
+        /// Indicates whether to disable content-CRC64 validation when downloading blobs.
+        /// </summary>
+        /// <param name="value"><c>true</c> to disable content-CRC64 validation; otherwise, <c>false</c>.</param>
+        void set_disable_content_crc64_validation(bool value)
+        {
+            m_disable_content_crc64_validation = value;
         }
 
         /// <summary>
@@ -2012,8 +2058,10 @@ namespace azure { namespace storage {
     private:
 
         option_with_default<bool> m_use_transactional_md5;
+        option_with_default<bool> m_use_transactional_crc64;
         option_with_default<bool> m_store_blob_content_md5;
         option_with_default<bool> m_disable_content_md5_validation;
+        option_with_default<bool> m_disable_content_crc64_validation;
         option_with_default<int> m_parallelism_factor;
         option_with_default<utility::size64_t> m_single_blob_upload_threshold;
         option_with_default<size_t> m_stream_write_size;
@@ -6423,11 +6471,10 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
-        void upload_block(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5) const
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
+        void upload_block(const utility::string_t& block_id, concurrency::streams::istream block_data, const checksum& content_checksum) const
         {
-            upload_block_async(block_id, block_data, content_md5).wait();
+            upload_block_async(block_id, block_data, content_checksum).wait();
         }
 
         /// <summary>
@@ -6435,14 +6482,13 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref = "azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void upload_block(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        void upload_block(const utility::string_t& block_id, concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
-            upload_block_async(block_id, block_data, content_md5, condition, options, context).wait();
+            upload_block_async(block_id, block_data, content_checksum, condition, options, context).wait();
         }
 
         /// <summary>
@@ -6450,12 +6496,11 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5) const
+        pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const checksum& content_checksum) const
         {
-            return upload_block_async(block_id, block_data, content_md5, access_condition(), blob_request_options(), operation_context());
+            return upload_block_async(block_id, block_data, content_checksum, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
@@ -6463,15 +6508,14 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        WASTORAGE_API pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        WASTORAGE_API pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
-            return upload_block_async(block_id, block_data, content_md5, condition, options, context, pplx::cancellation_token::none());
+            return upload_block_async(block_id, block_data, content_checksum, condition, options, context, pplx::cancellation_token::none());
         }
 
         /// <summary>
@@ -6479,16 +6523,15 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="block_id">A Base64-encoded block ID that identifies the block.</param>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+        pplx::task<void> upload_block_async(const utility::string_t& block_id, concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
         {
-            return upload_block_async_impl(block_id, block_data, content_md5, condition, options, context, cancellation_token, true);
+            return upload_block_async_impl(block_id, block_data, content_checksum, condition, options, context, cancellation_token, true);
         }
 
         /// <summary>
@@ -6778,7 +6821,7 @@ namespace azure { namespace storage {
         }
 
         WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout = false, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
-        WASTORAGE_API pplx::task<void> upload_block_async_impl(const utility::string_t& block_id, concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr) const;
+        WASTORAGE_API pplx::task<void> upload_block_async_impl(const utility::string_t& block_id, concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr) const;
         WASTORAGE_API pplx::task<void> upload_block_list_async_impl(const std::vector<block_list_item>& block_list, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
 
         friend class cloud_blob_container;
@@ -7272,11 +7315,10 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="page_data">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
-        void upload_pages(concurrency::streams::istream page_data, int64_t start_offset, const utility::string_t& content_md5)
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
+        void upload_pages(concurrency::streams::istream page_data, int64_t start_offset, const checksum& content_checksum)
         {
-            upload_pages_async(page_data, start_offset, content_md5).wait();
+            upload_pages_async(page_data, start_offset, content_checksum).wait();
         }
 
         /// <summary>
@@ -7284,14 +7326,13 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="page_data">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
-        void upload_pages(concurrency::streams::istream page_data, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context)
+        void upload_pages(concurrency::streams::istream page_data, int64_t start_offset, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            upload_pages_async(page_data, start_offset, content_md5, condition, options, context).wait();
+            upload_pages_async(page_data, start_offset, content_checksum, condition, options, context).wait();
         }
 
         /// <summary>
@@ -7299,12 +7340,11 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="source">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5)
+        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const checksum& content_checksum)
         {
-            return upload_pages_async(source, start_offset, content_md5, access_condition(), blob_request_options(), operation_context());
+            return upload_pages_async(source, start_offset, content_checksum, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
@@ -7312,15 +7352,14 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="source">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context)
+        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context)
         {
-            return upload_pages_async(source, start_offset, content_md5, condition, options, context, pplx::cancellation_token::none());
+            return upload_pages_async(source, start_offset, content_checksum, condition, options, context, pplx::cancellation_token::none());
         }
 
         /// <summary>
@@ -7328,16 +7367,15 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="source">A stream providing the page data.</param>
         /// <param name="start_offset">The offset at which to begin writing, in bytes. The offset must be a multiple of 512.</param>
-        /// <param name="content_md5">An optional hash value that will be used to set the Content-MD5 property
-        /// on the blob. May be an empty string.</param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        pplx::task<void> upload_pages_async(concurrency::streams::istream source, int64_t start_offset, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
         {
-            return upload_pages_async_impl(source, start_offset, content_md5, condition, options, context, cancellation_token, true);
+            return upload_pages_async_impl(source, start_offset, content_checksum, condition, options, context, cancellation_token, true);
         }
 
         /// <summary>
@@ -7968,7 +8006,7 @@ namespace azure { namespace storage {
             set_type(blob_type::page_blob);
         }
 
-        WASTORAGE_API pplx::task<void> upload_pages_async_impl(concurrency::streams::istream source, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
+        WASTORAGE_API pplx::task<void> upload_pages_async_impl(concurrency::streams::istream source, int64_t start_offset, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
         WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async_impl(utility::size64_t size, int64_t sequence_number, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
 
         friend class cloud_blob_container;
@@ -8097,70 +8135,65 @@ namespace azure { namespace storage {
         /// Commits a new block of data to the end of the blob.
         /// </summary>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
-        /// for the block. May be an empty string. </param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <returns>The offset in bytes at which the block was committed to.</returns>
-        int64_t append_block(concurrency::streams::istream block_data, const utility::string_t& content_md5) const
+        int64_t append_block(concurrency::streams::istream block_data, const checksum& content_checksum) const
         {
-            return append_block_async(block_data, content_md5).get();
+            return append_block_async(block_data, content_checksum).get();
         }
 
         /// <summary>
         /// Commits a new block of data to the end of the blob.
         /// </summary>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
-        /// for the block. May be an empty string. </param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>The offset in bytes at which the block was committed to.</returns>
-        int64_t append_block(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        int64_t append_block(concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
-            return append_block_async(block_data, content_md5, condition, options, context).get();
+            return append_block_async(block_data, content_checksum, condition, options, context).get();
         }
 
         /// <summary>
         /// Initiates an asynchronous operation to commit a new block of data to the end of the blob.
         /// </summary>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
-        /// for the block. May be an empty string. </param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const utility::string_t& content_md5) const
+        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const checksum& content_checksum) const
         {
-            return append_block_async(block_data, content_md5, access_condition(), blob_request_options(), operation_context());
+            return append_block_async(block_data, content_checksum, access_condition(), blob_request_options(), operation_context());
         }
 
         /// <summary>
         /// Initiates an asynchronous operation to commit a new block of data to the end of the blob.
         /// </summary>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
-        /// for the block. May be an empty string. </param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context) const
+        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context) const
         {
-            return append_block_async(block_data, content_md5, condition, options, context, pplx::cancellation_token::none());
+            return append_block_async(block_data, content_checksum, condition, options, context, pplx::cancellation_token::none());
         }
 
         /// <summary>
         /// Initiates an asynchronous operation to commit a new block of data to the end of the blob.
         /// </summary>
         /// <param name="block_data">A stream that provides the data for the block.</param>
-        /// <param name="content_md5">An optional hash value that will be used to to ensure transactional integrity
-        /// for the block. May be an empty string. </param>
+        /// <param name="content_checksum">A hash value used to ensure transactional integrity. May be <see cref="azure::storage::checksum_none" /> or a base64-encoded MD5 string or CRC64 integer.</param>
         /// <param name="condition">An <see cref="azure::storage::access_condition" /> object that represents the access condition for the operation.</param>
         /// <param name="options">A <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
-        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+        pplx::task<int64_t> append_block_async(concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
         {
-            return append_block_async_impl(block_data, content_md5, condition, options, context, cancellation_token, true);
+            return append_block_async_impl(block_data, content_checksum, condition, options, context, cancellation_token, true);
         }
         /// <summary>
         /// Downloads the blob's contents as a string.
@@ -8865,7 +8898,7 @@ namespace azure { namespace storage {
         /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
         pplx::task<void> upload_from_stream_internal_async(concurrency::streams::istream source, utility::size64_t length, bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
-        WASTORAGE_API pplx::task<int64_t> append_block_async_impl(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr) const;
+        WASTORAGE_API pplx::task<int64_t> append_block_async_impl(concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr) const;
         WASTORAGE_API pplx::task<concurrency::streams::ostream> open_write_async_impl(bool create_new, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_request_level_timeout, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
         WASTORAGE_API pplx::task<void> create_or_replace_async_impl(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, std::shared_ptr<core::timer_handler> timer_handler = nullptr);
 

@@ -103,6 +103,7 @@
     <ClCompile Include="blob_lease_test.cpp" />
     <ClCompile Include="blob_streams_test.cpp" />
     <ClCompile Include="blob_test_base.cpp" />
+    <ClCompile Include="checksum_test.cpp" />
     <ClCompile Include="cloud_append_blob_test.cpp" />
     <ClCompile Include="cloud_blob_client_test.cpp" />
     <ClCompile Include="cloud_blob_container_test.cpp" />

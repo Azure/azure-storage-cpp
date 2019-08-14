@@ -55,6 +55,7 @@ namespace azure { namespace storage {
         headers.match(protocol::ms_header_request_id, m_service_request_id);
         headers.match(web::http::header_names::content_length, m_content_length);
         headers.match(web::http::header_names::content_md5, m_content_md5);
+        headers.match(protocol::ms_header_content_crc64, m_content_crc64);
         headers.match(web::http::header_names::etag, m_etag);
 
         utility::string_t request_server_encrypted;

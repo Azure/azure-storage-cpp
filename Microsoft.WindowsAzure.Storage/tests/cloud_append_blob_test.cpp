@@ -20,6 +20,7 @@
 #include "check_macros.h"
 
 #include "cpprest/producerconsumerstream.h"
+#include "was/crc64.h"
 #include "wascore/constants.h"
 
 #pragma region Fixture
@@ -36,11 +37,16 @@ SUITE(Blob)
         azure::storage::blob_request_options options;
 
         utility::string_t md5_header;
-        m_context.set_sending_request([&md5_header](web::http::http_request& request, azure::storage::operation_context)
+        utility::string_t crc64_header;
+        m_context.set_sending_request([&md5_header, &crc64_header](web::http::http_request& request, azure::storage::operation_context)
         {
             if (!request.headers().match(web::http::header_names::content_md5, md5_header))
             {
                 md5_header.clear();
+            }
+            if (!request.headers().match(azure::storage::protocol::ms_header_content_crc64, crc64_header))
+            {
+                crc64_header.clear();
             }
         });
 
@@ -48,17 +54,20 @@ SUITE(Blob)
         check_blob_no_stale_property(m_blob);
 
         options.set_use_transactional_md5(false);
+        options.set_use_transactional_crc64(false);
         for (uint16_t i = 0; i < 3; ++i)
         {
-            fill_buffer_and_get_md5(buffer);
+            fill_buffer(buffer);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
             int64_t offset = m_blob.append_block(stream, utility::string_t(), azure::storage::access_condition(), options, m_context);
             CHECK_UTF8_EQUAL(utility::string_t(), md5_header);
+            CHECK_UTF8_EQUAL(utility::string_t(), crc64_header);
             CHECK_EQUAL(i * buffer_size, offset);
             CHECK_EQUAL(i + 1, m_blob.properties().append_blob_committed_block_count());
         }
 
         options.set_use_transactional_md5(false);
+        options.set_use_transactional_crc64(false);
         for (uint16_t i = 3; i < 6; ++i)
         {
             auto md5 = fill_buffer_and_get_md5(buffer);
@@ -70,6 +79,7 @@ SUITE(Blob)
         }
 
         options.set_use_transactional_md5(true);
+        options.set_use_transactional_crc64(false);
         for (uint16_t i = 6; i < 9; ++i)
         {
             auto md5 = fill_buffer_and_get_md5(buffer);
@@ -80,18 +90,52 @@ SUITE(Blob)
             CHECK_EQUAL(i + 1, m_blob.properties().append_blob_committed_block_count());
         }
 
+        options.set_use_transactional_md5(false);
+        options.set_use_transactional_crc64(true);
+        for (uint16_t i = 9; i < 12; ++i)
+        {
+            auto crc64 = fill_buffer_and_get_crc64(buffer);
+            auto stream = concurrency::streams::bytestream::open_istream(buffer);
+            int64_t offset = m_blob.append_block(stream, azure::storage::checksum_none, azure::storage::access_condition(), options, m_context);
+            CHECK_UTF8_EQUAL(crc64, crc64_header);
+            CHECK_EQUAL(i * buffer_size, offset);
+            CHECK_EQUAL(i + 1, m_blob.properties().append_blob_committed_block_count());
+        }
+
+        options.set_use_transactional_md5(false);
+        options.set_use_transactional_crc64(false);
+        for (uint16_t i = 12; i < 15; ++i)
+        {
+            auto crc64 = fill_buffer_and_get_crc64(buffer);
+            uint64_t crc64_val = azure::storage::crc64(buffer.data(), buffer.size());
+            auto stream = concurrency::streams::bytestream::open_istream(buffer);
+            int64_t offset = m_blob.append_block(stream, crc64_val, azure::storage::access_condition(), options, m_context);
+            CHECK_UTF8_EQUAL(crc64, crc64_header);
+            CHECK_EQUAL(i * buffer_size, offset);
+            CHECK_EQUAL(i + 1, m_blob.properties().append_blob_committed_block_count());
+        }
+
         // block stream with length = 0
         options.set_use_transactional_md5(true);
-        fill_buffer_and_get_md5(buffer);
+        options.set_use_transactional_crc64(false);
+        fill_buffer(buffer);
         auto stream1 = concurrency::streams::bytestream::open_istream(buffer);
         stream1.seek(buffer.size());
         CHECK_THROW(m_blob.append_block(stream1, utility::string_t(), azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
 
         options.set_use_transactional_md5(true);
-        fill_buffer_and_get_md5(buffer);
+        options.set_use_transactional_crc64(false);
+        fill_buffer(buffer);
         auto stream = concurrency::streams::bytestream::open_istream(buffer);
         CHECK_THROW(m_blob.append_block(stream, dummy_md5, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
         CHECK_UTF8_EQUAL(dummy_md5, md5_header);
+
+        options.set_use_transactional_md5(false);
+        options.set_use_transactional_crc64(true);
+        fill_buffer(buffer);
+        stream = concurrency::streams::bytestream::open_istream(buffer);
+        CHECK_THROW(m_blob.append_block(stream, dummy_crc64_val, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
+        CHECK_UTF8_EQUAL(dummy_crc64, crc64_header);
 
         m_context.set_sending_request(std::function<void(web::http::http_request &, azure::storage::operation_context)>());
     }
@@ -111,6 +155,7 @@ SUITE(Blob)
         int64_t bytes_appended = 0;
 
         options.set_use_transactional_md5(true);
+        options.set_use_transactional_crc64(false);
         for (size_t size : sizes)
         {
             buffer.resize(size);
@@ -123,12 +168,26 @@ SUITE(Blob)
         }
 
         options.set_use_transactional_md5(false);
+        options.set_use_transactional_crc64(true);
+        for (size_t size : sizes)
+        {
+            buffer.resize(size);
+            fill_buffer(buffer, 0, size);
+            auto stream = concurrency::streams::bytestream::open_istream(buffer);
+            int64_t offset = m_blob.append_block(stream, azure::storage::checksum_none, azure::storage::access_condition(), options, m_context);
+            CHECK_EQUAL(bytes_appended, offset);
+
+            bytes_appended += size;
+        }
+
+        options.set_use_transactional_md5(false);
+        options.set_use_transactional_crc64(false);
         for (size_t size : invalid_sizes)
         {
             buffer.resize(size);
-            fill_buffer_and_get_md5(buffer, 0, size);
+            fill_buffer(buffer, 0, size);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
-            CHECK_THROW(m_blob.append_block(stream, utility::string_t(), azure::storage::access_condition(), options, m_context), std::invalid_argument);
+            CHECK_THROW(m_blob.append_block(stream, azure::storage::checksum_none, azure::storage::access_condition(), options, m_context), std::invalid_argument);
         }
     }
 
@@ -137,7 +196,7 @@ SUITE(Blob)
         const size_t buffer_size =  64 * 1024;
         std::vector<uint8_t> buffer;
         buffer.resize(buffer_size);
-        fill_buffer_and_get_md5(buffer);
+        fill_buffer(buffer);
 
         azure::storage::blob_request_options options;
         options.set_use_transactional_md5(false);
@@ -172,7 +231,7 @@ SUITE(Blob)
 
         for (uint16_t i = 0; i < 3; ++i)
         {
-            fill_buffer_and_get_md5(buffer);
+            fill_buffer(buffer);
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
             int64_t offset = m_blob.append_block(stream, utility::string_t(), azure::storage::access_condition(), options, m_context);
             block_count++;
@@ -306,7 +365,7 @@ SUITE(Blob)
         {
             std::vector<uint8_t> buffer;
             buffer.resize(4 * 1024 * 1024);
-            fill_buffer_and_get_md5(buffer);
+            fill_buffer(buffer);
             std::copy(buffer.begin(), buffer.end(), file_buffer.begin() + buffer_offsets1[i]);
 
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
@@ -324,7 +383,7 @@ SUITE(Blob)
         {
             std::vector<uint8_t> buffer;
             buffer.resize(4 * 1024 * 1024);
-            fill_buffer_and_get_md5(buffer);
+            fill_buffer(buffer);
             std::copy(buffer.begin(), buffer.begin() + 2 * 1024 * 1024, file_buffer.begin() + buffer_offsets2[i]);
 
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
@@ -341,7 +400,7 @@ SUITE(Blob)
         {
             std::vector<uint8_t> buffer;
             buffer.resize(5 * 1024 * 1024);
-            fill_buffer_and_get_md5(buffer);
+            fill_buffer(buffer);
             std::copy(buffer.begin(), buffer.end(), file_buffer.begin() + buffer_offsets3[i]);
 
             // create a temporary test file
@@ -498,16 +557,16 @@ SUITE(Blob)
     TEST_FIXTURE(append_blob_test_base, append_blob_upload_max_size_condition)
     {
         const size_t buffer_size = 1024 * 1024;
-        
+
         std::vector<uint8_t> buffer;
         buffer.resize(buffer_size);
-        fill_buffer_and_get_md5(buffer);
+        fill_buffer(buffer);
         concurrency::streams::istream stream = concurrency::streams::bytestream::open_istream(buffer);
-        
+
         auto condition = azure::storage::access_condition::generate_if_max_size_less_than_or_equal_condition(512);
         CHECK_THROW(m_blob.upload_from_stream(stream, condition, azure::storage::blob_request_options(), m_context), std::invalid_argument);
     }
-    
+
     TEST_FIXTURE(append_blob_test_base, append_block_stale_properties)
     {
         azure::storage::blob_request_options options;
@@ -832,7 +891,7 @@ SUITE(Blob)
     {
         std::vector<uint8_t> buffer;
         buffer.resize(4 * 1024 * 1024);
-        fill_buffer_and_get_md5(buffer);
+        fill_buffer(buffer);
 
         {
             // cancel the cancellation prior to the operation
@@ -998,7 +1057,7 @@ SUITE(Blob)
     {
         std::vector<uint8_t> buffer;
         buffer.resize(4 * 1024 * 1024);
-        fill_buffer_and_get_md5(buffer);
+        fill_buffer(buffer);
 
         {
             auto options = azure::storage::blob_request_options();
@@ -1130,7 +1189,7 @@ SUITE(Blob)
     {
         std::vector<uint8_t> buffer;
         buffer.resize(4 * 1024 * 1024);
-        fill_buffer_and_get_md5(buffer);
+        fill_buffer(buffer);
         {
             auto options = azure::storage::blob_request_options();
             options.set_maximum_execution_time(std::chrono::milliseconds(10));
@@ -1161,7 +1220,7 @@ SUITE(Blob)
         utility::size64_t length = 260 * 1024 * 1024;
         std::vector<uint8_t> buffer;
         buffer.resize(length);
-        fill_buffer_and_get_md5(buffer);
+        fill_buffer(buffer);
 
         {
             auto cancel_token_src = pplx::cancellation_token_source();

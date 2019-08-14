@@ -46,7 +46,7 @@ namespace azure { namespace storage {
         command->set_build_request(std::bind(protocol::set_service_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-        return core::istream_descriptor::create(stream, false, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, context, modified_options, cancellation_token] (core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(stream, checksum_type::none, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, context, modified_options, cancellation_token] (core::istream_descriptor request_body) -> pplx::task<void>
         {
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);

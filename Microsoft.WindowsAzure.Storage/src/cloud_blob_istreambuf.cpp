@@ -148,7 +148,7 @@ namespace azure { namespace storage { namespace core {
                 this_pointer->m_buffer = concurrency::streams::container_buffer<std::vector<char_type>>(std::move(temp_buffer.collection()), std::ios_base::in);
                 this_pointer->m_buffer.seekpos(0, std::ios_base::in);
 
-                // Validate the blob's content MD5 hash
+                // Validate the blob's content checksum
                 if (this_pointer->m_blob_hash_provider.is_enabled())
                 {
                     std::vector<char_type>& result_buffer = this_pointer->m_buffer.collection();
@@ -157,7 +157,8 @@ namespace azure { namespace storage { namespace core {
                     if (((utility::size64_t) this_pointer->m_next_blob_offset) == this_pointer->size())
                     {
                         this_pointer->m_blob_hash_provider.close();
-                        if (this_pointer->m_blob->properties().content_md5() != this_pointer->m_blob_hash_provider.hash())
+                        checksum checksum = this_pointer->m_blob_hash_provider.hash();
+                        if (checksum.is_md5() && this_pointer->m_blob->properties().content_md5() != this_pointer->m_blob_hash_provider.hash().md5())
                         {
                             throw storage_exception(protocol::error_md5_mismatch);
                         }

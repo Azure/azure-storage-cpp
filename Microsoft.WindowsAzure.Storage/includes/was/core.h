@@ -445,6 +445,208 @@ namespace azure { namespace storage {
         std::shared_ptr<bearer_token_credential> m_bearer_token_credential;
     };
 
+    enum class checksum_type
+    {
+        none,
+        md5,
+        crc64,
+        hmac_sha256,
+    };
+
+    using checksum_none_t = std::integral_constant<checksum_type, checksum_type::none>;
+    using checksum_md5_t = std::integral_constant<checksum_type, checksum_type::md5>;
+    using checksum_crc64_t = std::integral_constant<checksum_type, checksum_type::crc64>;
+    using checksum_hmac_sha256_t = std::integral_constant<checksum_type, checksum_type::hmac_sha256>;
+
+    constexpr auto checksum_none = checksum_none_t();
+    constexpr auto checksum_md5 = checksum_md5_t();
+    constexpr auto checksum_crc64 = checksum_crc64_t();
+    constexpr auto checksum_hmac_sha256 = checksum_hmac_sha256_t();
+
+    /// <summary>
+    /// Represents a checksum to verify the integrity of data during transport.
+    /// </summary>
+    class checksum
+    {
+    public:
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class without specifying any checksum method.
+        /// </summary>
+        checksum() : checksum(checksum_none)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class with MD5 hash value.
+        /// </summary>
+        /// <param name="md5">A string containing base64-encoded MD5.</param>
+        /// <remarks>
+        /// If the provided string is empty, this class is initialized as if checksum method isn't specified.
+        /// </remarks>
+        checksum(utility::string_t md5) : m_type(checksum_type::md5), m_md5(std::move(md5))
+        {
+            if (m_md5.empty())
+            {
+                m_type = checksum_type::none;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class with MD5 hash value.
+        /// </summary>
+        /// <param name="md5">A string containing base64-encoded MD5.</param>
+        /// <remarks>
+        /// If the provided string is empty, this class is initialized as if checksum method isn't specified.
+        /// </remarks>
+        checksum(const utility::char_t* md5) : checksum(utility::string_t(md5))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class with CRC64 error-detecting code.
+        /// </summary>
+        /// <param name="crc64">An integer containing CRC64 code.</param>
+        checksum(uint64_t crc64) : m_type(checksum_type::crc64), m_crc64(crc64)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class without specifying any checksum method.
+        /// </summary>
+        checksum(checksum_none_t type) : m_type(type.value)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class with MD5 hash value.
+        /// </summary>
+        /// <param name="type">Explicitly specified checksum type, must be <see cref="azure::storage::checksum_md5" />.</param>
+        /// <param name="val">A string containing base64-encoded MD5.</param>
+        checksum(checksum_md5_t type, utility::string_t val) : m_type(type.value), m_md5(std::move(val))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class with CRC64 error-detecting code.
+        /// </summary>
+        /// <param name="type">Explicitly specified checksum type, must be <see cref="azure::storage::checksum_crc64" />.</param>
+        /// <param name="val">An integer containing CRC64 code.</param>
+        checksum(checksum_crc64_t type, uint64_t val) : m_type(type.value), m_crc64(val)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class with HMAC-SHA256 authentication code.
+        /// </summary>
+        /// <param name="type">Explicitly specified checksum type, must be <see cref="azure::storage::checksum_hmac_sha256" />.</param>
+        /// <param name="val">A string containing base64-encoded HMAC-SHA256 authentication code.</param>
+        checksum(checksum_hmac_sha256_t type, utility::string_t val) : m_type(type.value), m_hmac_sha256(std::move(val))
+        {
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::checksum" /> object.</param>
+        checksum(checksum&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to an <see cref="azure::storage::checksum" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::checksum" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::checksum" /> object with properties set.</returns>
+        checksum& operator=(checksum&& other)
+        {
+            if (this != &other)
+            {
+                m_type = std::move(other.m_type);
+                m_md5 = std::move(other.m_md5);
+                m_hmac_sha256 = std::move(other.hmac_sha256);
+                m_crc64 = std::move(other.m_crc64);
+            }
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Indicates whether this is an MD5 checksum.
+        /// </summary>
+        /// <returns><c>true</c> if this is an MD5 checksum; otherwise, <c>false</c>.</returns>
+        bool is_md5() const
+        {
+            return m_type == checksum_type::md5;
+        }
+
+        /// <summary>
+        /// Indicates whether this is an HMAC-SHA256 authentication code.
+        /// </summary>
+        /// <returns><c>true</c> if this is an HMAC-SHA256 authentication code; otherwise, <c>false</c>.</returns>
+        bool is_hmac_sha256() const
+        {
+            return m_type == checksum_type::hmac_sha256;
+        }
+
+        /// <summary>
+        /// Indicates whether this is a CRC64 checksum.
+        /// </summary>
+        /// <returns><c>true</c> if this is a CRC64 checksum; otherwise, <c>false</c>.</returns>
+        bool is_crc64() const
+        {
+            return m_type == checksum_type::crc64;
+        }
+
+        /// <summary>
+        /// Indicates whether any checksum method is used.
+        /// </summary>
+        /// <returns><c>true</c> if no checksum method is used; otherwise, <c>false</c>.</returns>
+        bool empty() const
+        {
+            return m_type == checksum_type::none;
+        }
+
+        /// <summary>
+        /// Gets the MD5 checksum.
+        /// </summary>
+        /// <returns>A string containing base64-encoded MD5.</returns>
+        const utility::string_t& md5() const
+        {
+            return m_md5;
+        }
+
+        /// <summary>
+        /// Gets the HMAC-256 authentication code.
+        /// </summary>
+        /// <returns>A string containing base64-encoded HMAC-256 authentiction code.</returns>
+        const utility::string_t& hmac_sha256() const
+        {
+            return m_hmac_sha256;
+        }
+
+        /// <summary>
+        /// Gets the CRC64 error-detecting code.
+        /// </summary>
+        /// <returns>A string containing base64-encoded CRC64 error-detecting code.</returns>
+        utility::string_t crc64() const
+        {
+            std::vector<uint8_t> crc64_str(sizeof(m_crc64) / sizeof(uint8_t));
+            memcpy(crc64_str.data(), &m_crc64, sizeof(m_crc64));
+            return utility::conversions::to_base64(crc64_str);
+        }
+
+    private:
+        checksum_type m_type;
+        utility::string_t m_md5;
+        utility::string_t m_hmac_sha256;
+        uint64_t m_crc64;
+    };
+
     /// <summary>
     /// Represents an option on a request.
     /// </summary>
@@ -744,6 +946,7 @@ namespace azure { namespace storage {
                 m_request_date = std::move(other.m_request_date);
                 m_content_length = std::move(other.m_content_length);
                 m_content_md5 = std::move(other.m_content_md5);
+                m_content_crc64 = std::move(other.m_content_crc64);
                 m_etag = std::move(other.m_etag);
                 m_request_server_encrypted = other.m_request_server_encrypted;
                 m_extended_error = std::move(other.m_extended_error);
@@ -843,6 +1046,15 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the content-CRC64 hash for the request.
+        /// </summary>
+        /// <returns>A string containing the content-CRC64 hash for the request.</returns>
+        const utility::string_t& content_crc64() const
+        {
+            return m_content_crc64;
+        }
+
+        /// <summary>
         /// Gets the ETag for the request.
         /// </summary>
         /// <returns>The ETag for the request.</returns>
@@ -883,6 +1095,7 @@ namespace azure { namespace storage {
         utility::datetime m_request_date;
         utility::size64_t m_content_length;
         utility::string_t m_content_md5;
+        utility::string_t m_content_crc64;
         utility::string_t m_etag;
         bool m_request_server_encrypted;
         storage_extended_error m_extended_error;

@@ -34,7 +34,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::put_page, range, page_write::clear, utility::string_t(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::put_page, range, page_write::clear, checksum(checksum_none), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -47,14 +47,24 @@ namespace azure { namespace storage {
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<void> cloud_page_blob::upload_pages_async_impl(concurrency::streams::istream page_data, int64_t start_offset, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler)
+    pplx::task<void> cloud_page_blob::upload_pages_async_impl(concurrency::streams::istream page_data, int64_t start_offset, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
         auto properties = m_properties;
-        bool needs_md5 = content_md5.empty() && modified_options.use_transactional_md5();
+        bool needs_md5 = modified_options.use_transactional_md5() && !content_checksum.is_md5();
+        bool needs_crc64 = modified_options.use_transactional_crc64() && !content_checksum.is_crc64();
+        checksum_type needs_checksum = checksum_type::none;
+        if (needs_md5)
+        {
+            needs_checksum = checksum_type::md5;
+        }
+        else if (needs_crc64)
+        {
+            needs_checksum = checksum_type::crc64;
+        }
 
         auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, (modified_options.is_maximum_execution_time_customized() && use_timeout), timer_handler);
         command->set_authentication_handler(service_client().authentication_handler());
@@ -66,12 +76,12 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(parsed_properties);
             properties->update_page_blob_sequence_number(parsed_properties);
         });
-        return core::istream_descriptor::create(page_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_page_size, command->get_cancellation_token()).then([command, context, start_offset, content_md5, modified_options, condition, cancellation_token](core::istream_descriptor request_body) -> pplx::task<void>
+        return core::istream_descriptor::create(page_data, needs_checksum, std::numeric_limits<utility::size64_t>::max(), protocol::max_page_size, command->get_cancellation_token()).then([command, context, start_offset, content_checksum, modified_options, condition, cancellation_token](core::istream_descriptor request_body) -> pplx::task<void>
         {
-            const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
+            const auto& checksum = content_checksum.empty() ? request_body.content_checksum() : content_checksum;
             auto end_offset = start_offset + request_body.length() - 1;
             page_range range(start_offset, end_offset);
-            command->set_build_request(std::bind(protocol::put_page, range, page_write::update, md5, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            command->set_build_request(std::bind(protocol::put_page, range, page_write::update, checksum, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });

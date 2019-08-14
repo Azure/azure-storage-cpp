@@ -44,14 +44,24 @@ namespace azure { namespace storage {
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<int64_t> cloud_append_blob::append_block_async_impl(concurrency::streams::istream block_data, const utility::string_t& content_md5, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler) const
+    pplx::task<int64_t> cloud_append_blob::append_block_async_impl(concurrency::streams::istream block_data, const checksum& content_checksum, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token, bool use_timeout, std::shared_ptr<core::timer_handler> timer_handler) const
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options(), type());
 
         auto properties = m_properties;
-        bool needs_md5 = content_md5.empty() && modified_options.use_transactional_md5();
+        bool needs_md5 = modified_options.use_transactional_md5() && !content_checksum.is_md5();
+        bool needs_crc64 = modified_options.use_transactional_crc64() && !content_checksum.is_crc64();
+        checksum_type needs_checksum = checksum_type::none;
+        if (needs_md5)
+        {
+            needs_checksum = checksum_type::md5;
+        }
+        else if (needs_crc64)
+        {
+            needs_checksum = checksum_type::crc64;
+        }
 
         auto command = std::make_shared<core::storage_command<int64_t>>(uri(), cancellation_token, (modified_options.is_maximum_execution_time_customized() && use_timeout), timer_handler);
         command->set_authentication_handler(service_client().authentication_handler());
@@ -64,10 +74,10 @@ namespace azure { namespace storage {
             properties->update_append_blob_committed_block_count(parsed_properties);
             return utility::conversions::details::scan_string<int64_t>(protocol::get_header_value(response.headers(), protocol::ms_header_blob_append_offset));
         });
-        return core::istream_descriptor::create(block_data, needs_md5, std::numeric_limits<utility::size64_t>::max(), protocol::max_append_block_size, command->get_cancellation_token()).then([command, context, content_md5, modified_options, condition, cancellation_token, options](core::istream_descriptor request_body) -> pplx::task<int64_t>
+        return core::istream_descriptor::create(block_data, needs_checksum, std::numeric_limits<utility::size64_t>::max(), protocol::max_append_block_size, command->get_cancellation_token()).then([command, context, content_checksum, modified_options, condition, cancellation_token, options](core::istream_descriptor request_body) -> pplx::task<int64_t>
         {
-            const utility::string_t& md5 = content_md5.empty() ? request_body.content_md5() : content_md5;
-            command->set_build_request(std::bind(protocol::append_block, md5, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            const auto& checksum = content_checksum.empty() ? request_body.content_checksum() : content_checksum;
+            command->set_build_request(std::bind(protocol::append_block, checksum, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<int64_t>::execute_async(command, modified_options, context);
         });

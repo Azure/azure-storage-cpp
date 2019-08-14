@@ -85,9 +85,13 @@ namespace azure { namespace storage { namespace core {
                 // Calculate the length and MD5 hash if needed as the incoming data is read
                 if (!instance->m_is_hashing_started)
                 {
-                    if (instance->m_command->m_calculate_response_body_md5)
+                    if (instance->m_command->m_calculate_response_body_checksum == checksum_type::md5)
                     {
                         instance->m_hash_provider = hash_provider::create_md5_hash_provider();
+                    }
+                    else if (instance->m_command->m_calculate_response_body_checksum == checksum_type::crc64)
+                    {
+                        instance->m_hash_provider = hash_provider::create_crc64_hash_provider();
                     }
 
                     instance->m_total_downloaded = 0;
@@ -99,9 +103,13 @@ namespace azure { namespace storage { namespace core {
 
                 if (instance->m_should_restart_hash_provider)
                 {
-                    if (instance->m_command->m_calculate_response_body_md5)
+                    if (instance->m_command->m_calculate_response_body_checksum == checksum_type::md5)
                     {
                         instance->m_hash_provider = hash_provider::create_md5_hash_provider();
+                    }
+                    else if (instance->m_command->m_calculate_response_body_checksum == checksum_type::crc64)
+                    {
+                        instance->m_hash_provider = hash_provider::create_crc64_hash_provider();
                     }
                     instance->m_should_restart_hash_provider = false;
                 }
@@ -244,7 +252,7 @@ namespace azure { namespace storage { namespace core {
                 }
 
                 // It is now time to call m_postprocess_response
-                // Finish the MD5 hash if MD5 was being calculated
+                // Finish the checksum hash if checksum was being calculated
                 instance->m_hash_provider.close();
                 instance->m_is_hashing_started = false;
 

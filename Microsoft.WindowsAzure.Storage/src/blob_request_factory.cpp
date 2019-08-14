@@ -260,21 +260,35 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
-    web::http::http_request put_block(const utility::string_t& block_id, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_block(const utility::string_t& block_id, const checksum& content_checksum, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_block_id, block_id));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
-        request.headers().add(web::http::header_names::content_md5, content_md5);
+        if (content_checksum.is_md5())
+        {
+            request.headers().add(web::http::header_names::content_md5, content_checksum.md5());
+        }
+        else if (content_checksum.is_crc64())
+        {
+            request.headers().add(ms_header_content_crc64, content_checksum.crc64());
+        }
         add_lease_id(request, condition);
         return request;
     }
 
-    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_block_list(const cloud_blob_properties& properties, const cloud_metadata& metadata, const checksum& content_checksum, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_block_list, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
-        request.headers().add(web::http::header_names::content_md5, content_md5);
+        if (content_checksum.is_md5())
+        {
+            request.headers().add(web::http::header_names::content_md5, content_checksum.md5());
+        }
+        else if (content_checksum.is_crc64())
+        {
+            request.headers().add(ms_header_content_crc64, content_checksum.crc64());
+        }
         add_properties(request, properties);
         add_metadata(request, metadata);
         add_access_condition(request, condition);
@@ -327,7 +341,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request put_page(page_range range, page_write write, const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_page(page_range range, page_write write, const checksum& content_checksum, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_page, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
@@ -339,7 +353,14 @@ namespace azure { namespace storage { namespace protocol {
         {
         case page_write::update:
             headers.add(ms_header_page_write, header_value_page_write_update);
-            add_optional_header(headers, web::http::header_names::content_md5, content_md5);
+            if (content_checksum.is_md5())
+            {
+                add_optional_header(headers, web::http::header_names::content_md5, content_checksum.md5());
+            }
+            else if (content_checksum.is_crc64())
+            {
+                add_optional_header(headers, ms_header_content_crc64, content_checksum.crc64());
+            }
             break;
 
         case page_write::clear:
@@ -352,23 +373,34 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request append_block(const utility::string_t& content_md5, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request append_block(const checksum& content_checksum, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_append_block, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
-        request.headers().add(web::http::header_names::content_md5, content_md5);
+        if (content_checksum.is_md5())
+        {
+            request.headers().add(web::http::header_names::content_md5, content_checksum.md5());
+        }
+        else if (content_checksum.is_crc64())
+        {
+            request.headers().add(ms_header_content_crc64, content_checksum.crc64());
+        }
         add_append_condition(request, condition);
         add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request put_block_blob(const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_block_blob(const checksum& content_checksum, const cloud_blob_properties& properties, const cloud_metadata& metadata, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_blob_type, header_value_blob_type_block);
         add_properties(request, properties);
         add_metadata(request, metadata);
         add_access_condition(request, condition);
+        if (content_checksum.is_crc64())
+        {
+            request.headers().add(ms_header_content_crc64, content_checksum.crc64());
+        }
         return request;
     }
 
@@ -399,15 +431,19 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, bool get_range_content_md5, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_blob(utility::size64_t offset, utility::size64_t length, checksum_type needs_checksum, const utility::string_t& snapshot_time, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         add_snapshot_time(uri_builder, snapshot_time);
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         add_range(request, offset, length);
 
-        if ((offset < std::numeric_limits<utility::size64_t>::max()) && get_range_content_md5)
+        if ((offset < std::numeric_limits<utility::size64_t>::max()) && needs_checksum == checksum_type::md5)
         {
             request.headers().add(ms_header_range_get_content_md5, header_value_true);
+        }
+        else if ((offset < std::numeric_limits<utility::size64_t>::max()) && needs_checksum == checksum_type::crc64)
+        {
+            request.headers().add(ms_header_range_get_content_crc64, header_value_true);
         }
 
         add_access_condition(request, condition);

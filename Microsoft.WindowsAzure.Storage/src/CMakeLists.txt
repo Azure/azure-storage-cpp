@@ -60,6 +60,7 @@ if(UNIX OR WIN32)
      basic_types.cpp
      authentication.cpp
      cloud_common.cpp
+     crc64.cpp
     )
 endif()
 

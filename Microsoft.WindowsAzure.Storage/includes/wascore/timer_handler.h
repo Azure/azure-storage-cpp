@@ -34,7 +34,7 @@ namespace azure { namespace storage { namespace core {
     /// <summary>
     /// Used for internal logic of timer handling, including timer creation, deletion and cancellation
     /// </summary>
-    class timer_handler
+    class timer_handler : public std::enable_shared_from_this<timer_handler>
     {
     public:
         WASTORAGE_API explicit timer_handler(const pplx::cancellation_token& token);

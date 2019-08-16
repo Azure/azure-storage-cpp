@@ -26,7 +26,7 @@ namespace azure {    namespace storage {    namespace core {
         m_worker_cancellation_token_source = std::make_shared<pplx::cancellation_token_source>();
         if (m_cancellation_token != pplx::cancellation_token::none())
         {
-            m_cancellation_token_registration = m_cancellation_token.register_callback([this]() 
+            m_cancellation_token_registration = m_cancellation_token.register_callback([this]()
             {
                 this->m_worker_cancellation_token_source->cancel();
                 this->stop_timer();
@@ -58,10 +58,11 @@ namespace azure {    namespace storage {    namespace core {
     void timer_handler::start_timer(const std::chrono::milliseconds& time)
     {
         m_mutex = std::make_shared<std::mutex>();
-        m_timeout_task = timeout_after(time).then([this]()
+        auto this_pointer = std::dynamic_pointer_cast<timer_handler>(shared_from_this());
+        m_timeout_task = timeout_after(time).then([this_pointer]()
         {
-            this->m_is_canceled_by_timeout = true;
-            this->m_worker_cancellation_token_source->cancel();
+            this_pointer->m_is_canceled_by_timeout = true;
+            this_pointer->m_worker_cancellation_token_source->cancel();
         });
     }
 
@@ -92,14 +93,15 @@ namespace azure {    namespace storage {    namespace core {
     {
         m_timer = std::make_shared<boost::asio::basic_waitable_timer<std_clock>>(crossplat::threadpool::shared_instance().service());
         m_timer->expires_from_now(std::chrono::duration_cast<std_clock::duration>(time));
-        auto callback = [this](const boost::system::error_code& ec)
+        auto this_pointer = std::dynamic_pointer_cast<timer_handler>(shared_from_this());
+        auto callback = [this_pointer](const boost::system::error_code& ec)
         {
             if (ec != boost::asio::error::operation_aborted)
             {
-                std::lock_guard<std::mutex> guard(*(this->m_mutex));
-                if (!this->m_tce._IsTriggered())
+                std::lock_guard<std::mutex> guard(*(this_pointer->m_mutex));
+                if (!this_pointer->m_tce._IsTriggered())
                 {
-                    this->m_tce.set();
+                    this_pointer->m_tce.set();
                 }
             }
         };
@@ -114,12 +116,13 @@ namespace azure {    namespace storage {    namespace core {
     {
         // initialize the timer and connect the callback with completion event.
         m_timer = std::make_shared<concurrency::timer<int>>(static_cast<unsigned int>(time.count()), 0);
-        auto callback = std::make_shared<concurrency::call<int>>([this](int)
+        auto this_pointer = std::dynamic_pointer_cast<timer_handler>(shared_from_this());
+        auto callback = std::make_shared<concurrency::call<int>>([this_pointer](int)
         {
-            std::lock_guard<std::mutex> guard(*(this->m_mutex));
-            if (!this->m_tce._IsTriggered())
+            std::lock_guard<std::mutex> guard(*(this_pointer->m_mutex));
+            if (!this_pointer->m_tce._IsTriggered())
             {
-                this->m_tce.set();
+                this_pointer->m_tce.set();
             }
         });
         m_timer->link_target(callback.get());//When timer stops, tce will trigger cancellation.

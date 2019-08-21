@@ -260,7 +260,6 @@ SUITE(File)
         m_share.create_if_not_exists(quota, azure::storage::file_request_options(), m_context);
         auto file = m_share.get_root_directory_reference().get_file_reference(_XPLATSTR("test"));
         utility::string_t content = _XPLATSTR("testtargetfile");
-        auto content_length = content.length();
         file.create_if_not_exists(content.length());
         file.upload_text(content, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
         file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);

@@ -331,9 +331,9 @@ SUITE(Blob)
         {
             auto same_blob = m_container.get_page_blob_reference(blob.name());
             auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
-            azure::storage::blob_request_options options;
-            options.set_use_transactional_md5(true);
-            same_blob.download_range_to_stream(stream, 0, 128, azure::storage::access_condition(), options, azure::storage::operation_context());
+            azure::storage::blob_request_options local_options;
+            local_options.set_use_transactional_md5(true);
+            same_blob.download_range_to_stream(stream, 0, 128, azure::storage::access_condition(), local_options, azure::storage::operation_context());
             check_blob_properties_equal(blob.properties(), same_blob.properties(), true);
         }
         
@@ -348,9 +348,9 @@ SUITE(Blob)
 
             auto same_blob = m_container.get_page_blob_reference(blob.name());
             auto stream = concurrency::streams::container_stream<std::vector<uint8_t>>::open_ostream();
-            azure::storage::blob_request_options options;
-            options.set_use_transactional_md5(true);
-            same_blob.download_range_to_stream(stream, 0, 128, azure::storage::access_condition(), options, azure::storage::operation_context());
+            azure::storage::blob_request_options local_options;
+            local_options.set_use_transactional_md5(true);
+            same_blob.download_range_to_stream(stream, 0, 128, azure::storage::access_condition(), local_options, azure::storage::operation_context());
             check_blob_properties_equal(blob.properties(), same_blob.properties(), true);
         }
     }
@@ -829,10 +829,7 @@ SUITE(Blob)
             option.set_parallelism_factor(2);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
 
@@ -856,10 +853,7 @@ SUITE(Blob)
             option.set_parallelism_factor(2);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
 
@@ -890,10 +884,7 @@ SUITE(Blob)
             option.set_parallelism_factor(2);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
 
@@ -921,10 +912,7 @@ SUITE(Blob)
             option.set_parallelism_factor(2);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
 
@@ -958,10 +946,7 @@ SUITE(Blob)
             option.set_parallelism_factor(10);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
 
@@ -993,10 +978,7 @@ SUITE(Blob)
             option.set_use_transactional_md5(true);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
 
@@ -1021,10 +1003,7 @@ SUITE(Blob)
             option.set_use_transactional_md5(true);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             blob.upload_from_stream(upload_buffer.create_istream(), azure::storage::access_condition(), option, m_context);
 

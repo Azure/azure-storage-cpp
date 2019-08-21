@@ -243,7 +243,7 @@ namespace azure { namespace storage { namespace core {
                 {
                     utility::size64_t current_total_downloaded = instance->m_response_streambuf.total_written();
                     utility::size64_t content_length = instance->m_request_result.content_length();
-                    if (content_length != -1 && current_total_downloaded != content_length)
+                    if (content_length != std::numeric_limits<utility::size64_t>::max() && current_total_downloaded != content_length)
                     {
                         // The download was interrupted before it could complete
                         instance->assert_canceled();

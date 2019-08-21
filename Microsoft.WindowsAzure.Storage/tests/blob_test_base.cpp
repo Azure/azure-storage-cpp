@@ -32,7 +32,7 @@ void blob_service_test_base::fill_buffer(std::vector<uint8_t>& buffer, size_t of
 {
     std::generate_n(buffer.begin() + offset, count, []() -> uint8_t
     {
-        return std::rand();
+        return uint8_t(std::rand());
     });
 }
 

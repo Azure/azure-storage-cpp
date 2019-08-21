@@ -88,7 +88,7 @@ public:
         });
     }
 
-    ~multi_location_test_helper()
+    ~multi_location_test_helper() noexcept(false)
     {
         m_context.set_sending_request(std::function<void(web::http::http_request&, azure::storage::operation_context)>());
 

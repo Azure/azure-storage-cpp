@@ -145,12 +145,12 @@ sudo apt-get install libxml2-dev uuid-dev
 cd azure-storage-cpp/Microsoft.WindowsAzure.Storage
 mkdir build.release
 cd build.release
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
 In the above command, replace `<path to Casablanca>` to point to your local installation of Casablanca. For example, if the file `libcpprest.so` exists at location `~/Github/Casablanca/cpprestsdk/Release/build.release/Binaries/libcpprest.so`, then your `cmake` command should be:
 ```bash
-CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
 
@@ -161,7 +161,7 @@ sudo apt-get install libunittest++-dev
 ```
 - Build the test code:
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 make
 ```
 - Run unit tests
@@ -173,7 +173,7 @@ vi test_configurations.json # modify test config file to include your storage ac
 
 To build sample code:
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
 To run the samples:
@@ -218,7 +218,7 @@ cd cpprestsdk/Release
 git submodule update --init
 mkdir build.release
 cd build.release
-CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF
+CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF
 sudo make install
 ```
 
@@ -235,7 +235,7 @@ The project is cloned to a folder called `azure-storage-cpp`. Always use the mas
 cd azure-storage-cpp/Microsoft.WindowsAzure.Storage
 mkdir build.release
 cd build.release
-CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
@@ -252,14 +252,14 @@ git clone https://github.com/unittest-cpp/unittest-cpp.git
 - Build and install the project:
 ```bash
 cd unittest-cpp/builds/
-CXX=g++-4.8 cmake ..
+CXX=g++-5.1 cmake ..
 sudo make install
 ```
 
 Build and run unit test against Azure Storage Client Library for C++:
 - Build the test code:
 ```bash
-CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 make
 ```
 - Run unit tests
@@ -271,7 +271,7 @@ vi test_configurations.json # modify test config file to include your storage ac
 
 To build sample code:
 ```bash
-CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
+CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
 To run the samples:

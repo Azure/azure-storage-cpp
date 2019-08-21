@@ -183,7 +183,7 @@ namespace azure { namespace storage { namespace core { namespace xml {
     private:
         xmlDocPtr m_doc;
     };
-}}}};// namespace azure::storage::core::xml
+}}}} // namespace azure::storage::core::xml
 #endif //#ifdef _WIN32
 
 #endif //#ifndef _XML_WRAPPER_H

@@ -41,7 +41,7 @@ namespace azure { namespace storage { namespace samples {
             azure::storage::table_batch_operation batch_operation;
             for (int i = 0; i < 10; ++i)
             {
-                utility::string_t row_key = _XPLATSTR("MyRowKey") + utility::conversions::print_string(i);
+                utility::string_t row_key = _XPLATSTR("MyRowKey") + utility::conversions::to_string_t(std::to_string(i));
                 azure::storage::table_entity entity(_XPLATSTR("MyPartitionKey"), row_key);
                 azure::storage::table_entity::properties_type& properties = entity.properties();
                 properties.reserve(8);

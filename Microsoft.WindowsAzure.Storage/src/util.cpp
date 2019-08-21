@@ -543,7 +543,7 @@ namespace azure { namespace storage {  namespace core {
         if (config.get_ssl_context_callback() != nullptr)
         {
             char buf[16];
-            sprintf(buf, "%p", (void*)&(config.get_ssl_context_callback()));
+            sprintf(buf, "%p", (const void*)&(config.get_ssl_context_callback()));
             key.append(buf);
             key.append(_XPLATSTR("#"));
         }

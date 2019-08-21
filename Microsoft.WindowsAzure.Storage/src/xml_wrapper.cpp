@@ -150,7 +150,7 @@ void xml_element_wrapper::set_namespace_declaration(const std::string & uri, con
 
 void xml_element_wrapper::set_namespace(const std::string & prefix)
 {
-    xmlNs* ns = xmlSearchNs(m_ele->doc, m_ele, (xmlChar*)(prefix.empty() ? nullptr : prefix.c_str()));
+    xmlNs* ns = xmlSearchNs(m_ele->doc, m_ele, (const xmlChar*)(prefix.empty() ? nullptr : prefix.c_str()));
     if (ns)
     {
         xmlSetNs(m_ele, ns);
@@ -200,7 +200,7 @@ void xml_element_wrapper::set_child_text(const std::string & text)
     {
         if (node->m_ele->type != xmlElementType::XML_ELEMENT_NODE)
         {
-            xmlNodeSetContent(node->m_ele, (xmlChar*)text.c_str());
+            xmlNodeSetContent(node->m_ele, (const xmlChar*)text.c_str());
         }
     }
     else {
@@ -309,6 +309,6 @@ xml_element_wrapper* xml_document_wrapper::get_root_node() const
     return nullptr;
 }
 
-}}}};// namespace azure::storage::core::xml
+}}}} // namespace azure::storage::core::xml
 
 #endif //#ifdef _WIN32

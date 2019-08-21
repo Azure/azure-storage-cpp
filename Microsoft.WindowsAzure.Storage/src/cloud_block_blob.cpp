@@ -198,7 +198,7 @@ namespace azure { namespace storage {
         // Otherwise, throws a storage_exception if the default value has been changed or if the blob size exceeds the maximum capacity.
         if (length != std::numeric_limits<utility::size64_t>::max())
         {
-            auto totalBlocks = std::ceil(static_cast<double>(length) / modified_options.stream_write_size_in_bytes());
+            auto totalBlocks = std::ceil(static_cast<double>(length) / static_cast<double>(modified_options.stream_write_size_in_bytes()));
 
             // Check if the total required blocks for the upload exceeds the maximum allowable block limit.
             if (totalBlocks > protocol::max_block_number)

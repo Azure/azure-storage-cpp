@@ -83,7 +83,7 @@ sudo apt-get install libxml++2.6-dev libxml++2.6-doc uuid-dev
 cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage
 mkdir build.release
 cd build.release
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
 In the above command, replace `<path to Casablanca>` to point to your local
@@ -91,7 +91,7 @@ installation of Casablanca. For example, if the file `libcpprest.so` exists at
 location `~/Github/Casablanca/cpprestsdk/Release/build.release/Binaries/libcpprest.so`,
 then your `cmake` command should be:
 ```bash
-CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release
+CASABLANCA_DIR=~/Github/Casablanca/cpprestsdk CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release
 ```
 The library is generated under
 `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
@@ -105,7 +105,7 @@ sudo apt-get install libunittest++-dev
 
 #### Build the Test Code
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 make
 ```
 The test binary `azurestoragetest` and `test_configuration.json` are generated under
@@ -126,7 +126,7 @@ cd Binaries
 
 ### Samples
 ```bash
-CASABLANCA_DIR=<path to Casablanca> CXX=g++-4.8 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
+CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
 

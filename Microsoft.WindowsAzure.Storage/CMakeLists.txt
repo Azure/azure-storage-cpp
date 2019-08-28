@@ -12,7 +12,7 @@ enable_testing()
 
 set(WARNINGS)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/")
 
 option(BUILD_TESTS "Build test codes" OFF)
 option(BUILD_SAMPLES "Build sample codes" OFF)

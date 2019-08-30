@@ -56,7 +56,12 @@ namespace azure { namespace storage { namespace protocol {
         return get_header_value(response, web::http::header_names::etag);
     }
 
-    utility::datetime parse_last_modified(const utility::string_t& value)
+    utility::datetime parse_datetime_iso8601(const utility::string_t& value)
+    {
+        return utility::datetime::from_string(value, utility::datetime::date_format::ISO_8601);
+    }
+
+    utility::datetime parse_datetime_rfc1123(const utility::string_t& value)
     {
         return utility::datetime::from_string(value, utility::datetime::date_format::RFC_1123);
     }
@@ -66,7 +71,7 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t value;
         if (response.headers().match(web::http::header_names::last_modified, value))
         {
-            return parse_last_modified(value);
+            return parse_datetime_rfc1123(value);
         }
         else
         {
@@ -166,6 +171,55 @@ namespace azure { namespace storage { namespace protocol {
         {
             return std::chrono::seconds();
         }
+    }
+
+    cloud_file_attributes parse_file_attributes(const utility::string_t& value)
+    {
+        cloud_file_attributes attributes = static_cast<cloud_file_attributes>(0);
+        for (const auto& attribute : core::string_split(value, header_value_file_attribute_delimiter))
+        {
+            if (attribute == header_value_file_attribute_none)
+            {
+                attributes |= cloud_file_attributes::none;
+            }
+            else if (attribute == header_value_file_attribute_readonly)
+            {
+                attributes |= cloud_file_attributes::readonly;
+            }
+            else if (attribute == header_value_file_attribute_hidden)
+            {
+                attributes |= cloud_file_attributes::hidden;
+            }
+            else if (attribute == header_value_file_attribute_system)
+            {
+                attributes |= cloud_file_attributes::system;
+            }
+            else if (attribute == header_value_file_attribute_directory)
+            {
+                attributes |= cloud_file_attributes::directory;
+            }
+            else if (attribute == header_value_file_attribute_archive)
+            {
+                attributes |= cloud_file_attributes::archive;
+            }
+            else if (attribute == header_value_file_attribute_temporary)
+            {
+                attributes |= cloud_file_attributes::temporary;
+            }
+            else if (attribute == header_value_file_attribute_offline)
+            {
+                attributes |= cloud_file_attributes::offline;
+            }
+            else if (attribute == header_value_file_attribute_notcontentindexed)
+            {
+                attributes |= cloud_file_attributes::not_content_indexed;
+            }
+            else if (attribute == header_value_file_attribute_noscrubdata)
+            {
+                attributes |= cloud_file_attributes::no_scrub_data;
+            }
+        }
+        return attributes;
     }
 
     int parse_approximate_messages_count(const web::http::http_response& response)

@@ -133,6 +133,111 @@ SUITE(File)
         }
     }
 
+    TEST_FIXTURE(file_test_base, file_smb_properties)
+    {
+        m_file.properties().set_permission(azure::storage::cloud_file_properties::inherit);
+        m_file.properties().set_attributes(azure::storage::cloud_file_attributes::none);
+        m_file.properties().set_creation_time(azure::storage::cloud_file_properties::now);
+        m_file.properties().set_last_write_time(azure::storage::cloud_file_properties::now);
+
+        m_file.create(1024);
+        auto properties = m_file.properties();
+        CHECK(properties.permission().empty());
+        CHECK(!properties.permission_key().empty());
+        CHECK(properties.attributes() != azure::storage::cloud_file_attributes::none);
+        CHECK(properties.creation_time().is_initialized());
+        CHECK(properties.last_write_time().is_initialized());
+        CHECK(properties.change_time().is_initialized());
+        CHECK(!properties.file_id().empty());
+        CHECK(!properties.file_parent_id().empty());
+
+        m_file.properties().set_permission(azure::storage::cloud_file_properties::preserve);
+        m_file.properties().set_attributes(azure::storage::cloud_file_attributes::preserve);
+        m_file.properties().set_creation_time(azure::storage::cloud_file_properties::preserve);
+        m_file.properties().set_last_write_time(azure::storage::cloud_file_properties::preserve);
+
+        m_file.upload_properties();
+        CHECK(m_file.properties().permission().empty());
+        CHECK(m_file.properties().permission_key() == properties.permission_key());
+        CHECK_EQUAL(m_file.properties().attributes(), properties.attributes());
+        CHECK(m_file.properties().creation_time() == properties.creation_time());
+        CHECK(m_file.properties().last_write_time() == properties.last_write_time());
+        CHECK(m_file.properties().file_id() == properties.file_id());
+        CHECK(m_file.properties().file_parent_id() == properties.file_parent_id());
+
+        utility::string_t permission = m_share.download_file_permission(m_file.properties().permission_key());
+        m_file.properties().set_permission(permission);
+        m_file.properties().set_attributes(
+            azure::storage::cloud_file_attributes::readonly | azure::storage::cloud_file_attributes::hidden | azure::storage::cloud_file_attributes::system |
+            azure::storage::cloud_file_attributes::archive | azure::storage::cloud_file_attributes::temporary | azure::storage::cloud_file_attributes::offline |
+            azure::storage::cloud_file_attributes::not_content_indexed | azure::storage::cloud_file_attributes::no_scrub_data);
+        auto new_attributes = m_file.properties().attributes();
+        auto current_time = utility::datetime::utc_now();
+        m_file.properties().set_creation_time(current_time);
+        m_file.properties().set_last_write_time(current_time);
+
+        m_file.upload_properties();
+        CHECK(m_file.properties().permission().empty());
+        CHECK(!m_file.properties().permission_key().empty());
+        CHECK_EQUAL(m_file.properties().attributes(), new_attributes);
+        CHECK(m_file.properties().creation_time() == current_time);
+        CHECK(m_file.properties().last_write_time() == current_time);
+
+        m_file.upload_properties();
+    }
+
+    TEST_FIXTURE(file_test_base, directory_smb_properties)
+    {
+        azure::storage::cloud_file_directory directory = m_share.get_directory_reference(get_random_string());
+        directory.properties().set_permission(azure::storage::cloud_file_directory_properties::inherit);
+        directory.properties().set_attributes(azure::storage::cloud_file_attributes::none);
+        directory.properties().set_creation_time(azure::storage::cloud_file_directory_properties::now);
+        directory.properties().set_last_write_time(azure::storage::cloud_file_directory_properties::now);
+        directory.create();
+
+        auto properties = directory.properties();
+        CHECK(properties.permission().empty());
+        CHECK(!properties.permission_key().empty());
+        CHECK(properties.attributes() != azure::storage::cloud_file_attributes::none);
+        CHECK(properties.creation_time().is_initialized());
+        CHECK(properties.last_write_time().is_initialized());
+        CHECK(!properties.file_id().empty());
+
+        directory.properties().set_permission(azure::storage::cloud_file_directory_properties::preserve);
+        directory.properties().set_attributes(azure::storage::cloud_file_attributes::preserve);
+        directory.properties().set_creation_time(azure::storage::cloud_file_directory_properties::preserve);
+        directory.properties().set_last_write_time(azure::storage::cloud_file_directory_properties::preserve);
+
+        directory.upload_properties();
+        CHECK(directory.properties().permission().empty());
+        CHECK(directory.properties().permission_key() == properties.permission_key());
+        CHECK_EQUAL(directory.properties().attributes(), properties.attributes());
+        CHECK(directory.properties().creation_time() == properties.creation_time());
+        CHECK(directory.properties().last_write_time() == properties.last_write_time());
+        CHECK(directory.properties().file_id() == properties.file_id());
+        CHECK(directory.properties().file_parent_id() == properties.file_parent_id());
+
+        utility::string_t permission = m_share.download_file_permission(directory.properties().permission_key());
+        directory.properties().set_permission(permission);
+        directory.properties().set_attributes(
+            azure::storage::cloud_file_attributes::readonly | azure::storage::cloud_file_attributes::hidden | azure::storage::cloud_file_attributes::system |
+            azure::storage::cloud_file_attributes::directory | azure::storage::cloud_file_attributes::offline | azure::storage::cloud_file_attributes::not_content_indexed |
+            azure::storage::cloud_file_attributes::no_scrub_data);
+        auto new_attributes = directory.properties().attributes();
+        auto current_time = utility::datetime::utc_now();
+        directory.properties().set_creation_time(current_time);
+        directory.properties().set_last_write_time(current_time);
+
+        directory.upload_properties();
+        CHECK(directory.properties().permission().empty());
+        CHECK(!directory.properties().permission_key().empty());
+        CHECK_EQUAL(directory.properties().attributes(), new_attributes);
+        CHECK(directory.properties().creation_time() == current_time);
+        CHECK(directory.properties().last_write_time() == current_time);
+
+        directory.upload_properties();
+    }
+
     TEST_FIXTURE(file_test_base, file_properties_resize_wont_work)
     {
         m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);

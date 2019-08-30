@@ -31,11 +31,6 @@ namespace azure { namespace storage {
         m_last_modified = other.last_modified();
     }
 
-    void cloud_file_directory_properties::update_etag(const cloud_file_directory_properties& other)
-    {
-        m_etag = other.etag();
-    }
-
     cloud_file_directory::cloud_file_directory(storage_uri uri)
         : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_file_directory_properties>())
     {
@@ -134,7 +129,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::create_file_directory, metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::create_file_directory, metadata(), this->properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -231,6 +226,26 @@ namespace azure { namespace storage {
             *properties = protocol::file_response_parsers::parse_file_directory_properties(response);
             *metadata = protocol::parse_metadata(response);
         });
+        return core::executor<void>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<void> cloud_file_directory::upload_properties_async(const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
+    {
+        UNREFERENCED_PARAMETER(access_condition);
+        file_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options());
+
+        auto properties = m_properties;
+
+        auto command = std::make_shared<core::storage_command<void>>(uri());
+        command->set_build_request(std::bind(protocol::set_file_directory_properties, this->properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
+        {
+            protocol::preprocess_response_void(response, result, context);
+            *properties = protocol::file_response_parsers::parse_file_directory_properties(response);
+        });
+
         return core::executor<void>::execute_async(command, modified_options, context);
     }
 

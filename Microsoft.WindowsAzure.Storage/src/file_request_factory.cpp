@@ -21,34 +21,208 @@
 #include "wascore/resources.h"
 
 namespace azure { namespace storage { namespace protocol {
-    
+
     void add_file_properties(web::http::http_request& request, const cloud_file_properties& properties)
     {
         web::http::http_headers& headers = request.headers();
 
         if (!core::is_empty_or_whitespace(properties.content_type()))
         {
-            headers.add(_XPLATSTR("x-ms-content-type"), properties.content_type());
+            headers.add(ms_header_content_type, properties.content_type());
         }
         if (!core::is_empty_or_whitespace(properties.content_encoding()))
         {
-            headers.add(_XPLATSTR("x-ms-content-encoding"), properties.content_encoding());
+            headers.add(ms_header_content_encoding, properties.content_encoding());
         }
         if (!core::is_empty_or_whitespace(properties.content_language()))
         {
-            headers.add(_XPLATSTR("x-ms-content-language"), properties.content_language());
+            headers.add(ms_header_content_language, properties.content_language());
         }
         if (!core::is_empty_or_whitespace(properties.cache_control()))
         {
-            headers.add(_XPLATSTR("x-ms-cache-control"), properties.cache_control());
+            headers.add(ms_header_cache_control, properties.cache_control());
         }
         if (!core::is_empty_or_whitespace(properties.content_md5()))
         {
-            headers.add(_XPLATSTR("x-ms-content-md5"), properties.content_md5());
+            headers.add(ms_header_content_md5, properties.content_md5());
         }
         if (!core::is_empty_or_whitespace(properties.content_disposition()))
         {
-            headers.add(_XPLATSTR("x-ms-content-disposition"), properties.content_disposition());
+            headers.add(ms_header_content_disposition, properties.content_disposition());
+        }
+    }
+
+    utility::string_t file_properties_to_string(cloud_file_attributes value)
+    {
+        if (value == cloud_file_attributes::preserve)
+        {
+            return protocol::header_value_file_property_preserve;
+        }
+        if (value & cloud_file_attributes::source)
+        {
+            return protocol::header_value_file_property_source;
+        }
+        if (value & cloud_file_attributes::none)
+        {
+            return protocol::header_value_file_attribute_none;
+        }
+
+        std::vector<utility::string_t> properties;
+        if (value & cloud_file_attributes::readonly)
+        {
+            properties.emplace_back(header_value_file_attribute_readonly);
+        }
+        if (value & cloud_file_attributes::hidden)
+        {
+            properties.emplace_back(header_value_file_attribute_hidden);
+        }
+        if (value & cloud_file_attributes::system)
+        {
+            properties.emplace_back(header_value_file_attribute_system);
+        }
+        if (value & cloud_file_attributes::directory)
+        {
+            properties.emplace_back(header_value_file_attribute_directory);
+        }
+        if (value & cloud_file_attributes::archive)
+        {
+            properties.emplace_back(header_value_file_attribute_archive);
+        }
+        if (value & cloud_file_attributes::temporary)
+        {
+            properties.emplace_back(header_value_file_attribute_temporary);
+        }
+        if (value & cloud_file_attributes::offline)
+        {
+            properties.emplace_back(header_value_file_attribute_offline);
+        }
+        if (value & cloud_file_attributes::not_content_indexed)
+        {
+            properties.emplace_back(header_value_file_attribute_notcontentindexed);
+        }
+        if (value & cloud_file_attributes::no_scrub_data)
+        {
+            properties.emplace_back(header_value_file_attribute_noscrubdata);
+        }
+        return core::string_join(properties, header_value_file_attribute_delimiter);
+    }
+
+    enum class file_operation_type
+    {
+        create,
+        update,
+        copy,
+    };
+
+    template<class Properties>
+    void add_additional_properties(web::http::http_request& request, const Properties& properties, file_operation_type op_type)
+    {
+        // The server side unreasonably demands 7 digits in the decimal fraction.
+        auto to_iso8601_string = [](const utility::datetime& time)
+        {
+            utility::string_t time_str = time.to_string(utility::datetime::ISO_8601);
+            auto decimal_pos = time_str.find(_XPLATSTR(":"));
+            if (decimal_pos != utility::string_t::npos)
+            {
+                decimal_pos = time_str.find(_XPLATSTR(":"), decimal_pos + 1);
+                if (decimal_pos != utility::string_t::npos)
+                {
+                    decimal_pos += 3;
+                }
+            }
+
+            auto z_pos = time_str.find(_XPLATSTR("Z"));
+            if (z_pos == utility::string_t::npos || z_pos < decimal_pos)
+            {
+                throw std::logic_error("Invalid date and time format.");
+            }
+
+            utility::string_t time_str2 = time_str.substr(0, z_pos);
+            size_t decimal_length = z_pos - decimal_pos;
+            const utility::string_t padding = _XPLATSTR(".0000000");
+            time_str2 += padding.substr(decimal_length);
+            time_str2 += time_str.substr(z_pos);
+            return time_str2;
+        };
+
+        web::http::http_headers& headers = request.headers();
+
+        bool permission_set = false;
+        if (!core::is_empty_or_whitespace(properties.permission_key()))
+        {
+            headers.add(ms_header_file_permission_key, properties.permission_key());
+            permission_set = true;
+        }
+        if (!core::is_empty_or_whitespace(properties.permission()))
+        {
+            headers.add(ms_header_file_permission, properties.permission());
+            permission_set = true;
+        }
+        if (!permission_set && op_type == file_operation_type::create)
+        {
+            headers.add(ms_header_file_permission, header_value_file_permission_inherit);
+        }
+        else if (!permission_set && op_type == file_operation_type::update)
+        {
+            headers.add(ms_header_file_permission, header_value_file_property_preserve);
+        }
+        if (op_type == file_operation_type::copy)
+        {
+            if (properties.permission() == header_value_file_property_source)
+            {
+                headers.remove(ms_header_file_permission);
+                headers.remove(ms_header_file_permission_key);
+                headers.add(ms_header_file_permission_copy_mode, header_value_file_property_source);
+            }
+            else if (permission_set)
+            {
+                headers.add(ms_header_file_permission_copy_mode, header_value_file_permission_override);
+            }
+        }
+
+        auto attributes = properties.attributes();
+        if (op_type == file_operation_type::create && attributes == cloud_file_attributes::preserve)
+        {
+            headers.add(ms_header_file_attributes, file_properties_to_string(cloud_file_attributes::none));
+        }
+        else if (op_type == file_operation_type::copy && attributes == cloud_file_attributes::preserve)
+        {
+        }
+        else
+        {
+            headers.add(ms_header_file_attributes, file_properties_to_string(attributes));
+        }
+
+        if (properties.creation_time().is_initialized())
+        {
+            headers.add(ms_header_file_creation_time, to_iso8601_string(properties.creation_time()));
+        }
+        else if (op_type == file_operation_type::create)
+        {
+            headers.add(ms_header_file_creation_time, header_value_file_time_now);
+        }
+        else if (op_type == file_operation_type::update)
+        {
+            headers.add(ms_header_file_creation_time, header_value_file_property_preserve);
+        }
+        else if (op_type == file_operation_type::copy)
+        {
+        }
+
+        if (properties.last_write_time().is_initialized())
+        {
+            headers.add(ms_header_file_last_write_time, to_iso8601_string(properties.last_write_time()));
+        }
+        else if (op_type == file_operation_type::create)
+        {
+            headers.add(ms_header_file_last_write_time, header_value_file_time_now);
+        }
+        else if (op_type == file_operation_type::update)
+        {
+            headers.add(ms_header_file_last_write_time, header_value_file_property_preserve);
+        }
+        else if (op_type == file_operation_type::copy)
+        {
         }
     }
 
@@ -171,11 +345,30 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request create_file_directory(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_file_share_permission(const utility::string_t& permission_key, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_share, /* do encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_file_permission, /* do encoding */ false));
+        web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
+        request.headers().add(protocol::ms_header_file_permission_key, permission_key);
+        return request;
+    }
+
+    web::http::http_request set_file_share_permission(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_share, /* do encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_file_permission, /* do encoding */ false));
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        request.headers().add(web::http::header_names::content_type, header_value_content_type_json);
+        return request;
+    }
+
+    web::http::http_request create_file_directory(const cloud_metadata& metadata, const cloud_file_directory_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_directory, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_metadata(request, metadata);
+        add_additional_properties(request, properties, file_operation_type::create);
         return request;
     }
 
@@ -190,6 +383,17 @@ namespace azure { namespace storage { namespace protocol {
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_directory, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::HEAD, uri_builder, timeout, context));
+        return request;
+    }
+
+    web::http::http_request set_file_directory_properties(const cloud_file_directory_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_directory, /* do_encoding */ false));
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
+
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+        add_additional_properties(request, properties, file_operation_type::update);
+
         return request;
     }
     
@@ -232,9 +436,10 @@ namespace azure { namespace storage { namespace protocol {
 
         add_metadata(request, metadata);
         add_file_properties(request, properties);
+        add_additional_properties(request, properties, file_operation_type::create);
 
         add_optional_header(request.headers(), _XPLATSTR("x-ms-type"), _XPLATSTR("file"));
-        request.headers()[_XPLATSTR("x-ms-content-length")] = core::convert_to_string(length);
+        request.headers()[ms_header_content_length] = core::convert_to_string(length);
 
         return request;
     }
@@ -259,6 +464,7 @@ namespace azure { namespace storage { namespace protocol {
         //Note that setting file properties with a length won't resize the file.
         //If resize is needed, user should call azure::storage::cloud_file::resize instead.
         add_file_properties(request, properties);
+        add_additional_properties(request, properties, file_operation_type::update);
 
         return request;
     }
@@ -267,7 +473,7 @@ namespace azure { namespace storage { namespace protocol {
     {
         auto request = set_file_properties(properties, uri_builder, timeout, context);
 
-        request.headers()[_XPLATSTR("x-ms-content-length")] = core::convert_to_string(properties.length());
+        request.headers()[ms_header_content_length] = core::convert_to_string(properties.length());
         return request;
     }
     
@@ -349,7 +555,7 @@ namespace azure { namespace storage { namespace protocol {
 
         if (start_offset < std::numeric_limits<utility::size64_t>::max() && md5_validation)
         {
-            headers.add(_XPLATSTR("x-ms-range-get-content-md5"), _XPLATSTR("true"));
+            headers.add(ms_header_range_get_content_md5, header_value_true);
         }
         return request;
     }

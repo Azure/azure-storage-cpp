@@ -1374,6 +1374,92 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<void> upload_permissions_async(const file_share_permissions& permissions, const file_access_condition& condition, const file_request_options& options, operation_context context) const;
 
         /// <summary>
+        /// Gets the Security Descriptor Definition Language (SDDL) for a given security descriptor.
+        /// </summary>
+        /// <param name="permission_key">Security descriptor of the permission.</param>
+        /// <returns>A <see cref="utility::string_t" /> object that contains permission in the Security Descriptor Definition Language (SDDL).</returns>
+        utility::string_t download_file_permission(const utility::string_t& permission_key) const
+        {
+            return download_file_permission_async(permission_key).get();
+        }
+
+        /// <summary>
+        /// Gets the Security Descriptor Definition Language (SDDL) for a given security descriptor.
+        /// </summary>
+        /// <param name="permission_key">Security descriptor of the permission.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="utility::string_t" /> object that contains permission in the Security Descriptor Definition Language (SDDL).</returns>
+        utility::string_t download_file_permission(const utility::string_t& permission_key, const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return download_file_permission_async(permission_key, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get the Security Descriptor Definition Language (SDDL) for a given security descriptor.
+        /// </summary>
+        /// <param name="permission_key">Security descriptor of the permission.</param>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        pplx::task<utility::string_t> download_file_permission_async(const utility::string_t& permission_key) const
+        {
+            return download_file_permission_async(permission_key, file_access_condition(), file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to get the Security Descriptor Definition Language (SDDL) for a given security descriptor.
+        /// </summary>
+        /// <param name="permission_key">Security descriptor of the permission.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> download_file_permission_async(const utility::string_t& permission_key, const file_access_condition& condition, const file_request_options& options, operation_context context) const;
+
+        /// <summary>
+        /// Creates a permission in the share. The created security descriptor can be used for the files/directories in this share.
+        /// </summary>
+        /// <param name="permission">A <see cref="utility::string_t" /> that contains permission in the Security Descriptor Definition Language (SDDL).</param>
+        /// <returns>A <see cref="utility::string_t" /> that contains security descriptor of the permission.</returns>
+        utility::string_t upload_file_permission(const utility::string_t& permission) const
+        {
+            return upload_file_permission_async(permission).get();
+        }
+
+        /// <summary>
+        /// Creates a permission in the share. The created security descriptor can be used for the files/directories in this share.
+        /// </summary>
+        /// <param name="permission">A <see cref="utility::string_t" /> that contains permission in the Security Descriptor Definition Language (SDDL).</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="utility::string_t" /> that contains security descriptor of the permission.</returns>
+        utility::string_t upload_file_permission(const utility::string_t& permission, const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return upload_file_permission_async(permission, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to creates a permission in the share. The created security descriptor can be used for the files/directories in this share.
+        /// </summary>
+        /// <param name="permission">A <see cref="utility::string_t" /> that contains permission in the Security Descriptor Definition Language (SDDL).</param>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        pplx::task<utility::string_t> upload_file_permission_async(const utility::string_t& permission) const
+        {
+            return upload_file_permission_async(permission, file_access_condition(), file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to creates a permission in the share. The created security descriptor can be used for the files/directories in this share.
+        /// </summary>
+        /// <param name="permission">A <see cref="utility::string_t" /> that contains permission in the Security Descriptor Definition Language (SDDL).</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> upload_file_permission_async(const utility::string_t& permission, const file_access_condition& condition, const file_request_options& options, operation_context context) const;
+
+        /// <summary>
         /// Resize the share.
         /// </summary>
         /// <param name="quota">The size to apply to the share.</param>
@@ -1549,16 +1635,50 @@ namespace azure { namespace storage {
     typedef result_segment<list_file_and_directory_item> list_file_and_directory_result_segment;
     typedef result_iterator<list_file_and_directory_item> list_file_and_diretory_result_iterator;
     
-    class list_file_and_directory_item;
+    /// <summary>
+    /// Valid set of file attributes.
+    /// </summary>
+    enum cloud_file_attributes : uint64_t
+    {
+        preserve = 0x0,
+        source = 0x1,
+        none = 0x2,
+        readonly = 0x4,
+        hidden = 0x8,
+        system = 0x10,
+        directory = 0x20,
+        archive = 0x40,
+        temporary = 0x80,
+        offline = 0x100,
+        not_content_indexed = 0x200,
+        no_scrub_data = 0x400,
+    };
+
+    inline cloud_file_attributes operator|(cloud_file_attributes lhs, cloud_file_attributes rhs)
+    {
+        return static_cast<cloud_file_attributes>(static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs));
+    }
+
+    inline cloud_file_attributes& operator|=(cloud_file_attributes& lhs, cloud_file_attributes rhs)
+    {
+        return lhs = lhs | rhs;
+    }
 
     class cloud_file_directory_properties
     {
     public:
+
+        struct now_t {};
+        struct inherit_t {};
+        struct preserve_t {};
+        static constexpr now_t now{};
+        static constexpr inherit_t inherit{};
+        static constexpr preserve_t preserve{};
+
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_file_directory_properties" /> class.
         /// </summary>
         cloud_file_directory_properties()
-            : m_server_encrypted(false)
         {
         }
 
@@ -1578,6 +1698,18 @@ namespace azure { namespace storage {
                 m_etag = std::move(other.m_etag);
                 m_last_modified = std::move(other.m_last_modified);
                 m_server_encrypted = std::move(other.m_server_encrypted);
+                m_permission = std::move(other.m_permission);
+                m_permission_key = std::move(other.m_permission_key);
+                m_attributes = std::move(other.m_attributes);
+                m_creation_time = std::move(other.m_creation_time);
+                m_creation_time_now = std::move(other.m_creation_time_now);
+                m_creation_time_preserve = std::move(other.m_creation_time_preserve);
+                m_last_write_time = std::move(other.m_last_write_time);
+                m_last_write_time_now = std::move(other.m_last_write_time_now);
+                m_last_write_time_preserve = std::move(other.m_last_write_time_preserve);
+                m_change_time = std::move(other.m_change_time);
+                m_file_id = std::move(other.m_file_id);
+                m_parent_id = std::move(other.m_parent_id);
             }
             return *this;
         }
@@ -1620,14 +1752,214 @@ namespace azure { namespace storage {
             m_server_encrypted = value;
         }
 
+        /// <summary>
+        /// Gets the permission property.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> object that contains permission in the Security Descriptor Definition Language(SDDL).</returns>
+        const utility::string_t& permission() const
+        {
+            return m_permission;
+        }
+
+        /// <summary>
+        /// Sets the permission property.
+        /// </summary>
+        /// <param name="value">A <see cref="utility::string_t" /> that contains permission in the Security Descriptor Definition Language (SDDL).</param>
+        void set_permission(utility::string_t value)
+        {
+            m_permission = std::move(value);
+            m_permission_key.clear();
+        }
+
+        /// <summary>
+        /// Sets the permission property value to inherit, which means to inherit from the parent directory.
+        /// </summary>
+        /// <param name="value">Explicitly specified permission value, must be <see cref="azure::storage::cloud_file_directory_properties::inherit" />.</param>
+        void set_permission(inherit_t)
+        {
+            m_permission = protocol::header_value_file_permission_inherit;
+            m_permission_key.clear();
+        }
+
+        /// <summary>
+        /// Sets the permission property value to preserve, which means to keep existing value unchanged.
+        /// </summary>
+        /// <param name="value">Explicitly specified permission value, must be <see cref="azure::storage::cloud_file_directory_properties::preserve" />.</param>
+        void set_permission(preserve_t)
+        {
+            m_permission = protocol::header_value_file_property_preserve;
+            m_permission_key.clear();
+        }
+
+        /// <summary>
+        /// Gets security descriptor of the permission.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> that contains security descriptor of the permission.</returns>
+        const utility::string_t& permission_key() const
+        {
+            return m_permission_key;
+        }
+
+        /// <summary>
+        /// Sets security descriptor of permission.
+        /// </summary>
+        /// <param name="value">A <see cref="utility::string_t" /> that contains security descriptor of the permission.</param>
+        void set_permission_key(utility::string_t value)
+        {
+            m_permission.clear();
+            m_permission_key = std::move(value);
+        }
+
+        /// <summary>
+        /// Gets file system attributes set on this directory.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::cloud_file_attributes" /> that represents a set of attributes.</returns>
+        cloud_file_attributes attributes() const
+        {
+            return m_attributes;
+        }
+
+        /// <summary>
+        /// Sets file system attributes on this directory.
+        /// </summary>
+        /// <param name="value">An <see cref="azure::storage::cloud_file_attributes" /> that represents a set of attributes.</param>
+        void set_attributes(cloud_file_attributes value)
+        {
+            m_attributes = value;
+        }
+
+        /// <summary>
+        /// Gets the creation time property for this directory.
+        /// </summary>
+        /// <returns>An ISO 8601 datetime <see cref="utility::string_t" />.</returns>
+        utility::datetime creation_time() const
+        {
+            return m_creation_time;
+        }
+
+        /// <summary>
+        /// Sets the creation time property for this directory.
+        /// </summary>
+        /// <param name="value">An ISO 8601 datetime <see cref="utility::string_t" />.</param>
+        void set_creation_time(utility::datetime value)
+        {
+            m_creation_time = std::move(value);
+            m_creation_time_now = false;
+            m_creation_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the creation time property for this directory to now, which indicates the time of the request.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_directory_properties::now" />.</param>
+        void set_creation_time(now_t)
+        {
+            m_creation_time = utility::datetime();
+            m_creation_time_now = true;
+            m_creation_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the creation time property for this directory to preserve, which means to keep the existing value unchanged.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_directory_properties::preserve" />.</param>
+        void set_creation_time(preserve_t)
+        {
+            m_creation_time = utility::datetime();
+            m_creation_time_now = false;
+            m_creation_time_preserve = true;
+        }
+
+        /// <summary>
+        /// Gets the last write time property for this directory.
+        /// </summary>
+        /// <returns>An ISO 8601 datetime <see cref="utility::string_t" />.</returns>
+        utility::datetime last_write_time() const
+        {
+            return m_last_write_time;
+        }
+
+        /// <summary>
+        /// Sets the last write time property for this directory.
+        /// </summary>
+        /// <param name="value">An ISO 8601 datetime <see cref="utility::string_t" />.</param>
+        void set_last_write_time(utility::datetime value)
+        {
+            m_last_write_time = std::move(value);
+            m_last_write_time_now = false;
+            m_last_write_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the last write time property for this directory to now, which indicates the time of the request.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_directory_properties::now" />.</param>
+        void set_last_write_time(now_t)
+        {
+            m_last_write_time = utility::datetime();
+            m_last_write_time_now = true;
+            m_last_write_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the last write time property for this directory to preserve, which means to keep the existing value unchanged.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_directory_properties::preserve" />.</param>
+        void set_last_write_time(preserve_t)
+        {
+            m_last_write_time = utility::datetime();
+            m_last_write_time_now = false;
+            m_last_write_time_preserve = true;
+        }
+
+        /// <summary>
+        /// Gets the change time property for this directory.
+        /// </summary>
+        /// <returns>An ISO 8601 datetime <see cref="utility::string_t" />.</returns>
+        utility::datetime chang_time() const
+        {
+            return m_change_time;
+        }
+
+        /// <summary>
+        /// Gets the file id property for this directory.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> contains the file id.</returns>
+        const utility::string_t& file_id() const
+        {
+            return m_file_id;
+        }
+
+        /// <summary>
+        /// Gets the parent file id property for this directory.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> contains the parent file id.</returns>
+        const utility::string_t& file_parent_id() const
+        {
+            return m_parent_id;
+        }
+
     private:
 
         utility::string_t m_etag;
         utility::datetime m_last_modified;
 
+        bool m_server_encrypted{ false };
+
+        utility::string_t m_permission;
+        utility::string_t m_permission_key;
+        cloud_file_attributes m_attributes{ cloud_file_attributes::preserve };
+        utility::datetime m_creation_time;
+        bool m_creation_time_now{ false };
+        bool m_creation_time_preserve{ true };
+        utility::datetime m_last_write_time;
+        bool m_last_write_time_now{ false };
+        bool m_last_write_time_preserve{ true };
+        utility::datetime m_change_time;
+        utility::string_t m_file_id;
+        utility::string_t m_parent_id;
+
         void update_etag_and_last_modified(const cloud_file_directory_properties& other);
-        void update_etag(const cloud_file_directory_properties& other);
-        bool m_server_encrypted;
 
         friend class cloud_file_directory;
         friend class protocol::file_response_parsers;
@@ -2123,6 +2455,43 @@ namespace azure { namespace storage {
         WASTORAGE_API pplx::task<void> download_attributes_async(const file_access_condition& condition, const file_request_options& options, operation_context context);
 
         /// <summary>
+        /// Updates the directory's properties.
+        /// </summary>
+        void upload_properties() const
+        {
+            upload_properties_async().wait();
+        }
+
+        /// <summary>
+        /// Updates the directory's properties.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void upload_properties(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            upload_properties_async(condition, options, context).wait();
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to update the directory's properties.
+        /// </summary>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        pplx::task<void> upload_properties_async() const
+        {
+            return upload_properties_async(file_access_condition(), file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Intitiates an asynchronous operation to update the directory's properties.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> upload_properties_async(const file_access_condition& condition, const file_request_options& options, operation_context context) const;
+
+        /// <summary>
         /// Uploads the directory's metadata.
         /// </summary>
         void upload_metadata() const
@@ -2275,12 +2644,19 @@ namespace azure { namespace storage {
     {
     public:
 
+        struct now_t {};
+        struct inherit_t {};
+        struct preserve_t {};
+        struct source_t {};
+        static constexpr now_t now{};
+        static constexpr inherit_t inherit{};
+        static constexpr preserve_t preserve{};
+        static constexpr source_t source{};
+
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::cloud_file_properties" /> class.
         /// </summary>
         cloud_file_properties()
-            : m_length(0),
-            m_server_encrypted(false)
         {
         }
 
@@ -2309,6 +2685,19 @@ namespace azure { namespace storage {
                 m_content_md5 = std::move(other.m_content_md5);
                 m_content_disposition = std::move(other.m_content_disposition);
                 m_server_encrypted = std::move(other.m_server_encrypted);
+
+                m_permission = std::move(other.m_permission);
+                m_permission_key = std::move(other.m_permission_key);
+                m_attributes = std::move(other.m_attributes);
+                m_creation_time = std::move(other.m_creation_time);
+                m_creation_time_now = std::move(other.m_creation_time_now);
+                m_creation_time_preserve = std::move(other.m_creation_time_preserve);
+                m_last_write_time = std::move(other.m_last_write_time);
+                m_last_write_time_now = std::move(other.m_last_write_time_now);
+                m_last_write_time_preserve = std::move(other.m_last_write_time_preserve);
+                m_change_time = std::move(other.m_change_time);
+                m_file_id = std::move(m_file_id);
+                m_parent_id = std::move(m_parent_id);
             }
             return *this;
         }
@@ -2472,7 +2861,7 @@ namespace azure { namespace storage {
         /// Gets if the server is encrypted.
         /// </summary>
         /// <returns><c>true</c> if a server is encrypted.</returns>
-        bool server_encrypted()
+        bool server_encrypted() const
         {
             return m_server_encrypted;
         }
@@ -2486,9 +2875,209 @@ namespace azure { namespace storage {
             m_server_encrypted = value;
         }
 
+        /// <summary>
+        /// Gets the permission property.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> object that contains permission in the Security Descriptor Definition Language(SDDL).</returns>
+        const utility::string_t& permission() const
+        {
+            return m_permission;
+        }
+
+        /// <summary>
+        /// Sets the permission property.
+        /// </summary>
+        /// <param name="value">A <see cref="utility::string_t" /> that contains permission in the Security Descriptor Definition Language (SDDL).</param>
+        void set_permission(utility::string_t value)
+        {
+            m_permission = std::move(value);
+            m_permission_key.clear();
+        }
+
+        /// <summary>
+        /// Sets the permission property value to inherit, which means to inherit from the parent directory.
+        /// </summary>
+        /// <param name="value">Explicitly specified permission value, must be <see cref="azure::storage::cloud_file_properties::inherit" />.</param>
+        void set_permission(inherit_t)
+        {
+            m_permission = protocol::header_value_file_permission_inherit;
+            m_permission_key.clear();
+        }
+
+        /// <summary>
+        /// Sets the permission property value to preserve, which means to keep existing value unchanged.
+        /// </summary>
+        /// <param name="value">Explicitly specified permission value, must be <see cref="azure::storage::cloud_file_properties::preserve" />.</param>
+        void set_permission(preserve_t)
+        {
+            m_permission = protocol::header_value_file_property_preserve;
+            m_permission_key.clear();
+        }
+
+        /// <summary>
+        /// Sets the permission property value to source, which means security descriptor shall be set for the target file by copying from the source file.
+        /// </summary>
+        /// <param name="value">Explicitly specified permission value, must be <see cref="azure::storage::cloud_file_properties::source" />.</param>
+        /// <remarks>
+        /// This only applies to copy operation.
+        /// </remarks>
+        void set_permission(source_t)
+        {
+            m_permission = protocol::header_value_file_property_source;
+            m_permission_key.clear();
+        }
+
+        /// <summary>
+        /// Gets security descriptor of the permission.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> that contains security descriptor of the permission.</returns>
+        const utility::string_t& permission_key() const
+        {
+            return m_permission_key;
+        }
+
+        /// <summary>
+        /// Sets security descriptor of permission.
+        /// </summary>
+        /// <param name="value">A <see cref="utility::string_t" /> that contains security descriptor of the permission.</param>
+        void set_permission_key(utility::string_t value)
+        {
+            m_permission.clear();
+            m_permission_key = std::move(value);
+        }
+
+        /// <summary>
+        /// Gets file system attributes set on this file.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::cloud_file_attributes" /> that represents a set of attributes.</returns>
+        cloud_file_attributes attributes() const
+        {
+            return m_attributes;
+        }
+
+        /// <summary>
+        /// Sets file system attributes on this file.
+        /// </summary>
+        /// <param name="value">An <see cref="azure::storage::cloud_file_attributes" /> that represents a set of attributes.</param>
+        void set_attributes(cloud_file_attributes value)
+        {
+            m_attributes = value;
+        }
+
+        /// <summary>
+        /// Gets the creation time property for this file.
+        /// </summary>
+        /// <returns>An ISO 8601 datetime <see cref="utility::string_t" />.</returns>
+        utility::datetime creation_time() const
+        {
+            return m_creation_time;
+        }
+
+        /// <summary>
+        /// Sets the creation time property for this file.
+        /// </summary>
+        /// <param name="value">An ISO 8601 datetime <see cref="utility::string_t" />.</param>
+        void set_creation_time(utility::datetime value)
+        {
+            m_creation_time = std::move(value);
+            m_creation_time_now = false;
+            m_creation_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the creation time property for this file to now, which indicates the time of the request.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_properties::now" />.</param>
+        void set_creation_time(now_t)
+        {
+            m_creation_time = utility::datetime();
+            m_creation_time_now = true;
+            m_creation_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the creation time property for this file to preserve, which means to keep the existing value unchanged.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_properties::preserve" />.</param>
+        void set_creation_time(preserve_t)
+        {
+            m_creation_time = utility::datetime();
+            m_creation_time_now = false;
+            m_creation_time_preserve = true;
+        }
+
+        /// <summary>
+        /// Gets the last write time property for this file.
+        /// </summary>
+        /// <returns>An ISO 8601 datetime <see cref="utility::string_t" />.</returns>
+        utility::datetime last_write_time() const
+        {
+            return m_last_write_time;
+        }
+
+        /// <summary>
+        /// Sets the last write time property for this file.
+        /// </summary>
+        /// <param name="value">An ISO 8601 datetime <see cref="utility::string_t" />.</param>
+        void set_last_write_time(utility::datetime value)
+        {
+            m_last_write_time = std::move(value);
+            m_last_write_time_now = false;
+            m_last_write_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the last write time property for this file to now, which indicates the time of the request.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_properties::now" />.</param>
+        void set_last_write_time(now_t)
+        {
+            m_last_write_time = utility::datetime();
+            m_last_write_time_now = true;
+            m_last_write_time_preserve = false;
+        }
+
+        /// <summary>
+        /// Sets the last write time property for this file to preserve, which means to keep the existing value unchanged.
+        /// </summary>
+        /// <param name="value">Explicitly specified datetime value, must be <see cref="azure::storage::cloud_file_properties::preserve" />.</param>
+        void set_last_write_time(preserve_t)
+        {
+            m_last_write_time = utility::datetime();
+            m_last_write_time_now = false;
+            m_last_write_time_preserve = true;
+        }
+
+        /// <summary>
+        /// Gets the change time property for this file.
+        /// </summary>
+        /// <returns>An ISO 8601 datetime <see cref="utility::string_t" />.</returns>
+        utility::datetime change_time() const
+        {
+            return m_change_time;
+        }
+
+        /// <summary>
+        /// Gets the file id property for this file.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> contains the file id.</returns>
+        const utility::string_t& file_id() const
+        {
+            return m_file_id;
+        }
+
+        /// <summary>
+        /// Gets the parent file id property for this file.
+        /// </summary>
+        /// <returns>A <see cref="utility::string_t" /> contains the parent file id.</returns>
+        const utility::string_t& file_parent_id() const
+        {
+            return m_parent_id;
+        }
+
     private:
 
-        utility::size64_t m_length;
+        utility::size64_t m_length{ 0 };
         utility::string_t m_etag;
         utility::datetime m_last_modified;
 
@@ -2500,10 +3089,23 @@ namespace azure { namespace storage {
         utility::string_t m_content_md5;
         utility::string_t m_content_disposition;
 
-        bool m_server_encrypted;
+        bool m_server_encrypted{ false };
+
+        utility::string_t m_permission;
+        utility::string_t m_permission_key;
+        cloud_file_attributes m_attributes{ cloud_file_attributes::preserve };
+        utility::datetime m_creation_time;
+        bool m_creation_time_now{ false };
+        bool m_creation_time_preserve{ true };
+        utility::datetime m_last_write_time;
+        bool m_last_write_time_now{ false };
+        bool m_last_write_time_preserve{ true };
+        utility::datetime m_change_time;
+        utility::string_t m_file_id;
+        utility::string_t m_parent_id;
 
         void update_etag_and_last_modified(const cloud_file_properties& other);
-        void update_etag(const cloud_file_properties& other);
+        void update_acl_attributes_filetime_and_fileid(const cloud_file_properties& other);
 
         friend class cloud_file;
         friend class protocol::file_response_parsers;
@@ -4154,12 +4756,23 @@ namespace azure { namespace storage {
             return m_name;
         }
 
+        const utility::string_t& file_id() const
+        {
+            return m_file_id;
+        }
+
+        void set_file_id(utility::string_t file_id)
+        {
+            m_file_id = std::move(file_id);
+        }
+
     private:
 
         bool m_is_file;
         utility::string_t m_name;
         int64_t m_length;
         cloud_file_directory m_directory;
+        utility::string_t m_file_id;
     };
 }} // namespace azure::storage
 

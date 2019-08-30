@@ -24,5 +24,7 @@ namespace azure { namespace storage { namespace protocol {
 
     table_entity parse_table_entity(const web::json::value& document);
     storage_extended_error parse_table_error(const web::json::value& document);
+    utility::string_t parse_file_permission(const web::json::value& document);
+    utility::string_t construct_file_permission(const utility::string_t& value);
 
 }}} // namespace azure::storage::protocol

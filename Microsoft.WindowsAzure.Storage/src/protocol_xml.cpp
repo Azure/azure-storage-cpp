@@ -74,7 +74,7 @@ namespace azure { namespace storage { namespace protocol {
         {
             if (element_name == xml_last_modified)
             {
-                m_properties.m_last_modified = parse_last_modified(get_current_element_text());
+                m_properties.m_last_modified = parse_datetime_rfc1123(get_current_element_text());
                 return;
             }
 
@@ -172,7 +172,7 @@ namespace azure { namespace storage { namespace protocol {
         {
             if (element_name == xml_last_modified)
             {
-                m_properties.m_last_modified = parse_last_modified(get_current_element_text());
+                m_properties.m_last_modified = parse_datetime_rfc1123(get_current_element_text());
                 return;
             }
 
@@ -763,7 +763,7 @@ namespace azure { namespace storage { namespace protocol {
         {
             if (element_name == xml_last_modified)
             {
-                m_properties.m_last_modified = parse_last_modified(get_current_element_text());
+                m_properties.m_last_modified = parse_datetime_rfc1123(get_current_element_text());
                 return;
             }
 
@@ -848,6 +848,10 @@ namespace azure { namespace storage { namespace protocol {
                     {
                         m_directory_path = get_current_element_text();
                     }
+                    else if (current_element_name == xml_file_id)
+                    {
+                        m_directory_file_id = get_current_element_text();
+                    }
                 } while (move_to_next_attribute());
             }
         }
@@ -864,21 +868,15 @@ namespace azure { namespace storage { namespace protocol {
             }
         }
 
-        if (element_name == _XPLATSTR("File"))
-        {
-            m_is_file = true;
-            return;
-        }
-
-        if (element_name == _XPLATSTR("Directory"))
-        {
-            m_is_file = false;
-            return;
-        }
-
         if (element_name == xml_name)
         {
             m_name = get_current_element_text();
+            return;
+        }
+
+        if (element_name == xml_file_id)
+        {
+            m_file_id = get_current_element_text();
             return;
         }
 
@@ -894,15 +892,14 @@ namespace azure { namespace storage { namespace protocol {
         if ((element_name == _XPLATSTR("File") || element_name == _XPLATSTR("Directory")) && get_parent_element_name() == _XPLATSTR("Entries"))
         {
             // End of the data for a file or directory. Create an item and add it to the list
-            if (element_name == _XPLATSTR("File"))
-            {
-                m_is_file = true;
-            }
-            m_items.push_back(list_file_and_directory_item(m_is_file, std::move(m_name), m_size));
+            bool is_file = element_name == _XPLATSTR("File");
+            list_file_and_directory_item new_item(is_file, std::move(m_name), m_size);
+            new_item.set_file_id(std::move(m_file_id));
+            m_items.emplace_back(std::move(new_item));
 
-            m_is_file = false;
             m_name = utility::string_t();
             m_size = 0;
+            m_file_id = utility::string_t();
         }
     }
 

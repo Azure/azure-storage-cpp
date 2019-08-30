@@ -251,4 +251,25 @@ SUITE(File)
             check_access(sas_token, permissions, azure::storage::cloud_file_shared_access_headers(), file);
         }
     }
+
+    TEST_FIXTURE(file_share_test_base, file_permission)
+    {
+        utility::size64_t quota = 512;
+        m_share.create_if_not_exists(quota, azure::storage::file_request_options(), m_context);
+        auto file = m_share.get_root_directory_reference().get_file_reference(_XPLATSTR("test"));
+        utility::string_t content = _XPLATSTR("testtargetfile");
+        auto content_length = content.length();
+        file.create_if_not_exists(content.length());
+        file.upload_text(content, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+        file.download_attributes(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
+
+        utility::string_t permission_key = file.properties().permission_key();
+        CHECK(!permission_key.empty());
+
+        utility::string_t permission = m_share.download_file_permission(permission_key);
+        CHECK(!permission.empty());
+
+        utility::string_t permission_key2 = m_share.upload_file_permission(permission);
+        CHECK(!permission_key2.empty());
+    }
 }

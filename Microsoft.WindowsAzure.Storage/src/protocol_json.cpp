@@ -244,4 +244,26 @@ namespace azure { namespace storage { namespace protocol {
         return storage_extended_error(std::move(error_code), std::move(error_message), std::move(details));
     }
 
+    utility::string_t parse_file_permission(const web::json::value& document)
+    {
+        if (document.is_object())
+        {
+            const web::json::object& result_obj = document.as_object();
+
+            web::json::object::const_iterator iter = result_obj.find(json_file_permission);
+            if (iter != result_obj.end())
+            {
+                return iter->second.as_string();
+            }
+        }
+        return utility::string_t();
+    }
+
+    utility::string_t construct_file_permission(const utility::string_t& value)
+    {
+        web::json::value obj;
+        obj[json_file_permission] = web::json::value::string(value);
+        return obj.serialize();
+    }
+
 }}} // namespace azure::storage::protocol

@@ -36,9 +36,20 @@ namespace azure { namespace storage {
         m_last_modified = other.last_modified();
     }
 
-    void cloud_file_properties::update_etag(const cloud_file_properties& other)
+    void cloud_file_properties::update_acl_attributes_filetime_and_fileid(const cloud_file_properties& other)
     {
-        m_etag = other.etag();
+        m_creation_time = other.m_creation_time;
+        m_creation_time_now = other.m_creation_time_now;
+        m_creation_time_preserve = other.m_creation_time_preserve;
+        m_last_write_time = other.m_last_write_time;
+        m_last_write_time_now = other.m_last_write_time_now;
+        m_last_write_time_preserve = other.m_last_write_time_preserve;
+        m_change_time = other.m_change_time;
+        m_permission = other.m_permission;
+        m_permission_key = other.m_permission_key;
+        m_attributes = other.m_attributes;
+        m_file_id = other.m_file_id;
+        m_parent_id = other.m_parent_id;
     }
 
     cloud_file::cloud_file(storage_uri uri)
@@ -98,7 +109,9 @@ namespace azure { namespace storage {
         command->set_preprocess_response([properties, length](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
-            properties->update_etag_and_last_modified(protocol::file_response_parsers::parse_file_properties(response));
+            auto response_properties = protocol::file_response_parsers::parse_file_properties(response);
+            properties->update_etag_and_last_modified(response_properties);
+            properties->update_acl_attributes_filetime_and_fileid(response_properties);
             properties->m_length = length;
         });
         return core::executor<void>::execute_async(command, modified_options, context);
@@ -209,7 +222,9 @@ namespace azure { namespace storage {
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
             protocol::preprocess_response_void(response, result, context);
-            properties->update_etag_and_last_modified(protocol::file_response_parsers::parse_file_properties(response));
+            auto response_properties = protocol::file_response_parsers::parse_file_properties(response);
+            properties->update_etag_and_last_modified(response_properties);
+            properties->update_acl_attributes_filetime_and_fileid(response_properties);
         });
 
         return core::executor<void>::execute_async(command, modified_options, context);

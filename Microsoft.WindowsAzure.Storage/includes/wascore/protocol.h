@@ -121,12 +121,15 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request get_file_share_stats(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_share_acl(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file_share_permission(const utility::string_t& permission_key, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_share_permission(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request list_files_and_directories(const utility::string_t& prefix, int64_t max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request create_file_directory(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request create_file_directory(const cloud_metadata& metadata, const cloud_file_directory_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request delete_file_directory(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_directory_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_directory_properties(const cloud_file_directory_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_directory_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request create_file(const int64_t length, const cloud_metadata& metadata, const cloud_file_properties& properties,  web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request create_file(const int64_t length, const cloud_metadata& metadata, const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request delete_file(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_file_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_properties(const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
@@ -164,12 +167,14 @@ namespace azure { namespace storage { namespace protocol {
 
     void preprocess_response_void(const web::http::http_response& response, const request_result& result, operation_context context);
 
-    utility::datetime parse_last_modified(const utility::string_t& value);
+    utility::datetime parse_datetime_rfc1123(const utility::string_t& value);
+    utility::datetime parse_datetime_iso8601(const utility::string_t& value);
     utility::string_t parse_lease_id(const utility::string_t& value);
     lease_status parse_lease_status(const utility::string_t& value);
     lease_state parse_lease_state(const utility::string_t& value);
     lease_duration parse_lease_duration(const utility::string_t& value);
     std::chrono::seconds parse_lease_time(const utility::string_t& value);
+    cloud_file_attributes parse_file_attributes(const utility::string_t& value);
     int parse_approximate_messages_count(const web::http::http_response& response);
     utility::string_t parse_pop_receipt(const web::http::http_response& response);
     utility::datetime parse_next_visible_time(const web::http::http_response& response);

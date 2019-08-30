@@ -775,7 +775,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
 
         explicit list_files_and_directories_reader(concurrency::streams::istream stream)
-            : xml_reader(stream), m_is_file(false), m_size(0)
+            : xml_reader(stream), m_size(0)
         {
         }
 
@@ -809,11 +809,12 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t m_next_marker;
         utility::string_t m_share_name;
         utility::string_t m_directory_path;
+        utility::string_t m_directory_file_id;
         web::http::uri m_service_uri;
 
-        bool m_is_file;
         utility::string_t m_name;
         int64_t m_size;
+        utility::string_t m_file_id;
     };
 
     class list_file_ranges_reader : public core::xml::xml_reader

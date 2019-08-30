@@ -37,7 +37,15 @@ namespace azure { namespace storage { namespace protocol {
         cloud_file_directory_properties properties;
         properties.m_etag = parse_etag(response);
         properties.m_last_modified = parse_last_modified(response);
-        properties.m_server_encrypted = response_parsers::parse_boolean(get_header_value(response.headers(), ms_header_server_encrypted));
+        const auto& headers = response.headers();
+        properties.m_server_encrypted = response_parsers::parse_boolean(get_header_value(headers, ms_header_server_encrypted));
+        properties.set_permission_key(get_header_value(headers, ms_header_file_permission_key));
+        properties.m_attributes = parse_file_attributes(get_header_value(headers, ms_header_file_attributes));
+        properties.set_creation_time(parse_datetime_iso8601(get_header_value(headers, ms_header_file_creation_time)));
+        properties.set_last_write_time(parse_datetime_iso8601(get_header_value(headers, ms_header_file_last_write_time)));
+        properties.m_change_time = parse_datetime_iso8601(get_header_value(headers, ms_header_file_change_time));
+        properties.m_file_id = get_header_value(headers, ms_header_file_id);
+        properties.m_parent_id = get_header_value(headers, ms_header_file_parent_id);
         return properties;
     }
 
@@ -63,7 +71,7 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_last_modified = parse_last_modified(response);
         properties.m_length = parse_file_size(response);
 
-        auto& headers = response.headers();
+        const auto& headers = response.headers();
         properties.m_cache_control = get_header_value(headers, web::http::header_names::cache_control);
         properties.m_content_disposition = get_header_value(headers, header_content_disposition);
         properties.m_content_encoding = get_header_value(headers, web::http::header_names::content_encoding);
@@ -77,6 +85,13 @@ namespace azure { namespace storage { namespace protocol {
         {
             properties.m_content_md5 = get_header_value(headers, web::http::header_names::content_md5);
         }
+        properties.set_permission_key(get_header_value(headers, ms_header_file_permission_key));
+        properties.m_attributes = parse_file_attributes(get_header_value(headers, ms_header_file_attributes));
+        properties.set_creation_time(parse_datetime_iso8601(get_header_value(headers, ms_header_file_creation_time)));
+        properties.set_last_write_time(parse_datetime_iso8601(get_header_value(headers, ms_header_file_last_write_time)));
+        properties.m_change_time = parse_datetime_iso8601(get_header_value(headers, ms_header_file_change_time));
+        properties.m_file_id = get_header_value(headers, ms_header_file_id);
+        properties.m_parent_id = get_header_value(headers, ms_header_file_parent_id);
 
         return properties;
     }

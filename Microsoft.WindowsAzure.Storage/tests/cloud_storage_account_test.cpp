@@ -17,6 +17,9 @@
 
 #include "stdafx.h"
 
+#include <vector>
+#include <future>
+
 #include "test_base.h"
 #include "check_macros.h"
 #include "was/storage_account.h"
@@ -906,22 +909,31 @@ SUITE(Core)
 
     TEST_FIXTURE(test_base, account_sas_permission)
     {
-        auto account = test_config::instance().account();
+        auto check_account_permission = [](int i) {
+            auto account = test_config::instance().account();
 
-        azure::storage::account_shared_access_policy policy;
-        policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(90));
-        policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("0.0.0.0"), _XPLATSTR("255.255.255.255")));
-        policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
-        policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
-        policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
+            azure::storage::account_shared_access_policy policy;
+            policy.set_expiry(utility::datetime::utc_now() + utility::datetime::from_minutes(90));
+            policy.set_address_or_range(azure::storage::shared_access_policy::ip_address_or_range(_XPLATSTR("0.0.0.0"), _XPLATSTR("255.255.255.255")));
+            policy.set_protocol(azure::storage::account_shared_access_policy::protocols::https_or_http);
+            policy.set_service_type((azure::storage::account_shared_access_policy::service_types)0xF);
+            policy.set_resource_type((azure::storage::account_shared_access_policy::resource_types)0x7);
 
-        for (int i = 1; i < 0x100; i++)
-        {
             policy.set_permissions((uint8_t)i);
             check_account_sas_permission_blob(account, policy);
             check_account_sas_permission_queue(account, policy);
             check_account_sas_permission_table(account, policy);
             check_account_sas_permission_file(account, policy);
+        };
+
+        std::vector<std::future<void>> results;
+        for (int i = 1; i < 0x100; ++i)
+        {
+            results.emplace_back(std::async(check_account_permission, i));
+        }
+        for (const auto& r : results)
+        {
+            r.wait();
         }
     }
 

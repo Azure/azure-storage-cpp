@@ -390,7 +390,7 @@ SUITE(File)
         for (size_t i = 0; i < 2; ++i)
         {
             auto blob_name = this->get_random_string();
-            auto container = test_config::instance().account().create_cloud_blob_client().get_container_reference(_XPLATSTR("container"));
+            auto container = test_config::instance().account().create_cloud_blob_client().get_container_reference(_XPLATSTR("container") + get_random_string());
             container.create_if_not_exists();
 
             auto source = container.get_block_blob_reference(blob_name);
@@ -411,6 +411,8 @@ SUITE(File)
             CHECK(wait_for_copy(dest));
             CHECK_THROW(dest.abort_copy(copy_id, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context), azure::storage::storage_exception);
             CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
+
+            container.delete_container();
         }
     }
 
@@ -724,10 +726,7 @@ SUITE(File)
             option.set_parallelism_factor(2);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
 
@@ -735,7 +734,7 @@ SUITE(File)
             azure::storage::operation_context context;
             concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
 
-            utility::size64_t actual_offset = rand() % 255 + 1;
+            utility::size64_t actual_offset = get_random_int32() % 255 + 1;
             utility::size64_t actual_length = target_length - actual_offset;
             file.download_range_to_stream(download_buffer.create_ostream(), actual_offset, actual_length, azure::storage::file_access_condition(), option, context);
 
@@ -755,10 +754,7 @@ SUITE(File)
             option.set_parallelism_factor(2);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
 
@@ -766,7 +762,7 @@ SUITE(File)
             azure::storage::operation_context context;
             concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
 
-            utility::size64_t actual_offset = rand() % 255 + 1;
+            utility::size64_t actual_offset = get_random_int32() % 255 + 1;
             utility::size64_t actual_length = target_length - actual_offset;
             file.download_range_to_stream(download_buffer.create_ostream(), actual_offset, std::numeric_limits<utility::size64_t>::max(), azure::storage::file_access_condition(), option, context);
 
@@ -792,10 +788,7 @@ SUITE(File)
             option.set_parallelism_factor(10);
             std::vector<uint8_t> data;
             data.resize(target_length);
-            for (size_t i = 0; i < target_length; ++i)
-            {
-                data[i] = i % 255;
-            }
+            fill_buffer(data);
             concurrency::streams::container_buffer<std::vector<uint8_t>> upload_buffer(data);
             file.upload_from_stream(upload_buffer.create_istream(), azure::storage::file_access_condition(), option, m_context);
 
@@ -803,7 +796,7 @@ SUITE(File)
             azure::storage::operation_context context;
             concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
 
-            utility::size64_t actual_offset = rand() % 255 + 1;
+            utility::size64_t actual_offset = get_random_int32() % 255 + 1;
             utility::size64_t actual_length = target_length - actual_offset;
             file.download_range_to_stream(download_buffer.create_ostream(), actual_offset, actual_length * 2, azure::storage::file_access_condition(), option, context);
 

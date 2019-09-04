@@ -26,6 +26,11 @@
 #define OPERATION_CANCELED "Operation canceled"
 #endif
 
+bool get_random_boolean();
+int32_t get_random_int32();
+int64_t get_random_int64();
+double get_random_double();
+
 class test_config
 {
 public:
@@ -81,29 +86,24 @@ protected:
     azure::storage::operation_context m_context;
     
     static utility::string_t object_name_prefix;
-    static bool is_random_initialized;
 
 public:
 
     static utility::datetime parse_datetime(const utility::string_t& value, utility::datetime::date_format format = utility::datetime::date_format::RFC_1123);
     static utility::string_t get_string(utility::char_t value1, utility::char_t value2);
-    static void initialize_random();
-    static bool get_random_boolean();
-    static int32_t get_random_int32();
-    static int64_t get_random_int64();
-    static double get_random_double();
-    static utility::string_t get_random_string(const std::vector<utility::char_t> charset, size_t size);
+    static utility::string_t get_random_string(const std::vector<utility::char_t>& charset, size_t size);
     static utility::string_t get_random_string(size_t size = 10);
     static utility::datetime get_random_datetime();
     static std::vector<uint8_t> get_random_binary_data();
+    static void fill_buffer(std::vector<uint8_t>& buffer);
+    static void fill_buffer(std::vector<uint8_t>& buffer, size_t offset, size_t count);
     static utility::uuid get_random_guid();
     static utility::string_t get_object_name(const utility::string_t& object_type_name);
     
     template <typename TEnum> 
     static TEnum get_random_enum(TEnum max_enum_value)
     {
-        initialize_random();
-        return static_cast<TEnum>(rand() % (static_cast<int>(max_enum_value)+1));
+        return static_cast<TEnum>(get_random_int32() % (static_cast<int>(max_enum_value) + 1));
     }
 
     template <typename It, typename T> 

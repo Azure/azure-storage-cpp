@@ -874,7 +874,7 @@ SUITE(Blob)
             try
             {
                 auto task_result = m_blob.create_or_replace_async(azure::storage::access_condition(), options, m_context, cancel_token_src.get_token());
-                std::this_thread::sleep_for(std::chrono::milliseconds(10)); //sleep for sometime before canceling the request and see result.
+                std::this_thread::sleep_for(std::chrono::milliseconds(30)); //sleep for sometime before canceling the request and see result.
                 cancel_token_src.cancel();
                 task_result.get();
             }

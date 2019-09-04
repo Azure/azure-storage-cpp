@@ -59,7 +59,7 @@ public:
         if (!m_return_full_segment)
         {
             // return less results
-            res_segment_size = std::rand() % (res_segment_size + 1);
+            res_segment_size = get_random_int32() % (res_segment_size + 1);
         }
 
         std::vector<int> res_vec;

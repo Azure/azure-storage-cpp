@@ -23,19 +23,6 @@
 #include "wascore/util.h"
 
 
-void blob_service_test_base::fill_buffer(std::vector<uint8_t>& buffer)
-{
-    fill_buffer(buffer, 0, buffer.size());
-}
-
-void blob_service_test_base::fill_buffer(std::vector<uint8_t>& buffer, size_t offset, size_t count)
-{
-    std::generate_n(buffer.begin() + offset, count, []() -> uint8_t
-    {
-        return uint8_t(std::rand());
-    });
-}
-
 utility::string_t blob_service_test_base::fill_buffer_and_get_md5(std::vector<uint8_t>& buffer)
 {
     return fill_buffer_and_get_md5(buffer, 0, buffer.size());
@@ -72,8 +59,8 @@ utility::string_t blob_service_test_base::get_random_container_name(size_t lengt
     name.resize(length);
     std::generate_n(name.begin(), length, [] () -> utility::char_t
     {
-        const utility::char_t possible_chars[] = { _XPLATSTR("abcdefghijklmnopqrstuvwxyz1234567890") };
-        return possible_chars[std::rand() % (sizeof(possible_chars) / sizeof(utility::char_t) - 1)];
+        const utility::string_t possible_chars = _XPLATSTR("abcdefghijklmnopqrstuvwxyz1234567890");
+        return possible_chars[get_random_int32() % possible_chars.length()];
     });
 
     return azure::storage::core::convert_to_string(utility::datetime::utc_now().to_interval()) + name;

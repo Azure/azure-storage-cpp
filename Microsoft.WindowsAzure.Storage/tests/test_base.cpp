@@ -17,11 +17,39 @@
 
 #include "stdafx.h"
 
+#include <ctime>
+#include <random>
+
 #include "test_base.h"
 #include "cpprest/json.h"
 
+static thread_local std::mt19937_64 random_generator(std::random_device{}());
+
+bool get_random_boolean()
+{
+    std::uniform_int_distribution<int> distribution(0, 1);
+    return distribution(random_generator) == 0;
+}
+
+int32_t get_random_int32()
+{
+    std::uniform_int_distribution<int32_t> distribution(0, std::numeric_limits<int32_t>::max());
+    return distribution(random_generator);
+}
+
+int64_t get_random_int64()
+{
+    std::uniform_int_distribution<int64_t> distribution(0LL, std::numeric_limits<int64_t>::max());
+    return distribution(random_generator);
+}
+
+double get_random_double()
+{
+    std::uniform_real_distribution<double> distribution(0, 1.0);
+    return distribution(random_generator);
+}
+
 utility::string_t test_base::object_name_prefix = utility::string_t(_XPLATSTR("nativeclientlibraryunittest"));
-bool test_base::is_random_initialized = false;
 
 test_config::test_config()
 {
@@ -116,81 +144,56 @@ utility::string_t test_base::get_string(utility::char_t value1, utility::char_t 
     return result.str();
 }
 
-void test_base::initialize_random()
+utility::string_t test_base::get_random_string(const std::vector<utility::char_t>& charset, size_t size)
 {
-    if (!is_random_initialized)
-    {
-        srand((unsigned int)time(NULL));
-        is_random_initialized = true;
-    }
-}
-
-bool test_base::get_random_boolean()
-{
-    initialize_random();
-    return (rand() & 0x1) == 0;
-}
-
-int32_t test_base::get_random_int32()
-{
-    initialize_random();
-    return (int32_t)rand() << 16 | (int32_t)rand();
-}
-
-int64_t test_base::get_random_int64()
-{
-    initialize_random();
-    return (int64_t)rand() << 48 | (int64_t)rand() << 32 | (int64_t)rand() << 16 | (int64_t)rand();
-}
-
-double test_base::get_random_double()
-{
-    initialize_random();
-    return (double)rand() / RAND_MAX;
-}
-
-utility::string_t test_base::get_random_string(const std::vector<utility::char_t> charset, size_t size)
-{
-    initialize_random();
     utility::string_t result;
     result.reserve(size);
+    std::uniform_int_distribution<size_t> distribution(0, charset.size() - 1);
     for (size_t i = 0; i < size; ++i)
     {
-        result.push_back(charset[rand() % charset.size()]);
+        result.push_back(charset[distribution(random_generator)]);
     }
-
     return result;
 }
 
 utility::string_t test_base::get_random_string(size_t size)
 {
-    initialize_random();
-    utility::string_t result;
-    result.reserve(size);
-    for (size_t i = 0; i < size; ++i)
-    {
-        result.push_back((utility::char_t) (_XPLATSTR('0') + rand() % 10));
-    }
-    return result;
+    const static std::vector<utility::char_t> charset {
+        _XPLATSTR('0'), _XPLATSTR('1'), _XPLATSTR('2'), _XPLATSTR('3'), _XPLATSTR('4'),
+        _XPLATSTR('5'), _XPLATSTR('6'), _XPLATSTR('7'), _XPLATSTR('8'), _XPLATSTR('9'),
+    };
+    return get_random_string(charset, size);
 }
 
 utility::datetime test_base::get_random_datetime()
 {
-    initialize_random();
-    return utility::datetime::utc_now() + rand();
+    return utility::datetime::utc_now() + get_random_int32();
 }
 
 std::vector<uint8_t> test_base::get_random_binary_data()
 {
-    initialize_random();
     const int SIZE = 100;
     std::vector<uint8_t> result;
     result.reserve(SIZE);
+    std::uniform_int_distribution<int> distribution(std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max());
     for (int i = 0; i < SIZE; ++i)
     {
-        result.push_back((unsigned char)(rand() % 256));
+        result.push_back(uint8_t(distribution(random_generator)));
     }
     return result;
+}
+
+void test_base::fill_buffer(std::vector<uint8_t>& buffer)
+{
+    fill_buffer(buffer, 0, buffer.size());
+}
+
+void test_base::fill_buffer(std::vector<uint8_t>& buffer, size_t offset, size_t count)
+{
+    std::generate_n(buffer.begin() + offset, count, []() -> uint8_t
+    {
+        return uint8_t(get_random_int32());
+    });
 }
 
 utility::uuid test_base::get_random_guid()

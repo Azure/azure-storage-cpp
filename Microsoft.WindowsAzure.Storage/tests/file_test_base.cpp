@@ -27,8 +27,8 @@ utility::string_t file_service_test_base::get_random_share_name(size_t length)
     name.resize(length);
     std::generate_n(name.begin(), length, []() -> utility::char_t
     {
-        const utility::char_t possible_chars[] = { _XPLATSTR("abcdefghijklmnopqrstuvwxyz1234567890") };
-        return possible_chars[std::rand() % (sizeof(possible_chars) / sizeof(utility::char_t) - 1)];
+        const utility::string_t possible_chars = _XPLATSTR("abcdefghijklmnopqrstuvwxyz1234567890");
+        return possible_chars[get_random_int32() % possible_chars.length()];
     });
 
     return azure::storage::core::convert_to_string(utility::datetime::utc_now().to_interval()) + name;

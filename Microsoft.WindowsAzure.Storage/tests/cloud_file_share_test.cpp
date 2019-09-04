@@ -45,7 +45,7 @@ SUITE(File)
 
     TEST_FIXTURE(file_share_test_base, share_create_delete_with_quotas)
     {
-        size_t quota = rand() % 5120 + 1;
+        size_t quota = get_random_int32() % 5120 + 1;
 
         CHECK(!m_share.exists(azure::storage::file_request_options(), m_context));
         CHECK(!m_share.delete_share_if_exists(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context));

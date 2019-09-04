@@ -54,7 +54,7 @@ azure::storage::operation_context blob_test_base::upload_and_download(azure::sto
     std::vector<uint8_t> buffer;
     buffer.resize(buffer_size);
     size_t target_blob_size = blob_size == 0 ? buffer_size - buffer_offset : blob_size;
-    auto md5 = fill_buffer_and_get_md5(buffer, buffer_offset, target_blob_size);
+    auto md5 = fill_buffer_and_get_md5(buffer, buffer_offset, std::min(target_blob_size, buffer.size() - buffer_offset));
 
     concurrency::streams::istream stream;
     if (use_seekable_stream)
@@ -794,7 +794,7 @@ SUITE(Blob)
         for (size_t i = 0; i < 2; ++i)
         {
             auto file_name = this->get_random_string();
-            auto share = test_config::instance().account().create_cloud_file_client().get_share_reference(_XPLATSTR("testshare"));
+            auto share = test_config::instance().account().create_cloud_file_client().get_share_reference(_XPLATSTR("testshare") + get_random_string());
             share.create_if_not_exists();
             auto source = share.get_root_directory_reference().get_file_reference(file_name);
             source.upload_text(_XPLATSTR("1"), azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
@@ -812,6 +812,7 @@ SUITE(Blob)
             CHECK(wait_for_copy(dest));
             CHECK_THROW(dest.abort_copy(copy_id, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
             CHECK_EQUAL(web::http::status_codes::Conflict, m_context.request_results().back().http_status_code());
+            share.delete_share();
         }
     }
 
@@ -892,7 +893,7 @@ SUITE(Blob)
             azure::storage::operation_context context;
             concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
 
-            utility::size64_t actual_offset = rand() % 255 + 1;
+            utility::size64_t actual_offset = get_random_int32() % 255 + 1;
             utility::size64_t actual_length = target_length - actual_offset;
             blob.download_range_to_stream(download_buffer.create_ostream(), actual_offset, actual_length, azure::storage::access_condition(), option, context);
 
@@ -920,7 +921,7 @@ SUITE(Blob)
             azure::storage::operation_context context;
             concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
 
-            utility::size64_t actual_offset = rand() % 255 + 1;
+            utility::size64_t actual_offset = get_random_int32() % 255 + 1;
             utility::size64_t actual_length = target_length - actual_offset;
             blob.download_range_to_stream(download_buffer.create_ostream(), actual_offset, std::numeric_limits<utility::size64_t>::max(), azure::storage::access_condition(), option, context);
 
@@ -954,7 +955,7 @@ SUITE(Blob)
             azure::storage::operation_context context;
             concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
 
-            utility::size64_t actual_offset = rand() % 255 + 1;
+            utility::size64_t actual_offset = get_random_int32() % 255 + 1;
             utility::size64_t actual_length = target_length - actual_offset;
             blob.download_range_to_stream(download_buffer.create_ostream(), actual_offset, actual_length * 2, azure::storage::access_condition(), option, context);
 

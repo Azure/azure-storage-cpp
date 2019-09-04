@@ -1381,7 +1381,7 @@ SUITE(Blob)
             try
             {
                 auto task_result = m_blob.delete_blob_if_exists_async(azure::storage::delete_snapshots_option::include_snapshots, azure::storage::access_condition(), options, m_context, cancel_token_src.get_token());
-                std::this_thread::sleep_for(std::chrono::milliseconds(10)); //sleep for sometime before canceling the request and see result.
+                std::this_thread::sleep_for(std::chrono::milliseconds(30)); //sleep for sometime before canceling the request and see result.
                 cancel_token_src.cancel();
                 task_result.get();
             }
@@ -1610,7 +1610,7 @@ SUITE(Blob)
 
         {
             auto options = azure::storage::blob_request_options();
-            options.set_maximum_execution_time(std::chrono::milliseconds(10000));
+            options.set_maximum_execution_time(std::chrono::seconds(20));
 
             std::string ex_msg;
 
@@ -1735,7 +1735,7 @@ SUITE(Blob)
                 auto task_result = m_blob.open_write_async(azure::storage::access_condition(), options, m_context, cancel_token_src.get_token());
                 auto os = task_result.get();
                 os.streambuf().putn_nocopy(buffer.data(), buffer.size()).wait();
-                std::this_thread::sleep_for(std::chrono::milliseconds(10)); //sleep for sometime before canceling the request and see result.
+                std::this_thread::sleep_for(std::chrono::milliseconds(30)); //sleep for sometime before canceling the request and see result.
                 cancel_token_src.cancel();
                 os.close().get();
             }

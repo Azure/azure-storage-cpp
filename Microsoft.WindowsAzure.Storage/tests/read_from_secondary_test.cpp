@@ -101,7 +101,8 @@ public:
 
             // This check assumes that datetime::to_interval() returns the time in microseconds/10
             std::chrono::microseconds interval((m_context.request_results()[m_context_results_offset + i + 1].start_time().to_interval() - m_context.request_results()[m_context_results_offset + i].end_time().to_interval()) / 10);
-            CHECK(m_retry_info_list[i].retry_interval() < interval);
+            const std::chrono::milliseconds deviation(1);
+            CHECK(m_retry_info_list[i].retry_interval() - deviation < interval);
         }
     }
 

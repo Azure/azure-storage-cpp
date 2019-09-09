@@ -1274,7 +1274,7 @@ namespace azure { namespace storage {
         /// <remarks>This method is deprecated in favor of download_shared_usage_in_bytes.</remarks>
         int32_t download_share_usage(const file_access_condition& condition, const file_request_options& options, operation_context context) const
         {
-            return download_share_usage_aysnc(condition, options, context).get();
+            return download_share_usage_async(condition, options, context).get();
         }
 
         /// <summary>
@@ -1284,7 +1284,7 @@ namespace azure { namespace storage {
         /// <remarks>This method is deprecated in favor of download_shared_usage_in_bytes_async.</remarks>
         pplx::task<int32_t> download_share_usage_async() const
         {
-            return download_share_usage_aysnc(file_access_condition(), file_request_options(), operation_context());
+            return download_share_usage_async(file_access_condition(), file_request_options(), operation_context());
         }
 
         /// <summary>
@@ -1295,7 +1295,7 @@ namespace azure { namespace storage {
         /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
         /// <returns>A <see cref="pplx::task" /> object that that represents the current operation.</returns>
         /// <remarks>This method is deprecated in favor of download_shared_usage_in_bytes_async.</remarks>
-        WASTORAGE_API pplx::task<int32_t> download_share_usage_aysnc(const file_access_condition& condition, const file_request_options& options, operation_context context) const;
+        WASTORAGE_API pplx::task<int32_t> download_share_usage_async(const file_access_condition& condition, const file_request_options& options, operation_context context) const;
 
         /// <summary>
         /// Retrieves the share's statistics.

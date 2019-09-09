@@ -266,7 +266,7 @@ namespace azure { namespace storage {
         return core::executor<bool>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<int32_t> cloud_file_share::download_share_usage_aysnc(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+    pplx::task<int32_t> cloud_file_share::download_share_usage_async(const file_access_condition& condition, const file_request_options& options, operation_context context) const
     {
         UNREFERENCED_PARAMETER(condition);
 

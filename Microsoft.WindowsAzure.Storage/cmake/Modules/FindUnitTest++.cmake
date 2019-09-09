@@ -20,6 +20,7 @@ find_path(UnitTest++_INCLUDE_DIR
   	${UnitTest++_PKGCONF_INCLUDE_DIRS}
   	${CMAKE_SOURCE_DIR}/tests/UnitTest++/src
 	/usr/local/include
+	/usr/include
   PATH_SUFFIXES
 	unittest++
 	UnitTest++

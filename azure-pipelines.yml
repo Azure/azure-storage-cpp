@@ -1,0 +1,111 @@
+trigger:
+- master
+- dev
+
+pr:
+- dev
+
+variables:
+  cpp_rest_sdk_version: 2.10.14
+
+jobs:
+- job: build_test_linux
+  displayName: Build and Test on Linux
+  timeoutInMinutes: 240
+
+  strategy:
+    maxParallel: 16
+    matrix:
+      UBUNTU1404:
+        container_image: ubuntu14.04:cpprestsdk_$(cpp_rest_sdk_version)
+        build_type: Release
+      UBUNTU1604:
+        container_image: ubuntu16.04:cpprestsdk_$(cpp_rest_sdk_version)
+        build_type: Release
+      UBUNTU1804:
+        container_image: ubuntu18.04:cpprestsdk_$(cpp_rest_sdk_version)
+        build_type: Release
+      UBUNTU1804_DEBUG:
+        container_image: ubuntu18.04:cpprestsdk_$(cpp_rest_sdk_version)
+        build_type: Debug
+      UBUNTU1804_I686:
+        container_image: ubuntu18.04.i686:cpprestsdk_$(cpp_rest_sdk_version)
+        build_type: Release
+        build_env_init: export CXXFLAGS=-m32
+
+  pool:
+    vmImage: 'ubuntu-16.04'
+
+  container:
+    image: azurecppsdkpipeline.azurecr.io/$(container_image)
+    endpoint: azure_docker_registry_connection
+
+  steps:
+  - script: |
+      $(build_env_init)
+      cmake Microsoft.WindowsAzure.Storage/CMakeLists.txt -B$(Build.BinariesDirectory) -DCMAKE_BUILD_TYPE=$(build_type) -DBUILD_SAMPLES=ON -DBUILD_TESTS=ON
+      cmake --build $(Build.BinariesDirectory) -- -j$(nproc)
+    displayName: Build
+
+  - script: echo ${MAPPED_TEST_CONFIGURATION} > $(Build.BinariesDirectory)/Binaries/test_configurations.json
+    displayName: Copy Test Configuration
+    env:
+      MAPPED_TEST_CONFIGURATION: $(test_configuration)
+
+  - script: ./azurestoragetest $(excluded_testcases) $(retry_policy) --warning-message='##vso[task.logissue type=warning]'
+    workingDirectory: $(Build.BinariesDirectory)/Binaries
+    displayName: Run Tests
+
+
+- job: build_test_windows
+  displayName: Build and Test on Windows
+  timeoutInMinutes: 300
+
+  strategy:
+    maxParallel: 16
+    matrix:
+      WIN1803_VS2017:
+        container_image: win1803_vs2017:cpprestsdk_$(cpp_rest_sdk_version)
+        project_file: Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj
+        ms_build_location: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
+        platform: x64
+        configuration: Release
+      WIN1803_VS2017_DEBUG:
+        container_image: win1803_vs2017:cpprestsdk_$(cpp_rest_sdk_version)
+        project_file: Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj
+        ms_build_location: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
+        platform: x64
+        configuration: Debug
+      WIN1803_VS2017_WIN32:
+        container_image: win1803_vs2017:cpprestsdk_$(cpp_rest_sdk_version)
+        project_file: Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj
+        ms_build_location: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
+        platform: Win32
+        configuration: Release
+
+  pool:
+    vmImage: 'win1803'
+
+  container:
+    image: azurecppsdkpipeline.azurecr.io/$(container_image)
+    endpoint: azure_docker_registry_connection
+
+  steps:
+  - task: MSBUILD@1
+    displayName: Build
+    inputs:
+      solution: $(project_file)
+      msbuildLocationMethod: location
+      msbuildLocation: $(ms_build_location)
+      msbuildArguments: /p:OutDir=$(Build.BinariesDirectory)\
+      platform: $(platform)
+      configuration: $(configuration)
+
+  - script: echo %MAPPED_TEST_CONFIGURATION% > $(Build.BinariesDirectory)\test_configurations.json
+    displayName: Copy Test Configuration
+    env:
+      MAPPED_TEST_CONFIGURATION: $(test_configuration)
+
+  - script: wastoretest.exe $(excluded_testcases) $(retry_policy) --warning-message="##vso[task.logissue type=warning]"
+    workingDirectory: $(Build.BinariesDirectory)
+    displayName: Run Tests

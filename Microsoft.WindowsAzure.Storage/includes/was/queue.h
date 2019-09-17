@@ -290,7 +290,7 @@ namespace azure { namespace storage {
         /// Returns the next time that the message will be visible.
         /// </summary>
         /// <returns>The next time that the message will be visible.</returns>
-        utility::datetime next_visibile_time() const
+        utility::datetime next_visible_time() const
         {
             return m_next_visible_time;
         }

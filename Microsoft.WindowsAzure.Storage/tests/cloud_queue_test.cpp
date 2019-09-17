@@ -110,7 +110,7 @@ SUITE(Queue)
         CHECK(message.pop_receipt().empty());
         CHECK(!message.expiration_time().is_initialized());
         CHECK(!message.insertion_time().is_initialized());
-        CHECK(!message.next_visibile_time().is_initialized());
+        CHECK(!message.next_visible_time().is_initialized());
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
@@ -126,7 +126,7 @@ SUITE(Queue)
         CHECK(message.pop_receipt().empty());
         CHECK(!message.expiration_time().is_initialized());
         CHECK(!message.insertion_time().is_initialized());
-        CHECK(!message.next_visibile_time().is_initialized());
+        CHECK(!message.next_visible_time().is_initialized());
         CHECK_EQUAL(0, message.dequeue_count());
 
         content = get_random_string();
@@ -138,7 +138,7 @@ SUITE(Queue)
         CHECK(message.pop_receipt().empty());
         CHECK(!message.expiration_time().is_initialized());
         CHECK(!message.insertion_time().is_initialized());
-        CHECK(!message.next_visibile_time().is_initialized());
+        CHECK(!message.next_visible_time().is_initialized());
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
@@ -154,7 +154,7 @@ SUITE(Queue)
         CHECK(message.pop_receipt().empty());
         CHECK(!message.expiration_time().is_initialized());
         CHECK(!message.insertion_time().is_initialized());
-        CHECK(!message.next_visibile_time().is_initialized());
+        CHECK(!message.next_visible_time().is_initialized());
         CHECK_EQUAL(0, message.dequeue_count());
 
         content = get_random_binary_data();
@@ -166,7 +166,7 @@ SUITE(Queue)
         CHECK(message.pop_receipt().empty());
         CHECK(!message.expiration_time().is_initialized());
         CHECK(!message.insertion_time().is_initialized());
-        CHECK(!message.next_visibile_time().is_initialized());
+        CHECK(!message.next_visible_time().is_initialized());
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
@@ -183,7 +183,7 @@ SUITE(Queue)
         CHECK(pop_receipt.compare(message.pop_receipt()) == 0);
         CHECK(!message.expiration_time().is_initialized());
         CHECK(!message.insertion_time().is_initialized());
-        CHECK(!message.next_visibile_time().is_initialized());
+        CHECK(!message.next_visible_time().is_initialized());
         CHECK_EQUAL(0, message.dequeue_count());
     }
 
@@ -796,15 +796,15 @@ SUITE(Queue)
             CHECK(!message.pop_receipt().empty());
             CHECK(message.insertion_time().is_initialized());
             CHECK(message.expiration_time().is_initialized());
-            CHECK(message.next_visibile_time().is_initialized());
+            CHECK(message.next_visible_time().is_initialized());
 
             utility::string_t old_pop_recepit = message.pop_receipt();
-            utility::datetime old_next_visible_time = message.next_visibile_time();
+            utility::datetime old_next_visible_time = message.next_visible_time();
             message.set_content(get_random_string());
             queue.update_message(message, std::chrono::seconds(15 * 60), true, options, context);
 
             CHECK(old_pop_recepit.compare(message.pop_receipt()) != 0);
-            CHECK(old_next_visible_time != message.next_visibile_time());
+            CHECK(old_next_visible_time != message.next_visible_time());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1010,7 +1010,7 @@ SUITE(Queue)
                 CHECK(!message.pop_receipt().empty());
                 CHECK(message.insertion_time().is_initialized());
                 CHECK(message.expiration_time().is_initialized());
-                CHECK(message.next_visibile_time().is_initialized());
+                CHECK(message.next_visible_time().is_initialized());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -1035,7 +1035,7 @@ SUITE(Queue)
 
         {
             utility::string_t old_pop_recepit = message1.pop_receipt();
-            utility::datetime old_next_visible_time = message1.next_visibile_time();
+            utility::datetime old_next_visible_time = message1.next_visible_time();
 
             std::chrono::seconds visibility_timeout;
             bool update_content;
@@ -1053,10 +1053,10 @@ SUITE(Queue)
             CHECK(!message1.pop_receipt().empty());
             CHECK(message1.insertion_time().is_initialized());
             CHECK(message1.expiration_time().is_initialized());
-            CHECK(message1.next_visibile_time().is_initialized());
+            CHECK(message1.next_visible_time().is_initialized());
 
             CHECK(old_pop_recepit.compare(message1.pop_receipt()) != 0);
-            CHECK(old_next_visible_time != message1.next_visibile_time());
+            CHECK(old_next_visible_time != message1.next_visible_time());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1097,7 +1097,7 @@ SUITE(Queue)
                 CHECK(message.pop_receipt().empty());
                 CHECK(message.insertion_time().is_initialized());
                 CHECK(message.expiration_time().is_initialized());
-                CHECK(!message.next_visibile_time().is_initialized());
+                CHECK(!message.next_visible_time().is_initialized());
             }
 
             CHECK(!context.client_request_id().empty());
@@ -1130,7 +1130,7 @@ SUITE(Queue)
             CHECK(!message2.pop_receipt().empty());
             CHECK(message2.insertion_time().is_initialized());
             CHECK(message2.expiration_time().is_initialized());
-            CHECK(message2.next_visibile_time().is_initialized());
+            CHECK(message2.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1162,7 +1162,7 @@ SUITE(Queue)
             CHECK(message.pop_receipt().empty());
             CHECK(message.insertion_time().is_initialized());
             CHECK(message.expiration_time().is_initialized());
-            CHECK(!message.next_visibile_time().is_initialized());
+            CHECK(!message.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1197,7 +1197,7 @@ SUITE(Queue)
             CHECK(!message3.pop_receipt().empty());
             CHECK(message3.insertion_time().is_initialized());
             CHECK(message3.expiration_time().is_initialized());
-            CHECK(message3.next_visibile_time().is_initialized());
+            CHECK(message3.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1229,7 +1229,7 @@ SUITE(Queue)
             CHECK(message.pop_receipt().empty());
             CHECK(!message.insertion_time().is_initialized());
             CHECK(!message.expiration_time().is_initialized());
-            CHECK(!message.next_visibile_time().is_initialized());
+            CHECK(!message.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1264,7 +1264,7 @@ SUITE(Queue)
             CHECK(message.pop_receipt().empty());
             CHECK(!message.insertion_time().is_initialized());
             CHECK(!message.expiration_time().is_initialized());
-            CHECK(!message.next_visibile_time().is_initialized());
+            CHECK(!message.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1289,7 +1289,7 @@ SUITE(Queue)
         {
             new_content = get_random_string();
             utility::string_t old_pop_recepit = message3.pop_receipt();
-            utility::datetime old_next_visible_time = message3.next_visibile_time();
+            utility::datetime old_next_visible_time = message3.next_visible_time();
 
             std::chrono::seconds visibility_timeout;
             bool update_content;
@@ -1308,10 +1308,10 @@ SUITE(Queue)
             CHECK(!message3.pop_receipt().empty());
             CHECK(message3.insertion_time().is_initialized());
             CHECK(message3.expiration_time().is_initialized());
-            CHECK(message3.next_visibile_time().is_initialized());
+            CHECK(message3.next_visible_time().is_initialized());
 
             CHECK(old_pop_recepit.compare(message3.pop_receipt()) != 0);
-            CHECK(old_next_visible_time != message3.next_visibile_time());
+            CHECK(old_next_visible_time != message3.next_visible_time());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1343,7 +1343,7 @@ SUITE(Queue)
             CHECK(message.pop_receipt().empty());
             CHECK(message.insertion_time().is_initialized());
             CHECK(message.expiration_time().is_initialized());
-            CHECK(!message.next_visibile_time().is_initialized());
+            CHECK(!message.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1383,7 +1383,7 @@ SUITE(Queue)
             CHECK(!message3.pop_receipt().empty());
             CHECK(message3.insertion_time().is_initialized());
             CHECK(message3.expiration_time().is_initialized());
-            CHECK(message3.next_visibile_time().is_initialized());
+            CHECK(message3.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1415,7 +1415,7 @@ SUITE(Queue)
             CHECK(message.pop_receipt().empty());
             CHECK(message.insertion_time().is_initialized());
             CHECK(message.expiration_time().is_initialized());
-            CHECK(!message.next_visibile_time().is_initialized());
+            CHECK(!message.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1472,7 +1472,7 @@ SUITE(Queue)
             CHECK(message.pop_receipt().empty());
             CHECK(!message.insertion_time().is_initialized());
             CHECK(!message.expiration_time().is_initialized());
-            CHECK(!message.next_visibile_time().is_initialized());
+            CHECK(!message.next_visible_time().is_initialized());
 
             CHECK(!context.client_request_id().empty());
             CHECK(context.start_time().is_initialized());
@@ -1869,10 +1869,10 @@ SUITE(Queue)
             CHECK(!message2.pop_receipt().empty());
             CHECK(message2.insertion_time().is_initialized());
             CHECK(message2.expiration_time().is_initialized());
-            CHECK(message2.next_visibile_time().is_initialized());
+            CHECK(message2.next_visible_time().is_initialized());
 
             utility::string_t old_pop_recepit = message2.pop_receipt();
-            utility::datetime old_next_visible_time = message2.next_visibile_time();
+            utility::datetime old_next_visible_time = message2.next_visible_time();
 
             UNREFERENCED_PARAMETER(old_pop_recepit);
             UNREFERENCED_PARAMETER(old_next_visible_time);

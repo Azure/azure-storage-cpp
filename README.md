@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (6.1.0)
+# Azure Storage Client Library for C++ (7.0.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -55,29 +55,37 @@ cd azure-storage-cpp
 
 To build with source code, there are three ways:
 
-**Via Vcpkg**
-You can manage the dependencies with Vcpkg, and use Visual Studio 2015 update 3 or Visual Studio 2017 for development environment. Simply install Casablanca via Vcpkg will setup everything needed.
-```
-C:\src\vcpkg> .\vcpkg install cpprestsdk
-```
+- Via Vcpkg
 
-**Via NuGet**
-Because Casablanca does not release NuGet packages anywhere anymore, Starting from 5.1.0, this repository cannot be built with pre-built Casablanca NuGet packages. However, you can export your own version of Casablanca NuGet packages to install dependencies of this project:
-```
-C:\src\vcpkg> .\vcpkg install cpprestsdk
-C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.13
-```
+    You can manage the dependencies with Vcpkg, and use Visual Studio 2015 update 3 or Visual Studio 2017 for development environment. Simply install Casablanca via Vcpkg will setup everything needed.
+    ```BatchFile
+    C:\src\vcpkg> .\vcpkg install cpprestsdk
+    ```
 
-**Manage dependencies by yourself**
-It is not recommended to manage dependencies by yourself. However, you can still build Casablanca by yourself and specify the include directories and link binaries.
+- Via NuGet
+
+    Because Casablanca does not release NuGet packages anywhere anymore, Starting from 5.1.0, this repository cannot be built with pre-built Casablanca NuGet packages. However, you can export your own version of Casablanca NuGet packages to install dependencies of this project:
+    ```BatchFile
+    C:\src\vcpkg> .\vcpkg install cpprestsdk
+    C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.14
+    ```
+
+- Manage dependencies by yourself
+
+    It is not recommended to manage dependencies by yourself. However, you can still build Casablanca by yourself and specify the include directories and link binaries.
+
+If you want to build and run test code, you can install UnitTest++ via vcpkg:
+```BatchFile
+C:\src\vcpkg> .\vcpkg install unittest-cpp
+```
 
 ### Via NuGet
 
 To install the binaries for the Azure Storage Client Library for C++, you can export a NuGet package with Vcpkg and put it into your local NuGet feed. For more information about how to export a NuGet package, please see [Binary Export](https://github.com/Microsoft/vcpkg/blob/master/docs/specifications/export-command.md).
 
 Normally, exporting NuGet package is done with the following command:
-```
-C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azure.Storage.CPP --nuget-version=6.0.0
+```BatchFile
+C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azure.Storage.CPP --nuget-version=7.0.0
 ```
 
 ### Via Vcpkg
@@ -85,7 +93,7 @@ C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azur
 To install the Azure Storage Client Library for C++ through Vcpkg, you need Vcpkg installed first. Please follow the instructions(https://github.com/Microsoft/vcpkg#quick-start) to install Vcpkg.
 
 install package with:
-```
+```BatchFile
 C:\src\vcpkg> .\vcpkg install azure-storage-cpp
 ```
 
@@ -114,6 +122,7 @@ The validated Casablanca version for each major or recent release on different p
 | 5.2.0                       | 2.10.6                         | 2.10.3                       |
 | 6.0.0                       | 2.10.10                        | 2.10.10                      |
 | 6.1.0                       | 2.10.13                        | 2.10.13                      |
+| 7.0.0                       | 2.10.14                        | 2.10.14                      |
 
 ## Code Samples
 
@@ -209,7 +218,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.13 -b v2.10.13
+git checkout tags/v2.10.14 -b v2.10.14
 ```
 
 - Build the project in Release mode
@@ -284,21 +293,21 @@ vi ../../samples/SamplesCommon/samples_common.h # modify connection string to in
 ./samplesqueues           # run the queues sample
 ```
 
-### Getting Started on RHEL 7
+### Getting Started on CentOS 6/7
 
-*Please note the following build script is only tested on RHEL 7.5. The script may need to be updated accordingly for other distributions.*
+*Please note the following build script is only tested on CentOS 6.10 and 7.6. The script may need to be updated accordingly for other distributions.*
 
 Before building the Azure Storage Client Library on C++, some prerequisites need to be installed first:
 - Install prerequisites:
 ```bash
-sudo yum install git gcc-c++ openssl-devel libxml2-devel libuuid-devel
+sudo yum install epel-release centos-release-scl
+sudo yum install git cmake3 make openssl-devel libxml2-devel libuuid-devel
 ```
 
-- Download and install cmake3:
+- Install and enable to use gcc-c++. Note that `devtoolset-4` may be not available on some platforms, you can choose to install whichever newer than that, like `devtoolset-8`.
 ```bash
-wget -O cmakeinstall.sh https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.sh
-chmod a+x cmakeinstall.sh
-sudo ./cmakeinstall.sh --prefix=/usr
+sudo yum install devtoolset-4-gcc-c++
+scl enable devtoolset-4 bash
 ```
 
 - Download and install boost
@@ -319,16 +328,16 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.13 -b v2.10.13
+cd cpprestsdk
+git checkout tags/v2.10.14 -b v2.10.14
 ```
 
 - Build the project in Release mode
 ```bash
-cd cpprestsdk/Release
 git submodule update --init
-mkdir build.release
-cd build.release
-cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF
+mkdir Release/build.release
+cd Release/build.release
+cmake3 .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF
 sudo make install
 ```
 
@@ -345,7 +354,7 @@ The project is cloned to a folder called `azure-storage-cpp`. Always use the mas
 cd azure-storage-cpp/Microsoft.WindowsAzure.Storage
 mkdir build.release
 cd build.release
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake3 .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
@@ -362,14 +371,14 @@ git clone https://github.com/unittest-cpp/unittest-cpp.git
 - Build and install the project:
 ```bash
 cd unittest-cpp/builds/
-cmake ..
+cmake3 ..
 sudo make install
 ```
 
 Build and run unit test against Azure Storage Client Library for C++:
 - Build the test code:
 ```bash
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+cmake3 .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
 make
 ```
 - Run unit tests
@@ -379,128 +388,13 @@ vi test_configurations.json # modify test config file to include your storage ac
 ./azurestoragetest
 ```
 
-To build sample code:
+- To build sample code:
 ```bash
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
-make
-```
-To run the samples:
-```bash
-cd Binaries
-vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
-./samplesblobs            # run the blobs sample
-./samplesjson             # run the tables sample with JSON payload
-./samplestables           # run the tables sample
-./samplesqueues           # run the queues sample
-```
-
-### Getting Started on RHEL 6
-
-*Please note the following build script is only tested on RHEL 6.9. The script may need to be updated accordingly for other distributions.*
-
-Before building the Azure Storage Client Library on C++, some prerequisites need to be installed first:
-- Install prerequisites:
-```bash
-sudo yum install git openssl-devel libxml2-devel libuuid-devel
-```
-
-- Install and enable to use gcc-c++
-```bash
-sudo yum install devtoolset-3-gcc-c++.x86_64
-scl enable devtoolset-3 bash
-```
-
-- Download and install cmake3:
-```bash
-wget -O cmakeinstall.sh https://cmake.org/files/v3.12/cmake-3.12.3-Linux-x86_64.sh
-chmod a+x cmakeinstall.sh
-sudo ./cmakeinstall.sh --prefix=/usr
-```
-
-- Download and install boost
-```bash
-wget https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz
-tar xvf boost_1_68_0.tar.gz
-cd boost_1_68_0
-./bootstrap.sh
-sudo ./b2 install
-```
-
-The Azure Storage Client Library for C++ depends on Casablanca, following are instructions to build and install Casablanca:
-
-- Clone the project using git:
-```bash
-git clone https://github.com/Microsoft/cpprestsdk.git
-```
-
-- Checkout the version on which Azure Storage Client Library for C++ depends:
-```bash
-git checkout tags/v2.10.13 -b v2.10.13
-```
-
-- Build the project in Release mode
-```bash
-cd cpprestsdk/Release
-git submodule update --init
-mkdir build.release
-cd build.release
-cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=OFF -DBUILD_SAMPLES=OFF -DBUILD_TESTS=OFF -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
-sudo make install
-```
-
-To build the Azure Storage Client Library for C++ project:
-
-- Clone the project using git:
-```bash
-git clone https://github.com/Azure/azure-storage-cpp.git
-```
-The project is cloned to a folder called `azure-storage-cpp`. Always use the master branch, which contains the latest release.
-
-- Build the SDK in Release mode:
-```bash
-cd azure-storage-cpp/Microsoft.WindowsAzure.Storage
-mkdir build.release
-cd build.release
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+cmake3 .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
 
-The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage/build.release/Binaries/`.
-
-The Azure Storage Client Library for C++ project depends on Unitest++ for unit test:
-
-To build and install Unitest++:
-- Clone the project using git: 
-```bash
-git clone https://github.com/unittest-cpp/unittest-cpp.git
-```
-
-- Build and install the project:
-```bash
-cd unittest-cpp/builds/
-cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
-sudo make install
-```
-
-Build and run unit test against Azure Storage Client Library for C++:
-- Build the test code:
-```bash
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
-make
-```
-- Run unit tests
-```bash
-cd Binaries
-vi test_configurations.json # modify test config file to include your storage account credentials
-./azurestoragetest
-```
-
-To build sample code:
-```bash
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
-make
-```
-To run the samples:
+- To run the samples:
 ```bash
 cd Binaries
 vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials

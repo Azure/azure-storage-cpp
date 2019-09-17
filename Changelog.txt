@@ -1,6 +1,17 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v7.0.0
+- Default REST API version is 2019-02-02.
+- Upgraded CPPRest to latest version 2.10.14.
+- Raised minimum required GCC version to 5.1.
+- Added new API `azure::storage::cloud_file_share::download_share_usage_in_bytes`.
+- SAS returned by calling `azure::storage::cloud_blob::get_shared_access_signature` on a snapshot object only has access to the snapshot, not the entire blob including every snapshots as before.
+- Added support for AAD based OAuth bearer token authentication.
+- Added support for CRCC64 transactional data integrity machanism as an alternative to MD5.
+- Added new API `azure::storage::cloud_file_share::upload_file_permission`, `azure::storage::cloud_file_share::download_file_permission` to support to create/retrieve a security descriptor at the Azure File share level,
+- Added support for a set of new headers on Azure File APIs.
+
 Changes in v6.1.0
 - Default REST API version is 2018-03-28.
 - Upgraded CPPRest to latest version: 2.10.13.

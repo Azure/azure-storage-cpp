@@ -1498,21 +1498,11 @@ namespace azure { namespace storage {
     /// </summary>
     WASTORAGE_API void __cdecl set_wastorage_ambient_scheduler(const std::shared_ptr<pplx::scheduler_interface>& scheduler);
 
-#if defined(_MSC_VER) && _MSC_VER < 1900
-    
     /// <summary>
     /// Gets the ambient scheduler to be used by the PPL constructs. Note this is not thread safe.
     /// </summary>
     WASTORAGE_API const std::shared_ptr<pplx::scheduler_interface> __cdecl get_wastorage_ambient_scheduler();
 
-#else
-
-    /// <summary>
-    /// Gets the ambient scheduler to be used by the PPL constructs. Note this is not thread safe.
-    /// </summary>
-    WASTORAGE_API const std::shared_ptr<pplx::scheduler_interface>& __cdecl get_wastorage_ambient_scheduler();
-
-#endif
     /// <summary>
     /// Sets the ambient scheduler to be used for scheduling delayed tasks. Note this is not thread safe.
     /// </summary>

@@ -2,6 +2,8 @@ var searchData=
 [
   ['file',['file',['../classazure_1_1storage_1_1service__properties__includes.html#aa5a6e79717d326db8cbb02af5967c33f',1,'azure::storage::service_properties_includes']]],
   ['file_5fendpoint',['file_endpoint',['../classazure_1_1storage_1_1cloud__storage__account.html#aa1257cef7479d9c3f4569148dd9536f7',1,'azure::storage::cloud_storage_account']]],
+  ['file_5fid',['file_id',['../classazure_1_1storage_1_1cloud__file__directory__properties.html#a2e48f5489439398d5ec92ec3975175d9',1,'azure::storage::cloud_file_directory_properties::file_id()'],['../classazure_1_1storage_1_1cloud__file__properties.html#a2a1f947ee36eb8d342142a4f6d8b7057',1,'azure::storage::cloud_file_properties::file_id()']]],
+  ['file_5fparent_5fid',['file_parent_id',['../classazure_1_1storage_1_1cloud__file__directory__properties.html#ae971c31c0f281e2232e5165deafdd08c',1,'azure::storage::cloud_file_directory_properties::file_parent_id()'],['../classazure_1_1storage_1_1cloud__file__properties.html#a324accf951d28730d3887c9787806ff1',1,'azure::storage::cloud_file_properties::file_parent_id()']]],
   ['file_5frange',['file_range',['../classazure_1_1storage_1_1file__range.html#a2676a7340ace2bf49b93188ba0d1b38c',1,'azure::storage::file_range']]],
   ['file_5frequest_5foptions',['file_request_options',['../classazure_1_1storage_1_1file__request__options.html#add4a8d4ab871d44db28e57b24b97f1f6',1,'azure::storage::file_request_options']]],
   ['file_5fshare_5fpermissions',['file_share_permissions',['../classazure_1_1storage_1_1file__share__permissions.html#a9be6821278f1c26adf084867c84dbef5',1,'azure::storage::file_share_permissions']]],

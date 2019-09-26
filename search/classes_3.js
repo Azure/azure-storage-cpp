@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['checksum',['checksum',['../classazure_1_1storage_1_1checksum.html',1,'azure::storage']]],
   ['cloud_5fappend_5fblob',['cloud_append_blob',['../classazure_1_1storage_1_1cloud__append__blob.html',1,'azure::storage']]],
   ['cloud_5fappend_5fblob_5fostreambuf',['cloud_append_blob_ostreambuf',['../classazure_1_1storage_1_1core_1_1cloud__append__blob__ostreambuf.html',1,'azure::storage::core']]],
   ['cloud_5fblob',['cloud_blob',['../classazure_1_1storage_1_1cloud__blob.html',1,'azure::storage']]],
@@ -39,5 +40,6 @@ var searchData=
   ['continuation_5ftoken',['continuation_token',['../classazure_1_1storage_1_1continuation__token.html',1,'azure::storage']]],
   ['copy_5fstate',['copy_state',['../classazure_1_1storage_1_1copy__state.html',1,'azure::storage']]],
   ['cors_5frule',['cors_rule',['../classazure_1_1storage_1_1service__properties_1_1cors__rule.html',1,'azure::storage::service_properties']]],
+  ['crc64_5fhash_5fprovider_5fimpl',['crc64_hash_provider_impl',['../classazure_1_1storage_1_1core_1_1crc64__hash__provider__impl.html',1,'azure::storage::core']]],
   ['cryptography_5fhash_5fprovider_5fimpl',['cryptography_hash_provider_impl',['../classazure_1_1storage_1_1core_1_1cryptography__hash__provider__impl.html',1,'azure::storage::core']]]
 ];

@@ -12,6 +12,7 @@ var searchData=
   ['basic_5fistreambuf_3c_20concurrency_3a_3astreams_3a_3aostream_3a_3atraits_3a_3achar_5ftype_20_3e',['basic_istreambuf&lt; concurrency::streams::ostream::traits::char_type &gt;',['../classazure_1_1storage_1_1core_1_1basic__istreambuf.html',1,'azure::storage::core']]],
   ['basic_5fostreambuf',['basic_ostreambuf',['../classazure_1_1storage_1_1core_1_1basic__ostreambuf.html',1,'azure::storage::core']]],
   ['basic_5fostreambuf_3c_20concurrency_3a_3astreams_3a_3aostream_3a_3atraits_3a_3achar_5ftype_20_3e',['basic_ostreambuf&lt; concurrency::streams::ostream::traits::char_type &gt;',['../classazure_1_1storage_1_1core_1_1basic__ostreambuf.html',1,'azure::storage::core']]],
+  ['bearer_5ftoken_5fcredential',['bearer_token_credential',['../classazure_1_1storage_1_1storage__credentials_1_1bearer__token__credential.html',1,'azure::storage::storage_credentials']]],
   ['blob_5fcontainer_5fpermissions',['blob_container_permissions',['../classazure_1_1storage_1_1blob__container__permissions.html',1,'azure::storage']]],
   ['blob_5flisting_5fdetails',['blob_listing_details',['../structazure_1_1storage_1_1blob__listing__details.html',1,'azure::storage']]],
   ['blob_5frequest_5foptions',['blob_request_options',['../classazure_1_1storage_1_1blob__request__options.html',1,'azure::storage']]],

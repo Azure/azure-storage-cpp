@@ -8,6 +8,7 @@ var searchData=
   ['maximum',['maximum',['../classazure_1_1storage_1_1sequence__number.html#aa37137d2ee2a9a6a98fe4a0d752b7f69',1,'azure::storage::sequence_number::maximum(int64_t value)'],['../classazure_1_1storage_1_1sequence__number.html#ab83b97dcec038c5610df17eb3635c669a65b0e2883c997f2bea5dd11c923b94cf',1,'azure::storage::sequence_number::maximum()']]],
   ['maximum_5faddress',['maximum_address',['../classazure_1_1storage_1_1shared__access__policy_1_1ip__address__or__range.html#a4fc6584eb649b3155bc8f7e141d19eb0',1,'azure::storage::shared_access_policy::ip_address_or_range']]],
   ['maximum_5fexecution_5ftime',['maximum_execution_time',['../classazure_1_1storage_1_1request__options.html#a42f11353351183c6b1a26a86574355c1',1,'azure::storage::request_options']]],
+  ['md5',['md5',['../classazure_1_1storage_1_1checksum.html#a68f5be5e4a94e687dfab0a754dcbd437',1,'azure::storage::checksum']]],
   ['md5_5fhash_5fprovider_5fimpl',['md5_hash_provider_impl',['../classazure_1_1storage_1_1core_1_1md5__hash__provider__impl.html',1,'azure::storage::core']]],
   ['merge_5fentity',['merge_entity',['../classazure_1_1storage_1_1table__operation.html#af19a895559eed1c1f1a5b7ec6ae0d28b',1,'azure::storage::table_operation::merge_entity()'],['../classazure_1_1storage_1_1table__batch__operation.html#aa0cee067a28b65f55c4d14bdf7eec81d',1,'azure::storage::table_batch_operation::merge_entity()']]],
   ['message',['message',['../classazure_1_1storage_1_1storage__extended__error.html#aec3ad44a1c659502d019fa6ef301fcc5',1,'azure::storage::storage_extended_error']]],

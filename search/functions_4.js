@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['empty',['empty',['../classazure_1_1storage_1_1continuation__token.html#a6ebbeed40778bb3bcfe7473488ecc134',1,'azure::storage::continuation_token']]],
+  ['empty',['empty',['../classazure_1_1storage_1_1continuation__token.html#a6ebbeed40778bb3bcfe7473488ecc134',1,'azure::storage::continuation_token::empty()'],['../classazure_1_1storage_1_1checksum.html#ac669e4d5ced18e00f6106a7de5eabfed',1,'azure::storage::checksum::empty()']]],
   ['enabled',['enabled',['../classazure_1_1storage_1_1service__properties_1_1metrics__properties.html#a1e2ddb91b897e6d16ca8240aa1416636',1,'azure::storage::service_properties::metrics_properties']]],
   ['end_5foffset',['end_offset',['../classazure_1_1storage_1_1page__range.html#a4c98488655739d79832e440646914228',1,'azure::storage::page_range::end_offset()'],['../classazure_1_1storage_1_1file__range.html#a49a1a64808da4dab2a15d80c2d6ef654',1,'azure::storage::file_range::end_offset()']]],
   ['end_5ftime',['end_time',['../classazure_1_1storage_1_1operation__context.html#a2eae2b866b24d72170efdfe4ac21241e',1,'azure::storage::operation_context::end_time()'],['../classazure_1_1storage_1_1request__result.html#aaccd1152aa81e27734b994a7c2e0eef5',1,'azure::storage::request_result::end_time()']]],

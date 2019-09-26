@@ -1,6 +1,7 @@
 var searchData=
 [
   ['base_5furi',['base_uri',['../classazure_1_1storage_1_1cloud__client.html#a179d36b80f8d624971f02e426a95a8ea',1,'azure::storage::cloud_client']]],
+  ['bearer_5ftoken',['bearer_token',['../classazure_1_1storage_1_1storage__credentials.html#a0253c32ffa0a34839254a2214c6b6bdb',1,'azure::storage::storage_credentials']]],
   ['binary_5fvalue',['binary_value',['../classazure_1_1storage_1_1entity__property.html#a40ec6ac441512d9dac2b7017ab6dea8a',1,'azure::storage::entity_property']]],
   ['blob_5fcontainer_5fpermissions',['blob_container_permissions',['../classazure_1_1storage_1_1blob__container__permissions.html#a39831b17379f49f60e1e056f6e0a8772',1,'azure::storage::blob_container_permissions']]],
   ['blob_5fendpoint',['blob_endpoint',['../classazure_1_1storage_1_1cloud__storage__account.html#a6358881d39b9d6b17091fcd7461e9abc',1,'azure::storage::cloud_storage_account']]],

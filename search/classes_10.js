@@ -10,6 +10,7 @@ var searchData=
   ['shared_5faccess_5fpolicies_3c_20queue_5fshared_5faccess_5fpolicy_20_3e',['shared_access_policies&lt; queue_shared_access_policy &gt;',['../classazure_1_1storage_1_1shared__access__policies.html',1,'azure::storage']]],
   ['shared_5faccess_5fpolicies_3c_20table_5fshared_5faccess_5fpolicy_20_3e',['shared_access_policies&lt; table_shared_access_policy &gt;',['../classazure_1_1storage_1_1shared__access__policies.html',1,'azure::storage']]],
   ['shared_5faccess_5fpolicy',['shared_access_policy',['../classazure_1_1storage_1_1shared__access__policy.html',1,'azure::storage']]],
+  ['source_5ft',['source_t',['../structazure_1_1storage_1_1cloud__file__properties_1_1source__t.html',1,'azure::storage::cloud_file_properties']]],
   ['storage_5fcommand',['storage_command',['../classazure_1_1storage_1_1core_1_1storage__command.html',1,'azure::storage::core']]],
   ['storage_5fcommand_3c_20void_20_3e',['storage_command&lt; void &gt;',['../classazure_1_1storage_1_1core_1_1storage__command_3_01void_01_4.html',1,'azure::storage::core']]],
   ['storage_5fcommand_5fbase',['storage_command_base',['../classazure_1_1storage_1_1core_1_1storage__command__base.html',1,'azure::storage::core']]],

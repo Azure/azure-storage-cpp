@@ -32,8 +32,8 @@ namespace azure { namespace storage { namespace core {
         auto instance = std::make_shared<executor_impl>(command, options, context);
         return pplx::details::_do_while([instance]() -> pplx::task<bool>
         {
-            //Start the timer to track timeout.
-            if (instance->m_command->m_use_timeout)
+            // Start the timer to track timeout.
+            if (instance->m_command->m_use_timeout && !instance->m_command->m_timer_handler->timer_started())
             {
                 // Timer will be stopped when instance is out of scope, so no need to stop here.
                 instance->m_command->m_timer_handler->start_timer(instance->m_request_options.maximum_execution_time());

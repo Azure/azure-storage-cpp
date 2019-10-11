@@ -45,38 +45,43 @@ namespace azure { namespace storage { namespace core {
 
         WASTORAGE_API void stop_timer();
 
-        pplx::cancellation_token get_cancellation_token()
+        bool timer_started() const
         {
-            return m_worker_cancellation_token_source->get_token();
+            return m_timer_started.load(std::memory_order_acquire);
         }
 
-        bool is_canceled()
+        pplx::cancellation_token get_cancellation_token() const
         {
-            return m_worker_cancellation_token_source->get_token().is_canceled();
+            return m_worker_cancellation_token_source.get_token();
         }
 
-        bool is_canceled_by_timeout()
+        bool is_canceled() const
         {
-            return m_is_canceled_by_timeout;
+            return m_worker_cancellation_token_source.get_token().is_canceled();
+        }
+
+        bool is_canceled_by_timeout() const
+        {
+            return m_is_canceled_by_timeout.load(std::memory_order_acquire);
         }
 
     private:
-        std::shared_ptr<pplx::cancellation_token_source> m_worker_cancellation_token_source;
+        pplx::cancellation_token_source m_worker_cancellation_token_source;
         pplx::cancellation_token_registration m_cancellation_token_registration;
         pplx::cancellation_token m_cancellation_token;
         pplx::task<void> m_timeout_task;
-        bool m_is_canceled_by_timeout;
+        std::atomic<bool> m_is_canceled_by_timeout;
         pplx::task_completion_event<void> m_tce;
 
-        std::shared_ptr<std::mutex> m_mutex;
+        std::mutex m_mutex;
 
         WASTORAGE_API pplx::task<void> timeout_after(const std::chrono::milliseconds& time);
 
 #ifndef _WIN32
-        typedef std::chrono::steady_clock std_clock;
-        std::shared_ptr<boost::asio::basic_waitable_timer<std_clock>> m_timer;
+        std::shared_ptr<boost::asio::basic_waitable_timer<std::chrono::steady_clock>> m_timer;
 #else
         std::shared_ptr<concurrency::timer<int>> m_timer;
 #endif
+        std::atomic<bool> m_timer_started;
     };
 }}}

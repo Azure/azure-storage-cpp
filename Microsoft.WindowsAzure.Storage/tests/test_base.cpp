@@ -190,10 +190,30 @@ void test_base::fill_buffer(std::vector<uint8_t>& buffer)
 
 void test_base::fill_buffer(std::vector<uint8_t>& buffer, size_t offset, size_t count)
 {
-    std::generate_n(buffer.begin() + offset, count, []() -> uint8_t
+    using rand_int_type = uint64_t;
+    const size_t rand_int_size = sizeof(rand_int_type);
+
+    uint8_t* start_addr = buffer.data() + offset;
+    uint8_t* end_addr = start_addr + count;
+
+    auto random_char_generator = []() -> uint8_t
     {
         return uint8_t(get_random_int32());
-    });
+    };
+
+    while (uintptr_t(start_addr) % rand_int_size != 0 && start_addr < end_addr)
+    {
+        *(start_addr++) = random_char_generator();
+    }
+
+    std::uniform_int_distribution<rand_int_type> distribution(0LL, std::numeric_limits<rand_int_type>::max());
+    while (start_addr + rand_int_size <= end_addr)
+    {
+        *reinterpret_cast<rand_int_type*>(start_addr) = distribution(random_generator);
+        start_addr += rand_int_size;
+    }
+
+    std::generate(start_addr, end_addr, random_char_generator);
 }
 
 utility::uuid test_base::get_random_guid()

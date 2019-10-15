@@ -69,27 +69,29 @@ void container_test_base::check_lease_access(azure::storage::cloud_blob_containe
     if (locked)
     {
         CHECK_THROW(container.delete_container(empty_condition, azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
-    }
-    else
-    {
-        if (allow_delete)
-        {
-            container.delete_container(empty_condition, azure::storage::blob_request_options(), m_context);
-        }
-    }
 
-    if (locked && !fake)
-    {
-        container.download_attributes(lease_condition, azure::storage::blob_request_options(), m_context);
-        if (allow_delete)
+        if (fake)
         {
-            container.delete_container(lease_condition, azure::storage::blob_request_options(), m_context);
+            CHECK_THROW(container.delete_container(lease_condition, azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+            CHECK_THROW(container.download_attributes(lease_condition, azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        }
+        else
+        {
+            container.download_attributes(lease_condition, azure::storage::blob_request_options(), m_context);
+            if (allow_delete)
+            {
+                container.delete_container(lease_condition, azure::storage::blob_request_options(), m_context);
+            }
         }
     }
     else
     {
         CHECK_THROW(container.delete_container(lease_condition, azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
         CHECK_THROW(container.download_attributes(lease_condition, azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        if (allow_delete)
+        {
+            container.delete_container(empty_condition, azure::storage::blob_request_options(), m_context);
+        }
     }
 }
 

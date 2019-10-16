@@ -836,7 +836,7 @@ namespace azure { namespace storage {
         }
         else
         {
-            return download_single_range_to_stream_async(target, offset, length, condition, options, context, true, cancellation_token, timer_handler).then([timer_handler/*timer_handler MUST be captured*/]() {});;
+            return download_single_range_to_stream_async(target, offset, length, condition, options, context, true, timer_handler->get_cancellation_token(), timer_handler).then([timer_handler/*timer_handler MUST be captured*/]() {});;
         }
     }
 

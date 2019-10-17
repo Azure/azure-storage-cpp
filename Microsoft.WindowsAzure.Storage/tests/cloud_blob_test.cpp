@@ -817,6 +817,43 @@ SUITE(Blob)
     }
 
     /// <summary>
+    /// Test blob copy with metadata.
+    /// </summary>
+    TEST_FIXTURE(blob_test_base, blob_copy_metadata)
+    {
+        auto src_blob = m_container.get_block_blob_reference(_XPLATSTR("src_blob"));
+        azure::storage::cloud_metadata metadata1;
+        metadata1[_XPLATSTR("m_key1")] = _XPLATSTR("m_val1");
+        metadata1[_XPLATSTR("m_key2")] = _XPLATSTR("m_val1");
+        metadata1[_XPLATSTR("m_key3")] = _XPLATSTR("m_val2");
+        metadata1[_XPLATSTR("m_key4")] = _XPLATSTR("m_val3");
+        azure::storage::cloud_metadata metadata2;
+        metadata2[_XPLATSTR("mm_key1")] = _XPLATSTR("mm_val1");
+        metadata2[_XPLATSTR("mm_key2")] = _XPLATSTR("mm_val2");
+        src_blob.metadata() = metadata1;
+        src_blob.upload_text(_XPLATSTR("Hello world!"));
+        auto dest_blob = m_container.get_block_blob_reference(_XPLATSTR("dest_blob"));
+
+        // dest doesn't exist
+        dest_blob.start_copy(src_blob);
+        CHECK(wait_for_copy(dest_blob));
+        dest_blob.download_attributes();
+        CHECK(metadata1 == dest_blob.metadata());
+
+        // dest exists with metadata, now we want to override metadata.
+        dest_blob.start_copy(src_blob, metadata2, azure::storage::access_condition(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK(wait_for_copy(dest_blob));
+        dest_blob.download_attributes();
+        CHECK(metadata2 == dest_blob.metadata());
+
+        // dest exists with metadata, keep src's metadata.
+        dest_blob.start_copy(src_blob, azure::storage::cloud_metadata(), azure::storage::access_condition(), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        CHECK(wait_for_copy(dest_blob));
+        dest_blob.download_attributes();
+        CHECK(metadata1 == dest_blob.metadata());
+    }
+
+    /// <summary>
     /// Test parallel download
     /// </summary>
     TEST_FIXTURE(blob_test_base, parallel_download)

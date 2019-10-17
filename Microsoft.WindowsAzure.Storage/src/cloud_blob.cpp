@@ -884,7 +884,7 @@ namespace azure { namespace storage {
         return core::executor<bool>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         assert_no_snapshot();
         blob_request_options modified_options(options);
@@ -894,7 +894,7 @@ namespace azure { namespace storage {
         auto copy_state = m_copy_state;
 
         auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::copy_blob, source, get_premium_access_tier_string(tier), source_condition, metadata(), destination_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::copy_blob, source, get_premium_access_tier_string(tier), source_condition, metadata, destination_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, copy_state, tier](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
         {
@@ -908,12 +908,12 @@ namespace azure { namespace storage {
         return core::executor<utility::string_t>::execute_async(command, modified_options, context);
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_blob& source, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         web::http::uri raw_source_uri = source.snapshot_qualified_uri().primary_uri();
         web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
 
-        return start_copy_async(source_uri, source_condition, destination_condition, options, context, cancellation_token);
+        return start_copy_async(source_uri, metadata, source_condition, destination_condition, options, context, cancellation_token);
     }
 
     pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source)
@@ -921,13 +921,13 @@ namespace azure { namespace storage {
         return start_copy_async(source, file_access_condition(), access_condition(), blob_request_options(), operation_context());
     }
 
-    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+    pplx::task<utility::string_t> cloud_blob::start_copy_async(const cloud_file& source, const cloud_metadata& metadata, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         UNREFERENCED_PARAMETER(source_condition);
         web::http::uri raw_source_uri = source.uri().primary_uri();
         web::http::uri source_uri = source.service_client().credentials().transform_uri(raw_source_uri);
 
-        return start_copy_async(source_uri, access_condition(), destination_condition, options, context, cancellation_token);
+        return start_copy_async(source_uri, metadata, access_condition(), destination_condition, options, context, cancellation_token);
     }
 
     pplx::task<void> cloud_blob::abort_copy_async(const utility::string_t& copy_id, const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const

@@ -5664,6 +5664,25 @@ namespace azure { namespace storage {
         /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the copy operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_copy(const web::http::uri& source, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async(source, metadata, source_condition, destination_condition, options, context, pplx::cancellation_token::none()).get();
+        }
+
+        /// <summary>
+        /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
         /// <returns>The copy ID associated with the copy operation.</returns>
         /// <remarks>
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
@@ -5690,6 +5709,25 @@ namespace azure { namespace storage {
         utility::string_t start_copy(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
         {
             return start_copy_async(source, source_condition, destination_condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the copy operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_copy(const cloud_blob& source, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async(source, metadata, source_condition, destination_condition, options, context, pplx::cancellation_token::none()).get();
         }
 
         /// <summary>
@@ -5722,6 +5760,25 @@ namespace azure { namespace storage {
         utility::string_t start_copy(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
         {
             return start_copy_async(source, source_condition, destination_condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Begins an operation to copy a file's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source file.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the copy operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_copy(const cloud_file& source, const cloud_metadata& metadata, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async(source, metadata, source_condition, destination_condition, options, context, pplx::cancellation_token::none()).get();
         }
 
         /// <summary>
@@ -5797,7 +5854,27 @@ namespace azure { namespace storage {
         /// </remarks>
         pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
         {
-            return start_copy_async_impl(source, premium_blob_tier::unknown, source_condition, destination_condition, options, context, cancellation_token);
+            return start_copy_async(source, cloud_metadata(), source_condition, destination_condition, options, context, cancellation_token);
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return start_copy_async_impl(source, premium_blob_tier::unknown, metadata, source_condition, destination_condition, options, context, cancellation_token);
         }
 
         /// <summary>
@@ -5832,7 +5909,28 @@ namespace azure { namespace storage {
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
+        pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return start_copy_async(source, cloud_metadata(), source_condition, destination_condition, options, context, cancellation_token);
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_blob& source, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
+
 
         /// <summary>
         /// Initiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
@@ -5866,7 +5964,27 @@ namespace azure { namespace storage {
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
+        pplx::task<utility::string_t> start_copy_async(const cloud_file& source, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return start_copy_async(source, cloud_metadata(), source_condition, destination_condition, options, context, cancellation_token);
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a file's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source file.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async(const cloud_file& source, const cloud_metadata& metadata, const file_access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         /// <summary>
         /// Aborts an ongoing blob copy operation.
@@ -6122,6 +6240,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
         /// <param name="tier">An enum that represents the <see cref="azure::storage::premium_blob_tier" /> for the destination blob.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
         /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
         /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
         /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
@@ -6132,7 +6251,7 @@ namespace azure { namespace storage {
         /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
         /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
         /// </remarks>
-        WASTORAGE_API pplx::task<utility::string_t> start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
+        WASTORAGE_API pplx::task<utility::string_t> start_copy_async_impl(const web::http::uri& source, const premium_blob_tier tier, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token);
 
         void assert_no_snapshot() const;
 
@@ -7955,6 +8074,26 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Begins an operation to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="tier">An enum that represents the <see cref="azure::storage::premium_blob_tier" /> for the destination blob.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The copy ID associated with the copy operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        utility::string_t start_copy(const web::http::uri& source, const azure::storage::premium_blob_tier tier, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context)
+        {
+            return start_copy_async(source, tier, metadata, source_condition, destination_condition, options, context, pplx::cancellation_token::none()).get();
+        }
+
+        /// <summary>
         /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
         /// </summary>
         /// <param name="source">The URI of a source blob.</param>
@@ -7990,7 +8129,28 @@ namespace azure { namespace storage {
         /// </remarks>
         pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const premium_blob_tier tier, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
         {
-            return start_copy_async_impl(source, tier, source_condition, destination_condition, options, context, cancellation_token);
+            return start_copy_async(source, tier, cloud_metadata(), source_condition, destination_condition, options, context, cancellation_token);
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to begin to copy a blob's contents, properties, and metadata to a new blob.
+        /// </summary>
+        /// <param name="source">The URI of a source blob.</param>
+        /// <param name="tier">An enum that represents the <see cref="azure::storage::premium_blob_tier" /> for the destination blob.</param>
+        /// <param name="metadata">Metadata that will be set on the destination blob.</param>
+        /// <param name="source_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the source blob.</param>
+        /// <param name="destination_condition">An object that represents the <see cref="azure::storage::access_condition" /> for the destination blob.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        /// <remarks>
+        /// This method fetches the blob's ETag, last-modified time, and part of the copy state.
+        /// The copy ID and copy status fields are fetched, and the rest of the copy state is cleared.
+        /// </remarks>
+        pplx::task<utility::string_t> start_copy_async(const web::http::uri& source, const premium_blob_tier tier, const cloud_metadata& metadata, const access_condition& source_condition, const access_condition& destination_condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
+        {
+            return start_copy_async_impl(source, tier, metadata, source_condition, destination_condition, options, context, cancellation_token);
         }
     private:
 

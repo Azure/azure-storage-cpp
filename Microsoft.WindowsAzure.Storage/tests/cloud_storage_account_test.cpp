@@ -929,7 +929,7 @@ SUITE(Core)
         std::vector<std::future<void>> results;
         for (int i = 1; i < 0x100; ++i)
         {
-            results.emplace_back(std::async(check_account_permission, i));
+            results.emplace_back(std::async(std::launch::async, check_account_permission, i));
         }
         for (const auto& r : results)
         {

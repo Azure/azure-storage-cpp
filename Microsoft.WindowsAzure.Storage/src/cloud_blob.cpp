@@ -597,11 +597,11 @@ namespace azure { namespace storage {
 
                 if (modified_options.use_transactional_md5() && !modified_options.disable_content_md5_validation() && download_info->m_response_md5.empty())
                 {
-                    throw storage_exception(protocol::error_missing_md5);
+                    throw storage_exception(protocol::error_missing_md5, false);
                 }
                 if (!modified_options.use_transactional_md5() && modified_options.use_transactional_crc64() && !modified_options.disable_content_crc64_validation() && download_info->m_response_crc64.empty())
                 {
-                    throw storage_exception(protocol::error_missing_crc64);
+                    throw storage_exception(protocol::error_missing_crc64, false);
                 }
 
                 // Lock to the current storage location when resuming a failed download. This is locked 

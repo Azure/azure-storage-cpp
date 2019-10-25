@@ -544,7 +544,7 @@ namespace azure { namespace storage {
                     // Consider the file has no MD5 hash in default.
                     && offset < std::numeric_limits<utility::size64_t>::max())
                 {
-                    throw storage_exception(protocol::error_missing_md5);
+                    throw storage_exception(protocol::error_missing_md5, false);
                 }
 
                 // Lock to the current storage location when resuming a failed download. This is locked 

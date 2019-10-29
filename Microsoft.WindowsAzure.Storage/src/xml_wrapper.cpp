@@ -50,7 +50,7 @@ xml_text_reader_wrapper::~xml_text_reader_wrapper()
 
 bool xml_text_reader_wrapper::read()
 {
-    return xmlTextReaderRead(m_reader) != 0;
+    return xmlTextReaderRead(m_reader) == 1;
 }
 
 unsigned xml_text_reader_wrapper::get_node_type()
@@ -60,7 +60,7 @@ unsigned xml_text_reader_wrapper::get_node_type()
 
 bool xml_text_reader_wrapper::is_empty_element()
 {
-    return xmlTextReaderIsEmptyElement(m_reader) != 0;
+    return xmlTextReaderIsEmptyElement(m_reader) == 1;
 }
 
 std::string xml_text_reader_wrapper::get_local_name()
@@ -92,12 +92,12 @@ std::string xml_text_reader_wrapper::get_value()
 
 bool xml_text_reader_wrapper::move_to_first_attribute()
 {
-    return xmlTextReaderMoveToFirstAttribute(m_reader) != 0;
+    return xmlTextReaderMoveToFirstAttribute(m_reader) == 1;
 }
 
 bool xml_text_reader_wrapper::move_to_next_attribute()
 {
-    return xmlTextReaderMoveToNextAttribute(m_reader) != 0;
+    return xmlTextReaderMoveToNextAttribute(m_reader) == 1;
 }
 
 xml_element_wrapper::~xml_element_wrapper()

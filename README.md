@@ -1,8 +1,8 @@
 # Azure Storage Client Library for C++ (7.0.0)
 
-The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
+The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [ Introduction to Microsoft Azure Storage ]( http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/ ).
 
-There is an alternative client library that requires minimum dependency, which provides basic object storage that Blob service offers. Please see [azure-storage-cpplite](https://github.com/Azure/azure-storage-cpplite) for more information.
+There is an alternative client library that requires minimum dependency, which provides basic object storage that Blob service offers. Please see [azure-storage-cpplite]( https://github.com/Azure/azure-storage-cpplite ) for more information.
 
 # Features
 
@@ -81,7 +81,7 @@ C:\src\vcpkg> .\vcpkg install unittest-cpp
 
 ### Via NuGet
 
-To install the binaries for the Azure Storage Client Library for C++, you can export a NuGet package with Vcpkg and put it into your local NuGet feed. For more information about how to export a NuGet package, please see [Binary Export](https://github.com/Microsoft/vcpkg/blob/master/docs/specifications/export-command.md).
+To install the binaries for the Azure Storage Client Library for C++, you can export a NuGet package with Vcpkg and put it into your local NuGet feed. For more information about how to export a NuGet package, please see [Binary Export]( https://github.com/Microsoft/vcpkg/blob/master/docs/specifications/export-command.md ).
 
 Normally, exporting NuGet package is done with the following command:
 ```BatchFile
@@ -90,7 +90,7 @@ C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azur
 
 ### Via Vcpkg
 
-To install the Azure Storage Client Library for C++ through Vcpkg, you need Vcpkg installed first. Please follow the instructions(https://github.com/Microsoft/vcpkg#quick-start) to install Vcpkg.
+To install the Azure Storage Client Library for C++ through Vcpkg, you need Vcpkg installed first. Please follow the instructions( https://github.com/Microsoft/vcpkg#quick-start ) to install Vcpkg.
 
 install package with:
 ```BatchFile
@@ -98,7 +98,7 @@ C:\src\vcpkg> .\vcpkg install azure-storage-cpp
 ```
 
 #### Visual Studio Version
-Starting from version 6.1.0, Azure Storage Client Library for C++ supports Visual Studio 2015 and Visual Studio 2017. In case you have the need to use Visual Studio 2013, please get [version 6.0.0](https://github.com/Azure/azure-storage-cpp/releases/tag/v6.0.0), to use Visual Studio 2012, please get [version 2.0.0](http://www.nuget.org/packages/wastorage/2.0.0).
+Starting from version 6.1.0, Azure Storage Client Library for C++ supports Visual Studio 2015 and Visual Studio 2017. In case you have the need to use Visual Studio 2013, please get [version 6.0.0]( https://github.com/Azure/azure-storage-cpp/releases/tag/v6.0.0 ), to use Visual Studio 2012, please get [version 2.0.0]( http://www.nuget.org/packages/wastorage/2.0.0 ).
 
 ## Dependencies
 

@@ -1,3 +1,0 @@
-[submodule "Microsoft.WindowsAzure.Storage/tests/UnitTest++"]
-	path = Microsoft.WindowsAzure.Storage/tests/UnitTest++
-	url = https://github.com/unittest-cpp/unittest-cpp

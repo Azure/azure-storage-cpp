@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="BlobsGettingStarted.cpp" />
+    <ClCompile Include="FilesGettingStarted.cpp" />
+    <ClCompile Include="OAuthGettingStarted.cpp" />
+    <ClCompile Include="QueuesGettingStarted.cpp" />
+    <ClCompile Include="TablesGettingStarted.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="JsonPayloadFormat.cpp" />
+    <ClCompile Include="NativeClientLibraryDemo1.cpp" />
+    <ClCompile Include="NativeClientLibraryDemo2.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="samples_common.h" />
+  </ItemGroup>
+</Project>

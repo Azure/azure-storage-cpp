@@ -272,13 +272,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="includes\wascore\constants.dat" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-    </PropertyGroup>
-  </Target>
 </Project>

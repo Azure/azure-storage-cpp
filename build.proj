@@ -17,10 +17,6 @@
         <Properties>Configuration=Release;Platform=x64</Properties>
     </Solution>
   </ItemGroup>
-
-  <Target Name="RestorePackages">
-    <Exec Command="&quot;tools\NuGet.exe&quot; restore &quot;%(Solution.Identity)&quot;" />
-  </Target>
   
   <Target Name="Clean">
     <!-- Clean the solutions -->
@@ -31,7 +27,7 @@
       BuildInParallel="true" />
   </Target>
 
-  <Target Name="Build" DependsOnTargets="RestorePackages;Clean">
+  <Target Name="Build" DependsOnTargets="Clean">
     <Message Importance="high" Text="Building all versions of the projects..." />
     <MSBuild
       Projects="@(Solution)"

@@ -300,7 +300,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="includes\wascore\constants.dat">
       <Filter>Header Files</Filter>
     </None>

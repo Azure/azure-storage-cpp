@@ -171,6 +171,7 @@ if(BUILD_TESTS)
 endif()
 
 if(BUILD_SAMPLES)
+  set(AZUREAZURAGE_LIBRARY_SAMPLE azurestoragesample)
   add_subdirectory(samples)
 endif()
 

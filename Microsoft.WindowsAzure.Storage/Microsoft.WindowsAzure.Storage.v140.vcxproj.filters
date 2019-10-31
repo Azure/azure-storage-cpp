@@ -108,6 +108,12 @@
     <ClInclude Include="includes\wascore\filestream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\wascore\timer_handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\wascore\xml_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="includes\was\crc64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -275,6 +281,15 @@
     <ClCompile Include="src\streams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\executor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\timer_handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xml_wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\crc64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -285,7 +300,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="includes\wascore\constants.dat">
       <Filter>Header Files</Filter>
     </None>

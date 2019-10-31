@@ -10,6 +10,7 @@ if(UNIX)
     QueuesGettingStarted.cpp
     samples_common.h
     TablesGettingStarted.cpp
+    FilesProperties.cpp
   )
 endif()
 

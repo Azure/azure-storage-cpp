@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClCompile Include="BlobsGettingStarted.cpp" />
     <ClCompile Include="FilesGettingStarted.cpp" />
+    <ClCompile Include="FilesProperties.cpp" />
     <ClCompile Include="JsonPayloadFormat.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NativeClientLibraryDemo1.cpp" />

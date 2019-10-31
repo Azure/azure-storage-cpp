@@ -10,6 +10,7 @@
     <ClCompile Include="JsonPayloadFormat.cpp" />
     <ClCompile Include="NativeClientLibraryDemo1.cpp" />
     <ClCompile Include="NativeClientLibraryDemo2.cpp" />
+    <ClCompile Include="FilesProperties.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="samples_common.h" />

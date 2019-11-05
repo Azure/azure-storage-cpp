@@ -279,7 +279,7 @@ namespace azure { namespace storage { namespace protocol {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_share, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         web::http::http_headers& headers = request.headers();
-        if (max_size <= maximum_share_quota)
+        if (max_size != std::numeric_limits<unsigned long long>::max())
         {
             headers.add(protocol::ms_header_share_quota, max_size);
         }
@@ -305,10 +305,7 @@ namespace azure { namespace storage { namespace protocol {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_share, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
-        if (properties.quota() <= protocol::maximum_share_quota)
-        {
-            request.headers().add(protocol::ms_header_share_quota, properties.quota());
-        }
+        request.headers().add(protocol::ms_header_share_quota, properties.quota());
         return request;
     }
 

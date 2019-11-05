@@ -84,7 +84,7 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file_share::create_async(const file_request_options& options, operation_context context)
     {
-        return create_async(protocol::maximum_share_quota, options, context);
+        return create_async(std::numeric_limits<unsigned long long>::max(), options, context);
     }
 
     pplx::task<void> cloud_file_share::create_async(utility::size64_t max_size, const file_request_options& options, operation_context context)
@@ -107,7 +107,7 @@ namespace azure { namespace storage {
 
     pplx::task<bool> cloud_file_share::create_if_not_exists_async(const file_request_options& options, operation_context context)
     {
-        return create_if_not_exists_async(protocol::maximum_share_quota, options, context);
+        return create_if_not_exists_async(std::numeric_limits<unsigned long long>::max(), options, context);
     }
 
     pplx::task<bool> cloud_file_share::create_if_not_exists_async(utility::size64_t max_size, const file_request_options& options, operation_context context)

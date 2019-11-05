@@ -702,7 +702,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
 
         explicit get_share_stats_reader(concurrency::streams::istream stream)
-            : xml_reader(stream), m_quota(maximum_share_quota)
+            : xml_reader(stream), m_quota(std::numeric_limits<unsigned long long>::max())
         {
         }
 

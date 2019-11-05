@@ -58,9 +58,6 @@ namespace azure { namespace storage { namespace protocol {
     const std::chrono::seconds minimum_fixed_lease_duration(15);
     const std::chrono::seconds maximum_fixed_lease_duration(60);
 
-    // could file share limitation
-    const int maximum_share_quota(5120);
-
 #define _CONSTANTS
 #define DAT(a, b) WASTORAGE_API extern const utility::char_t a[]; const size_t a ## _size = sizeof(b) / sizeof(utility::char_t) - 1;
 #include "constants.dat"

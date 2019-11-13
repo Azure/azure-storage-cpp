@@ -1251,7 +1251,6 @@ namespace azure { namespace storage {
 
         /// <summary>
         /// Gets the results of the last request.
-        /// Example: WinHttp exceptions for timeout (12002)
         /// </summary>
         /// <returns>An <see cref="azure::storage::request_result" /> object that represents the results of the last request.</returns>
         const request_result& last_request_result() const

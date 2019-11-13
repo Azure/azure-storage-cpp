@@ -1203,9 +1203,9 @@ namespace azure { namespace storage {
         /// <param name="last_request_result">The last request result.</param>
         /// <param name="next_location">The next location to retry.</param>
         /// <param name="current_location_mode">The current location mode.</param>
-        /// <param name="ex_ptr">Exception Ptr of any exception other than storage_exception</param>
-        retry_context(int current_retry_count, request_result last_request_result, storage_location next_location, location_mode current_location_mode, const std::exception_ptr& ex_ptr = nullptr)
-            : m_current_retry_count(current_retry_count), m_last_request_result(std::move(last_request_result)), m_next_location(next_location), m_current_location_mode(current_location_mode), m_unhandled_exception(ex_ptr)
+        /// <param name="nonstorage_exception">Exception Ptr of any exception other than storage_exception</param>
+        retry_context(int current_retry_count, request_result last_request_result, storage_location next_location, location_mode current_location_mode, const std::exception_ptr& nonstorage_exception = nullptr)
+            : m_current_retry_count(current_retry_count), m_last_request_result(std::move(last_request_result)), m_next_location(next_location), m_current_location_mode(current_location_mode), m_nonstorage_exception(nonstorage_exception)
         {
         }
 
@@ -1250,10 +1250,10 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the exception_ptr of any unhandled exception during the request.
+        /// Gets the results of the last request.
         /// Example: WinHttp exceptions for timeout (12002)
         /// </summary>
-        /// <returns>An <see cref="std::exception_ptr" /> object that represents the results of the last request.</returns>
+        /// <returns>An <see cref="azure::storage::request_result" /> object that represents the results of the last request.</returns>
         const request_result& last_request_result() const
         {
             return m_last_request_result;
@@ -1278,11 +1278,12 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Gets the location mode for subsequent retries.
+        /// Gets the exception_ptr of any unhandled nonstorage exception during the request.
+        /// Example: WinHttp exceptions for timeout (12002)
         /// </summary>
-        /// <returns>The <see cref="azure::storage::location_mode" /> for subsequent retries.</returns>
-        const std::exception_ptr& unhandled_exception() const {
-            return m_unhandled_exception;
+        /// <returns>An <see cref="std::exception_ptr" /> object that represents the nonstorage exception thrown while sending request</returns>
+        const std::exception_ptr& nonstorage_exception() const {
+            return m_nonstorage_exception;
         }
 
     private:
@@ -1291,7 +1292,7 @@ namespace azure { namespace storage {
         request_result m_last_request_result;
         storage_location m_next_location;
         location_mode m_current_location_mode;
-        std::exception_ptr m_unhandled_exception;
+        std::exception_ptr m_nonstorage_exception;
     };
 
     /// <summary>

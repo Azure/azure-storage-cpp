@@ -285,7 +285,8 @@ namespace azure { namespace storage { namespace core {
             {
                 bool retryable_exception = true;
                 instance->m_context._get_impl()->add_request_result(instance->m_request_result);
-                std::exception_ptr ex_ptr = nullptr;
+                // Currently this holds exception pointer to non storage exceptions (exceptions thrown from cpp_rest)
+                std::exception_ptr nonstorage_ex_ptr = nullptr;
 
                 try
                 {
@@ -299,7 +300,7 @@ namespace azure { namespace storage { namespace core {
                         throw;
                     }
                     catch (...) {
-                        ex_ptr = std::current_exception();
+                        nonstorage_ex_ptr = std::current_exception();
                         throw;
                     }
                 }
@@ -341,7 +342,7 @@ namespace azure { namespace storage { namespace core {
                     }
 
                     // An exception occurred and thus the request might be retried. Ask the retry policy.
-                    retry_context context(instance->m_retry_count++, instance->m_request_result, instance->get_next_location(), instance->m_current_location_mode, ex_ptr);
+                    retry_context context(instance->m_retry_count++, instance->m_request_result, instance->get_next_location(), instance->m_current_location_mode, nonstorage_ex_ptr);
                     retry_info retry(instance->m_retry_policy.evaluate(context, instance->m_context));
                     if (!retry.should_retry())
                     {

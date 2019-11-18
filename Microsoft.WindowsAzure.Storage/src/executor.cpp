@@ -150,6 +150,8 @@ namespace azure { namespace storage { namespace core {
             }
 #endif
 
+            config.set_validate_certificates(instance->m_request_options.validate_certificates());
+
             // 5-6. Potentially upload data and get response
             instance->assert_canceled();
 #ifdef _WIN32

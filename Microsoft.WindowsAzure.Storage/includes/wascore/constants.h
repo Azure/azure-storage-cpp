@@ -35,6 +35,7 @@ namespace azure { namespace storage { namespace protocol {
     const size_t default_stream_write_size = 4 * 1024 * 1024;
     const size_t default_stream_read_size = 4 * 1024 * 1024;
     const size_t default_buffer_size = 64 * 1024;
+    const bool default_validate_certificates = true;
     const utility::size64_t default_single_blob_upload_threshold = 128 * 1024 * 1024;
     const utility::size64_t default_single_blob_download_threshold = 32 * 1024 * 1024;
     const utility::size64_t default_single_block_download_threshold = 4 * 1024 * 1024;

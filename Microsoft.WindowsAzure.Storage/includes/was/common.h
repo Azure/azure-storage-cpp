@@ -2702,6 +2702,28 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets the server certificate validation property.
+        /// </summary>
+        /// <returns>True if certificates are to be verified, false otherwise</returns>
+        bool validate_certificates() const
+        {
+            return m_validate_certificates;
+        }
+
+        /// <summary>
+        /// Sets the server certificate validation property.
+        /// </summary>
+        /// <param name="validate_certificates">False to disable all server certificate validation, true otherwise.</param>
+        /// <remarks>
+        /// Disabling certificate validation is not recommended and will make the user exposed to unsecure environment.
+        /// Please use with caution and at your own risk.
+        /// </remarks>
+        void set_validate_certificates(bool validate_certificates)
+        {
+            m_validate_certificates = validate_certificates;
+        }
+
+        /// <summary>
         /// Gets the expiry time across all potential retries for the request.
         /// </summary>
         /// <returns>The expiry time.</returns>
@@ -2735,6 +2757,7 @@ namespace azure { namespace storage {
             m_maximum_execution_time.merge(other.m_maximum_execution_time);
             m_location_mode.merge(other.m_location_mode);
             m_http_buffer_size.merge(other.m_http_buffer_size);
+            m_validate_certificates.merge(other.m_validate_certificates);
 
             if (apply_expiry)
             {
@@ -2759,6 +2782,7 @@ namespace azure { namespace storage {
         option_with_default<std::chrono::milliseconds> m_maximum_execution_time;
         option_with_default<azure::storage::location_mode> m_location_mode;
         option_with_default<size_t> m_http_buffer_size;
+        option_with_default<bool> m_validate_certificates;
     };
 
     /// <summary>

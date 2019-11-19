@@ -22,7 +22,7 @@ There is an alternative client library that requires minimum dependency, which p
 
 # Getting started
 
-For the best development experience, we recommend that developers use the [Vcpkg](https://github.com/Microsoft/vcpkg) as the cross-platform library manager.
+For the best development experience, we recommend that developers use the [vcpkg](https://github.com/Microsoft/vcpkg) as the cross-platform library manager.
 
 ## Requirements
 
@@ -44,22 +44,20 @@ For general suggestions about Azure, use our [Azure feedback forum](http://feedb
 
 ## Download & Install
 
-### Via Git
+### Build from Source
 
-To create a local clone of the source for the Azure Storage Client Library for C++ via `git`, type:
+To build with source code, there are three ways to install dependencies:
 
-```bash
-git clone https://github.com/Azure/azure-storage-cpp.git
-cd azure-storage-cpp
-```
+- Via vcpkg
 
-To build with source code, there are three ways:
-
-- Via Vcpkg
-
-    You can manage the dependencies with Vcpkg, and use Visual Studio 2015 update 3 or Visual Studio 2017 for development environment. Simply install Casablanca via Vcpkg will setup everything needed.
+    You can manage the dependencies with vcpkg, and use Visual Studio 2015 update 3 or Visual Studio 2017 for development environment. Simply installing Casablanca via vcpkg will setup everything needed.
     ```BatchFile
     C:\src\vcpkg> .\vcpkg install cpprestsdk
+    ```
+
+    If you want to build and run test code, you can install UnitTest++ via vcpkg:
+    ```BatchFile
+    C:\src\vcpkg> .\vcpkg install unittest-cpp
     ```
 
 - Via NuGet
@@ -72,39 +70,44 @@ To build with source code, there are three ways:
 
 - Manage dependencies by yourself
 
-    It is not recommended to manage dependencies by yourself. However, you can still build Casablanca by yourself and specify the include directories and link binaries.
+    It is not recommended to manage dependencies by yourself. However, you can still build Casablanca by yourself by following [these instructions](https://github.com/microsoft/cpprestsdk/wiki) and specify the include directories and link binaries.
 
-If you want to build and run test code, you can install UnitTest++ via vcpkg:
-```BatchFile
-C:\src\vcpkg> .\vcpkg install unittest-cpp
+To create a local clone of the source for the Azure Storage Client Library for C++ via git, type:
+
+```bash
+git clone https://github.com/Azure/azure-storage-cpp.git
+cd azure-storage-cpp
 ```
+
+Follow [Getting Started on Linux](#getting-started-on-linux) or [Getting Started on macOS](#getting-started-on-macos) to build on these two platforms.
+
+To build on Windows, directly open the solution file with Visual Studio in project root directory.
+
+#### Visual Studio Version
+Starting from version 6.1.0, Azure Storage Client Library for C++ supports Visual Studio 2015 and Visual Studio 2017. In case you have the need to use Visual Studio 2013, please get [version 6.0.0](https://github.com/Azure/azure-storage-cpp/releases/tag/v6.0.0), to use Visual Studio 2012, please get [version 2.0.0](http://www.nuget.org/packages/wastorage/2.0.0).
 
 ### Via NuGet
 
-To install the binaries for the Azure Storage Client Library for C++, you can export a NuGet package with Vcpkg and put it into your local NuGet feed. For more information about how to export a NuGet package, please see [Binary Export](https://github.com/Microsoft/vcpkg/blob/master/docs/specifications/export-command.md).
+To install the binaries for the Azure Storage Client Library for C++, you can export a NuGet package with vcpkg and put it into your local NuGet feed. For more information about how to export a NuGet package, please see [Binary Export](https://github.com/Microsoft/vcpkg/blob/master/docs/specifications/export-command.md).
 
 Normally, exporting NuGet package is done with the following command:
 ```BatchFile
 C:\src\vcpkg> .\vcpkg export --nuget azure-storage-cpp --nuget-id=Microsoft.Azure.Storage.CPP --nuget-version=7.0.0
 ```
 
-### Via Vcpkg
+### Via vcpkg
 
-To install the Azure Storage Client Library for C++ through Vcpkg, you need Vcpkg installed first. Please follow the instructions(https://github.com/Microsoft/vcpkg#quick-start) to install Vcpkg.
+To install the Azure Storage Client Library for C++ through vcpkg, you need vcpkg installed first. Please follow the instructions(https://github.com/Microsoft/vcpkg#quick-start) to install vcpkg.
 
-install package with:
+Install package with:
 ```BatchFile
 C:\src\vcpkg> .\vcpkg install azure-storage-cpp
 ```
-
-#### Visual Studio Version
-Starting from version 6.1.0, Azure Storage Client Library for C++ supports Visual Studio 2015 and Visual Studio 2017. In case you have the need to use Visual Studio 2013, please get [version 6.0.0](https://github.com/Azure/azure-storage-cpp/releases/tag/v6.0.0), to use Visual Studio 2012, please get [version 2.0.0](http://www.nuget.org/packages/wastorage/2.0.0).
-
 ## Dependencies
 
 ### C++ REST SDK
 
-The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") It can be installed through Vcpkg (vcpkg install cpprestsdk) or downloaded directly from [GitHub](https://github.com/Microsoft/cpprestsdk/releases/).
+The Azure Storage Client Library for C++ depends on the C++ REST SDK (codename "Casablanca") It can be installed through vcpkg (`vcpkg install cpprestsdk`) or downloaded directly from [GitHub](https://github.com/Microsoft/cpprestsdk/releases/).
 
 The validated Casablanca version for each major or recent release on different platforms can be found in the following chart:
 
@@ -168,6 +171,7 @@ To build and run unit tests:
 ```bash
 sudo apt-get install libunittest++-dev
 ```
+
 - Build the test code:
 ```bash
 CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
@@ -182,17 +186,14 @@ vi test_configurations.json # modify test config file to include your storage ac
 
 To build sample code:
 ```bash
+vi ../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
 CASABLANCA_DIR=<path to Casablanca> CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
 To run the samples:
 ```bash
 cd Binaries
-vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
-./samplesblobs            # run the blobs sample
-./samplesjson             # run the tables sample with JSON payload
-./samplestables           # run the tables sample
-./samplesqueues           # run the queues sample
+./azurestoragesample
 ```
 
 Please note the current build script is only tested on Ubuntu 16.04. Please update the script accordingly for other distributions.
@@ -204,6 +205,7 @@ Please note that starting from 2.10.0, Casablanca requires a minimum version of 
 *Please note the following build script is only tested on SLES12 SP3. The script may need to be updated accordingly for other distributions.*
 
 Before building the Azure Storage Client Library on C++, some prerequisites need to be installed first:
+
 - Install prerequisites:
 ```bash
 sudo zypper install git gcc-c++ boost-devel cmake libopenssl-devel libxml2-devel libuuid-devel
@@ -280,17 +282,14 @@ vi test_configurations.json # modify test config file to include your storage ac
 
 To build sample code:
 ```bash
+vi ../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
 CXX=g++-5.1 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
 To run the samples:
 ```bash
 cd Binaries
-vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
-./samplesblobs            # run the blobs sample
-./samplesjson             # run the tables sample with JSON payload
-./samplestables           # run the tables sample
-./samplesqueues           # run the queues sample
+./azurestoragesample
 ```
 
 ### Getting Started on CentOS 6/7
@@ -390,6 +389,7 @@ vi test_configurations.json # modify test config file to include your storage ac
 
 - To build sample code:
 ```bash
+vi ../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
 cmake3 .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SAMPLES=ON
 make
 ```
@@ -397,16 +397,12 @@ make
 - To run the samples:
 ```bash
 cd Binaries
-vi ../../samples/SamplesCommon/samples_common.h # modify connection string to include your storage account credentials
-./samplesblobs            # run the blobs sample
-./samplesjson             # run the tables sample with JSON payload
-./samplestables           # run the tables sample
-./samplesqueues           # run the queues sample
+./azurestoragesample
 ```
 
-## Getting Started on OSX
+## Getting Started on macOS
 
-*Note that OSX is not officially supported yet, but it has been seen to work, YMMV. This build has been tested to work when the dependencies are installed via homebrew, YMMV if using FINK or MacPorts*
+*Note that macOS is not officially supported yet, but it has been seen to work, YMMV. This build has been tested to work when the dependencies are installed via homebrew, YMMV if using FINK or MacPorts*
 
 Install dependecies with homebrew:
 
@@ -432,7 +428,7 @@ The project is cloned to a folder called `azure-storage-cpp`. Always use the mas
 
 **Some notes about building**:
 - If you're using homebrew, there seems to be an issue with the pkg-config files, which means that, by default, a -L flag to tell the linker where libintl lives is left out. We've accounted for this in our CMAKE file, by looking in the usual directory that homebrew puts those libs. If you are not using homebrew, you will get an error stating that you need to tell us where those libs live.
-- Similarly, for openssl, you don't want to use the version that comes with OSX, it is old. We've accounted for this in the CMAKE script by setting the search paths to where homebrew puts openssl, so if you're not using homebrew you'll need to tell us where a more recent version of openssl lives.
+- Similarly, for openssl, you don't want to use the version that comes with macOS, it is old. We've accounted for this in the CMAKE script by setting the search paths to where homebrew puts openssl, so if you're not using homebrew you'll need to tell us where a more recent version of openssl lives.
 
 - Build the SDK for Release if you are using hombrew:
 ```bash
@@ -455,7 +451,7 @@ make
 
 In the above command, replace:
 - `<path to Casablanca>` to point to your local installation of Casablanca. For example, if the file `libcpprest.so` exists at location `~/Github/Casablanca/cpprestsdk/Release/build.release/Binaries/libcpprest.dylib`, then <path to casablanca> should be `~/Github/Casablanca/cpprestsdk`
-- `<path to openssl>` to your local openssl, it is recommended not to use the version that comes with OSX, rather use one from Homebrew or the like. This should be the path that contains the `lib` and `include` directories
+- `<path to openssl>` to your local openssl, it is recommended not to use the version that comes with macOS, rather use one from Homebrew or the like. This should be the path that contains the `lib` and `include` directories
 - `<path to gettext lib dir>` is the directory which contains `libintl.dylib`
 
 For example you might use:

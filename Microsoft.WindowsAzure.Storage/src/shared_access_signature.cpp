@@ -178,7 +178,6 @@ namespace azure { namespace storage { namespace protocol {
         auto builder = get_sas_token_builder(identifier, policy, signature);
 
         add_query_if_not_empty(builder, uri_query_sas_resource, resource_type, /* do_encoding */ true);
-        add_query_if_not_empty(builder, uri_query_snapshot, snapshot_time, /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_cache_control, headers.cache_control(), /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_content_type, headers.content_type(), /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_content_encoding, headers.content_encoding(), /* do_encoding */ true);

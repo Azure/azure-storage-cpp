@@ -117,34 +117,6 @@ namespace azure { namespace storage { namespace protocol {
     template<class Properties>
     void add_additional_properties(web::http::http_request& request, const Properties& properties, file_operation_type op_type)
     {
-        // The server side unreasonably demands 7 digits in the decimal fraction.
-        auto to_iso8601_string = [](const utility::datetime& time)
-        {
-            utility::string_t time_str = time.to_string(utility::datetime::ISO_8601);
-            auto decimal_pos = time_str.find(_XPLATSTR(":"));
-            if (decimal_pos != utility::string_t::npos)
-            {
-                decimal_pos = time_str.find(_XPLATSTR(":"), decimal_pos + 1);
-                if (decimal_pos != utility::string_t::npos)
-                {
-                    decimal_pos += 3;
-                }
-            }
-
-            auto z_pos = time_str.find(_XPLATSTR("Z"));
-            if (z_pos == utility::string_t::npos || z_pos < decimal_pos)
-            {
-                throw std::logic_error("Invalid date and time format.");
-            }
-
-            utility::string_t time_str2 = time_str.substr(0, z_pos);
-            size_t decimal_length = z_pos - decimal_pos;
-            const utility::string_t padding = _XPLATSTR(".0000000");
-            time_str2 += padding.substr(decimal_length);
-            time_str2 += time_str.substr(z_pos);
-            return time_str2;
-        };
-
         web::http::http_headers& headers = request.headers();
 
         bool permission_set = false;
@@ -195,7 +167,7 @@ namespace azure { namespace storage { namespace protocol {
 
         if (properties.creation_time().is_initialized())
         {
-            headers.add(ms_header_file_creation_time, to_iso8601_string(properties.creation_time()));
+            headers.add(ms_header_file_creation_time, core::convert_to_iso8601_string(properties.creation_time(), 7));
         }
         else if (op_type == file_operation_type::create)
         {
@@ -211,7 +183,7 @@ namespace azure { namespace storage { namespace protocol {
 
         if (properties.last_write_time().is_initialized())
         {
-            headers.add(ms_header_file_last_write_time, to_iso8601_string(properties.last_write_time()));
+            headers.add(ms_header_file_last_write_time, core::convert_to_iso8601_string(properties.last_write_time(), 7));
         }
         else if (op_type == file_operation_type::create)
         {

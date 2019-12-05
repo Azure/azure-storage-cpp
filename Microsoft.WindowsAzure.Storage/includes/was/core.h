@@ -232,22 +232,45 @@ namespace azure { namespace storage {
         {
         }
 
+        class sas_credential
+        {
+        public:
+            explicit sas_credential(utility::string_t sas_token) : m_sas_token(std::move(sas_token))
+            {
+            }
+
+        private:
+            utility::string_t m_sas_token;
+
+            friend class storage_credentials;
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified shared access signature token.
         /// </summary>
         /// <param name="sas_token">A string containing the shared access signature token.</param>
         explicit storage_credentials(utility::string_t sas_token)
-            : m_sas_token(std::move(sas_token))
+            : storage_credentials(utility::string_t(), sas_credential{sas_token})
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified account name and shared access signature token.
+        /// </summary>
+        /// <param name="account_name">A string containing the name of the storage account.</param>
+        /// <param name="sas_token">An <see cref="azure::storage::sas_credential" /> containing shared access signature token.</param>
+        storage_credentials(utility::string_t account_name, sas_credential sas_token)
+            : m_account_name(std::move(account_name)), m_sas_token(std::move(sas_token.m_sas_token))
         {
             if (m_sas_token.size() >= 1 && m_sas_token.at(0) == _XPLATSTR('?'))
             {
                 m_sas_token = m_sas_token.substr(1);
             }
-            
+
             auto splitted_query = web::uri::split_query(m_sas_token);
             if (!splitted_query.empty())
             {
-                splitted_query[protocol::uri_query_sas_api_version] = protocol::header_value_storage_version; 
+                splitted_query[protocol::uri_query_sas_api_version] = protocol::header_value_storage_version;
                 web::uri_builder builder;
                 for (const auto& kv : splitted_query)
                 {
@@ -278,7 +301,17 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="token">A <see cref="azure::storage::storage_credentials::bearer_token_credential" /> class containing bearer token.</param>
         template<class T, typename std::enable_if<std::is_same<typename std::decay<T>::type, bearer_token_credential>::value>::type* = nullptr>
-        explicit storage_credentials(T&& token) : m_bearer_token_credential(std::make_shared<bearer_token_credential>())
+        explicit storage_credentials(T&& token) : storage_credentials(utility::string_t(), std::forward<T>(token))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified account name and bearer token.
+        /// </summary>
+        /// <param name="account_name">A string containing the name of the storage account.</param>
+        /// <param name="token">A <see cref="azure::storage::storage_credentials::bearer_token_credential" /> class containing bearer token.</param>
+        template<class T, typename std::enable_if<std::is_same<typename std::decay<T>::type, bearer_token_credential>::value>::type* = nullptr>
+        storage_credentials(utility::string_t account_name, T&& token) : m_account_name(std::move(account_name)), m_bearer_token_credential(std::make_shared<bearer_token_credential>())
         {
             m_bearer_token_credential->m_bearer_token = std::forward<T>(token).m_bearer_token;
         }
@@ -399,7 +432,7 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are for anonymous access; otherwise, <c>false</c>.</returns>
         bool is_anonymous() const
         {
-            return m_sas_token.empty() && m_account_name.empty() && !is_bearer_token();
+            return m_sas_token.empty() && m_account_key.empty() && !is_bearer_token();
         }
 
         /// <summary>
@@ -408,7 +441,7 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are a shared access signature token; otherwise, <c>false</c>.</returns>
         bool is_sas() const
         {
-            return !m_sas_token.empty() && m_account_name.empty() && !is_bearer_token();
+            return !m_sas_token.empty() && m_account_key.empty() && !is_bearer_token();
         }
 
         /// <summary>
@@ -417,7 +450,7 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are a shared key; otherwise, <c>false</c>.</returns>
         bool is_shared_key() const
         {
-            return m_sas_token.empty() && !m_account_name.empty() && !is_bearer_token();
+            return m_sas_token.empty() && !m_account_key.empty() && !is_bearer_token();
         }
 
         /// <summary>

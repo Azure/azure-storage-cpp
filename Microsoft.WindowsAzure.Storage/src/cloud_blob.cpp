@@ -163,6 +163,16 @@ namespace azure { namespace storage {
         return protocol::get_blob_sas_token(stored_policy_identifier, policy, headers, is_snapshot() ? _XPLATSTR("bs") : _XPLATSTR("b"), resource_str, snapshot_time(), service_client().credentials());
     }
 
+    utility::string_t cloud_blob::get_user_delegation_sas(const user_delegation_key& key, const blob_shared_access_policy& policy, const cloud_blob_shared_access_headers& headers) const
+    {
+        utility::string_t resource_str =
+            _XPLATSTR("/") + utility::string_t(protocol::service_blob) +
+            _XPLATSTR("/") + service_client().credentials().account_name() +
+            _XPLATSTR("/") + container().name() +
+            _XPLATSTR("/") + name();
+        return protocol::get_blob_user_delegation_sas_token(policy, headers, is_snapshot() ? _XPLATSTR("bs") : _XPLATSTR("b"), resource_str, snapshot_time(), key);
+    }
+
     pplx::task<concurrency::streams::istream> cloud_blob::open_read_async(const access_condition& condition, const blob_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token)
     {
         blob_request_options modified_options(options);

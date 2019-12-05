@@ -470,12 +470,12 @@ namespace azure { namespace storage { namespace protocol {
 
                 if (policy.start().is_initialized())
                 {
-                    write_element(xml_access_policy_start, core::convert_to_string_with_fixed_length_fractional_seconds(policy.start()));
+                    write_element(xml_access_policy_start, core::convert_to_iso8601_string(policy.start(), 7));
                 }
 
                 if (policy.expiry().is_initialized())
                 {
-                    write_element(xml_access_policy_expiry, core::convert_to_string_with_fixed_length_fractional_seconds(policy.expiry()));
+                    write_element(xml_access_policy_expiry, core::convert_to_iso8601_string(policy.expiry(), 7));
                 }
 
                 if (policy.permission() != 0)
@@ -929,6 +929,40 @@ namespace azure { namespace storage { namespace protocol {
     private:
 
         void handle_geo_replication_status(const utility::string_t& element_name);
+    };
+
+    class user_delegation_key_time_writer : public core::xml::xml_writer
+    {
+    public:
+
+        user_delegation_key_time_writer()
+        {
+        }
+
+        std::string write(const utility::datetime& start, const utility::datetime& expiry);
+    };
+
+    class user_delegation_key_reader : public core::xml::xml_reader
+    {
+    public:
+        explicit user_delegation_key_reader(concurrency::streams::istream stream) : xml_reader(stream)
+        {
+        }
+
+        user_delegation_key move_key()
+        {
+            auto result = parse();
+            if (result == xml_reader::parse_result::xml_not_complete)
+            {
+                throw storage_exception(protocol::error_xml_not_complete, true);
+            }
+            return std::move(m_key);
+        }
+
+    protected:
+        void handle_element(const utility::string_t& element_name) override;
+
+        user_delegation_key m_key;
     };
 
 }}} // namespace azure::storage::protocol

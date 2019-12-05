@@ -26,17 +26,13 @@ namespace azure { namespace storage { namespace samples {
     SAMPLE(OAuthGettingStarted, oauth_getting_started_sample)
     void oauth_getting_started_sample()
     {
+        utility::string_t account_name = _XPLATSTR("YOUR ACCOUNT_NAME");
         utility::string_t oauth_access_token(_XPLATSTR("PUT_YOUR_OAUTH_2_0_ACCESS_TOKEN_HERE"));
 
         using OAuthAccessToken = azure::storage::storage_credentials::bearer_token_credential;
-        azure::storage::storage_credentials storage_cred(OAuthAccessToken{ oauth_access_token });
+        azure::storage::storage_credentials storage_cred(account_name, OAuthAccessToken{ oauth_access_token });
 
-        azure::storage::cloud_storage_account storage_account(
-            storage_cred,
-            azure::storage::storage_uri(web::http::uri(_XPLATSTR("https://YOUR_STORAGE_ACCOUNT.blob.core.windows.net"))),
-            azure::storage::storage_uri(web::http::uri(_XPLATSTR("https://YOUR_STORAGE_ACCOUNT.queue.core.windows.net"))),
-            azure::storage::storage_uri(web::http::uri(_XPLATSTR("https://YOUR_STORAGE_ACCOUNT.table.core.windows.net")))
-        );
+        azure::storage::cloud_storage_account storage_account(storage_cred, /* use https */ true);
 
         auto blob_client = storage_account.create_cloud_blob_client();
         auto blob_container = blob_client.get_container_reference(_XPLATSTR("YOUR_CONTAINER"));

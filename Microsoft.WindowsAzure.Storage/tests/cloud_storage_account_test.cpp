@@ -573,25 +573,27 @@ SUITE(Core)
         CHECK_UTF8_EQUAL(creds7.bearer_token(), token_str);
     }
 
-    TEST_FIXTURE(test_base, storage_credentials_empty_key)
+    TEST_FIXTURE(test_base, storage_credentials_oauth_operation)
     {
-        const utility::string_t defaults_connection_string(_XPLATSTR("DefaultEndpointsProtocol=https;AccountName=") + test_account_name + _XPLATSTR(";AccountKey="));
+        using OAuthAccessToken = azure::storage::storage_credentials::bearer_token_credential;
 
-        azure::storage::storage_credentials creds(test_account_name, utility::string_t());
-        CHECK(creds.sas_token().empty());
-        CHECK_UTF8_EQUAL(test_account_name, creds.account_name());
-        CHECK_EQUAL(false, creds.is_anonymous());
-        CHECK_EQUAL(false, creds.is_sas());
-        CHECK_EQUAL(true, creds.is_shared_key());
-        CHECK_UTF8_EQUAL(utility::string_t(), utility::conversions::to_base64(creds.account_key()));
+        utility::string_t account_name = test_config::instance().get_oauth_account_name();
+        utility::string_t access_token = test_config::instance().get_oauth_token();
 
-        azure::storage::cloud_storage_account account1(creds, true);
-        CHECK_UTF8_EQUAL(defaults_connection_string, account1.to_string(true));
-        check_credentials_equal(creds, account1.credentials());
+        azure::storage::storage_credentials storage_cred(account_name, OAuthAccessToken{ access_token });
+        azure::storage::cloud_storage_account storage_account(storage_cred, /* use https */ true);
 
-        auto account2 = azure::storage::cloud_storage_account::parse(defaults_connection_string);
-        CHECK_UTF8_EQUAL(defaults_connection_string, account2.to_string(true));
-        check_credentials_equal(creds, account2.credentials());
+        auto blob_client = storage_account.create_cloud_blob_client();
+
+        auto container_name = test_base::get_random_string();
+        auto blob_name = test_base::get_random_string();
+
+        auto blob_container = blob_client.get_container_reference(container_name);
+        blob_container.create();
+        auto blob = blob_container.get_block_blob_reference(blob_name);
+        blob.upload_text(_XPLATSTR("Block blob content"));
+        blob.delete_blob();
+        blob_container.delete_container();
     }
 
     TEST_FIXTURE(test_base, storage_credentials_move_constructor)
@@ -1068,5 +1070,73 @@ SUITE(Core)
             sas_token = account.get_shared_access_signature(policy);
             azure::storage::cloud_blob_client(account.blob_endpoint(), azure::storage::storage_credentials(sas_token)).list_containers(_XPLATSTR("prefix"));
         }
+    }
+
+    TEST_FIXTURE(test_base, user_delegation_sas)
+    {
+        using OAuthAccessToken = azure::storage::storage_credentials::bearer_token_credential;
+        using SASToken = azure::storage::storage_credentials::sas_credential;
+
+        utility::string_t account_name = test_config::instance().get_oauth_account_name();
+        utility::string_t access_token = test_config::instance().get_oauth_token();
+
+        azure::storage::storage_credentials storage_cred(account_name, OAuthAccessToken{ access_token });
+        azure::storage::cloud_storage_account storage_account(storage_cred, true);
+
+        auto container_name = test_base::get_random_string();
+        auto blob_name = test_base::get_random_string();
+        auto blob_content1 = test_base::get_random_string();
+        auto blob_content2 = test_base::get_random_string();
+
+        auto blob_client = storage_account.create_cloud_blob_client();
+        auto container = blob_client.get_container_reference(container_name);
+        container.create();
+        auto blob = container.get_block_blob_reference(blob_name);
+        blob.upload_text(blob_content1);
+        auto blob_snapshot = blob.create_snapshot();
+        blob.upload_text(blob_content2);
+
+        utility::datetime start = utility::datetime::utc_now() - utility::datetime::from_days(1);
+        utility::datetime end = utility::datetime::utc_now() + utility::datetime::from_days(1);
+        auto key = blob_client.get_user_delegation_key(start, end);
+
+        // container sas
+        azure::storage::blob_shared_access_policy access_policy(start, end, azure::storage::blob_shared_access_policy::write | azure::storage::blob_shared_access_policy::create);
+        auto sas_token = container.get_user_delegation_sas(key, access_policy);
+        {
+            azure::storage::storage_credentials sas_cred(account_name, SASToken{ sas_token });
+            azure::storage::cloud_storage_account sas_account(sas_cred, true);
+
+            auto sas_blob_client = sas_account.create_cloud_blob_client();
+            auto sas_container = sas_blob_client.get_container_reference(container_name);
+            auto sas_blob = sas_container.get_block_blob_reference(test_base::get_random_string());
+            sas_blob.upload_text(_XPLATSTR("Block blob content"));
+            CHECK_THROW(sas_blob.delete_blob(), azure::storage::storage_exception);
+        }
+
+        // blob sas
+        access_policy = azure::storage::blob_shared_access_policy(utility::datetime(), end, azure::storage::blob_shared_access_policy::read);
+        azure::storage::cloud_blob_shared_access_headers headers;
+        headers.set_content_type(_XPLATSTR("text/plain; charset=utf-8"));
+        sas_token = blob.get_user_delegation_sas(key, access_policy, headers);
+        {
+            azure::storage::storage_credentials sas_cred(account_name, SASToken{ sas_token });
+            azure::storage::cloud_block_blob sas_blob(blob.uri(), sas_cred);
+
+            CHECK_UTF8_EQUAL(blob_content2, sas_blob.download_text());
+            CHECK_THROW(sas_blob.delete_blob(), azure::storage::storage_exception);
+        }
+
+        // blob snapshot sas
+        sas_token = blob_snapshot.get_user_delegation_sas(key, access_policy);
+        {
+            azure::storage::storage_credentials sas_cred(account_name, SASToken{ sas_token });
+            azure::storage::cloud_block_blob sas_blob(blob_snapshot.uri(), blob_snapshot.snapshot_time(), sas_cred);
+
+            CHECK_UTF8_EQUAL(blob_content1, sas_blob.download_text());
+            CHECK_THROW(sas_blob.delete_blob(), azure::storage::storage_exception);
+        }
+
+        container.delete_container();
     }
 }

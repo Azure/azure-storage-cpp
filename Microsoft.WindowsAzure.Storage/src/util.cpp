@@ -264,13 +264,6 @@ namespace azure { namespace storage {  namespace core {
         return true;
     }
 
-    utility::datetime truncate_fractional_seconds(utility::datetime value)
-    {
-        utility::datetime result;
-        result = result + (value.to_interval() / second_interval * second_interval);
-        return result;
-    }
-
     utility::string_t convert_to_string(double value)
     {
         utility::ostringstream_t buffer;
@@ -299,6 +292,46 @@ namespace azure { namespace storage {  namespace core {
         return source;
     }
 
+    utility::string_t convert_to_iso8601_string(const utility::datetime& value, int num_decimal_digits)
+    {
+        if (!value.is_initialized())
+        {
+            return utility::string_t();
+        }
+
+        utility::string_t time_str = value.to_string(utility::datetime::ISO_8601);
+        auto second_end = time_str.find_last_of(_XPLATSTR(':')) + 3;
+        auto z_pos = time_str.find_last_of(_XPLATSTR('Z'));
+
+        if (second_end == utility::string_t::npos || z_pos < second_end)
+        {
+            throw std::logic_error("Invalid date and time format.");
+        }
+
+        utility::string_t integral_part = time_str.substr(0, second_end);
+        utility::string_t fractional_part = time_str.substr(second_end, z_pos - second_end);
+        utility::string_t suffix = time_str.substr(z_pos);
+
+        if (num_decimal_digits == 0)
+        {
+            return integral_part + suffix;
+        }
+        else
+        {
+            if (fractional_part.empty())
+            {
+                fractional_part += _XPLATSTR('.');
+            }
+            fractional_part = fractional_part.substr(0, 1 + num_decimal_digits);
+            int padding_length = num_decimal_digits - (static_cast<int>(fractional_part.length()) - 1);
+            if (padding_length > 0)
+            {
+                fractional_part += utility::string_t(padding_length, _XPLATSTR('0'));
+            }
+            return integral_part + fractional_part + suffix;
+        }
+    }
+
     utility::string_t str_trim_starting_trailing_whitespaces(const utility::string_t& str)
     {
         auto non_space_begin = std::find_if(str.begin(), str.end(), std::not1(std::ptr_fun<int, int>(isspace)));
@@ -312,99 +345,6 @@ namespace azure { namespace storage {  namespace core {
         {
             throw storage_exception(protocol::error_client_timeout, false);
         }
-    }
-
-    utility::string_t convert_to_string_with_fixed_length_fractional_seconds(utility::datetime value)
-    {
-        // TODO: Remove this function if Casablanca changes their datetime serialization to not trim trailing zeros in the fractional seconds component of a time
-
-#ifdef _WIN32
-        int status;
-
-        ULARGE_INTEGER largeInt;
-        largeInt.QuadPart = value.to_interval();
-
-        FILETIME ft;
-        ft.dwHighDateTime = largeInt.HighPart;
-        ft.dwLowDateTime = largeInt.LowPart;
-
-        SYSTEMTIME systemTime;
-        if (!FileTimeToSystemTime((const FILETIME *)&ft, &systemTime))
-        {
-            throw utility::details::create_system_error(GetLastError());
-        }
-
-        std::wostringstream outStream;
-
-        const size_t buffSize = 64;
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-        TCHAR dateStr[buffSize] = { 0 };
-        status = GetDateFormat(LOCALE_INVARIANT, 0, &systemTime, "yyyy-MM-dd", dateStr, buffSize);
-#else
-        wchar_t dateStr[buffSize] = { 0 };
-        status = GetDateFormatEx(LOCALE_NAME_INVARIANT, 0, &systemTime, L"yyyy-MM-dd", dateStr, buffSize, NULL);
-#endif // _WIN32_WINNT < _WIN32_WINNT_VISTA
-        if (status == 0)
-        {
-            throw utility::details::create_system_error(GetLastError());
-        }
-
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-        TCHAR timeStr[buffSize] = { 0 };
-        status = GetTimeFormat(LOCALE_INVARIANT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, &systemTime, "HH':'mm':'ss", timeStr, buffSize);
-#else
-        wchar_t timeStr[buffSize] = { 0 };
-        status = GetTimeFormatEx(LOCALE_NAME_INVARIANT, TIME_NOTIMEMARKER | TIME_FORCE24HOURFORMAT, &systemTime, L"HH':'mm':'ss", timeStr, buffSize);
-#endif // _WIN32_WINNT < _WIN32_WINNT_VISTA
-        if (status == 0)
-        {
-            throw utility::details::create_system_error(GetLastError());
-        }
-
-        outStream << dateStr << "T" << timeStr;
-        uint64_t frac_sec = largeInt.QuadPart % second_interval;
-        if (frac_sec > 0)
-        {
-            // Append fractional second, which is a 7-digit value
-            // This way, '1200' becomes '0001200'
-            char buf[9] = { 0 };
-            sprintf_s(buf, sizeof(buf), ".%07ld", (long int)frac_sec);
-            outStream << buf;
-        }
-        outStream << "Z";
-
-        return outStream.str();
-#else //LINUX
-        uint64_t input = value.to_interval();
-        uint64_t frac_sec = input % second_interval;
-        input /= second_interval; // convert to seconds
-        time_t time = (time_t)input - (time_t)11644473600LL;// diff between windows and unix epochs (seconds)
-
-        struct tm datetime;
-        gmtime_r(&time, &datetime);
-
-        const int max_dt_length = 64;
-        char output[max_dt_length + 1] = { 0 };
-
-        if (frac_sec > 0)
-        {
-            // Append fractional second, which is a 7-digit value
-            // This way, '1200' becomes '0001200'
-            char buf[9] = { 0 };
-            snprintf(buf, sizeof(buf), ".%07ld", (long int)frac_sec);
-            // format the datetime into a separate buffer
-            char datetime_str[max_dt_length + 1] = { 0 };
-            strftime(datetime_str, sizeof(datetime_str), "%Y-%m-%dT%H:%M:%S", &datetime);
-            // now print this buffer into the output buffer
-            snprintf(output, sizeof(output), "%s%sZ", datetime_str, buf);
-        }
-        else
-        {
-            strftime(output, sizeof(output), "%Y-%m-%dT%H:%M:%SZ", &datetime);
-        }
-
-        return std::string(output);
-#endif
     }
 
 #ifdef _WIN32

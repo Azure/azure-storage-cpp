@@ -589,6 +589,14 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
+    web::http::http_request get_user_delegation_key(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_service), /* do_encoding */ false);
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_user_delegation_key), /* do encoding */ false);
+        web::http::http_request request(base_request(web::http::methods::POST, uri_builder, timeout, context));
+        return request;
+    }
+
     void add_lease_id(web::http::http_request& request, const access_condition& condition)
     {
         add_optional_header(request.headers(), ms_header_lease_id, condition.lease_id());

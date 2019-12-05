@@ -26,12 +26,13 @@ namespace azure { namespace storage {
     class cloud_blob_shared_access_headers;
     class cloud_file_shared_access_headers;
     class account_shared_access_policy;
+    struct user_delegation_key;
 
 }} // namespace azure::storage
 
 namespace azure { namespace storage { namespace protocol {
 
-    utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials);
+    utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const std::vector<uint8_t>& key);
 
     const utility::string_t auth_name_shared_key(_XPLATSTR("SharedKey"));
     const utility::string_t auth_name_shared_key_lite(_XPLATSTR("SharedKeyLite"));
@@ -474,6 +475,7 @@ namespace azure { namespace storage { namespace protocol {
     utility::string_t get_queue_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials);
     utility::string_t get_table_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& table_name, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials);
     utility::string_t get_file_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_file_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials);
+    utility::string_t get_blob_user_delegation_sas_token(const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const utility::string_t& snapshot_time, const user_delegation_key& key);
     storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource);
 
 #pragma endregion

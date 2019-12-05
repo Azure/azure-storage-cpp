@@ -24,10 +24,10 @@
 
 namespace azure { namespace storage { namespace protocol {
 
-    utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const storage_credentials& credentials)
+    utility::string_t calculate_hmac_sha256_hash(const utility::string_t& string_to_hash, const std::vector<uint8_t>& key)
     {
         std::string utf8_string_to_hash = utility::conversions::to_utf8string(string_to_hash);
-        core::hash_provider provider = core::hash_provider::create_hmac_sha256_hash_provider(credentials.account_key());
+        core::hash_provider provider = core::hash_provider::create_hmac_sha256_hash_provider(key);
         provider.write(reinterpret_cast<const uint8_t*>(utf8_string_to_hash.data()), utf8_string_to_hash.size());
         provider.close();
         return provider.hash().hmac_sha256();
@@ -62,7 +62,7 @@ namespace azure { namespace storage { namespace protocol {
             header_value.append(_XPLATSTR(" "));
             header_value.append(m_credentials.account_name());
             header_value.append(_XPLATSTR(":"));
-            header_value.append(calculate_hmac_sha256_hash(string_to_sign, m_credentials));
+            header_value.append(calculate_hmac_sha256_hash(string_to_sign, m_credentials.account_key()));
 
             headers.add(web::http::header_names::authorization, header_value);
         }

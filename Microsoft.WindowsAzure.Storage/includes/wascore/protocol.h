@@ -70,6 +70,7 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request abort_copy_blob(const utility::string_t& copy_id, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request incremental_copy_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_blob_tier(const utility::string_t& tier, const access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_user_delegation_key(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     void add_lease_id(web::http::http_request& request, const access_condition& condition);
     void add_sequence_number_condition(web::http::http_request& request, const access_condition& condition);
     void add_access_condition(web::http::http_request& request, const access_condition& condition);

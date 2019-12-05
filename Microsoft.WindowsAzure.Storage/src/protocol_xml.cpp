@@ -18,6 +18,7 @@
 #include "stdafx.h"
 #include "wascore/protocol.h"
 #include "wascore/protocol_xml.h"
+#include "wascore/util.h"
 
 namespace azure { namespace storage { namespace protocol {
 
@@ -1054,6 +1055,52 @@ namespace azure { namespace storage { namespace protocol {
         else if (element_name == xml_service_stats_geo_replication_last_sync_time)
         {
             m_service_stats.geo_replication_private().set_last_sync_time(utility::datetime::from_string(get_current_element_text(), utility::datetime::RFC_1123));
+        }
+    }
+
+    std::string user_delegation_key_time_writer::write(const utility::datetime& start, const utility::datetime& expiry)
+    {
+        std::ostringstream outstream;
+        initialize(outstream);
+
+        write_start_element(xml_user_delegation_key_info);
+        write_element(xml_user_delegation_key_start, core::convert_to_iso8601_string(start, 0));
+        write_element(xml_user_delegation_key_expiry, core::convert_to_iso8601_string(expiry, 0));
+        write_end_element();
+
+        finalize();
+        return outstream.str();
+    }
+
+    void user_delegation_key_reader::handle_element(const utility::string_t& element_name)
+    {
+        if (element_name == xml_user_delegation_key_signed_oid)
+        {
+            extract_current_element(m_key.signed_oid);
+        }
+        else if (element_name == xml_user_delegation_key_signed_tid)
+        {
+            extract_current_element(m_key.signed_tid);
+        }
+        else if (element_name == xml_user_delegation_key_signed_start)
+        {
+            m_key.signed_start = utility::datetime::from_string(get_current_element_text(), utility::datetime::ISO_8601);
+        }
+        else if (element_name == xml_user_delegation_key_signed_expiry)
+        {
+            m_key.signed_expiry = utility::datetime::from_string(get_current_element_text(), utility::datetime::ISO_8601);
+        }
+        else if (element_name == xml_user_delegation_key_signed_service)
+        {
+            extract_current_element(m_key.signed_service);
+        }
+        else if (element_name == xml_user_delegation_key_signed_version)
+        {
+            extract_current_element(m_key.signed_version);
+        }
+        else if (element_name == xml_user_delegation_key_value)
+        {
+            extract_current_element(m_key.key);
         }
     }
 

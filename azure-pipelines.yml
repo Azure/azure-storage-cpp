@@ -61,43 +61,53 @@ jobs:
   displayName: Build and Test on Windows
   timeoutInMinutes: 300
 
+  variables:
+  - name: project_file
+    value: Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj
+
   strategy:
     maxParallel: 16
     matrix:
-      WIN1803_VS2017:
-        container_image: win1803_vs2017:cpprestsdk_$(cpp_rest_sdk_version)
-        project_file: Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj
-        ms_build_location: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
+      VS2017:
+        vm_image: vs2017-win2016
         platform: x64
         configuration: Release
-      WIN1803_VS2017_DEBUG:
-        container_image: win1803_vs2017:cpprestsdk_$(cpp_rest_sdk_version)
-        project_file: Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj
-        ms_build_location: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
+        toolset: v141
+      VS2017_DEBUG:
+        vm_image: vs2017-win2016
         platform: x64
         configuration: Debug
-      WIN1803_VS2017_WIN32:
-        container_image: win1803_vs2017:cpprestsdk_$(cpp_rest_sdk_version)
-        project_file: Microsoft.WindowsAzure.Storage\tests\Microsoft.WindowsAzure.Storage.UnitTests.v141.vcxproj
-        ms_build_location: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
+        toolset: v141
+      VS2017_WIN32:
+        vm_image: vs2017-win2016
         platform: Win32
         configuration: Release
+        toolset: v141
+      VS2019:
+        vm_image: windows-2019
+        platform: x64
+        configuration: Release
+        toolset: v142
 
   pool:
-    vmImage: 'win1803'
-
-  container:
-    image: azurecppsdkpipeline.azurecr.io/$(container_image)
-    endpoint: azure_docker_registry_connection
+    vmImage: $(vm_image)
 
   steps:
+  - powershell: |
+      Invoke-WebRequest -Uri https://codeload.github.com/microsoft/vcpkg/zip/master -OutFile vcpkg-master.zip
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      [System.IO.Compression.ZipFile]::ExtractToDirectory("vcpkg-master.zip", "C:\")
+      cd C:\vcpkg-master
+      .\bootstrap-vcpkg.bat
+      .\vcpkg install cpprestsdk[core]:x86-windows cpprestsdk[core]:x64-windows unittest-cpp:x86-windows unittest-cpp:x64-windows
+      .\vcpkg integrate install
+    displayName: Install Dependencies
+
   - task: MSBUILD@1
     displayName: Build
     inputs:
       solution: $(project_file)
-      msbuildLocationMethod: location
-      msbuildLocation: $(ms_build_location)
-      msbuildArguments: /p:OutDir=$(Build.BinariesDirectory)\
+      msbuildArguments: /p:OutDir=$(Build.BinariesDirectory)\ /p:PlatformToolset=$(toolset)
       platform: $(platform)
       configuration: $(configuration)
 

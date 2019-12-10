@@ -83,8 +83,9 @@ namespace azure { namespace storage { namespace core {
 
             return stream_copy_async(stream, temp_stream, length, max_length, cancellation_token).then([temp_buffer, provider] (pplx::task<utility::size64_t> buffer_task) mutable -> istream_descriptor
             {
+                auto length = buffer_task.get();
                 provider.close();
-                return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(temp_buffer.collection()), buffer_task.get(), provider.hash());
+                return istream_descriptor(concurrency::streams::container_stream<std::vector<uint8_t>>::open_istream(temp_buffer.collection()), length, provider.hash());
             });
         }
 

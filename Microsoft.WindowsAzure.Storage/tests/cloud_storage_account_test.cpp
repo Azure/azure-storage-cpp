@@ -911,6 +911,7 @@ SUITE(Core)
 
     TEST_FIXTURE(test_base, account_sas_permission)
     {
+        int parallelism = 8;
         auto check_account_permission = [](int i) {
             auto account = test_config::instance().account();
 
@@ -929,14 +930,25 @@ SUITE(Core)
         };
 
         std::vector<std::future<void>> results;
+        auto wait_on_results = [&results]()
+        {
+            for (const auto& r : results)
+            {
+                r.wait();
+            }
+            results.clear();
+        };
+
         for (int i = 1; i < 0x100; ++i)
         {
             results.emplace_back(std::async(std::launch::async, check_account_permission, i));
+
+            if (results.size() >= parallelism)
+            {
+                wait_on_results();
+            }
         }
-        for (const auto& r : results)
-        {
-            r.wait();
-        }
+        wait_on_results();
     }
 
     TEST_FIXTURE(test_base, account_sas_service_types)

@@ -383,8 +383,8 @@ namespace azure { namespace storage {  namespace core {
         struct tm datetime;
         gmtime_r(&time, &datetime);
 
-        const int max_dt_length = 64;
-        char output[max_dt_length + 1] = { 0 };
+        const int max_dt_length = 32; // Actually 20
+        char output[max_dt_length + 8 + 1 + 1] = { 0 };  // date + suffix + Z + \0
 
         if (frac_sec > 0)
         {

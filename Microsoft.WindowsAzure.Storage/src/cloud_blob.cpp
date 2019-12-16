@@ -736,7 +736,8 @@ namespace azure { namespace storage {
 
                     auto smallest_offset = std::make_shared<utility::size64_t>(target_offset);
                     auto condition_variable = std::make_shared<std::condition_variable>();
-                    std::mutex  condition_variable_mutex;
+                    std::mutex condition_variable_mutex;
+                    std::vector<pplx::task<void>> parallel_tasks;
                     for (utility::size64_t current_offset = target_offset; current_offset < target_offset + target_length; current_offset += protocol::transactional_md5_block_size)
                     {
                         utility::size64_t current_length = protocol::transactional_md5_block_size;
@@ -744,22 +745,36 @@ namespace azure { namespace storage {
                         {
                             current_length = target_offset + target_length - current_offset;
                         }
-                        semaphore->lock_async().then([instance, &mutex, semaphore, condition_variable, &condition_variable_mutex, &writer, offset, target, smallest_offset, current_offset, current_length, modified_condition, options, context, timer_handler]()
+                        auto parallel_task = semaphore->lock_async().then([instance, &mutex, semaphore, condition_variable, &condition_variable_mutex, &writer, offset, target, smallest_offset, current_offset, current_length, modified_condition, options, context, timer_handler]()
                         {
+                            auto sem_unlocker = std::make_shared<std::unique_lock<core::async_semaphore>>(*semaphore, std::adopt_lock);
+
                             concurrency::streams::container_buffer<std::vector<uint8_t>> buffer;
                             auto segment_ostream = buffer.create_ostream();
                             // if transaction MD5 is enabled, it will be checked inside each download_single_range_to_stream_async.
-                            instance->download_single_range_to_stream_async(segment_ostream, current_offset, current_length, modified_condition, options, context, false, timer_handler->get_cancellation_token(), timer_handler)
-                                .then([buffer, segment_ostream, semaphore, condition_variable, &condition_variable_mutex, smallest_offset, offset, current_offset, current_length, &mutex, target, &writer, options](pplx::task<void> download_task)
+                            return instance->download_single_range_to_stream_async(segment_ostream, current_offset, current_length, modified_condition, options, context, false, timer_handler->get_cancellation_token(), timer_handler)
+                                .then([buffer, segment_ostream, semaphore, sem_unlocker, condition_variable, &condition_variable_mutex, smallest_offset, offset, current_offset, current_length, &mutex, target, &writer, options](pplx::task<void> download_task)
                             {
                                 segment_ostream.close().then([download_task](pplx::task<void> close_task)
                                 {
-                                    download_task.wait();
+                                    try
+                                    {
+                                        download_task.wait();
+                                    }
+                                    catch (const std::exception&)
+                                    {
+                                        try
+                                        {
+                                            close_task.wait();
+                                        }
+                                        catch (...)
+                                        {
+                                        }
+                                        throw;
+                                    }
                                     close_task.wait();
                                 }).wait();
 
-                                // status of current semaphore.
-                                bool released = false;
                                 // target stream is seekable, could write to target stream once the download finished.
                                 if (target.can_seek())
                                 {
@@ -767,11 +782,11 @@ namespace azure { namespace storage {
                                     target.streambuf().seekpos(current_offset - offset, std::ios_base::out);
                                     target.streambuf().putn_nocopy(buffer.collection().data(), buffer.collection().size()).wait();
                                     *smallest_offset += protocol::transactional_md5_block_size;
-                                    released = true;
-                                    semaphore->unlock();
                                 }
                                 else
                                 {
+                                    // status of current semaphore.
+                                    bool released = false;
                                     {
                                         pplx::extensibility::scoped_rw_lock_t guard(mutex);
                                         if (*smallest_offset == current_offset)
@@ -781,7 +796,7 @@ namespace azure { namespace storage {
                                             *smallest_offset += protocol::transactional_md5_block_size;
                                             condition_variable->notify_all();
                                             released = true;
-                                            semaphore->unlock();
+                                            sem_unlocker->unlock();
                                         }
                                     }
                                     if (!released)
@@ -790,7 +805,7 @@ namespace azure { namespace storage {
                                         if (writer < options.parallelism_factor())
                                         {
                                             released = true;
-                                            semaphore->unlock();
+                                            sem_unlocker->unlock();
                                         }
                                         std::unique_lock<std::mutex> locker(condition_variable_mutex);
                                         condition_variable->wait(locker, [smallest_offset, current_offset, &mutex]()
@@ -813,15 +828,13 @@ namespace azure { namespace storage {
                                         }
                                         condition_variable->notify_all();
                                         pplx::details::atomic_decrement(writer);
-                                        if (!released)
-                                        {
-                                            semaphore->unlock();
-                                        }
                                     }
                                 }
                             });
                         });
+                        parallel_tasks.emplace_back(std::move(parallel_task));
                     }
+                    // Code below is nonsense, becasuse exceptions won't be thrown from wait_all_async.
                     // If the cancellation token is canceled, the lock will be in lock status when the exception is thrown, so need to unlock it in case it blocks other async processes
                     try
                     {
@@ -835,6 +848,32 @@ namespace azure { namespace storage {
                         }
                         throw ex;
                     }
+
+                    pplx::when_all(parallel_tasks.begin(), parallel_tasks.end()).then([parallel_tasks](pplx::task<void> wait_all_task)
+                    {
+                        try
+                        {
+                            wait_all_task.wait();
+                        }
+                        catch (const std::exception&)
+                        {
+                            std::for_each(parallel_tasks.begin(), parallel_tasks.end(), [](pplx::task<void> task)
+                            {
+                                task.then([](pplx::task<void> t)
+                                {
+                                    try
+                                    {
+                                        t.wait();
+                                    }
+                                    catch (...)
+                                    {
+                                    }
+                                });
+                            });
+                            throw;
+                        }
+                    }).wait();
+
                     std::unique_lock<std::mutex> locker(condition_variable_mutex);
                     condition_variable->wait(locker, [smallest_offset, &mutex, target_offset, target_length]()
                     {

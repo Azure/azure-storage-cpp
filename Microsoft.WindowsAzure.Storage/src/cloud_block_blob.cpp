@@ -261,9 +261,27 @@ namespace azure { namespace storage {
 
         return open_write_async_impl(condition, modified_options, context, timer_handler->get_cancellation_token(), false, timer_handler).then([source, length, timer_handler](concurrency::streams::ostream blob_stream) -> pplx::task<void>
         {
-            return core::stream_copy_async(source, blob_stream, length, std::numeric_limits<utility::size64_t>::max(), timer_handler->get_cancellation_token(), timer_handler).then([blob_stream, timer_handler](utility::size64_t)->pplx::task<void>
+            return core::stream_copy_async(source, blob_stream, length, std::numeric_limits<utility::size64_t>::max(), timer_handler->get_cancellation_token(), timer_handler).then([blob_stream, timer_handler](pplx::task<utility::size64_t> copy_task)->pplx::task<void>
             {
-                return blob_stream.close().then([timer_handler/*timer_handler MUST be captured*/]() {});
+                return blob_stream.close().then([timer_handler, copy_task](pplx::task<void> close_task)
+                {
+                    try
+                    {
+                        copy_task.wait();
+                    }
+                    catch (const std::exception&)
+                    {
+                        try
+                        {
+                            close_task.wait();
+                        }
+                        catch (...)
+                        {
+                        }
+                        throw;
+                    }
+                    close_task.wait();
+                });
             });
         });
     }

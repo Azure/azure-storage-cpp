@@ -1673,7 +1673,7 @@ SUITE(Blob)
 
         {
             auto options = azure::storage::blob_request_options();
-            options.set_maximum_execution_time(std::chrono::milliseconds(10000));
+            options.set_maximum_execution_time(std::chrono::seconds(30));
 
             std::string ex_msg;
 

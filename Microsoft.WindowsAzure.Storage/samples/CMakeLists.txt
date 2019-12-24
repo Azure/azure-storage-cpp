@@ -1,6 +1,7 @@
 if(UNIX)
   set(SOURCES
     BlobsGettingStarted.cpp
+    BlobsPerformanceBenchmark.cpp
     FilesGettingStarted.cpp
     JsonPayloadFormat.cpp
     main.cpp

@@ -834,7 +834,6 @@ namespace azure { namespace storage {
                         });
                         parallel_tasks.emplace_back(std::move(parallel_task));
                     }
-                    // Code below is nonsense, becasuse exceptions won't be thrown from wait_all_async.
                     // If the cancellation token is canceled, the lock will be in lock status when the exception is thrown, so need to unlock it in case it blocks other async processes
                     try
                     {

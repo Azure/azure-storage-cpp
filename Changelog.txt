@@ -1,6 +1,13 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v7.1.0
+- New feature: User delegation SAS.
+- Fixed a bug in snapshot SAS.
+- Fixed some unittest failures.
+- Fixed some crash issues.
+- Added an API with which user can custom HTTP connection settings.
+
 Changes in v7.0.0
 - Default REST API version is 2019-02-02.
 - Upgraded CPPRest to latest version 2.10.14.

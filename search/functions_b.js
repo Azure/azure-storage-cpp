@@ -4,5 +4,6 @@ var searchData=
   ['next_5flocation',['next_location',['../classazure_1_1storage_1_1retry__context.html#a228a434742e1ebd007ff8157b5f30a75',1,'azure::storage::retry_context']]],
   ['next_5fmarker',['next_marker',['../classazure_1_1storage_1_1continuation__token.html#a46d5afbd205690bd99676d2a0d763216',1,'azure::storage::continuation_token']]],
   ['next_5fvisible_5ftime',['next_visible_time',['../classazure_1_1storage_1_1cloud__queue__message.html#a650b3d79234dbcbb24bf962d43511a29',1,'azure::storage::cloud_queue_message']]],
-  ['no_5fretry_5fpolicy',['no_retry_policy',['../classazure_1_1storage_1_1no__retry__policy.html#a050342848e77cfa77941393437c39d0b',1,'azure::storage::no_retry_policy']]]
+  ['no_5fretry_5fpolicy',['no_retry_policy',['../classazure_1_1storage_1_1no__retry__policy.html#a050342848e77cfa77941393437c39d0b',1,'azure::storage::no_retry_policy']]],
+  ['nonstorage_5fexception',['nonstorage_exception',['../classazure_1_1storage_1_1retry__context.html#a4cf414d4fa6dd7559e598cf64adbdae3',1,'azure::storage::retry_context']]]
 ];

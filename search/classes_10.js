@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['sas_5fcredential',['sas_credential',['../classazure_1_1storage_1_1storage__credentials_1_1sas__credential.html',1,'azure::storage::storage_credentials']]],
   ['sequence_5fnumber',['sequence_number',['../classazure_1_1storage_1_1sequence__number.html',1,'azure::storage']]],
   ['service_5fproperties',['service_properties',['../classazure_1_1storage_1_1service__properties.html',1,'azure::storage']]],
   ['service_5fproperties_5fincludes',['service_properties_includes',['../classazure_1_1storage_1_1service__properties__includes.html',1,'azure::storage']]],

@@ -132,7 +132,7 @@ void blob_test_base::check_access(const utility::string_t& sas_token, uint8_t pe
     }
 
     azure::storage::cloud_blob_container container(m_container.uri(), credentials);
-    azure::storage::cloud_blob blob = container.get_blob_reference(original_blob.name());
+    azure::storage::cloud_blob blob = container.get_blob_reference(original_blob.name(), original_blob.snapshot_time());
 
     if (permissions & azure::storage::blob_shared_access_policy::permissions::list)
     {
@@ -197,13 +197,16 @@ void blob_test_base::check_access(const utility::string_t& sas_token, uint8_t pe
         CHECK_THROW(blob.download_attributes(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
     }
 
-    if (permissions & azure::storage::blob_shared_access_policy::permissions::write)
+    if (!blob.is_snapshot())
     {
-        blob.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-    }
-    else
-    {
-        CHECK_THROW(blob.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        if (permissions & azure::storage::blob_shared_access_policy::permissions::write)
+        {
+            blob.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
+        }
+        else
+        {
+            CHECK_THROW(blob.upload_metadata(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context), azure::storage::storage_exception);
+        }
     }
 
     if (permissions & azure::storage::blob_shared_access_policy::permissions::del)

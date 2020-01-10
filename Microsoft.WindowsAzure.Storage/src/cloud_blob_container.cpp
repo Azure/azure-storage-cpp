@@ -83,6 +83,15 @@ namespace azure { namespace storage {
         return protocol::get_blob_sas_token(stored_policy_identifier, policy, cloud_blob_shared_access_headers(), _XPLATSTR("c"), resource_str, utility::string_t(), service_client().credentials());
     }
 
+    utility::string_t cloud_blob_container::get_user_delegation_sas(const user_delegation_key& key, const blob_shared_access_policy& policy) const
+    {
+        utility::string_t resource_str =
+            _XPLATSTR("/") + utility::string_t(protocol::service_blob) +
+            _XPLATSTR("/") + service_client().credentials().account_name() +
+            _XPLATSTR("/") + name();
+        return protocol::get_blob_user_delegation_sas_token(policy, cloud_blob_shared_access_headers(), _XPLATSTR("c"), resource_str, utility::string_t(), key);
+    }
+
     cloud_blob cloud_blob_container::get_blob_reference(utility::string_t blob_name) const
     {
         return get_blob_reference(std::move(blob_name), utility::string_t());

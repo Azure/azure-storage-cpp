@@ -149,6 +149,10 @@ namespace azure { namespace storage { namespace core {
                 config.set_ssl_context_callback(instance->m_context._get_impl()->get_ssl_context_callback());
             }
 #endif
+            if (instance->m_context._get_impl()->get_native_session_handle_options_callback() != nullptr)
+            {
+                config.set_nativesessionhandle_options(instance->m_context._get_impl()->get_native_session_handle_options_callback());
+            }
 
             config.set_validate_certificates(instance->m_request_options.validate_certificates());
 

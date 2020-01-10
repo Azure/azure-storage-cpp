@@ -2516,6 +2516,17 @@ namespace azure { namespace storage {
         friend class protocol::list_containers_reader;
     };
 
+    struct user_delegation_key
+    {
+        utility::string_t signed_oid;
+        utility::string_t signed_tid;
+        utility::datetime signed_start;
+        utility::datetime signed_expiry;
+        utility::string_t signed_service;
+        utility::string_t signed_version;
+        utility::string_t key;
+    };
+
     /// <summary>
     /// Provides a client-side logical representation of the Windows Azure Blob Service. This client is used to configure and execute requests against the Blob Service.
     /// </summary>
@@ -3064,6 +3075,39 @@ namespace azure { namespace storage {
             m_directory_delimiter = std::move(value);
         }
 
+        /// <summary>
+        /// Gets a key that can be used to sign a user delegation SAS (shared access signature).
+        /// </summary>
+        /// <param name="start">The start time for the user delegation key.</param>
+        /// <param name="expiry">The expiry time for the user delegation key.</param>
+        /// <returns>A string containing user delegation key.</returns>
+        user_delegation_key get_user_delegation_key(const utility::datetime& start, const utility::datetime& expiry)
+        {
+            return get_user_delegation_key_async(start, expiry).get();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get a key that can be used to sign a user delegation SAS (shared access signature).
+        /// </summary>
+        /// <param name="start">The start time for the user delegation key.</param>
+        /// <param name="expiry">The expiry time for the user delegation key.</param>
+        /// <returns>A <see cref="pplx::task" /> object of string that contains user delegation key.</returns>
+        pplx::task<user_delegation_key> get_user_delegation_key_async(const utility::datetime& start, const utility::datetime& expiry)
+        {
+            return get_user_delegation_key_async(start, expiry, blob_request_options(), operation_context(), pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to get a key that can be used to sign a user delegation SAS (shared access signature).
+        /// </summary>
+        /// <param name="start">The start time for the user delegation key.</param>
+        /// <param name="expiry">The expiry time for the user delegation key.</param>
+        /// <param name="options">An <see cref="azure::storage::blob_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of string that contains user delegation key.</returns>
+        WASTORAGE_API pplx::task<user_delegation_key> get_user_delegation_key_async(const utility::datetime& start, const utility::datetime& expiry, const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token);
+
     private:
         pplx::task<account_properties> download_account_properties_base_async(const storage_uri& uri, const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
@@ -3174,6 +3218,14 @@ namespace azure { namespace storage {
         /// <param name="stored_policy_identifier">A container-level access policy.</param>
         /// <returns>A string containing a shared access signature.</returns>
         WASTORAGE_API utility::string_t get_shared_access_signature(const blob_shared_access_policy& policy, const utility::string_t& stored_policy_identifier) const;
+
+        /// <summary>
+        /// Returns a user delegation SAS for the container.
+        /// </summary>
+        /// <param name="key">User delegation key used to sign this SAS.</param>
+        /// <param name="policy">The access policy for the shared access signature.</param>
+        /// <returns>A string containing a shared access signature.</returns>
+        WASTORAGE_API utility::string_t get_user_delegation_sas(const user_delegation_key& key, const blob_shared_access_policy& policy) const;
 
         /// <summary>
         /// Gets a reference to a blob in this container.
@@ -4611,6 +4663,27 @@ namespace azure { namespace storage {
         /// <param name="headers">The optional header values to set for a blob returned with this SAS.</param>
         /// <returns>A string containing a shared access signature.</returns>
         WASTORAGE_API utility::string_t get_shared_access_signature(const blob_shared_access_policy& policy, const utility::string_t& stored_policy_identifier, const cloud_blob_shared_access_headers& headers) const;
+
+
+        /// <summary>
+        /// Returns a user delegation SAS for the blob.
+        /// </summary>
+        /// <param name="key">User delegation key used to sign this SAS.</param>
+        /// <param name="policy">The access policy for the shared access signature.</param>
+        /// <returns>A string containing a shared access signature.</returns>
+        utility::string_t get_user_delegation_sas(const user_delegation_key& key, const blob_shared_access_policy& policy) const
+        {
+            return get_user_delegation_sas(key, policy, cloud_blob_shared_access_headers());
+        }
+
+        /// <summary>
+        /// Returns a user delegation SAS for the blob.
+        /// </summary>
+        /// <param name="key">User delegation key used to sign this SAS.</param>
+        /// <param name="policy">The access policy for the shared access signature.</param>
+        /// <param name="headers">The optional header values to set for a blob returned with this SAS.</param>
+        /// <returns>A string containing a shared access signature.</returns>
+        WASTORAGE_API utility::string_t get_user_delegation_sas(const user_delegation_key& key, const blob_shared_access_policy& policy, const cloud_blob_shared_access_headers& headers) const;
 
         /// <summary>
         /// Opens a stream for reading from the blob.

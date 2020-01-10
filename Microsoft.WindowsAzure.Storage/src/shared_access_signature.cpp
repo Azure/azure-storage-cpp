@@ -39,11 +39,6 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
-    utility::string_t convert_datetime_if_initialized(utility::datetime value)
-    {
-        return value.is_initialized() ? core::truncate_fractional_seconds(value).to_string(utility::datetime::ISO_8601) : utility::string_t();
-    }
-
     void log_sas_string_to_sign(const utility::string_t& string_to_sign)
     {
         operation_context context;
@@ -67,8 +62,8 @@ namespace azure { namespace storage { namespace protocol {
 
         if (policy.is_valid())
         {
-            add_query_if_not_empty(builder, uri_query_sas_start, convert_datetime_if_initialized(policy.start()), /* do_encoding */ true);
-            add_query_if_not_empty(builder, uri_query_sas_expiry, convert_datetime_if_initialized(policy.expiry()), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_start, core::convert_to_iso8601_string(policy.start(), 0), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_expiry, core::convert_to_iso8601_string(policy.expiry(), 0), /* do_encoding */ true);
             add_query_if_not_empty(builder, uri_query_sas_permissions, policy.permissions_to_string(), /* do_encoding */ true);
         }
 
@@ -78,8 +73,8 @@ namespace azure { namespace storage { namespace protocol {
     void get_sas_string_to_sign(utility::string_t& str, const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource)
     {
         str.append(policy.permissions_to_string()).append(_XPLATSTR("\n"));
-        str.append(convert_datetime_if_initialized(policy.start())).append(_XPLATSTR("\n"));
-        str.append(convert_datetime_if_initialized(policy.expiry())).append(_XPLATSTR("\n"));
+        str.append(core::convert_to_iso8601_string(policy.start(), 0)).append(_XPLATSTR("\n"));
+        str.append(core::convert_to_iso8601_string(policy.expiry(), 0)).append(_XPLATSTR("\n"));
         str.append(resource).append(_XPLATSTR("\n"));
         str.append(identifier).append(_XPLATSTR("\n"));
         str.append(policy.address_or_range().to_string()).append(_XPLATSTR("\n"));
@@ -174,7 +169,7 @@ namespace azure { namespace storage { namespace protocol {
 
         log_sas_string_to_sign(string_to_sign);
 
-        return calculate_hmac_sha256_hash(string_to_sign, credentials);
+        return calculate_hmac_sha256_hash(string_to_sign, credentials.account_key());
     }
 
     utility::string_t get_blob_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const utility::string_t& snapshot_time, const storage_credentials& credentials)
@@ -183,12 +178,80 @@ namespace azure { namespace storage { namespace protocol {
         auto builder = get_sas_token_builder(identifier, policy, signature);
 
         add_query_if_not_empty(builder, uri_query_sas_resource, resource_type, /* do_encoding */ true);
-        add_query_if_not_empty(builder, uri_query_snapshot, snapshot_time, /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_cache_control, headers.cache_control(), /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_content_type, headers.content_type(), /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_content_encoding, headers.content_encoding(), /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_content_language, headers.content_language(), /* do_encoding */ true);
         add_query_if_not_empty(builder, uri_query_sas_content_disposition, headers.content_disposition(), /* do_encoding */ true);
+
+        return builder.query();
+    }
+
+    utility::string_t get_blob_user_delegation_sas_token(const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const utility::string_t& snapshot_time, const user_delegation_key& key)
+    {
+        const utility::string_t new_line = _XPLATSTR("\n");
+
+        //// StringToSign =      signed permissions + "\n" +
+        ////                     signed start + "\n" +
+        ////                     signed expiry + "\n" +
+        ////                     canonicalized resource + "\n" +
+        ////                     signed key oid + "\n" +
+        ////                     signed key tid + "\n" +
+        ////                     signed keys tart + "\n" +
+        ////                     signed key expiry + "\n" +
+        ////                     signed key service + "\n" +
+        ////                     signed key version + "\n" +
+        ////                     signed IP + "\n" +
+        ////                     signed protocol + "\n" +
+        ////                     signed version + "\n" +
+        ////                     signed resource yype + "\n" +
+        ////                     signed snapshot time + "\n" +
+        ////                     cache control + "\n" +
+        ////                     content disposition + "\n" +
+        ////                     content encoding + "\n" +
+        ////                     content language + "\n" +
+        ////                     content type
+        ////
+        //// HMAC-SHA256(UTF8.Encode(StringToSign))
+
+        utility::string_t string_to_sign;
+        string_to_sign += policy.permissions_to_string() + new_line;
+        string_to_sign += core::convert_to_iso8601_string(policy.start(), 0) + new_line;
+        string_to_sign += core::convert_to_iso8601_string(policy.expiry(), 0) + new_line;
+        string_to_sign += resource + new_line;
+        string_to_sign += key.signed_oid + new_line;
+        string_to_sign += key.signed_tid + new_line;
+        string_to_sign += core::convert_to_iso8601_string(key.signed_start, 0) + new_line;
+        string_to_sign += core::convert_to_iso8601_string(key.signed_expiry, 0) + new_line;
+        string_to_sign += key.signed_service + new_line;
+        string_to_sign += key.signed_version + new_line;
+        string_to_sign += policy.address_or_range().to_string() + new_line;
+        string_to_sign += policy.protocols_to_string() + new_line;
+        string_to_sign += header_value_storage_version + new_line;
+        string_to_sign += resource_type + new_line;
+        string_to_sign += snapshot_time + new_line;
+        string_to_sign += headers.cache_control() + new_line;
+        string_to_sign += headers.content_disposition() + new_line;
+        string_to_sign += headers.content_encoding() + new_line;
+        string_to_sign += headers.content_language() + new_line;
+        string_to_sign += headers.content_type();
+
+        auto signature = calculate_hmac_sha256_hash(string_to_sign, utility::conversions::from_base64(key.key));
+
+        auto builder = get_sas_token_builder(utility::string_t(), policy, signature);
+
+        add_query_if_not_empty(builder, uri_query_sas_resource, resource_type, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_cache_control, headers.cache_control(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_type, headers.content_type(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_encoding, headers.content_encoding(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_language, headers.content_language(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_content_disposition, headers.content_disposition(), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_skoid, key.signed_oid, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_sktid, key.signed_tid, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_skt, core::convert_to_iso8601_string(key.signed_start, 0), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_ske, core::convert_to_iso8601_string(key.signed_expiry, 0), /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_sks, key.signed_service, /* do_encoding */ true);
+        add_query_if_not_empty(builder, uri_query_sas_skv, key.signed_version, /* do_encoding */ true);
 
         return builder.query();
     }
@@ -216,7 +279,7 @@ namespace azure { namespace storage { namespace protocol {
 
         log_sas_string_to_sign(string_to_sign);
 
-        return calculate_hmac_sha256_hash(string_to_sign, credentials);
+        return calculate_hmac_sha256_hash(string_to_sign, credentials.account_key());
     }
 
     utility::string_t get_queue_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& resource, const storage_credentials& credentials)
@@ -258,7 +321,7 @@ namespace azure { namespace storage { namespace protocol {
 
         log_sas_string_to_sign(string_to_sign);
 
-        return calculate_hmac_sha256_hash(string_to_sign, credentials);
+        return calculate_hmac_sha256_hash(string_to_sign, credentials.account_key());
     }
 
     utility::string_t get_table_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const utility::string_t& table_name, const utility::string_t& start_partition_key, const utility::string_t& start_row_key, const utility::string_t& end_partition_key, const utility::string_t& end_row_key, const utility::string_t& resource, const storage_credentials& credentials)
@@ -308,7 +371,7 @@ namespace azure { namespace storage { namespace protocol {
 
         log_sas_string_to_sign(string_to_sign);
 
-        return calculate_hmac_sha256_hash(string_to_sign, credentials);
+        return calculate_hmac_sha256_hash(string_to_sign, credentials.account_key());
     }
 
     utility::string_t get_file_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_file_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const storage_credentials& credentials)
@@ -352,15 +415,15 @@ namespace azure { namespace storage { namespace protocol {
         string_to_sign.append(policy.permissions_to_string()).append(_XPLATSTR("\n"));
         string_to_sign.append(policy.service_types_to_string()).append(_XPLATSTR("\n"));
         string_to_sign.append(policy.resource_types_to_string()).append(_XPLATSTR("\n"));
-        string_to_sign.append(convert_datetime_if_initialized(policy.start())).append(_XPLATSTR("\n"));
-        string_to_sign.append(convert_datetime_if_initialized(policy.expiry())).append(_XPLATSTR("\n"));
+        string_to_sign.append(core::convert_to_iso8601_string(policy.start(), 0)).append(_XPLATSTR("\n"));
+        string_to_sign.append(core::convert_to_iso8601_string(policy.expiry(), 0)).append(_XPLATSTR("\n"));
         string_to_sign.append(policy.address_or_range().to_string()).append(_XPLATSTR("\n"));
         string_to_sign.append(policy.protocols_to_string()).append(_XPLATSTR("\n"));
         string_to_sign.append(header_value_storage_version).append(_XPLATSTR("\n"));
 
         log_sas_string_to_sign(string_to_sign);
 
-        return calculate_hmac_sha256_hash(string_to_sign, credentials);
+        return calculate_hmac_sha256_hash(string_to_sign, credentials.account_key());
     }
 
     utility::string_t get_account_sas_token(const utility::string_t& identifier, const account_shared_access_policy& policy, const storage_credentials& credentials)
@@ -378,8 +441,8 @@ namespace azure { namespace storage { namespace protocol {
 
         if (policy.is_valid())
         {
-            add_query_if_not_empty(builder, uri_query_sas_start, convert_datetime_if_initialized(policy.start()), /* do_encoding */ true);
-            add_query_if_not_empty(builder, uri_query_sas_expiry, convert_datetime_if_initialized(policy.expiry()), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_start, core::convert_to_iso8601_string(policy.start(), 0), /* do_encoding */ true);
+            add_query_if_not_empty(builder, uri_query_sas_expiry, core::convert_to_iso8601_string(policy.expiry(), 0), /* do_encoding */ true);
             add_query_if_not_empty(builder, uri_query_sas_permissions, policy.permissions_to_string(), /* do_encoding */ true);
             add_query_if_not_empty(builder, uri_query_sas_ip, policy.address_or_range().to_string(), /* do_encoding */ true);
             add_query_if_not_empty(builder, uri_query_sas_protocol, policy.protocols_to_string(), /* do_encoding */ true);

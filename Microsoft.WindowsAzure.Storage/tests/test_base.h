@@ -56,6 +56,9 @@ public:
         return m_blob_storage_account;
     }
 
+    const utility::string_t& get_oauth_account_name() const;
+    utility::string_t get_oauth_token() const;
+
 private:
 
     test_config();
@@ -63,6 +66,12 @@ private:
     azure::storage::cloud_storage_account m_account;
     azure::storage::cloud_storage_account m_premium_account;
     azure::storage::cloud_storage_account m_blob_storage_account;
+
+    utility::string_t m_token_account_name;
+    utility::string_t m_token_tenant_id;
+    utility::string_t m_token_client_id;
+    utility::string_t m_token_client_secret;
+    utility::string_t m_token_resource;
 };
 
 class test_base

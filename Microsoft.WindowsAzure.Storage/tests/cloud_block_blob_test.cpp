@@ -1134,7 +1134,7 @@ SUITE(Blob)
             try
             {
                 auto task_result = m_blob.upload_text_async(_XPLATSTR("test"), azure::storage::access_condition(), azure::storage::blob_request_options(), m_context, cancel_token_src.get_token());
-                std::this_thread::sleep_for(std::chrono::milliseconds(10)); //sleep for sometime before canceling the request and see result.
+                std::this_thread::sleep_for(std::chrono::milliseconds(3)); //sleep for sometime before canceling the request and see result.
                 cancel_token_src.cancel();
                 task_result.get();
             }
@@ -1195,7 +1195,7 @@ SUITE(Blob)
             try
             {
                 auto task_result = m_blob.delete_blob_if_exists_async(azure::storage::delete_snapshots_option::include_snapshots, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context, cancel_token_src.get_token());
-                std::this_thread::sleep_for(std::chrono::milliseconds(10)); //sleep for sometime before canceling the request and see result.
+                std::this_thread::sleep_for(std::chrono::milliseconds(3)); //sleep for sometime before canceling the request and see result.
                 cancel_token_src.cancel();
                 task_result.get();
             }
@@ -1252,7 +1252,7 @@ SUITE(Blob)
 
         {
             auto options = azure::storage::blob_request_options();
-            options.set_maximum_execution_time(std::chrono::milliseconds(20));
+            options.set_maximum_execution_time(std::chrono::milliseconds(3));
 
             std::string ex_msg;
 
@@ -1309,7 +1309,7 @@ SUITE(Blob)
 
         {
             auto options = azure::storage::blob_request_options();
-            options.set_maximum_execution_time(std::chrono::milliseconds(20));
+            options.set_maximum_execution_time(std::chrono::milliseconds(3));
 
             std::string ex_msg;
 
@@ -1373,7 +1373,7 @@ SUITE(Blob)
         {
             //when timeout first
             auto options = azure::storage::blob_request_options();
-            options.set_maximum_execution_time(std::chrono::milliseconds(10));
+            options.set_maximum_execution_time(std::chrono::milliseconds(3));
             auto cancel_token_src = pplx::cancellation_token_source();
 
             std::string ex_msg;
@@ -1673,7 +1673,7 @@ SUITE(Blob)
 
         {
             auto options = azure::storage::blob_request_options();
-            options.set_maximum_execution_time(std::chrono::milliseconds(10000));
+            options.set_maximum_execution_time(std::chrono::seconds(30));
 
             std::string ex_msg;
 

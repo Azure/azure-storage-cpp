@@ -116,6 +116,61 @@ test_config::test_config()
             }
         }
     }
+
+    web::json::value& token_information = config[_XPLATSTR("token_information")];
+
+    m_token_account_name = token_information.at(_XPLATSTR("account_name")).as_string();
+    m_token_tenant_id = token_information.at(_XPLATSTR("tenant_id")).as_string();
+    m_token_client_id = token_information.at(_XPLATSTR("client_id")).as_string();
+    m_token_client_secret = token_information.at(_XPLATSTR("client_secret")).as_string();
+    m_token_resource = token_information.at(_XPLATSTR("resource")).as_string();
+}
+
+const utility::string_t& test_config::get_oauth_account_name() const
+{
+    return m_token_account_name;
+}
+
+utility::string_t test_config::get_oauth_token() const
+{
+    utility::string_t uri = _XPLATSTR("https://login.microsoftonline.com/") + m_token_tenant_id + _XPLATSTR("/oauth2/token");
+
+    utility::string_t body;
+    body += _XPLATSTR("grant_type=client_credentials&");
+    body += _XPLATSTR("client_id=") + m_token_client_id + _XPLATSTR("&");
+    body += _XPLATSTR("client_secret=") + m_token_client_secret + _XPLATSTR("&");
+    body += _XPLATSTR("resource=") + m_token_resource;
+
+    web::http::http_request request;
+    request.set_method(web::http::methods::POST);
+    request.set_body(body, _XPLATSTR("application/x-www-form-urlencoded"));
+
+    utility::string_t access_token;
+
+    web::http::client::http_client client(uri);
+    auto get_token_task = client.request(request).then([](web::http::http_response response)
+    {
+        if (response.status_code() == web::http::status_codes::OK)
+        {
+            return response.extract_json();
+        }
+        return pplx::task_from_result(web::json::value());
+    }).then([&access_token](pplx::task<web::json::value> json_task)
+    {
+        const auto& json_value = json_task.get();
+        access_token = json_value.at(_XPLATSTR("access_token")).as_string();
+    });
+
+    try
+    {
+        get_token_task.wait();
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Cannot get OAuth access token: " << e.what() << std::endl;
+    }
+
+    return access_token;
 }
 
 utility::datetime test_base::parse_datetime(const utility::string_t& value, utility::datetime::date_format format)

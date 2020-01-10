@@ -195,4 +195,31 @@ namespace azure { namespace storage {
         }
     }
 
+    pplx::task<user_delegation_key> cloud_blob_client::get_user_delegation_key_async(const utility::datetime& start, const utility::datetime& expiry, const request_options& modified_options, operation_context context, const pplx::cancellation_token& cancellation_token)
+    {
+        if (!credentials().is_bearer_token())
+        {
+            throw std::logic_error(protocol::error_uds_missing_credentials);
+        }
+
+        protocol::user_delegation_key_time_writer writer;
+        concurrency::streams::istream stream(concurrency::streams::bytestream::open_istream(writer.write(start, expiry)));
+
+        auto command = std::make_shared<core::storage_command<user_delegation_key>>(base_uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
+        command->set_build_request(std::bind(protocol::get_user_delegation_key, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(authentication_handler());
+        command->set_location_mode(core::command_location_mode::primary_or_secondary);
+        command->set_preprocess_response(std::bind(protocol::preprocess_response<user_delegation_key>, user_delegation_key(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_postprocess_response([](const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) -> pplx::task<user_delegation_key>
+        {
+            protocol::user_delegation_key_reader reader(response.body());
+            return pplx::task_from_result<user_delegation_key>(reader.move_key());
+        });
+        return core::istream_descriptor::create(stream, checksum_type::none, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, context, modified_options, cancellation_token](core::istream_descriptor request_body) -> pplx::task<user_delegation_key>
+        {
+            command->set_request_body(request_body);
+            return core::executor<user_delegation_key>::execute_async(command, modified_options, context);
+        });
+    }
+
 }} // namespace azure::storage

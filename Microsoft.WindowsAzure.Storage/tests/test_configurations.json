@@ -23,5 +23,12 @@
       "type": "cloud",
       "connection_string": "DefaultEndpointsProtocol=https;"
     }
-  ]
+  ],
+  "token_information": {
+    "account_name": "",
+    "tenant_id": "",
+    "client_id": "",
+    "client_secret": "",
+    "resource": "https://storage.azure.com"
+  }
 }

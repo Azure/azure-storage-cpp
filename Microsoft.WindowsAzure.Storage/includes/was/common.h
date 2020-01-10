@@ -1728,6 +1728,23 @@ namespace azure { namespace storage {
         }
 #endif
 
+        /// <summary>
+        /// Sets a callback to enable custom setting of platform specific options.
+        /// </summary>
+        /// <param name="callback">A user callback allowing for customization of the session.</param>
+        void set_native_session_handle_options_callback(const std::function<void(web::http::client::native_handle)>& callback)
+        {
+            m_native_session_handle_options_callback = callback;
+        }
+
+        /// <summary>
+        /// Gets the user's callback to custom setting of platform specific options.
+        /// </summary>
+        const std::function<void(web::http::client::native_handle)>& get_native_session_handle_options_callback() const
+        {
+            return m_native_session_handle_options_callback;
+        }
+
     private:
 
         std::function<void(web::http::http_request &, operation_context)> m_sending_request;
@@ -1744,6 +1761,7 @@ namespace azure { namespace storage {
         boost::log::sources::severity_logger<boost::log::trivial::severity_level> m_logger;
         std::function<void(boost::asio::ssl::context&)> m_ssl_context_callback; //No need to initialize as CPPRest does not initialize it.
 #endif
+        std::function<void(web::http::client::native_handle)> m_native_session_handle_options_callback;
     };
 
     /// <summary>
@@ -1990,6 +2008,23 @@ namespace azure { namespace storage {
             return m_impl->get_ssl_context_callback();
         }
 #endif
+
+        /// <summary>
+        /// Sets a callback to enable custom setting of platform specific options.
+        /// </summary>
+        /// <param name="callback">A user callback allowing for customization of the session.</param>
+        void set_native_session_handle_options_callback(const std::function<void(web::http::client::native_handle)>& callback)
+        {
+            m_impl->set_native_session_handle_options_callback(callback);
+        }
+
+        /// <summary>
+        /// Gets the user's callback to custom setting of platform specific options.
+        /// </summary>
+        const std::function<void(web::http::client::native_handle)>& get_native_session_handle_options_callback() const
+        {
+            return m_impl->get_native_session_handle_options_callback();
+        }
 
         std::shared_ptr<_operation_context> _get_impl() const
         {

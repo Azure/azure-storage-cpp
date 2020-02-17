@@ -44,5 +44,5 @@ var searchData=
   ['attributes',['attributes',['../classazure_1_1storage_1_1cloud__file__directory__properties.html#adc5fadf6a9228b2520fd01a86cfc5d9c',1,'azure::storage::cloud_file_directory_properties::attributes()'],['../classazure_1_1storage_1_1cloud__file__properties.html#a3642f8bf2953aecbca636fccb29596b7',1,'azure::storage::cloud_file_properties::attributes()']]],
   ['authentication_5fhandler',['authentication_handler',['../classazure_1_1storage_1_1cloud__client.html#afb507589132db936405495e4bd972be5',1,'azure::storage::cloud_client']]],
   ['authentication_5fscheme',['authentication_scheme',['../classazure_1_1storage_1_1cloud__client.html#aae65b414fd609abea12d2d577ddec30a',1,'azure::storage::cloud_client']]],
-  ['azure_20storage_20client_20library_20for_20c_2b_2b_20_287_2e1_2e0_29',['Azure Storage Client Library for C++ (7.1.0)',['../index.html',1,'']]]
+  ['azure_20storage_20client_20library_20for_20c_2b_2b_20_287_2e2_2e0_29',['Azure Storage Client Library for C++ (7.2.0)',['../index.html',1,'']]]
 ];

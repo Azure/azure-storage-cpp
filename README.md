@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (7.1.0)
+# Azure Storage Client Library for C++ (7.2.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -127,6 +127,7 @@ The validated Casablanca version for each major or recent release on different p
 | 6.1.0                       | 2.10.13                        | 2.10.13                      |
 | 7.0.0                       | 2.10.14                        | 2.10.14                      |
 | 7.1.0                       | 2.10.14                        | 2.10.14                      |
+| 7.2.0                       | 2.10.14                        | 2.10.14                      |
 
 ## Code Samples
 

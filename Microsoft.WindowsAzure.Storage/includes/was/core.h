@@ -482,17 +482,20 @@ namespace azure { namespace storage {
     {
         none,
         md5,
+        sha256,
         crc64,
         hmac_sha256,
     };
 
     using checksum_none_t = std::integral_constant<checksum_type, checksum_type::none>;
     using checksum_md5_t = std::integral_constant<checksum_type, checksum_type::md5>;
+    using checksum_sha256_t = std::integral_constant<checksum_type, checksum_type::sha256>;
     using checksum_crc64_t = std::integral_constant<checksum_type, checksum_type::crc64>;
     using checksum_hmac_sha256_t = std::integral_constant<checksum_type, checksum_type::hmac_sha256>;
 
     constexpr auto checksum_none = checksum_none_t();
     constexpr auto checksum_md5 = checksum_md5_t();
+    constexpr auto checksum_sha256 = checksum_sha256_t();
     constexpr auto checksum_crc64 = checksum_crc64_t();
     constexpr auto checksum_hmac_sha256 = checksum_hmac_sha256_t();
 
@@ -516,9 +519,9 @@ namespace azure { namespace storage {
         /// <remarks>
         /// If the provided string is empty, this class is initialized as if checksum method isn't specified.
         /// </remarks>
-        checksum(utility::string_t md5) : m_type(checksum_type::md5), m_md5(std::move(md5))
+        checksum(utility::string_t md5) : m_type(checksum_type::md5), m_str_hash(std::move(md5))
         {
-            if (m_md5.empty())
+            if (m_str_hash.empty())
             {
                 m_type = checksum_type::none;
             }
@@ -555,7 +558,16 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="type">Explicitly specified checksum type, must be <see cref="azure::storage::checksum_md5" />.</param>
         /// <param name="val">A string containing base64-encoded MD5.</param>
-        checksum(checksum_md5_t type, utility::string_t val) : m_type(type.value), m_md5(std::move(val))
+        checksum(checksum_md5_t type, utility::string_t val) : m_type(type.value), m_str_hash(std::move(val))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::checksum" /> class with SHA-256 hash value.
+        /// </summary>
+        /// <param name="type">Explicitly specified checksum type, must be <see cref="azure::storage::checksum_sha256" />.</param>
+        /// <param name="val">A string containing base64-encoded SHA-256.</param>
+        checksum(checksum_sha256_t type, utility::string_t val) : m_type(type.value), m_str_hash(std::move(val))
         {
         }
 
@@ -573,7 +585,7 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="type">Explicitly specified checksum type, must be <see cref="azure::storage::checksum_hmac_sha256" />.</param>
         /// <param name="val">A string containing base64-encoded HMAC-SHA256 authentication code.</param>
-        checksum(checksum_hmac_sha256_t type, utility::string_t val) : m_type(type.value), m_hmac_sha256(std::move(val))
+        checksum(checksum_hmac_sha256_t type, utility::string_t val) : m_type(type.value), m_str_hash(std::move(val))
         {
         }
 
@@ -600,8 +612,7 @@ namespace azure { namespace storage {
             if (this != &other)
             {
                 m_type = std::move(other.m_type);
-                m_md5 = std::move(other.m_md5);
-                m_hmac_sha256 = std::move(other.hmac_sha256);
+                m_str_hash = std::move(other.m_str_hash);
                 m_crc64 = std::move(other.m_crc64);
             }
             return *this;
@@ -615,6 +626,15 @@ namespace azure { namespace storage {
         bool is_md5() const
         {
             return m_type == checksum_type::md5;
+        }
+
+        /// <summary>
+        /// Indicates whether this is an SHA-256 checksum.
+        /// </summary>
+        /// <returns><c>true</c> if this is an SHA-256 checksum; otherwise, <c>false</c>.</returns>
+        bool is_sha256() const
+        {
+            return m_type == checksum_type::sha256;
         }
 
         /// <summary>
@@ -650,7 +670,16 @@ namespace azure { namespace storage {
         /// <returns>A string containing base64-encoded MD5.</returns>
         const utility::string_t& md5() const
         {
-            return m_md5;
+            return m_str_hash;
+        }
+
+        /// <summary>
+        /// Gets the SHA-256 checksum.
+        /// </summary>
+        /// <returns>A string containing base64-encoded SHA-256.</returns>
+        const utility::string_t& sha256() const
+        {
+            return m_str_hash;
         }
 
         /// <summary>
@@ -659,7 +688,7 @@ namespace azure { namespace storage {
         /// <returns>A string containing base64-encoded HMAC-256 authentiction code.</returns>
         const utility::string_t& hmac_sha256() const
         {
-            return m_hmac_sha256;
+            return m_str_hash;
         }
 
         /// <summary>
@@ -675,8 +704,7 @@ namespace azure { namespace storage {
 
     private:
         checksum_type m_type;
-        utility::string_t m_md5;
-        utility::string_t m_hmac_sha256;
+        utility::string_t m_str_hash;
         uint64_t m_crc64;
     };
 

@@ -151,6 +151,33 @@ namespace azure { namespace storage { namespace core {
 #endif
     };
 
+    class sha256_hash_provider_impl : public cryptography_hash_provider_impl
+    {
+    public:
+        sha256_hash_provider_impl();
+        ~sha256_hash_provider_impl() override;
+
+        bool is_enabled() const override
+        {
+            return true;
+        }
+
+        void write(const uint8_t* data, size_t count) override;
+        void close() override;
+
+        checksum hash() const override
+        {
+            return checksum(checksum_sha256, utility::conversions::to_base64(m_hash));
+        }
+
+    private:
+#ifdef _WIN32
+        static BCRYPT_ALG_HANDLE algorithm_handle();
+#else // Linux
+        SHA256_CTX* m_hash_context = nullptr;
+#endif
+    };
+
     class crc64_hash_provider_impl : public hash_provider_impl
     {
     public:
@@ -213,6 +240,11 @@ namespace azure { namespace storage { namespace core {
         static hash_provider create_md5_hash_provider()
         {
             return hash_provider(std::make_shared<md5_hash_provider_impl>());
+        }
+
+        static hash_provider create_sha256_hash_provider()
+        {
+            return hash_provider(std::make_shared<sha256_hash_provider_impl>());
         }
 
         static hash_provider create_crc64_hash_provider()

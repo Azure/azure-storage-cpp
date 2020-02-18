@@ -33,7 +33,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized(), timer_handler);
-        command->set_build_request(std::bind(protocol::put_append_blob, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::put_append_blob, *properties, metadata(), condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -77,7 +77,7 @@ namespace azure { namespace storage {
         return core::istream_descriptor::create(block_data, needs_checksum, std::numeric_limits<utility::size64_t>::max(), protocol::max_append_block_size, command->get_cancellation_token()).then([command, context, content_checksum, modified_options, condition, cancellation_token, options](core::istream_descriptor request_body) -> pplx::task<int64_t>
         {
             const auto& checksum = content_checksum.empty() ? request_body.content_checksum() : content_checksum;
-            command->set_build_request(std::bind(protocol::append_block, checksum, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            command->set_build_request(std::bind(protocol::append_block, checksum, condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<int64_t>::execute_async(command, modified_options, context);
         });

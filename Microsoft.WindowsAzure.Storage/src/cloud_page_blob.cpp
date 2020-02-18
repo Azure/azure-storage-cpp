@@ -34,7 +34,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::put_page, range, page_write::clear, checksum(checksum_none), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::put_page, range, page_write::clear, checksum(checksum_none), condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -81,7 +81,7 @@ namespace azure { namespace storage {
             const auto& checksum = content_checksum.empty() ? request_body.content_checksum() : content_checksum;
             auto end_offset = start_offset + request_body.length() - 1;
             page_range range(start_offset, end_offset);
-            command->set_build_request(std::bind(protocol::put_page, range, page_write::update, checksum, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            command->set_build_request(std::bind(protocol::put_page, range, page_write::update, checksum, condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });
@@ -190,7 +190,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::put_page_blob, size, get_premium_access_tier_string(tier), sequence_number, *properties, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::put_page_blob, size, get_premium_access_tier_string(tier), sequence_number, *properties, metadata(), condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, size, tier](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -343,7 +343,7 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        command->set_build_request(std::bind(protocol::set_blob_tier, get_premium_access_tier_string(tier), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::set_blob_tier, get_premium_access_tier_string(tier), condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, tier](const web::http::http_response& response, const request_result& result, operation_context context) -> void
         {

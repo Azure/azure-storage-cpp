@@ -197,7 +197,7 @@ namespace azure { namespace storage {
         auto copy_state = m_copy_state;
 
         auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized() && use_timer, timer_handler);
-        command->set_build_request(std::bind(protocol::get_blob_properties, snapshot_time(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::get_blob_properties, snapshot_time(), condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
         command->set_preprocess_response([properties, metadata, copy_state](const web::http::http_response& response, const request_result& result, operation_context context)
@@ -220,7 +220,7 @@ namespace azure { namespace storage {
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::set_blob_metadata, metadata(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::set_blob_metadata, metadata(), condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -531,7 +531,7 @@ namespace azure { namespace storage {
                 needs_checksum = checksum_type::crc64;
             }
 
-            return protocol::get_blob(current_offset, current_length, needs_checksum, current_snapshot_time, current_condition, uri_builder, timeout, context);
+            return protocol::get_blob(current_offset, current_length, needs_checksum, current_snapshot_time, current_condition, modified_options, uri_builder, timeout, context);
         });
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
@@ -913,7 +913,7 @@ namespace azure { namespace storage {
         auto copy_state = m_copy_state;
 
         auto command = std::make_shared<core::storage_command<bool>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::get_blob_properties, snapshot_time(), access_condition(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::get_blob_properties, snapshot_time(), access_condition(), modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(primary_only ? core::command_location_mode::primary_only : core::command_location_mode::primary_or_secondary);
         command->set_preprocess_response([properties, metadata, copy_state](const web::http::http_response& response, const request_result& result, operation_context context) -> bool
@@ -1004,7 +1004,7 @@ namespace azure { namespace storage {
         auto resulting_metadata = snapshot_metadata->empty() ? m_metadata : snapshot_metadata;
 
         auto command = std::make_shared<core::storage_command<cloud_blob>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
-        command->set_build_request(std::bind(protocol::snapshot_blob, *snapshot_metadata, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::snapshot_blob, *snapshot_metadata, condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([snapshot_name, snapshot_container, resulting_metadata, properties](const web::http::http_response& response, const request_result& result, operation_context context) -> cloud_blob
         {

@@ -1698,4 +1698,28 @@ SUITE(Blob)
             CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
         }
     }
+
+    TEST_FIXTURE(premium_page_blob_test_base, page_blob_cpkv)
+    {
+        utility::size64_t length = 128 * 1024;
+        std::vector<uint8_t> buffer(length);
+        fill_buffer(buffer);
+        auto empty_options = azure::storage::blob_request_options();
+        auto cpk_options = azure::storage::blob_request_options();
+        std::vector<uint8_t> key(32);
+        fill_buffer(key);
+        cpk_options.set_encryption_key(key);
+
+        m_blob.create(length, 0, azure::storage::access_condition(), cpk_options, m_context);
+
+        CHECK_THROW(m_blob.exists(empty_options, m_context), azure::storage::storage_exception);
+        m_blob.exists(cpk_options, m_context);
+        CHECK_THROW(m_blob.upload_pages(concurrency::streams::bytestream::open_istream(buffer), 0, azure::storage::checksum_none, azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        m_blob.upload_pages(concurrency::streams::bytestream::open_istream(buffer), 0, azure::storage::checksum_none, azure::storage::access_condition(), cpk_options, m_context);
+        CHECK_THROW(m_blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p4, azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        CHECK_THROW(m_blob.set_premium_blob_tier(azure::storage::premium_blob_tier::p4, azure::storage::access_condition(), cpk_options, m_context), azure::storage::storage_exception);
+        m_blob.resize(length * 2, azure::storage::access_condition(), empty_options, m_context);
+        m_blob.download_page_ranges(azure::storage::access_condition(), empty_options, m_context);
+        m_blob.set_sequence_number(azure::storage::sequence_number::increment(), azure::storage::access_condition(), empty_options, m_context);
+    }
 }

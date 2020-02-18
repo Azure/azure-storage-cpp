@@ -210,6 +210,9 @@ DAT(ms_header_file_change_time, _XPLATSTR("x-ms-file-change-time"))
 DAT(ms_header_file_id, _XPLATSTR("x-ms-file-id"))
 DAT(ms_header_file_parent_id, _XPLATSTR("x-ms-file-parent-id"))
 DAT(ms_header_previous_snapshot_url, _XPLATSTR("x-ms-previous-snapshot-url"))
+DAT(ms_header_encryption_key, _XPLATSTR("x-ms-encryption-key"))
+DAT(ms_header_encryption_key_sha256, _XPLATSTR("x-ms-encryption-key-sha256"))
+DAT(ms_header_encryption_algorithm, _XPLATSTR("x-ms-encryption-algorithm"))
 
 // header values
 DAT(header_value_storage_version, _XPLATSTR("2019-07-07"))
@@ -285,6 +288,7 @@ DAT(header_value_file_attribute_offline, _XPLATSTR("Offline"))
 DAT(header_value_file_attribute_notcontentindexed, _XPLATSTR("NotContentIndexed"))
 DAT(header_value_file_attribute_noscrubdata, _XPLATSTR("NoScrubData"))
 DAT(header_value_file_attribute_delimiter, _XPLATSTR(" | "))
+DAT(header_value_encryption_algorithm_aes256, _XPLATSTR("AES256"))
 
 // xml strings
 DAT(xml_last_modified, _XPLATSTR("Last-Modified"))

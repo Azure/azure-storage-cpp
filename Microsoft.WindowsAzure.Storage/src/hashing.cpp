@@ -140,6 +140,39 @@ namespace azure { namespace storage { namespace core {
         cryptography_hash_provider_impl::close();
     }
 
+    BCRYPT_ALG_HANDLE sha256_hash_provider_impl::algorithm_handle()
+    {
+        static const BCRYPT_ALG_HANDLE alg_handle = []() {
+            BCRYPT_ALG_HANDLE handle;
+            NTSTATUS status = BCryptOpenAlgorithmProvider(&handle, BCRYPT_SHA256_ALGORITHM, NULL, 0);
+            if (status != 0)
+            {
+                throw utility::details::create_system_error(status);
+            }
+            return handle;
+        }();
+
+        return alg_handle;
+    }
+
+    sha256_hash_provider_impl::sha256_hash_provider_impl() : cryptography_hash_provider_impl(algorithm_handle(), std::vector<uint8_t>())
+    {
+    }
+
+    sha256_hash_provider_impl::~sha256_hash_provider_impl()
+    {
+    }
+
+    void sha256_hash_provider_impl::write(const uint8_t* data, size_t count)
+    {
+        cryptography_hash_provider_impl::write(data, count);
+    }
+
+    void sha256_hash_provider_impl::close()
+    {
+        cryptography_hash_provider_impl::close();
+    }
+
 #else // Linux
 
     hmac_sha256_hash_provider_impl::hmac_sha256_hash_provider_impl(const std::vector<uint8_t>& key)
@@ -207,6 +240,32 @@ namespace azure { namespace storage { namespace core {
     {
         m_hash.resize(MD5_DIGEST_LENGTH);
         MD5_Final(m_hash.data(), m_hash_context);
+    }
+
+    sha256_hash_provider_impl::sha256_hash_provider_impl()
+    {
+        m_hash_context = (SHA256_CTX*)OPENSSL_malloc(sizeof(SHA256_CTX));
+        memset(m_hash_context, 0, sizeof(*m_hash_context));
+        SHA256_Init(m_hash_context);
+    }
+
+    sha256_hash_provider_impl::~sha256_hash_provider_impl()
+    {
+        if (m_hash_context != nullptr)
+        {
+            OPENSSL_free(m_hash_context);
+        }
+    }
+
+    void sha256_hash_provider_impl::write(const uint8_t* data, size_t count)
+    {
+        SHA256_Update(m_hash_context, data, count);
+    }
+
+    void sha256_hash_provider_impl::close()
+    {
+        m_hash.resize(SHA256_DIGEST_LENGTH);
+        SHA256_Final(m_hash.data(), m_hash_context);
     }
 
 #endif

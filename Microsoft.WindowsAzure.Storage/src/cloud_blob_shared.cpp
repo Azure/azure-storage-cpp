@@ -47,6 +47,7 @@ namespace azure { namespace storage {
         m_content_language = root_blob_properties.m_content_language;
         m_content_md5 = root_blob_properties.m_content_md5;
         m_content_type = root_blob_properties.m_content_type;
+        m_encryption_key_sha256 = root_blob_properties.m_encryption_key_sha256;
     }
 
     void cloud_blob_properties::update_size(const cloud_blob_properties& parsed_properties)

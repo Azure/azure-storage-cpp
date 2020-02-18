@@ -1288,4 +1288,25 @@ SUITE(Blob)
             CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
         }
     }
+
+    TEST_FIXTURE(append_blob_test_base, append_blob_cpkv)
+    {
+        utility::size64_t length = 128 * 1024;
+        std::vector<uint8_t> buffer(length);
+        fill_buffer(buffer);
+        auto empty_options = azure::storage::blob_request_options();
+        auto cpk_options = azure::storage::blob_request_options();
+        std::vector<uint8_t> key(32);
+        fill_buffer(key);
+        cpk_options.set_encryption_key(key);
+
+        m_blob.create_or_replace(azure::storage::access_condition(), cpk_options, m_context);
+
+        CHECK_THROW(m_blob.exists(empty_options, m_context), azure::storage::storage_exception);
+        m_blob.exists(cpk_options, m_context);
+        CHECK_THROW(m_blob.append_block(concurrency::streams::bytestream::open_istream(buffer), azure::storage::checksum_none, azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        m_blob.append_block(concurrency::streams::bytestream::open_istream(buffer), azure::storage::checksum_none, azure::storage::access_condition(), cpk_options, m_context);
+        CHECK_THROW(m_blob.append_text(_XPLATSTR("Hello world"), azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        m_blob.append_text(_XPLATSTR("Hello world"), azure::storage::access_condition(), cpk_options, m_context);
+    }
 }

@@ -1287,6 +1287,7 @@ namespace azure { namespace storage {
                 m_content_md5 = std::move(other.m_content_md5);
                 m_content_type = std::move(other.m_content_type);
                 m_etag = std::move(other.m_etag);
+                m_encryption_key_sha256 = std::move(other.m_encryption_key_sha256);
                 m_last_modified = std::move(other.m_last_modified);
                 m_type = std::move(other.m_type);
                 m_lease_status = std::move(other.m_lease_status);
@@ -1430,6 +1431,15 @@ namespace azure { namespace storage {
         const utility::string_t& etag() const
         {
             return m_etag;
+        }
+
+        /// <summary>
+        /// Gets the SHA-256 of the customer-provided key used to encrypt this blob.
+        /// </summary>
+        /// <returns>The base64-encoded SHA-256 value.</returns>
+        const utility::string_t& encryption_key_sha256() const
+        {
+            return m_encryption_key_sha256;
         }
 
         /// <summary>
@@ -1583,6 +1593,7 @@ namespace azure { namespace storage {
         utility::string_t m_content_md5;
         utility::string_t m_content_type;
         utility::string_t m_etag;
+        utility::string_t m_encryption_key_sha256;
         utility::datetime m_last_modified;
         utility::datetime m_access_tier_change_time;
         blob_type m_type;
@@ -1819,6 +1830,7 @@ namespace azure { namespace storage {
                 m_stream_write_size = std::move(other.m_stream_write_size);
                 m_stream_read_size = std::move(other.m_stream_read_size);
                 m_absorb_conditional_errors_on_retry = std::move(other.m_absorb_conditional_errors_on_retry);
+                m_encryption_key = std::move(other.m_encryption_key);
             }
             return *this;
         }
@@ -1859,6 +1871,8 @@ namespace azure { namespace storage {
             m_stream_write_size.merge(other.m_stream_write_size);
             m_stream_read_size.merge(other.m_stream_read_size);
             m_absorb_conditional_errors_on_retry.merge(other.m_absorb_conditional_errors_on_retry);
+            if (m_encryption_key.empty() && !other.m_encryption_key.empty())
+                m_encryption_key = other.m_encryption_key;
         }
 
         /// <summary>
@@ -2055,6 +2069,24 @@ namespace azure { namespace storage {
             m_absorb_conditional_errors_on_retry = value;
         }
 
+        /// <summary>
+        /// Gets the customer provided encryption key.
+        /// </summary>
+        /// <returns>The customer provided encryption key.</returns>
+        const std::vector<uint8_t>& encryption_key() const
+        {
+            return m_encryption_key;
+        }
+
+        /// <summary>
+        /// Sets the customer provided encryption key.
+        /// </summary>
+        /// <param name="encryption_key">The customer provided encryption key.</returns>
+        void set_encryption_key(std::vector<uint8_t> encryption_key)
+        {
+            m_encryption_key = std::move(encryption_key);
+        }
+
     private:
 
         option_with_default<bool> m_use_transactional_md5;
@@ -2067,6 +2099,7 @@ namespace azure { namespace storage {
         option_with_default<size_t> m_stream_write_size;
         option_with_default<size_t> m_stream_read_size;
         option_with_default<bool> m_absorb_conditional_errors_on_retry;
+        std::vector<uint8_t> m_encryption_key;
     };
 
     /// <summary>

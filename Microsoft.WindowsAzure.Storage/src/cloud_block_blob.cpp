@@ -46,7 +46,7 @@ namespace azure { namespace storage {
         return core::istream_descriptor::create(block_data, needs_checksum, std::numeric_limits<utility::size64_t>::max(), protocol::max_block_size, command->get_cancellation_token()).then([command, context, block_id, content_checksum, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
         {
             const auto& checksum = content_checksum.empty() ? request_body.content_checksum() : content_checksum;
-            command->set_build_request(std::bind(protocol::put_block, block_id, checksum, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            command->set_build_request(std::bind(protocol::put_block, block_id, checksum, condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });
@@ -84,7 +84,7 @@ namespace azure { namespace storage {
         });
         return core::istream_descriptor::create(stream, needs_checksum, std::numeric_limits<utility::size64_t>::max(), std::numeric_limits<utility::size64_t>::max(), command->get_cancellation_token()).then([command, properties, this, context, modified_options, condition](core::istream_descriptor request_body) -> pplx::task<void>
         {
-            command->set_build_request(std::bind(protocol::put_block_list, *properties, metadata(), request_body.content_checksum(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            command->set_build_request(std::bind(protocol::put_block_list, *properties, metadata(), request_body.content_checksum(), condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });
@@ -224,7 +224,7 @@ namespace azure { namespace storage {
                     content_checksum = request_body.content_checksum();
                 }
 
-                command->set_build_request(std::bind(protocol::put_block_blob, content_checksum, *properties, *metadata, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+                command->set_build_request(std::bind(protocol::put_block_blob, content_checksum, *properties, *metadata, condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
                 command->set_request_body(request_body);
                 return core::executor<void>::execute_async(command, modified_options, context);
             });
@@ -362,7 +362,7 @@ namespace azure { namespace storage {
 
         auto properties = m_properties;
 
-        command->set_build_request(std::bind(protocol::set_blob_tier, tier_str, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::set_blob_tier, tier_str, condition, modified_options, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, tier](const web::http::http_response& response, const request_result& result, operation_context context) -> void
         {

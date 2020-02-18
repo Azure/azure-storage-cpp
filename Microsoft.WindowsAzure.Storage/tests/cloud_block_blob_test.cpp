@@ -663,7 +663,7 @@ SUITE(Blob)
         auto original_file = concurrency::streams::file_stream<uint8_t>::open_istream(file.path()).get();
         original_file.read_to_end(original_file_buffer).wait();
         original_file.close().wait();
-         
+
         concurrency::streams::container_buffer<std::vector<uint8_t>> downloaded_file_buffer;
         auto downloaded_file = concurrency::streams::file_stream<uint8_t>::open_istream(file2.path()).get();
         downloaded_file.read_to_end(downloaded_file_buffer).wait();
@@ -864,7 +864,7 @@ SUITE(Blob)
         m_blob.upload_block_list(blocks, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         CHECK_UTF8_EQUAL(_XPLATSTR("4123567894"), m_blob.download_text(azure::storage::access_condition(), azure::storage::blob_request_options(), m_context));
     }
-    
+
     TEST_FIXTURE(block_blob_test_base, list_uncommitted_blobs)
     {
         std::vector<uint8_t> buffer;
@@ -905,7 +905,7 @@ SUITE(Blob)
 
         m_context.set_response_received(std::function<void(web::http::http_request &, const web::http::http_response&, azure::storage::operation_context)>());
     }
- 
+
     TEST_FIXTURE(block_blob_test_base, large_block_blob)
     {
         std::vector<uint8_t> buffer;
@@ -921,7 +921,7 @@ SUITE(Blob)
         options.set_single_blob_upload_threshold_in_bytes(buffer.size() / 2);
         m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
         CHECK_EQUAL(6U, m_context.request_results().size()); // PutBlock * 3 + PutBlockList
-        
+
         options.set_stream_write_size_in_bytes(6 * 1024 * 1024);
         m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
         CHECK_EQUAL(9U, m_context.request_results().size()); // PutBlock * 2 + PutBlockList
@@ -1893,6 +1893,90 @@ SUITE(Blob)
             }
 
             CHECK_EQUAL("The client could not finish the operation within specified timeout.", ex_msg);
+        }
+    }
+
+    TEST_FIXTURE(block_blob_test_base, block_blob_cpkv)
+    {
+        utility::size64_t length = 128 * 1024;
+        std::vector<uint8_t> buffer(length);
+        fill_buffer(buffer);
+        auto empty_options = azure::storage::blob_request_options();
+        auto cpk_options = azure::storage::blob_request_options();
+        std::vector<uint8_t> key(32);
+        fill_buffer(key);
+        cpk_options.set_encryption_key(key);
+
+        m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), length, azure::storage::access_condition(), cpk_options, m_context);
+
+        for (const auto& options : { empty_options, cpk_options })
+        {
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            concurrency::streams::ostream download_stream(download_buffer);
+            if (options.encryption_key().empty())
+            {
+                CHECK_THROW(m_blob.download_to_stream(download_stream, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
+            }
+            else
+            {
+                m_blob.download_to_stream(download_stream, azure::storage::access_condition(), options, m_context);
+                CHECK(!m_blob.properties().encryption_key_sha256().empty());
+                CHECK(buffer == download_buffer.collection());
+            }
+        }
+
+        auto binary_data = get_random_binary_data();
+        binary_data.resize(10);
+        utility::string_t block_id = utility::conversions::to_base64(binary_data);
+        m_blob.upload_block(block_id, concurrency::streams::bytestream::open_istream(buffer), azure::storage::checksum_none, azure::storage::access_condition(), cpk_options, m_context);
+        std::vector<azure::storage::block_list_item> blocks_id;
+        blocks_id.emplace_back(block_id);
+        m_blob.upload_block_list(blocks_id, azure::storage::access_condition(), cpk_options, m_context);
+
+        for (const auto& options : { empty_options, cpk_options })
+        {
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            concurrency::streams::ostream download_stream(download_buffer);
+            if (options.encryption_key().empty())
+            {
+                CHECK_THROW(m_blob.download_to_stream(download_stream, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
+            }
+            else
+            {
+                m_blob.download_to_stream(download_stream, azure::storage::access_condition(), options, m_context);
+                CHECK(!m_blob.properties().encryption_key_sha256().empty());
+                CHECK(buffer == download_buffer.collection());
+            }
+        }
+
+        m_blob.properties().set_content_type(_XPLATSTR("application/octet-stream"));
+        m_blob.properties().set_content_language(_XPLATSTR("en-US"));
+        CHECK_THROW(m_blob.upload_metadata(azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        CHECK_THROW(m_blob.download_attributes(azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        m_blob.upload_properties(azure::storage::access_condition(), empty_options, m_context);
+        m_blob.upload_metadata(azure::storage::access_condition(), cpk_options, m_context);
+        m_blob.download_attributes(azure::storage::access_condition(), cpk_options, m_context);
+
+        CHECK_THROW(m_blob.set_standard_blob_tier(azure::storage::standard_blob_tier::cool, azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        CHECK_THROW(m_blob.set_standard_blob_tier(azure::storage::standard_blob_tier::cool, azure::storage::access_condition(), cpk_options, m_context), azure::storage::storage_exception);
+
+        CHECK_THROW(m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), empty_options, m_context), azure::storage::storage_exception);
+        auto snapshot_blob = m_blob.create_snapshot(azure::storage::cloud_metadata(), azure::storage::access_condition(), cpk_options, m_context);
+        CHECK(snapshot_blob.is_snapshot());
+        for (const auto& options : { empty_options, cpk_options })
+        {
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+            concurrency::streams::ostream download_stream(download_buffer);
+            if (options.encryption_key().empty())
+            {
+                CHECK_THROW(snapshot_blob.download_to_stream(download_stream, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
+            }
+            else
+            {
+                snapshot_blob.download_to_stream(download_stream, azure::storage::access_condition(), options, m_context);
+                CHECK(!snapshot_blob.properties().encryption_key_sha256().empty());
+                CHECK(buffer == download_buffer.collection());
+            }
         }
     }
 }

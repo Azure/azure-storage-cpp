@@ -48,7 +48,7 @@ SUITE(File)
         CHECK(!m_file.create_if_not_exists(1024U, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context));
         CHECK_EQUAL(m_file.properties().length(), 1024U);
         m_file.download_attributes();
- 
+
         CHECK_EQUAL(m_file.properties().server_encrypted(), true);
 
         CHECK(m_file.exists(azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context));
@@ -159,7 +159,7 @@ SUITE(File)
         m_file.upload_properties();
         CHECK(m_file.properties().permission().empty());
         CHECK(m_file.properties().permission_key() == properties.permission_key());
-        CHECK_EQUAL(m_file.properties().attributes(), properties.attributes());
+        CHECK(m_file.properties().attributes() == properties.attributes());
         CHECK(m_file.properties().creation_time() == properties.creation_time());
         CHECK(m_file.properties().last_write_time() == properties.last_write_time());
         CHECK(m_file.properties().file_id() == properties.file_id());
@@ -179,7 +179,7 @@ SUITE(File)
         m_file.upload_properties();
         CHECK(m_file.properties().permission().empty());
         CHECK(!m_file.properties().permission_key().empty());
-        CHECK_EQUAL(m_file.properties().attributes(), new_attributes);
+        CHECK(m_file.properties().attributes() == new_attributes);
         CHECK(m_file.properties().creation_time() == current_time);
         CHECK(m_file.properties().last_write_time() == current_time);
 
@@ -211,7 +211,7 @@ SUITE(File)
         directory.upload_properties();
         CHECK(directory.properties().permission().empty());
         CHECK(directory.properties().permission_key() == properties.permission_key());
-        CHECK_EQUAL(directory.properties().attributes(), properties.attributes());
+        CHECK(directory.properties().attributes() == properties.attributes());
         CHECK(directory.properties().creation_time() == properties.creation_time());
         CHECK(directory.properties().last_write_time() == properties.last_write_time());
         CHECK(directory.properties().file_id() == properties.file_id());
@@ -231,7 +231,7 @@ SUITE(File)
         directory.upload_properties();
         CHECK(directory.properties().permission().empty());
         CHECK(!directory.properties().permission_key().empty());
-        CHECK_EQUAL(directory.properties().attributes(), new_attributes);
+        CHECK(directory.properties().attributes() == new_attributes);
         CHECK(directory.properties().creation_time() == current_time);
         CHECK(directory.properties().last_write_time() == current_time);
 
@@ -405,7 +405,7 @@ SUITE(File)
             /// create dest files with specified sas credentials, only read access to dest read file and only write access to dest write file.
             auto dest_file_name = this->get_random_string();
             auto dest = m_directory.get_file_reference(dest_file_name);
-            
+
             /// try to copy from source blob to dest file, use dest_read_file to check copy stats.
             auto copy_id = dest.start_copy(source_blob, azure::storage::access_condition(), azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
             CHECK(wait_for_copy(dest));
@@ -537,7 +537,7 @@ SUITE(File)
         {
             auto range = ranges1.at(0);
             CHECK(range.start_offset() == 0);
-            CHECK((range.end_offset() - range.start_offset() + 1) == content.length());
+            CHECK(size_t(range.end_offset() - range.start_offset() + 1) == content.length());
         }
         m_file.clear_range(0, content.length());
         auto ranges_clear = m_file.list_ranges(0, 2048, azure::storage::file_access_condition(), azure::storage::file_request_options(), m_context);
@@ -547,7 +547,7 @@ SUITE(File)
         {
             auto range = ranges1.at(0);
             CHECK(range.start_offset() == 0);
-            CHECK((range.end_offset() - range.start_offset() + 1) == content.length());
+            CHECK(size_t(range.end_offset() - range.start_offset() + 1) == content.length());
         }
 
         // verify write range with total length larger than the content.
@@ -879,5 +879,186 @@ SUITE(File)
 
         check_parallelism(context, 1);
         CHECK(file.properties().size() == target_length);
+    }
+
+    TEST_FIXTURE(file_test_base, file_lease)
+    {
+        m_file.create(1024);
+        CHECK(azure::storage::lease_status::unspecified == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::unspecified == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+        m_file.download_attributes();
+        CHECK(azure::storage::lease_status::unlocked == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::available == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+
+        // Acquire
+        utility::string_t lease_id = m_file.acquire_lease(utility::string_t());
+        CHECK(azure::storage::lease_status::unspecified == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::unspecified == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+        m_file.download_attributes();
+        CHECK(azure::storage::lease_status::locked == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::leased == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::infinite == m_file.properties().lease_duration());
+
+        // Change
+        utility::string_t lease_id2 = utility::uuid_to_string(utility::new_uuid());
+        azure::storage::file_access_condition condition;
+        condition.set_lease_id(lease_id);
+        lease_id = m_file.change_lease(lease_id2, condition);
+        utility::details::inplace_tolower(lease_id);
+        utility::details::inplace_tolower(lease_id2);
+        CHECK(lease_id == lease_id2);
+        CHECK(azure::storage::lease_status::unspecified == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::unspecified == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+
+        // Break
+        m_file.break_lease();
+        CHECK(azure::storage::lease_status::unspecified == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::unspecified == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+        m_file.download_attributes();
+        CHECK(azure::storage::lease_status::unlocked == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::broken == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+
+        lease_id = m_file.acquire_lease(utility::string_t());
+        condition.set_lease_id(lease_id);
+        m_file.break_lease(condition, azure::storage::file_request_options(), m_context);
+
+        // Acquire with proposed lease id
+        lease_id2 = utility::uuid_to_string(utility::new_uuid());
+        lease_id = m_file.acquire_lease(lease_id2);
+        utility::details::inplace_tolower(lease_id);
+        utility::details::inplace_tolower(lease_id2);
+        CHECK(lease_id == lease_id2);
+
+        // Release
+        CHECK_THROW(m_file.release_lease(condition), azure::storage::storage_exception);
+        condition.set_lease_id(lease_id);
+        m_file.release_lease(condition);
+        CHECK(azure::storage::lease_status::unspecified == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::unspecified == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+        m_file.download_attributes();
+        CHECK(azure::storage::lease_status::unlocked == m_file.properties().lease_status());
+        CHECK(azure::storage::lease_state::available == m_file.properties().lease_state());
+        CHECK(azure::storage::lease_duration::unspecified == m_file.properties().lease_duration());
+    }
+
+    TEST_FIXTURE(file_test_base, file_operations_with_lease)
+    {
+        m_file.create(1024);
+        utility::string_t lease_id = m_file.acquire_lease(utility::string_t());
+
+        azure::storage::file_access_condition lease_condition;
+        lease_condition.set_lease_id(lease_id);
+        azure::storage::file_access_condition wrong_condition;
+        wrong_condition.set_lease_id(utility::uuid_to_string(utility::new_uuid()));
+        azure::storage::file_access_condition empty_condition;
+
+        std::vector<azure::storage::file_access_condition> conditions =
+        {
+            empty_condition, wrong_condition, lease_condition
+        };
+
+        utility::string_t upload_content = _XPLATSTR("content");
+        concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+        auto copy_src = m_directory.get_file_reference(_XPLATSTR("copy_src"));
+        copy_src.create(1024);
+        copy_src.upload_text(upload_content);
+        utility::string_t copy_id;
+        std::vector<std::function<void(azure::storage::file_access_condition)>> funcs =
+        {
+            // Create
+            [&](azure::storage::file_access_condition condition) { m_file.create(2048, condition, azure::storage::file_request_options(), m_context); },
+            // Create if not exists
+            [&](azure::storage::file_access_condition condition) { m_file.create_if_not_exists(2048, condition, azure::storage::file_request_options(), m_context); },
+            // Download attributes
+            [&](azure::storage::file_access_condition condition) { m_file.download_attributes(condition, azure::storage::file_request_options(), m_context); },
+            // Exist
+            [&](azure::storage::file_access_condition condition) { m_file.exists(condition, azure::storage::file_request_options(), m_context); },
+            // Upload properties
+            [&](azure::storage::file_access_condition condition) { m_file.upload_properties(condition, azure::storage::file_request_options(), m_context); },
+            // Upload metadata
+            [&](azure::storage::file_access_condition condition) { m_file.upload_metadata(condition, azure::storage::file_request_options(), m_context); },
+            // Resize
+            [&](azure::storage::file_access_condition condition) { m_file.resize(4096, condition, azure::storage::file_request_options(), m_context); },
+            // Upload from stream
+            [&](azure::storage::file_access_condition condition) { m_file.upload_from_stream(concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(upload_content)), condition, azure::storage::file_request_options(), m_context); },
+            // Write range
+            [&](azure::storage::file_access_condition condition) { m_file.write_range(concurrency::streams::bytestream::open_istream(utility::conversions::to_utf8string(upload_content)), 0, utility::string_t(), condition, azure::storage::file_request_options(), m_context); },
+            // List ranges
+            [&](azure::storage::file_access_condition condition) { m_file.list_ranges(0, 4096, condition, azure::storage::file_request_options(), m_context); },
+            // Download range
+            [&](azure::storage::file_access_condition condition) { m_file.download_to_stream(download_buffer.create_ostream(), condition, azure::storage::file_request_options(), m_context); },
+            // Clear range
+            [&](azure::storage::file_access_condition condition) { m_file.clear_range(0, 1, condition, azure::storage::file_request_options(), m_context); },
+            // Start copy
+            [&](azure::storage::file_access_condition condition)
+            {
+                auto id = m_file.start_copy(copy_src.uri().primary_uri(), azure::storage::access_condition(), condition, azure::storage::file_request_options(), m_context);
+                copy_id = id.empty() ? copy_id : id;
+            },
+            // Abort copy
+            [&](azure::storage::file_access_condition condition) { m_file.abort_copy(copy_id, condition, azure::storage::file_request_options(), m_context); },
+            // Delete if exists
+            [&](azure::storage::file_access_condition condition) { m_file.delete_file_if_exists(condition, azure::storage::file_request_options(), m_context); },
+        };
+
+        std::vector<std::vector<bool>> expected_results =
+        {
+            // Create
+            {0, 0, 1},
+            // Create if not exists
+            {0, 0, 1},
+            // Download Attributes
+            {1, 0, 1},
+            // Exist
+            {1, 0, 1},
+            // Upload properties
+            {0, 0, 1},
+            // Upload metadata
+            {0, 0, 1},
+            // Resize
+            {0, 0, 1},
+            // Upload from stream
+            {0, 0, 1},
+            // Write range
+            {0, 0, 1},
+            // List ranges
+            {1, 0, 1},
+            // Download range
+            {1, 0, 1},
+            // Clear range
+            {0, 0, 1},
+            // Start copy
+            {0, 0, 1},
+            // Abort copy
+            {0, 0, 1},
+            // Delete if exists
+            {0, 0, 1},
+        };
+        CHECK_EQUAL(funcs.size(), expected_results.size());
+
+        for (int i = 0; i < funcs.size(); ++i)
+        {
+            for (int j = 0; j < conditions.size(); ++j)
+            {
+                try
+                {
+                    funcs[i](conditions[j]);
+                }
+                catch (azure::storage::storage_exception& e)
+                {
+                    if (expected_results[i][j] == true && e.result().http_status_code() == web::http::status_codes::PreconditionFailed)
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
     }
 }

@@ -118,7 +118,7 @@ namespace azure { namespace storage {
         WASTORAGE_API storage_uri(web::http::uri primary_uri, web::http::uri secondary_uri);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace azure { namespace storage {
 
         public:
             utility::string_t m_bearer_token;
-            
+
         private:
             pplx::extensibility::reader_writer_lock_t m_mutex;
 
@@ -733,7 +733,7 @@ namespace azure { namespace storage {
         }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -859,7 +859,7 @@ namespace azure { namespace storage {
         }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -977,7 +977,7 @@ namespace azure { namespace storage {
         WASTORAGE_API request_result(utility::datetime start_time, storage_location target_location, const web::http::http_response& response, web::http::status_code http_status_code, storage_extended_error extended_error);
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 r-value reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 r-value reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -1271,7 +1271,7 @@ namespace azure { namespace storage {
         }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -1382,7 +1382,7 @@ namespace azure { namespace storage {
         }
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
         // have implicitly-declared move constructor and move assignment operator.
 
         /// <summary>
@@ -1554,6 +1554,236 @@ namespace azure { namespace storage {
     private:
 
         std::shared_ptr<basic_retry_policy> m_policy;
+    };
+
+    /// <summary>
+    /// The lease state of a resource.
+    /// </summary>
+    enum class lease_state
+    {
+        /// <summary>
+        /// The lease state is not specified.
+        /// </summary>
+        unspecified,
+
+        /// <summary>
+        /// The lease is in the Available state.
+        /// </summary>
+        available,
+
+        /// <summary>
+        /// The lease is in the Leased state.
+        /// </summary>
+        leased,
+
+        /// <summary>
+        /// The lease is in the Expired state.
+        /// </summary>
+        expired,
+
+        /// <summary>
+        /// The lease is in the Breaking state.
+        /// </summary>
+        breaking,
+
+        /// <summary>
+        /// The lease is in the Broken state.
+        /// </summary>
+        broken,
+    };
+
+    /// <summary>
+    /// The lease status of a resource.
+    /// </summary>
+    enum class lease_status
+    {
+        /// <summary>
+        /// The lease status is not specified.
+        /// </summary>
+        unspecified,
+
+        /// <summary>
+        /// The resource is locked.
+        /// </summary>
+        locked,
+
+        /// <summary>
+        /// The resource is available to be locked.
+        /// </summary>
+        unlocked
+    };
+
+    /// <summary>
+    /// Specifies the proposed duration of seconds that the lease should continue before it is broken.
+    /// </summary>
+    class lease_break_period
+    {
+    public:
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::lease_break_period" /> class that breaks
+        /// a fixed-duration lease after the remaining lease period elapses, or breaks an infinite lease immediately.
+        /// </summary>
+        lease_break_period()
+            : m_seconds(std::chrono::seconds::max())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::lease_break_period" /> class that breaks
+        /// a lease after the proposed duration.
+        /// </summary>
+        /// <param name="seconds">The proposed duration, in seconds, for the lease before it is broken. Value may
+        /// be between 0 and 60 seconds.</param>
+        lease_break_period(const std::chrono::seconds& seconds)
+            : m_seconds(seconds)
+        {
+            if (seconds != std::chrono::seconds::max())
+            {
+                utility::assert_in_bounds(_XPLATSTR("seconds"), seconds, protocol::minimum_lease_break_period, protocol::maximum_lease_break_period);
+            }
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::lease_break_period" /> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::lease_break_period" /> object.</param>
+        lease_break_period(lease_break_period&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to an <see cref="azure::storage::lease_break_period" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::lease_break_period" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::lease_break_period" /> object with properties set.</returns>
+        lease_break_period& operator=(lease_break_period&& other)
+        {
+            if (this != &other)
+            {
+                m_seconds = std::move(other.m_seconds);
+            }
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Indicates whether the <see cref="azure::storage::lease_break_period" /> object is valid.
+        /// </summary>
+        /// <returns><c>true</c> if the <see cref="azure::storage::lease_break_period" /> object is valid; otherwise, <c>false</c>.</returns>
+        bool is_valid() const
+        {
+            return m_seconds < std::chrono::seconds::max();
+        }
+
+        /// <summary>
+        /// Gets the proposed duration for the lease before it is broken.
+        /// </summary>
+        /// <returns>The proposed proposed duration for the lease before it is broken, in seconds.</returns>
+        const std::chrono::seconds& seconds() const
+        {
+            return m_seconds;
+        }
+
+    private:
+
+        std::chrono::seconds m_seconds;
+    };
+
+    /// <summary>
+    /// The lease duration for a Blob service resource.
+    /// </summary>
+    enum class lease_duration
+    {
+        /// <summary>
+        /// The lease duration is not specified.
+        /// </summary>
+        unspecified,
+
+        /// <summary>
+        /// The lease duration is finite.
+        /// </summary>
+        fixed,
+
+        /// <summary>
+        /// The lease duration is infinite.
+        /// </summary>
+        infinite,
+    };
+
+    /// <summary>
+    /// Specifies the duration of the lease.
+    /// </summary>
+    class lease_time
+    {
+    public:
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::lease_time" /> class that never expires.
+        /// </summary>
+        lease_time()
+            : m_seconds(-1)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::lease_time" /> class that expires after the
+        /// specified duration.
+        /// </summary>
+        /// <param name="seconds">The duration of the lease in seconds. For a non-infinite lease, this value can be
+        /// between 15 and 60 seconds.</param>
+        lease_time(const std::chrono::seconds& seconds)
+            : m_seconds(seconds)
+        {
+            if (seconds.count() != -1)
+            {
+                utility::assert_in_bounds(_XPLATSTR("seconds"), seconds, protocol::minimum_fixed_lease_duration, protocol::maximum_fixed_lease_duration);
+            }
+        }
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+,
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage::lease_time" /> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::lease_time" /> object.</param>
+        lease_time(lease_time&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to an <see cref="azure::storage::lease_time" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="azure::storage::lease_time" /> object to use to set properties.</param>
+        /// <returns>An <see cref="azure::storage::lease_time" /> object with properties set.</returns>
+        lease_time& operator=(lease_time&& other)
+        {
+            if (this != &other)
+            {
+                m_seconds = std::move(other.m_seconds);
+            }
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Gets the duration of the lease in seconds for a non-infinite lease.
+        /// </summary>
+        /// <returns>The duration of the lease.</returns>
+        const std::chrono::seconds& seconds() const
+        {
+            return m_seconds;
+        }
+
+    private:
+
+        std::chrono::seconds m_seconds;
     };
 
 #ifdef _WIN32

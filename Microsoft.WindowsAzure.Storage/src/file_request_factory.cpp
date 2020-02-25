@@ -218,6 +218,11 @@ namespace azure { namespace storage { namespace protocol {
         }
     }
 
+    void add_access_condition(web::http::http_request& request, const file_access_condition& condition)
+    {
+        add_optional_header(request.headers(), ms_header_lease_id, condition.lease_id());
+    }
+
     web::http::http_request list_shares(const utility::string_t& prefix, bool get_metadata, int max_results, const continuation_token& token, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_list, /* do_encoding */ false));
@@ -365,7 +370,7 @@ namespace azure { namespace storage { namespace protocol {
 
         return request;
     }
-    
+
     web::http::http_request set_file_directory_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_resource_type, resource_directory, /* do_encoding */ false));
@@ -384,7 +389,7 @@ namespace azure { namespace storage { namespace protocol {
         {
             uri_builder.append_query(core::make_query_parameter(uri_query_prefix, prefix));
         }
-        
+
         if (!token.empty())
         {
             uri_builder.append_query(core::make_query_parameter(uri_query_marker, token.next_marker()));
@@ -399,7 +404,7 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request create_file(const int64_t length, const cloud_metadata& metadata, const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request create_file(const int64_t length, const cloud_metadata& metadata, const cloud_file_properties& properties, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
 
@@ -410,22 +415,25 @@ namespace azure { namespace storage { namespace protocol {
         add_optional_header(request.headers(), _XPLATSTR("x-ms-type"), _XPLATSTR("file"));
         request.headers()[ms_header_content_length] = core::convert_to_string(length);
 
+        add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request delete_file(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request delete_file(const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::DEL, uri_builder, timeout, context));
+        add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request get_file_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_file_properties(const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::HEAD, uri_builder, timeout, context));
+        add_access_condition(request, condition);
         return request;
     }
-    
-    web::http::http_request set_file_properties(const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+
+    web::http::http_request set_file_properties(const cloud_file_properties& properties, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_properties, /* do_encoding */ false));
 
@@ -434,71 +442,72 @@ namespace azure { namespace storage { namespace protocol {
         //If resize is needed, user should call azure::storage::cloud_file::resize instead.
         add_file_properties(request, properties);
         add_additional_properties(request, properties, file_operation_type::update);
+        add_access_condition(request, condition);
 
         return request;
     }
 
-    web::http::http_request resize_with_properties(const cloud_file_properties & properties, web::http::uri_builder uri_builder, const std::chrono::seconds & timeout, operation_context context)
+    web::http::http_request resize_with_properties(const cloud_file_properties & properties, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds & timeout, operation_context context)
     {
-        auto request = set_file_properties(properties, uri_builder, timeout, context);
-
+        auto request = set_file_properties(properties, condition, uri_builder, timeout, context);
         request.headers()[ms_header_content_length] = core::convert_to_string(properties.length());
         return request;
     }
-    
-    web::http::http_request set_file_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+
+    web::http::http_request set_file_metadata(const cloud_metadata& metadata, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_metadata, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         add_metadata(request, metadata);
+        add_access_condition(request, condition);
         return request;
     }
 
-    
-        web::http::http_request copy_file(const web::http::uri& source, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request copy_file(const web::http::uri& source, const cloud_metadata& metadata, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_copy_source, source.to_string());
         add_metadata(request, metadata);
-
+        add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request copy_file_from_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request copy_file_from_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, const file_access_condition& file_condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_copy_source, source.to_string());
         add_source_access_condition(request, condition);
         add_metadata(request, metadata);
-
+        add_access_condition(request, file_condition);
         return request;
     }
 
-    web::http::http_request abort_copy_file(const utility::string_t& copy_id, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request abort_copy_file(const utility::string_t& copy_id, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_copy, /* do_encoding */ false));
         uri_builder.append_query(core::make_query_parameter(uri_query_copy_id, copy_id, /* do_encoding */ false));
 
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
         request.headers().add(ms_header_copy_action, header_value_copy_abort);
+        add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request list_file_ranges(utility::size64_t start_offset, utility::size64_t length, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request list_file_ranges(utility::size64_t start_offset, utility::size64_t length, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_range_list, /* do_encoding */ false));
-        
+
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         add_file_range(request, start_offset, length);
-
+        add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request put_file_range(file_range range, file_range_write write, utility::string_t content_md5, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request put_file_range(file_range range, file_range_write write, utility::string_t content_md5, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         uri_builder.append_query(core::make_query_parameter(uri_query_component, component_range, /* do_encoding */ false));
         web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
-        
+
         web::http::http_headers& headers = request.headers();
         headers.add(ms_header_range, range.to_string());
 
@@ -513,10 +522,11 @@ namespace azure { namespace storage { namespace protocol {
             headers.add(_XPLATSTR("x-ms-write"), _XPLATSTR("clear"));
             break;
         }
+        add_access_condition(request, condition);
         return request;
     }
 
-    web::http::http_request get_file(utility::size64_t start_offset, utility::size64_t length, bool md5_validation, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request get_file(utility::size64_t start_offset, utility::size64_t length, bool md5_validation, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         web::http::http_request request(base_request(web::http::methods::GET, uri_builder, timeout, context));
         web::http::http_headers& headers = request.headers();
@@ -526,6 +536,29 @@ namespace azure { namespace storage { namespace protocol {
         {
             headers.add(ms_header_range_get_content_md5, header_value_true);
         }
+        add_access_condition(request, condition);
+        return request;
+    }
+
+    web::http::http_request lease_file(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const file_access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    {
+        uri_builder.append_query(core::make_query_parameter(uri_query_component, component_lease, /* do_encoding */ false));
+        web::http::http_request request(base_request(web::http::methods::PUT, uri_builder, timeout, context));
+
+        web::http::http_headers& headers = request.headers();
+        headers.add(ms_header_lease_action, lease_action);
+        if (lease_action == header_value_lease_acquire)
+        {
+            headers.add(ms_header_lease_duration, "-1");
+            add_optional_header(headers, ms_header_lease_proposed_id, proposed_lease_id);
+        }
+        else if (lease_action == header_value_lease_change)
+        {
+            add_optional_header(headers, ms_header_lease_proposed_id, proposed_lease_id);
+        }
+
+        add_access_condition(request, condition);
+
         return request;
     }
 }}}

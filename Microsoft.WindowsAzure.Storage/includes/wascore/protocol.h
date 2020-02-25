@@ -130,19 +130,21 @@ namespace azure { namespace storage { namespace protocol {
     web::http::http_request get_file_directory_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_directory_properties(const cloud_file_directory_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_file_directory_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request create_file(const int64_t length, const cloud_metadata& metadata, const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request delete_file(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_file_properties(web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_file_properties(const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request resize_with_properties(const cloud_file_properties& properties, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request set_file_metadata(const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request copy_file(const web::http::uri& source, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request copy_file_from_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request abort_copy_file(const utility::string_t& copy_id, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request list_file_ranges(utility::size64_t start_offset, utility::size64_t length, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request put_file_range(file_range range, file_range_write write, utility::string_t content_md5, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request get_file(utility::size64_t start_offset, utility::size64_t length, bool md5_validation, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    
+    web::http::http_request create_file(const int64_t length, const cloud_metadata& metadata, const cloud_file_properties& properties, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request delete_file(const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file_properties(const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_properties(const cloud_file_properties& properties, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request resize_with_properties(const cloud_file_properties& properties, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request set_file_metadata(const cloud_metadata& metadata, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request copy_file(const web::http::uri& source, const cloud_metadata& metadata, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request copy_file_from_blob(const web::http::uri& source, const access_condition& condition, const cloud_metadata& metadata, const file_access_condition& file_condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request abort_copy_file(const utility::string_t& copy_id, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request list_file_ranges(utility::size64_t start_offset, utility::size64_t length, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request put_file_range(file_range range, file_range_write write, utility::string_t content_md5, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request get_file(utility::size64_t start_offset, utility::size64_t length, bool md5_validation, const file_access_condition& condition, web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request lease_file(const utility::string_t& lease_action, const utility::string_t& proposed_lease_id, const file_access_condition& condition, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    void add_access_condition(web::http::http_request& request, const file_access_condition& condition);
+
     // Common response parsers
 
     template<typename T>

@@ -322,7 +322,7 @@ SUITE(File)
             m_directory.get_subdirectory_reference(exclude_prefix + azure::storage::core::convert_to_string(i)).create();
         }
 
-        int num_items_expected = directories.size() + files.size();
+        size_t num_items_expected = directories.size() + files.size();
         int num_items_actual = 0;
         for (auto&& item : m_directory.list_files_and_directories(prefix))
         {

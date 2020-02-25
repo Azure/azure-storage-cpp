@@ -52,13 +52,20 @@ namespace azure { namespace storage {
         m_parent_id = other.m_parent_id;
     }
 
+    void cloud_file_properties::update_lease(const cloud_file_properties& other)
+    {
+        m_lease_status = other.m_lease_status;
+        m_lease_state = other.m_lease_state;
+        m_lease_duration = other.m_lease_duration;
+    }
+
     cloud_file::cloud_file(storage_uri uri)
         : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_file_properties>()),
         m_copy_state(std::make_shared<azure::storage::copy_state>())
     {
         init(std::move(storage_credentials()));
     }
-    
+
     cloud_file::cloud_file(storage_uri uri, storage_credentials credentials)
         : m_uri(std::move(uri)), m_metadata(std::make_shared<cloud_metadata>()), m_properties(std::make_shared<cloud_file_properties>()),
         m_copy_state(std::make_shared<azure::storage::copy_state>())
@@ -97,14 +104,13 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::create_async(int64_t length, const file_access_condition& access_condition, const file_request_options& options, operation_context context)
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::create_file, length, metadata(), this->properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::create_file, length, metadata(), this->properties(), access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, length](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -144,14 +150,13 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::delete_file_async(const file_access_condition& access_condition, const file_request_options& options, operation_context context)
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::delete_file, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::delete_file, access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -187,7 +192,6 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::download_attributes_async(const file_access_condition& access_condition, const file_request_options& options, operation_context context)
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -196,7 +200,7 @@ namespace azure { namespace storage {
         auto copy_state = m_copy_state;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::get_file_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::get_file_properties, access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([metadata, properties, copy_state](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -210,14 +214,13 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::upload_properties_async(const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::set_file_properties, this->properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::set_file_properties, this->properties(), access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -232,14 +235,13 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::upload_metadata_async(const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::set_file_metadata, this->metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::set_file_metadata, this->metadata(), access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -253,7 +255,6 @@ namespace azure { namespace storage {
     pplx::task<utility::string_t> cloud_file::start_copy_async(const web::http::uri& source, const file_access_condition& source_condition, const file_access_condition& dest_condition, const file_request_options& options, operation_context context) const
     {
         UNREFERENCED_PARAMETER(source_condition);
-        UNREFERENCED_PARAMETER(dest_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -261,7 +262,7 @@ namespace azure { namespace storage {
         auto copy_state = m_copy_state;
 
         auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
-        command->set_build_request(std::bind(protocol::copy_file, source, this->metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::copy_file, source, this->metadata(), dest_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, copy_state](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -284,7 +285,6 @@ namespace azure { namespace storage {
 
     pplx::task<utility::string_t> cloud_file::start_copy_async(const web::http::uri& source, const access_condition& source_condition, const file_access_condition& dest_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(dest_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -292,7 +292,7 @@ namespace azure { namespace storage {
         auto copy_state = m_copy_state;
 
         auto command = std::make_shared<core::storage_command<utility::string_t>>(uri());
-        command->set_build_request(std::bind(protocol::copy_file_from_blob, source, source_condition, this->metadata(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::copy_file_from_blob, source, source_condition, this->metadata(), dest_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties, copy_state](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -321,27 +321,25 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::abort_copy_async(const utility::string_t& copy_id, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::abort_copy_file, copy_id, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::abort_copy_file, copy_id, access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response(std::bind(protocol::preprocess_response_void, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         return core::executor<void>::execute_async(command, modified_options, context);
     }
-    
+
     pplx::task<std::vector<file_range>> cloud_file::list_ranges_async(utility::size64_t start_offset, utility::size64_t length, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
         auto properties = m_properties;
 
         auto command = std::make_shared<core::storage_command<std::vector<file_range>>>(uri());
-        command->set_build_request(std::bind(protocol::list_file_ranges, start_offset, length, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::list_file_ranges, start_offset, length, access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> std::vector<file_range>
         {
@@ -364,7 +362,6 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::clear_range_async(utility::size64_t start_offset, utility::size64_t length, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -373,7 +370,7 @@ namespace azure { namespace storage {
         file_range range(start_offset, end_offset);
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::put_file_range, range, file_range_write::clear, utility::string_t(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::put_file_range, range, file_range_write::clear, utility::string_t(), access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -384,10 +381,9 @@ namespace azure { namespace storage {
         });
         return core::executor<void>::execute_async(command, modified_options, context);
     }
-    
+
     pplx::task<void> cloud_file::write_range_async(Concurrency::streams::istream stream, int64_t start_offset, const utility::string_t& content_md5, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -403,12 +399,12 @@ namespace azure { namespace storage {
             properties->update_etag_and_last_modified(modified_properties);
             properties->m_content_md5 = modified_properties.content_md5();
         });
-        return core::istream_descriptor::create(stream, needs_md5 ? checksum_type::md5 : checksum_type::none, std::numeric_limits<utility::size64_t>::max(), protocol::max_range_size).then([command, context, start_offset, content_md5, modified_options](core::istream_descriptor request_body)->pplx::task<void>
+        return core::istream_descriptor::create(stream, needs_md5 ? checksum_type::md5 : checksum_type::none, std::numeric_limits<utility::size64_t>::max(), protocol::max_range_size).then([command, context, start_offset, content_md5, access_condition, modified_options](core::istream_descriptor request_body)->pplx::task<void>
         {
             const utility::string_t& md5 = content_md5.empty() ? request_body.content_checksum().md5() : content_md5;
             auto end_offset = start_offset + request_body.length() - 1;
             file_range range(start_offset, end_offset);
-            command->set_build_request(std::bind(protocol::put_file_range, range, file_range_write::update, md5, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            command->set_build_request(std::bind(protocol::put_file_range, range, file_range_write::update, md5, access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
             command->set_request_body(request_body);
             return core::executor<void>::execute_async(command, modified_options, context);
         });
@@ -427,7 +423,6 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::download_single_range_to_stream_async(concurrency::streams::ostream target, utility::size64_t offset, utility::size64_t length, const file_access_condition& condition, const file_request_options& options, operation_context context, bool update_properties, bool validate_last_modify) const
     {
-        UNREFERENCED_PARAMETER(condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -444,7 +439,7 @@ namespace azure { namespace storage {
 
         std::shared_ptr<core::storage_command<void>> command = std::make_shared<core::storage_command<void>>(uri());
         std::weak_ptr<core::storage_command<void>> weak_command(command);
-        command->set_build_request([offset, length, modified_options, download_info](web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context) -> web::http::http_request
+        command->set_build_request([offset, length, condition, modified_options, download_info](web::http::uri_builder uri_builder, const std::chrono::seconds& timeout, operation_context context) -> web::http::http_request
         {
             utility::size64_t current_offset = offset;
             utility::size64_t current_length = length;
@@ -469,7 +464,7 @@ namespace azure { namespace storage {
                 }
             }
 
-            return protocol::get_file(current_offset, current_length, modified_options.use_transactional_md5() && !download_info->m_are_properties_populated, uri_builder, timeout, context);
+            return protocol::get_file(current_offset, current_length, modified_options.use_transactional_md5() && !download_info->m_are_properties_populated, condition, uri_builder, timeout, context);
         });
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary);
@@ -547,7 +542,7 @@ namespace azure { namespace storage {
                     throw storage_exception(protocol::error_missing_md5, false);
                 }
 
-                // Lock to the current storage location when resuming a failed download. This is locked 
+                // Lock to the current storage location when resuming a failed download. This is locked
                 // early before the retry policy has the opportunity to change the storage location.
                 command->set_location_mode(core::command_location_mode::primary_or_secondary, result.target_location());
 
@@ -797,7 +792,7 @@ namespace azure { namespace storage {
             return core::cloud_file_ostreambuf(instance, instance->properties().length(), access_condition, modified_options, context).create_ostream();
         });
     }
-    
+
     pplx::task<concurrency::streams::ostream> cloud_file::open_write_async(utility::size64_t length, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
         file_request_options modified_options(options);
@@ -809,7 +804,7 @@ namespace azure { namespace storage {
             return core::cloud_file_ostreambuf(instance, length, access_condition, modified_options, context).create_ostream();
         });
     }
-    
+
     pplx::task<void> cloud_file::upload_from_stream_async(concurrency::streams::istream source, utility::size64_t length, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
         file_request_options modified_options(options);
@@ -832,7 +827,7 @@ namespace azure { namespace storage {
             });
         });
     }
-    
+
     pplx::task<void> cloud_file::upload_from_file_async(const utility::string_t& path, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
         auto instance = std::make_shared<cloud_file>(*this);
@@ -847,7 +842,7 @@ namespace azure { namespace storage {
             });
         });
     }
-    
+
     pplx::task<void> cloud_file::upload_text_async(const utility::string_t& text, const file_access_condition& condition, const file_request_options& options, operation_context context) const
     {
         auto utf8_body = utility::conversions::to_utf8string(text);
@@ -859,7 +854,6 @@ namespace azure { namespace storage {
 
     pplx::task<void> cloud_file::resize_async(int64_t length, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -867,7 +861,7 @@ namespace azure { namespace storage {
         properties->m_length = length;
 
         auto command = std::make_shared<core::storage_command<void>>(uri());
-        command->set_build_request(std::bind(protocol::resize_with_properties, this->properties(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::resize_with_properties, this->properties(), access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context)
         {
@@ -910,7 +904,6 @@ namespace azure { namespace storage {
 
     pplx::task<bool> cloud_file::exists_async(bool primary_only, const file_access_condition& access_condition, const file_request_options& options, operation_context context) const
     {
-        UNREFERENCED_PARAMETER(access_condition);
         file_request_options modified_options(options);
         modified_options.apply_defaults(service_client().default_request_options());
 
@@ -918,7 +911,7 @@ namespace azure { namespace storage {
         auto metadata = m_metadata;
 
         auto command = std::make_shared<core::storage_command<bool>>(uri());
-        command->set_build_request(std::bind(protocol::get_file_properties, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::get_file_properties, access_condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(primary_only ? core::command_location_mode::primary_only : core::command_location_mode::primary_or_secondary);
         command->set_preprocess_response([properties, metadata](const web::http::http_response& response, const request_result& result, operation_context context)
@@ -933,6 +926,92 @@ namespace azure { namespace storage {
             return true;
         });
         return core::executor<bool>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<utility::string_t> cloud_file::acquire_lease_async(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    {
+        file_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options());
+
+        auto properties = m_properties;
+
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
+        command->set_build_request(std::bind(protocol::lease_file, protocol::header_value_lease_acquire, proposed_lease_id, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        {
+            protocol::preprocess_response_void(response, result, context);
+            auto response_properties = protocol::file_response_parsers::parse_file_properties(response);
+            properties->update_etag_and_last_modified(response_properties);
+            properties->update_lease(response_properties);
+            return protocol::parse_lease_id(response);
+        });
+
+        return core::executor<utility::string_t>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<utility::string_t> cloud_file::change_lease_async(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    {
+        file_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options());
+
+        auto properties = m_properties;
+
+        auto command = std::make_shared<core::storage_command<utility::string_t>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
+        command->set_build_request(std::bind(protocol::lease_file, protocol::header_value_lease_change, proposed_lease_id, condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> utility::string_t
+        {
+            protocol::preprocess_response_void(response, result, context);
+            auto response_properties = protocol::file_response_parsers::parse_file_properties(response);
+            properties->update_etag_and_last_modified(response_properties);
+            properties->update_lease(response_properties);
+            return protocol::parse_lease_id(response);
+        });
+
+        return core::executor<utility::string_t>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<void> cloud_file::release_lease_async(const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    {
+        file_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options());
+
+        auto properties = m_properties;
+
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
+        command->set_build_request(std::bind(protocol::lease_file, protocol::header_value_lease_release, utility::string_t(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> void
+        {
+            protocol::preprocess_response_void(response, result, context);
+            auto response_properties = protocol::file_response_parsers::parse_file_properties(response);
+            properties->update_etag_and_last_modified(response_properties);
+            properties->update_lease(response_properties);
+        });
+
+        return core::executor<void>::execute_async(command, modified_options, context);
+    }
+
+    pplx::task<void> cloud_file::break_lease_async(const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const
+    {
+        file_request_options modified_options(options);
+        modified_options.apply_defaults(service_client().default_request_options());
+
+        auto properties = m_properties;
+
+        auto command = std::make_shared<core::storage_command<void>>(uri(), cancellation_token, modified_options.is_maximum_execution_time_customized());
+        command->set_build_request(std::bind(protocol::lease_file, protocol::header_value_lease_break, utility::string_t(), condition, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_authentication_handler(service_client().authentication_handler());
+        command->set_preprocess_response([properties](const web::http::http_response& response, const request_result& result, operation_context context) -> void
+        {
+            protocol::preprocess_response_void(response, result, context);
+            auto response_properties = protocol::file_response_parsers::parse_file_properties(response);
+            properties->update_etag_and_last_modified(response_properties);
+            properties->update_lease(response_properties);
+        });
+
+        return core::executor<void>::execute_async(command, modified_options, context);
     }
 
 }}

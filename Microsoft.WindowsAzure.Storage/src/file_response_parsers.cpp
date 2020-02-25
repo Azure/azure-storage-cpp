@@ -93,6 +93,10 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_file_id = get_header_value(headers, ms_header_file_id);
         properties.m_parent_id = get_header_value(headers, ms_header_file_parent_id);
 
+        properties.m_lease_status = parse_lease_status(response);
+        properties.m_lease_state = parse_lease_state(response);
+        properties.m_lease_duration = parse_lease_duration(response);
+
         return properties;
     }
 

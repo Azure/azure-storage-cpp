@@ -51,19 +51,83 @@ namespace azure { namespace storage {
     class file_access_condition
     {
     public:
+        /// <summary>
+        /// Constructs an empty file access condition.
+        /// </summary>
         file_access_condition()
-            : m_valid(false)
         {
         }
 
+#if defined(_MSC_VER) && _MSC_VER < 1900
+        // Compilers that fully support C++ 11 rvalue reference, e.g. g++ 4.8+, clang++ 3.3+ and Visual Studio 2015+, 
+        // have implicitly-declared move constructor and move assignment operator.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="file_access_condition" /> class based on an existing instance.
+        /// </summary>
+        /// <param name="other">An existing <see cref="file_access_condition" /> object.</param>
+        file_access_condition(file_access_condition&& other)
+        {
+            *this = std::move(other);
+        }
+
+        /// <summary>
+        /// Returns a reference to an <see cref="file_access_condition" /> object.
+        /// </summary>
+        /// <param name="other">An existing <see cref="file_access_condition" /> object to use to set properties.</param>
+        /// <returns>An <see cref="file_access_condition" /> object with properties set.</returns>
+        file_access_condition& operator=(file_access_condition&& other)
+        {
+            if (this != &other)
+            {
+                m_lease_id = std::move(other.m_lease_id);
+            }
+            return *this;
+        }
+#endif
+
+        /// <summary>
+        /// Generates a file access condition such that an operation will be performed only if the lease ID on the
+        /// resource matches the specified lease ID.
+        /// </summary>
+        /// <param name="lease_id">The lease ID that must match the lease ID of the resource.</param>
+        /// <returns>An <see cref="azure::storage::file_access_condition" /> object that represents the lease condition.</returns>
+        static file_access_condition generate_lease_condition(utility::string_t lease_id)
+        {
+            file_access_condition condition;
+            condition.set_lease_id(std::move(lease_id));
+            return condition;
+        }
+
+        /// <summary>
+        /// Returns if this condition is empty.
+        /// </summary>
+        /// <returns><c>true</c> if this condition is empty, <c>false</c> otherwise.</returns>
         bool is_valid() const
         {
-            return m_valid;
+            return !m_lease_id.empty();
+        }
+
+        /// <summary>
+        /// Gets a lease ID that must match the lease on a resource.
+        /// </summary>
+        /// <returns>A string containing the lease ID.</returns>
+        const utility::string_t& lease_id() const
+        {
+            return m_lease_id;
+        }
+
+        /// <summary>
+        /// Sets a lease ID that must match the lease on a resource.
+        /// </summary>
+        /// <param name="value">A string containing the lease ID.</param>
+        void set_lease_id(utility::string_t value)
+        {
+            m_lease_id = std::move(value);
         }
 
     private:
-
-        bool m_valid;
+        utility::string_t m_lease_id;
     };
 
     /// <summary>
@@ -2700,6 +2764,8 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_file_properties" /> class.
         /// </summary>
         cloud_file_properties()
+            : m_lease_status(azure::storage::lease_status::unspecified), m_lease_state(azure::storage::lease_state::unspecified),
+            m_lease_duration(azure::storage::lease_duration::unspecified)
         {
         }
 
@@ -2739,8 +2805,11 @@ namespace azure { namespace storage {
                 m_last_write_time_now = std::move(other.m_last_write_time_now);
                 m_last_write_time_preserve = std::move(other.m_last_write_time_preserve);
                 m_change_time = std::move(other.m_change_time);
-                m_file_id = std::move(m_file_id);
-                m_parent_id = std::move(m_parent_id);
+                m_file_id = std::move(other.m_file_id);
+                m_parent_id = std::move(other.m_parent_id);
+                m_lease_status = std::move(other.m_lease_status);
+                m_lease_state = std::move(other.m_lease_state);
+                m_lease_duration = std::move(other.m_lease_duration);
             }
             return *this;
         }
@@ -3118,6 +3187,33 @@ namespace azure { namespace storage {
             return m_parent_id;
         }
 
+        /// <summary>
+        /// Gets the file's lease status.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::lease_status" /> object that indicates the file's lease status.</returns>
+        azure::storage::lease_status lease_status() const
+        {
+            return m_lease_status;
+        }
+
+        /// <summary>
+        /// Gets the file's lease state.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::lease_state" /> object that indicates the file's lease state.</returns>
+        azure::storage::lease_state lease_state() const
+        {
+            return m_lease_state;
+        }
+
+        /// <summary>
+        /// Gets the file's lease duration.
+        /// </summary>
+        /// <returns>An <see cref="azure::storage::lease_duration" /> object that indicates the file's lease duration.</returns>
+        azure::storage::lease_duration lease_duration() const
+        {
+            return m_lease_duration;
+        }
+
     private:
 
         utility::size64_t m_length{ 0 };
@@ -3146,9 +3242,13 @@ namespace azure { namespace storage {
         utility::datetime m_change_time;
         utility::string_t m_file_id;
         utility::string_t m_parent_id;
+        azure::storage::lease_status m_lease_status;
+        azure::storage::lease_state m_lease_state;
+        azure::storage::lease_duration m_lease_duration;
 
         void update_etag_and_last_modified(const cloud_file_properties& other);
         void update_acl_attributes_filetime_and_fileid(const cloud_file_properties& other);
+        void update_lease(const cloud_file_properties& other);
 
         friend class cloud_file;
         friend class protocol::file_response_parsers;
@@ -4695,6 +4795,224 @@ namespace azure { namespace storage {
         {
             return *m_copy_state;
         }
+
+        /// <summary>
+        /// Acquires a lease on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
+        /// <returns>A string containing the lease ID.</returns>
+        utility::string_t acquire_lease(const utility::string_t& proposed_lease_id) const
+        {
+            return acquire_lease_async(proposed_lease_id).get();
+        }
+
+        /// <summary>
+        /// Acquires a lease on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A string containing the lease ID.</returns>
+        utility::string_t acquire_lease(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return acquire_lease_async(proposed_lease_id, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to acquire a lease on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        pplx::task<utility::string_t> acquire_lease_async(const utility::string_t& proposed_lease_id) const
+        {
+            return acquire_lease_async(proposed_lease_id, file_access_condition(), file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to acquire a lease on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        pplx::task<utility::string_t> acquire_lease_async(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return acquire_lease_async(proposed_lease_id, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to acquire a lease on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string representing the proposed lease ID for the new lease. May be an empty string if no lease ID is proposed.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access condition for the operation.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> acquire_lease_async(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
+
+        /// <summary>
+        /// Changes the lease ID on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <returns>The new lease ID.</returns>
+        utility::string_t change_lease(const utility::string_t& proposed_lease_id, const file_access_condition& condition) const
+        {
+            return change_lease_async(proposed_lease_id, condition).get();
+        }
+
+        /// <summary>
+        /// Changes the lease ID on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>The new lease ID.</returns>
+        utility::string_t change_lease(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return change_lease_async(proposed_lease_id, condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to change the lease ID on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const file_access_condition& condition) const
+        {
+            return change_lease_async(proposed_lease_id, condition, file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to change the lease ID on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return change_lease_async(proposed_lease_id, condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to change the lease ID on the file.
+        /// </summary>
+        /// <param name="proposed_lease_id">A string containing the proposed lease ID for the lease. May not be empty.</param>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object of type <see cref="utility::string_t" /> that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<utility::string_t> change_lease_async(const utility::string_t& proposed_lease_id, const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
+
+        /// <summary>
+        /// Releases the lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        void release_lease(const file_access_condition& condition) const
+        {
+            release_lease_async(condition).wait();
+        }
+
+        /// <summary>
+        /// Releases the lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void release_lease(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            release_lease_async(condition, options, context).wait();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to release the lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> release_lease_async(const file_access_condition& condition) const
+        {
+            return release_lease_async(condition, file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to release the lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> release_lease_async(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return release_lease_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to release the lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> release_lease_async(const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
+
+        /// <summary>
+        /// Breaks the current lease on the file.
+        /// </summary>
+        void break_lease() const
+        {
+            return break_lease_async().get();
+        }
+
+        /// <summary>
+        /// Breaks the current lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        void break_lease(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return break_lease_async(condition, options, context).get();
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to break the current lease on the file.
+        /// </summary>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> break_lease_async() const
+        {
+            return break_lease_async(file_access_condition(), file_request_options(), operation_context());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to break the current lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        pplx::task<void> break_lease_async(const file_access_condition& condition, const file_request_options& options, operation_context context) const
+        {
+            return break_lease_async(condition, options, context, pplx::cancellation_token::none());
+        }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to break the current lease on the file.
+        /// </summary>
+        /// <param name="condition">An <see cref="azure::storage::file_access_condition" /> object that represents the access conditions for the file, including a required lease ID.</param>
+        /// <param name="options">An <see cref="azure::storage::file_request_options" /> object that specifies additional options for the request.</param>
+        /// <param name="context">An <see cref="azure::storage::operation_context" /> object that represents the context for the current operation.</param>
+        /// <param name="cancellation_token">An <see cref="pplx::cancellation_token" /> object that is used to cancel the current operation.</param>
+        /// <returns>A <see cref="pplx::task" /> object that represents the current operation.</returns>
+        WASTORAGE_API pplx::task<void> break_lease_async(const file_access_condition& condition, const file_request_options& options, operation_context context, const pplx::cancellation_token& cancellation_token) const;
 
     private:
 

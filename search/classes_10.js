@@ -5,6 +5,7 @@ var searchData=
   ['service_5fproperties',['service_properties',['../classazure_1_1storage_1_1service__properties.html',1,'azure::storage']]],
   ['service_5fproperties_5fincludes',['service_properties_includes',['../classazure_1_1storage_1_1service__properties__includes.html',1,'azure::storage']]],
   ['service_5fstats',['service_stats',['../classazure_1_1storage_1_1service__stats.html',1,'azure::storage']]],
+  ['sha256_5fhash_5fprovider_5fimpl',['sha256_hash_provider_impl',['../classazure_1_1storage_1_1core_1_1sha256__hash__provider__impl.html',1,'azure::storage::core']]],
   ['shared_5faccess_5fpolicies',['shared_access_policies',['../classazure_1_1storage_1_1shared__access__policies.html',1,'azure::storage']]],
   ['shared_5faccess_5fpolicies_3c_20blob_5fshared_5faccess_5fpolicy_20_3e',['shared_access_policies&lt; blob_shared_access_policy &gt;',['../classazure_1_1storage_1_1shared__access__policies.html',1,'azure::storage']]],
   ['shared_5faccess_5fpolicies_3c_20file_5fshared_5faccess_5fpolicy_20_3e',['shared_access_policies&lt; file_shared_access_policy &gt;',['../classazure_1_1storage_1_1shared__access__policies.html',1,'azure::storage']]],

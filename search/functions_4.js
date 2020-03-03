@@ -2,6 +2,8 @@ var searchData=
 [
   ['empty',['empty',['../classazure_1_1storage_1_1continuation__token.html#a6ebbeed40778bb3bcfe7473488ecc134',1,'azure::storage::continuation_token::empty()'],['../classazure_1_1storage_1_1checksum.html#ac669e4d5ced18e00f6106a7de5eabfed',1,'azure::storage::checksum::empty()']]],
   ['enabled',['enabled',['../classazure_1_1storage_1_1service__properties_1_1metrics__properties.html#a1e2ddb91b897e6d16ca8240aa1416636',1,'azure::storage::service_properties::metrics_properties']]],
+  ['encryption_5fkey',['encryption_key',['../classazure_1_1storage_1_1blob__request__options.html#aedaff5f817a130c0ed8b09466033acbd',1,'azure::storage::blob_request_options']]],
+  ['encryption_5fkey_5fsha256',['encryption_key_sha256',['../classazure_1_1storage_1_1cloud__blob__properties.html#a3ba0bc8b4f6377d7ff7867e7f3e47af6',1,'azure::storage::cloud_blob_properties']]],
   ['end_5foffset',['end_offset',['../classazure_1_1storage_1_1page__range.html#a4c98488655739d79832e440646914228',1,'azure::storage::page_range::end_offset()'],['../classazure_1_1storage_1_1file__range.html#a49a1a64808da4dab2a15d80c2d6ef654',1,'azure::storage::file_range::end_offset()']]],
   ['end_5ftime',['end_time',['../classazure_1_1storage_1_1operation__context.html#a2eae2b866b24d72170efdfe4ac21241e',1,'azure::storage::operation_context::end_time()'],['../classazure_1_1storage_1_1request__result.html#aaccd1152aa81e27734b994a7c2e0eef5',1,'azure::storage::request_result::end_time()']]],
   ['entity',['entity',['../classazure_1_1storage_1_1table__operation.html#a5836afdfa762348fa9447f77b1c96c30',1,'azure::storage::table_operation::entity()'],['../classazure_1_1storage_1_1table__result.html#a63a0d42838ef44f01d2c6c6314ba96e1',1,'azure::storage::table_result::entity()']]],

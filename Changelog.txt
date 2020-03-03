@@ -1,6 +1,11 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v7.3.0
+- New feature: Customer provided key (CPK-V)
+- New feature: File lease
+- Upgraded CPPRest to latest version 2.10.15.
+
 Changes in v7.2.0
 - New feature: Previous snapshot with URL.
 - Service version upgraded to 2019-07-07.

@@ -1,4 +1,4 @@
-# Azure Storage Client Library for C++ (7.2.0)
+# Azure Storage Client Library for C++ (7.3.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
 
@@ -65,7 +65,7 @@ To build with source code, there are three ways to install dependencies:
     Because Casablanca does not release NuGet packages anywhere anymore, Starting from 5.1.0, this repository cannot be built with pre-built Casablanca NuGet packages. However, you can export your own version of Casablanca NuGet packages to install dependencies of this project:
     ```BatchFile
     C:\src\vcpkg> .\vcpkg install cpprestsdk
-    C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.14
+    C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.15
     ```
 
 - Manage dependencies by yourself
@@ -128,6 +128,7 @@ The validated Casablanca version for each major or recent release on different p
 | 7.0.0                       | 2.10.14                        | 2.10.14                      |
 | 7.1.0                       | 2.10.14                        | 2.10.14                      |
 | 7.2.0                       | 2.10.14                        | 2.10.14                      |
+| 7.3.0                       | 2.10.15                        | 2.10.15                      |
 
 ## Code Samples
 
@@ -222,7 +223,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.14 -b v2.10.14
+git checkout tags/v2.10.15 -b v2.10.15
 ```
 
 - Build the project in Release mode
@@ -257,7 +258,7 @@ The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage
 The Azure Storage Client Library for C++ project depends on Unitest++ for unit test:
 
 To build and install Unitest++:
-- Clone the project using git: 
+- Clone the project using git:
 ```bash
 git clone https://github.com/unittest-cpp/unittest-cpp.git
 ```
@@ -330,7 +331,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
 cd cpprestsdk
-git checkout tags/v2.10.14 -b v2.10.14
+git checkout tags/v2.10.15 -b v2.10.15
 ```
 
 - Build the project in Release mode
@@ -364,7 +365,7 @@ The library is generated under `azure-storage-cpp/Microsoft.WindowsAzure.Storage
 The Azure Storage Client Library for C++ project depends on Unitest++ for unit test:
 
 To build and install Unitest++:
-- Clone the project using git: 
+- Clone the project using git:
 ```bash
 git clone https://github.com/unittest-cpp/unittest-cpp.git
 ```

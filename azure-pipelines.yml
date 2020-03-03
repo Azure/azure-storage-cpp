@@ -6,7 +6,7 @@ pr:
 - dev
 
 variables:
-  cpp_rest_sdk_version: 2.10.14
+  cpp_rest_sdk_version: 2.10.15
 
 jobs:
 - job: build_test_linux
@@ -32,6 +32,10 @@ jobs:
         container_image: ubuntu18.04.i686:cpprestsdk_$(cpp_rest_sdk_version)
         build_type: Release
         build_env_init: export CXXFLAGS=-m32
+      CENTOS7_DEBUG:
+        container_image: centos7:cpprestsdk_$(cpp_rest_sdk_version)
+        build_type: Debug
+        build_env_init: source scl_source enable devtoolset-4
 
   pool:
     vmImage: 'ubuntu-16.04'

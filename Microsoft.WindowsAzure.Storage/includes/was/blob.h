@@ -1815,7 +1815,7 @@ namespace azure { namespace storage {
         /// <summary>
         /// Gets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <returns>The minimum number of bytes to buffer, ranging from between 16 KB and 100 MB inclusive.</returns>
+        /// <returns>The minimum number of bytes to buffer, ranging from between 16 KB and 4000 MB inclusive.</returns>
         option_with_default<size_t> stream_write_size_in_bytes() const
         {
             return m_stream_write_size;
@@ -1824,10 +1824,10 @@ namespace azure { namespace storage {
         /// <summary>
         /// Sets the minimum number of bytes to buffer when writing to a blob stream.
         /// </summary>
-        /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 100 MB inclusive.</param>
+        /// <param name="value">The minimum number of bytes to buffer, ranging from between 16 KB and 4000 MB inclusive.</param>
         void set_stream_write_size_in_bytes(size_t value)
         {
-            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, 100 * 1024 * 1024);
+            utility::assert_in_bounds<size_t>(_XPLATSTR("value"), value, 16 * 1024, protocol::max_block_size);
             m_stream_write_size = value;
         }
 

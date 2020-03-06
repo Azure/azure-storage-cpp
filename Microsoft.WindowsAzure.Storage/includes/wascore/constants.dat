@@ -222,7 +222,7 @@ DAT(ms_header_share_provisioned_iops, _XPLATSTR("x-ms-share-provisioned-iops"))
 DAT(ms_header_version_id, _XPLATSTR("x-ms-version-id"))
 
 // header values
-DAT(header_value_storage_version, _XPLATSTR("2019-10-10"))
+DAT(header_value_storage_version, _XPLATSTR("2019-12-12"))
 DAT(header_value_true, _XPLATSTR("true"))
 DAT(header_value_false, _XPLATSTR("false"))
 DAT(header_value_locked, _XPLATSTR("locked"))

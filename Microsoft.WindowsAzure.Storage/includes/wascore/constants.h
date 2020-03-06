@@ -25,7 +25,7 @@ namespace azure { namespace storage { namespace protocol {
 
     // size constants
     const size_t max_block_number = 50000;
-    const size_t max_block_size = 100 * 1024 * 1024;
+    const utility::size64_t max_block_size = 4 * 1000 * 1024 * 1024ULL;
     const utility::size64_t max_block_blob_size = static_cast<utility::size64_t>(max_block_number) * max_block_size;
     const size_t max_append_block_size = 4 * 1024 * 1024;
     const size_t max_page_size = 4 * 1024 * 1024;

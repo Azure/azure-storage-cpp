@@ -32,6 +32,7 @@ namespace azure { namespace storage {
     {
         m_etag = parsed_properties.etag();
         m_last_modified = parsed_properties.last_modified();
+        m_version_id = parsed_properties.version_id();
     }
 
     void cloud_blob_properties::copy_from_root(const cloud_blob_properties& root_blob_properties)

@@ -330,6 +330,18 @@ namespace azure { namespace storage { namespace protocol {
             return;
         }
 
+        if (element_name == xml_version_id)
+        {
+            m_properties.m_version_id = get_current_element_text();
+            return;
+        }
+
+        if (element_name == xml_is_current_version)
+        {
+            m_is_current_version = response_parsers::parse_boolean(get_current_element_text());
+            return;
+        }
+
         if (element_name == xml_name)
         {
             m_name = get_current_element_text();
@@ -350,10 +362,11 @@ namespace azure { namespace storage { namespace protocol {
         {
             if (element_name == xml_blob)
             {
-                m_blob_items.push_back(cloud_blob_list_item(std::move(m_uri), std::move(m_name), std::move(m_snapshot_time), std::move(m_metadata), std::move(m_properties), std::move(m_copy_state)));
+                m_blob_items.push_back(cloud_blob_list_item(std::move(m_uri), std::move(m_name), std::move(m_snapshot_time), m_is_current_version, std::move(m_metadata), std::move(m_properties), std::move(m_copy_state)));
                 m_uri = web::uri();
                 m_name = utility::string_t();
                 m_snapshot_time = utility::string_t();
+                m_is_current_version = false;
                 m_metadata = azure::storage::cloud_metadata();
                 m_properties = azure::storage::cloud_blob_properties();
                 m_copy_state = azure::storage::copy_state();

@@ -151,8 +151,8 @@ namespace azure { namespace storage { namespace protocol {
     {
     public:
 
-        cloud_blob_list_item(web::http::uri uri, utility::string_t name, utility::string_t snapshot_time, cloud_metadata metadata, cloud_blob_properties properties, copy_state copy_state)
-            : m_uri(std::move(uri)), m_name(std::move(name)), m_snapshot_time(std::move(snapshot_time)), m_metadata(std::move(metadata)), m_properties(std::move(properties)), m_copy_state(std::move(copy_state))
+        cloud_blob_list_item(web::http::uri uri, utility::string_t name, utility::string_t snapshot_time, bool is_current_version, cloud_metadata metadata, cloud_blob_properties properties, copy_state copy_state)
+            : m_uri(std::move(uri)), m_name(std::move(name)), m_snapshot_time(std::move(snapshot_time)), m_is_current_version(is_current_version), m_metadata(std::move(metadata)), m_properties(std::move(properties)), m_copy_state(std::move(copy_state))
         {
         }
 
@@ -169,6 +169,11 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t move_snapshot_time()
         {
             return std::move(m_snapshot_time);
+        }
+
+        bool is_current_version() const
+        {
+            return m_is_current_version;
         }
 
         cloud_metadata move_metadata()
@@ -191,6 +196,7 @@ namespace azure { namespace storage { namespace protocol {
         web::http::uri m_uri;
         utility::string_t m_name;
         utility::string_t m_snapshot_time;
+        bool m_is_current_version;
         cloud_metadata m_metadata;
         cloud_blob_properties m_properties;
         azure::storage::copy_state m_copy_state;
@@ -274,6 +280,7 @@ namespace azure { namespace storage { namespace protocol {
         utility::string_t m_name;
         web::http::uri m_uri;
         utility::string_t m_snapshot_time;
+        bool m_is_current_version = false;
         cloud_metadata m_metadata;
         cloud_blob_properties m_properties;
         copy_state m_copy_state;

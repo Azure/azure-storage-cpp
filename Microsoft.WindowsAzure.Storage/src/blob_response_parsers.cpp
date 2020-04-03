@@ -192,6 +192,8 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_is_incremental_copy = response_parsers::parse_boolean(get_header_value(headers, ms_header_incremental_copy));
         properties.m_access_tier_inferred = response_parsers::parse_boolean(get_header_value(headers, ms_header_access_tier_inferred));
         properties.m_encryption_key_sha256 = get_header_value(headers, ms_header_encryption_key_sha256);
+        properties.m_version_id = get_header_value(headers, ms_header_version_id);
+
         return properties;
     }
 

@@ -180,6 +180,12 @@ namespace azure { namespace storage { namespace protocol {
             include.append(_XPLATSTR(","));
         }
 
+        if ((includes & blob_listing_details::versions) != 0)
+        {
+            include.append(component_versions);
+            include.append(_XPLATSTR(","));
+        }
+
         if (!include.empty())
         {
             include.pop_back();

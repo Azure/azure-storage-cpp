@@ -474,7 +474,7 @@ namespace azure { namespace storage {
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(core::command_location_mode::primary_or_secondary, token.target_location());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<list_blob_item_segment>, list_blob_item_segment(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-        command->set_postprocess_response([container, delimiter] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<list_blob_item_segment>
+        command->set_postprocess_response([container, delimiter, includes] (const web::http::http_response& response, const request_result& result, const core::ostream_descriptor&, operation_context context) -> pplx::task<list_blob_item_segment>
         {
             protocol::list_blobs_reader reader(response.body());
 
@@ -486,7 +486,9 @@ namespace azure { namespace storage {
 
             for (auto iter = blob_items.begin(); iter != blob_items.end(); ++iter)
             {
-                list_blob_items.push_back(list_blob_item(iter->move_name(), iter->move_snapshot_time(), container, iter->move_properties(), iter->move_metadata(), iter->move_copy_state()));
+                auto properties = iter->move_properties();
+                utility::string_t version_id = (includes & blob_listing_details::values::versions) ? properties.version_id() : utility::string_t();
+                list_blob_items.push_back(list_blob_item(iter->move_name(), iter->move_snapshot_time(), std::move(version_id), iter->is_current_version(), container, std::move(properties), iter->move_metadata(), iter->move_copy_state()));
             }
 
             for (auto iter = blob_prefix_items.begin(); iter != blob_prefix_items.end(); ++iter)

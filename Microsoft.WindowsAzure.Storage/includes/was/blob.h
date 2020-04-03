@@ -281,6 +281,11 @@ namespace azure { namespace storage {
             copy = 1 << 3,
 
             /// <summary>
+            /// Include saved versions of blobs.
+            /// <summary>
+            versions = 1 << 4,
+
+            /// <summary>
             /// List all available committed blobs, uncommitted blobs, and snapshots, and return all metadata and copy status for those blobs.
             /// </summary>
             all = snapshots | metadata | uncommitted_blobs | copy
@@ -1072,6 +1077,7 @@ namespace azure { namespace storage {
                 m_archive_status = std::move(other.m_archive_status);
                 m_access_tier_inferred = std::move(other.m_access_tier_inferred);
                 m_access_tier_change_time = std::move(other.m_access_tier_change_time);
+                m_version_id = std::move(other.m_version_id);
             }
             return *this;
         }
@@ -1338,6 +1344,15 @@ namespace azure { namespace storage {
             return m_access_tier_change_time;
         }
 
+        /// <summary>
+        /// Gets the version id of the blob.
+        /// </summary>
+        /// <returns>The version id the blob refers to.</returns>
+        const utility::string_t& version_id() const
+        {
+            return m_version_id;
+        }
+
     private:
 
         /// <summary>
@@ -1366,6 +1381,7 @@ namespace azure { namespace storage {
         utility::string_t m_encryption_key_sha256;
         utility::datetime m_last_modified;
         utility::datetime m_access_tier_change_time;
+        utility::string_t m_version_id;
         blob_type m_type;
         azure::storage::lease_status m_lease_status;
         azure::storage::lease_state m_lease_state;
@@ -4417,6 +4433,7 @@ namespace azure { namespace storage {
                 m_copy_state = std::move(other.m_copy_state);
                 m_name = std::move(other.m_name);
                 m_snapshot_time = std::move(other.m_snapshot_time);
+                m_version_id = std::move(other.m_version_id);
                 m_container = std::move(other.m_container);
                 m_uri = std::move(other.m_uri);
             }
@@ -6046,6 +6063,51 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Sets the version id of this blob.
+        /// </summary>
+        /// <param name="version_id">The blob's version id.</param>
+        void set_version_id(utility::string_t version_id)
+        {
+            m_version_id = std::move(version_id);
+
+            web::uri primary_uri = m_uri.primary_uri();
+            web::uri secondary_uri = m_uri.secondary_uri();
+
+            for (auto uri : std::vector<std::reference_wrapper<web::uri>>{ primary_uri, secondary_uri })
+            {
+                auto query = web::http::uri::split_query(uri.get().query());
+                if (m_version_id.empty())
+                {
+                    query.erase(protocol::uri_query_version_id);
+                }
+                else
+                {
+                    query[protocol::uri_query_version_id] = m_version_id;
+                }
+
+                web::uri_builder builder(uri);
+                builder.set_query(utility::string_t());
+                for (const auto& q : query)
+                {
+                    builder.append_query(q.first, q.second);
+                }
+
+                uri.get() = builder.to_uri();
+            }
+
+            m_uri = storage_uri(primary_uri, secondary_uri);
+        }
+
+        /// <summary>
+        /// Gets the version id of the blob, if this blob refers to a version.
+        /// </summary>
+        /// <returns>The blob's version id, if the blob refers to a version; otherwise returns an empty string.</returns>
+        const utility::string_t& version_id() const
+        {
+            return m_version_id;
+        }
+
+        /// <summary>
         /// Gets the state of the most recent or pending copy operation.
         /// </summary>
         /// <returns>An <see cref="azure::storage::copy_state" /> object containing the copy state.</returns>
@@ -6153,6 +6215,7 @@ namespace azure { namespace storage {
 
         utility::string_t m_name;
         utility::string_t m_snapshot_time;
+        utility::string_t m_version_id;
         cloud_blob_container m_container;
         storage_uri m_uri;
 
@@ -9110,13 +9173,15 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="blob_name">The name of the blob.</param>
         /// <param name="snapshot_time">The snapshot timestamp, if the blob is a snapshot.</param>
+        /// <param name="version_id">The version id of the blob.</param>
+        /// <param name="is_current_version">If this blob version is current active version.</param>
         /// <param name="container">A reference to the parent container.</param>
         /// <param name="properties">A set of properties for the blob.</param>
         /// <param name="metadata">User-defined metadata for the blob.</param>
         /// <param name="copy_state">the state of the most recent or pending copy operation.</param>
-        explicit list_blob_item(utility::string_t blob_name, utility::string_t snapshot_time, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state)
+        explicit list_blob_item(utility::string_t blob_name, utility::string_t snapshot_time, utility::string_t version_id, bool is_current_version, cloud_blob_container container, cloud_blob_properties properties, cloud_metadata metadata, copy_state copy_state)
             : m_is_blob(true), m_name(std::move(blob_name)), m_container(std::move(container)),
-            m_snapshot_time(std::move(snapshot_time)), m_properties(std::move(properties)),
+            m_snapshot_time(std::move(snapshot_time)), m_version_id(std::move(version_id)), m_is_current_version(is_current_version), m_properties(std::move(properties)),
             m_metadata(std::move(metadata)), m_copy_state(std::move(copy_state))
         {
         }
@@ -9157,6 +9222,8 @@ namespace azure { namespace storage {
                 m_name = std::move(other.m_name);
                 m_container = std::move(other.m_container);
                 m_snapshot_time = std::move(other.m_snapshot_time);
+                m_version_id = std::move(other.m_version_id);
+                m_is_current_version = other.m_is_current_version;
                 m_properties = std::move(other.m_properties);
                 m_metadata = std::move(other.m_metadata);
                 m_copy_state = std::move(other.m_copy_state);
@@ -9176,6 +9243,15 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
+        /// Gets a value indicating whether this <see cref="azure::storage::list_blob_item" /> represents current active version of a blob.
+        /// </summary>
+        /// <returns><c>true</c> if this <see cref="azure::storage::list_blob_item" /> represents current active version of a blob; otherwise, <c>false</c>.</returns>
+        bool is_current_version() const
+        {
+            return m_is_current_version;
+        }
+
+        /// <summary>
         /// Returns the item as an <see cref="azure::storage::cloud_blob" /> object, if and only if it represents a cloud blob.
         /// </summary>
         /// <returns>An <see cref="azure::storage::cloud_blob" /> object.</returns>
@@ -9186,7 +9262,12 @@ namespace azure { namespace storage {
                 throw std::runtime_error("Cannot access a cloud blob directory as cloud blob ");
             }
 
-            return cloud_blob(m_name, m_snapshot_time, m_container, m_properties, m_metadata, m_copy_state);
+            auto blob = cloud_blob(m_name, m_snapshot_time, m_container, m_properties, m_metadata, m_copy_state);
+            if (!m_version_id.empty())
+            {
+                blob.set_version_id(m_version_id);
+            }
+            return blob;
         }
 
         /// <summary>
@@ -9209,6 +9290,8 @@ namespace azure { namespace storage {
         utility::string_t m_name;
         cloud_blob_container m_container;
         utility::string_t m_snapshot_time;
+        utility::string_t m_version_id;
+        bool m_is_current_version = false;
         cloud_blob_properties m_properties;
         cloud_metadata m_metadata;
         copy_state m_copy_state;

@@ -1021,6 +1021,7 @@ namespace azure { namespace storage {
             *snapshot.m_metadata = *resulting_metadata;
             snapshot.m_properties->copy_from_root(*properties);
             snapshot.m_properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
+            properties->update_etag_and_last_modified(protocol::blob_response_parsers::parse_blob_properties(response));
             return snapshot;
         });
         return core::executor<cloud_blob>::execute_async(command, modified_options, context);

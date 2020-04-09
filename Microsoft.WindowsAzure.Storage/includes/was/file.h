@@ -3252,6 +3252,7 @@ namespace azure { namespace storage {
 
         friend class cloud_file;
         friend class protocol::file_response_parsers;
+        friend class list_file_and_directory_item;
     };
 
     enum class file_range_write
@@ -5079,7 +5080,9 @@ namespace azure { namespace storage {
             {
                 throw std::runtime_error("Cannot access a cloud file directory as cloud file");
             }
-            return cloud_file(m_name, m_directory);
+            cloud_file result = cloud_file(m_name, m_directory);
+            result.properties().m_length = static_cast<utility::size64_t>(m_length);
+            return result;
         }
 
         /// <summary>

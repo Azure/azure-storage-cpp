@@ -1082,6 +1082,47 @@ SUITE(Blob)
         CHECK(blob.properties().size() == target_length);
     }
 
+    TEST_FIXTURE(blob_test_base, range_not_satisfiable_exception)
+    {
+        auto blob_name = get_random_string(20);
+        auto blob = m_container.get_block_blob_reference(blob_name);
+        blob.upload_text(utility::string_t());
+
+        auto blob2 = m_container.get_block_blob_reference(blob_name + _XPLATSTR("2"));
+        blob2.upload_text(_XPLATSTR("abcd"));
+
+        azure::storage::blob_request_options options1;
+        options1.set_parallelism_factor(1);
+        options1.set_use_transactional_crc64(false);
+
+        azure::storage::blob_request_options options2;
+        options2.set_parallelism_factor(2);
+        options2.set_use_transactional_crc64(false);
+
+        azure::storage::blob_request_options options3;
+        options3.set_parallelism_factor(1);
+        options3.set_use_transactional_crc64(true);
+
+        for (const auto& option : { options1, options2, options3 }) {
+            concurrency::streams::container_buffer<std::vector<uint8_t>> download_buffer;
+
+            // download whole blob, no exception
+            blob.download_to_stream(download_buffer.create_ostream(), azure::storage::access_condition(), option, azure::storage::operation_context());
+
+            // download range, should throw
+            CHECK_THROW(blob.download_range_to_stream(download_buffer.create_ostream(), 0, 100, azure::storage::access_condition(), option, azure::storage::operation_context()), azure::storage::storage_exception);
+
+            // download range(max, ...), no exception
+            blob.download_range_to_stream(download_buffer.create_ostream(), std::numeric_limits<utility::size64_t>::max(), 0, azure::storage::access_condition(), option, azure::storage::operation_context());
+
+            // download range(3, very large), no exception
+            blob2.download_range_to_stream(download_buffer.create_ostream(), 3, 100, azure::storage::access_condition(), option, azure::storage::operation_context());
+
+            // download range(4, ...), should throw
+            CHECK_THROW(blob2.download_range_to_stream(download_buffer.create_ostream(), 4, 100, azure::storage::access_condition(), option, azure::storage::operation_context()), azure::storage::storage_exception);
+        }
+    }
+
     TEST_FIXTURE(blob_test_base, read_blob_with_invalid_if_none_match)
     {
         auto blob_name = get_random_string(20);

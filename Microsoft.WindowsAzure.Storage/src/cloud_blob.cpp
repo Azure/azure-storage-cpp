@@ -666,8 +666,15 @@ namespace azure { namespace storage {
                 single_blob_download_threshold = protocol::default_single_block_download_threshold;
             }
 
+            // We use this variable to track if we are trying to download the whole blob or just a range.
+            // In the former case, no exception should be thrown if the blob is empty.
+            // In the latter case, exception should be thrown.
+            // And the behavior should be consistent no matter we're downloading with multiple or single thread.
+            bool no_throw_on_empty = false;
+
             if (offset >= std::numeric_limits<utility::size64_t>::max())
             {
+                no_throw_on_empty = true;
                 if (length == 0)
                 {
                     offset = 0;
@@ -690,9 +697,9 @@ namespace azure { namespace storage {
                 }
                 catch (storage_exception &e)
                 {
-                    // For empty blob, swallow the exception and update the attributes.
-                    if (e.result().http_status_code() == web::http::status_codes::RangeNotSatisfiable
-                        && offset == 0)
+                    // If offset equals to 0 and HTTP status code is 416 RangeNotSatisfiable, then this is an empty blob.
+                    // For empty blob, update the attributes or throw an exception.
+                    if (e.result().http_status_code() == web::http::status_codes::RangeNotSatisfiable && offset == 0 && no_throw_on_empty)
                     {
                         return instance->download_attributes_async_impl(condition, options, context, timer_handler->get_cancellation_token(), false, timer_handler);
                     }

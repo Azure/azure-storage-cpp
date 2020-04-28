@@ -29,6 +29,10 @@ namespace azure { namespace storage { namespace protocol {
         properties.m_quota = parse_quota(response);
         properties.m_etag = parse_etag(response);
         properties.m_last_modified = parse_last_modified(response);
+        properties.m_next_allowed_quota_downgrade_time = parse_datetime_rfc1123(get_header_value(response.headers(), ms_header_share_next_allowed_quota_downgrade_time));
+        response.headers().match(ms_header_share_provisioned_egress_mbps, properties.m_provisioned_egress);
+        response.headers().match(ms_header_share_provisioned_ingress_mbps, properties.m_provisioned_ingress);
+        response.headers().match(ms_header_share_provisioned_iops, properties.m_provisioned_iops);
         return properties;
     }
 

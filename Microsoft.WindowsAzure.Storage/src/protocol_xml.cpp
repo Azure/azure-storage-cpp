@@ -779,6 +779,30 @@ namespace azure { namespace storage { namespace protocol {
                 extract_current_element(m_properties.m_quota);
                 return;
             }
+
+            if (element_name == xml_provisioned_iops)
+            {
+                extract_current_element(m_properties.m_provisioned_iops);
+                return;
+            }
+
+            if (element_name == xml_provisioned_ingress_mbps)
+            {
+                extract_current_element(m_properties.m_provisioned_ingress);
+                return;
+            }
+
+            if (element_name == xml_provisioned_egress_mpbs)
+            {
+                extract_current_element(m_properties.m_provisioned_egress);
+                return;
+            }
+
+            if (element_name == xml_next_allowed_quota_downgrade_time)
+            {
+                m_properties.m_next_allowed_quota_downgrade_time = parse_datetime_rfc1123(get_current_element_text());;
+                return;
+            }
         }
 
         if (element_name == xml_name)

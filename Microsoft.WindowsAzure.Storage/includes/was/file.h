@@ -406,7 +406,6 @@ namespace azure { namespace storage {
         /// Initializes a new instance of the <see cref="azure::storage::cloud_file_share_properties" /> class.
         /// </summary>
         cloud_file_share_properties()
-            : m_quota(0)
         {
         }
 
@@ -426,6 +425,10 @@ namespace azure { namespace storage {
                 m_quota = other.m_quota;
                 m_etag = std::move(other.m_etag);
                 m_last_modified = std::move(other.m_last_modified);
+                m_next_allowed_quota_downgrade_time = std::move(other.m_next_allowed_quota_downgrade_time);
+                m_provisioned_iops = std::move(other.m_provisioned_iops);
+                m_provisioned_ingress = std::move(other.m_provisioned_ingress);
+                m_provisioned_egress = std::move(other.m_provisioned_egress);
             }
             return *this;
         }
@@ -468,11 +471,47 @@ namespace azure { namespace storage {
             return m_last_modified;
         }
 
+        /// <summary>
+        /// Gets the next allowed quota downgrade time for the share, expressed as a UTC value.
+        /// </summary>
+        /// <returns>The share's last-modified time, in UTC format.</returns>
+        utility::datetime next_allowed_quota_downgrade_time() const {
+            return m_next_allowed_quota_downgrade_time;
+        }
+
+        /// <summary>
+        /// Gets the provisioned IOPS for the share.
+        /// </summary>
+        /// <returns>Allowed IOPS for this share.</returns>
+        utility::size64_t provisioned_iops() const {
+            return m_provisioned_iops;
+        }
+
+        /// <summary>
+        /// Gets the allowed network ingress rate for the share.
+        /// </summary>
+        /// <returns>Allowed network ingress rate for the share, in MiB/s.</returns>
+        utility::size64_t provisioned_ingress() const {
+            return m_provisioned_ingress;
+        }
+
+        /// <summary>
+        /// Gets the allowed network egress rate for the share.
+        /// </summary>
+        /// <returns>Allowed network egress rate for the share, in MiB/s.</returns>
+        utility::size64_t provisioned_egress() const {
+            return m_provisioned_egress;
+        }
+
     private:
 
-        utility::size64_t m_quota;
+        utility::size64_t m_quota{ 0 };
         utility::string_t m_etag;
         utility::datetime m_last_modified;
+        utility::datetime m_next_allowed_quota_downgrade_time;
+        utility::size64_t m_provisioned_iops{ 0 };
+        utility::size64_t m_provisioned_ingress{ 0 };
+        utility::size64_t m_provisioned_egress{ 0 };
 
         void update_etag_and_last_modified(const cloud_file_share_properties& other);
 

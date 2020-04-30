@@ -1,6 +1,6 @@
 # Azure Storage Client Library for C++ (7.3.1)
 
-The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](http://azure.microsoft.com/en-us/documentation/articles/storage-introduction/).
+The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-introduction).
 
 There is an alternative client library that requires minimum dependency, which provides basic object storage that Blob service offers. Please see [azure-storage-cpplite](https://github.com/Azure/azure-storage-cpplite) for more information.
 

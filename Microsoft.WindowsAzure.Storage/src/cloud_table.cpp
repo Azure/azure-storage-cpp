@@ -192,13 +192,13 @@ namespace azure { namespace storage {
             throw std::invalid_argument(protocol::error_batch_operation_retrieve_mix);
         }
 
-        // TODO: Pre-create a stream for the response to pass to response handler in other functions too so the response doesn't need to be copied
-        Concurrency::streams::stringstreambuf response_buffer;
+        concurrency::streams::container_buffer<std::vector<uint8_t>> response_buffer;
 
         std::shared_ptr<core::storage_command<std::vector<table_result>>> command = std::make_shared<core::storage_command<std::vector<table_result>>>(uri);
-        command->set_build_request(std::bind(protocol::execute_batch_operation, response_buffer, *this, operation, options.payload_format(), is_query, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        command->set_build_request(std::bind(protocol::execute_batch_operation, *this, operation, options.payload_format(), is_query, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_authentication_handler(service_client().authentication_handler());
         command->set_location_mode(is_query ? core::command_location_mode::primary_or_secondary : core::command_location_mode::primary_only);
+        command->set_destination_stream(response_buffer.create_ostream());
         command->set_preprocess_response(std::bind(protocol::preprocess_response<std::vector<table_result>>, std::vector<table_result>(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
         command->set_postprocess_response([response_buffer, operations, is_query] (const web::http::http_response& response, const request_result&, const core::ostream_descriptor&, operation_context context) mutable -> pplx::task<std::vector<table_result>>
         {

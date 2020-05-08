@@ -86,7 +86,7 @@ namespace azure { namespace storage { namespace protocol {
     storage_uri generate_table_uri(const cloud_table_client& service_client, const cloud_table& table, const table_query& query, const continuation_token& token);
     web::http::http_request execute_table_operation(const cloud_table& table, table_operation_type operation_type, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request execute_operation(const table_operation& operation, table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
-    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
+    web::http::http_request execute_batch_operation(const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request execute_query(table_payload_format payload_format, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request get_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
     web::http::http_request set_table_acl(web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context);
@@ -229,7 +229,7 @@ namespace azure { namespace storage { namespace protocol {
     public:
         static utility::string_t parse_etag(const web::http::http_response& response);
         static continuation_token parse_continuation_token(const web::http::http_response& response, const request_result& result);
-        static std::vector<table_result> parse_batch_results(const web::http::http_response& response, Concurrency::streams::stringstreambuf& response_buffer, bool is_query, size_t batch_size);
+        static std::vector<table_result> parse_batch_results(const web::http::http_response& response, const concurrency::streams::container_buffer<std::vector<uint8_t>>& response_buffer, bool is_query, size_t batch_size);
         static std::vector<table_entity> parse_query_results(const web::json::value& obj);
     };
 

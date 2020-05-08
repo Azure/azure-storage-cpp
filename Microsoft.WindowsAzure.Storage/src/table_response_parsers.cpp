@@ -68,12 +68,14 @@ namespace azure { namespace storage { namespace protocol {
         return token;
     }
 
-    std::vector<table_result> table_response_parsers::parse_batch_results(const web::http::http_response& response, Concurrency::streams::stringstreambuf& response_buffer, bool is_query, size_t batch_size)
+    std::vector<table_result> table_response_parsers::parse_batch_results(const web::http::http_response& response, const concurrency::streams::container_buffer<std::vector<uint8_t>>& response_buffer, bool is_query, size_t batch_size)
     {
         std::vector<table_result> batch_result;
         batch_result.reserve(batch_size);
 
-        std::string& response_body = response_buffer.collection();
+        // TODO: We make a copy of the response here, we may optimize it in the future
+        const std::vector<uint8_t>& response_collection = response_buffer.collection();
+        const std::string response_body(response_collection.begin(), response_collection.end());
 
         // TODO: Make this Casablanca code more robust
 

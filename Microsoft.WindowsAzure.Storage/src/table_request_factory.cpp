@@ -441,16 +441,12 @@ namespace azure { namespace storage { namespace protocol {
         return request;
     }
 
-    web::http::http_request execute_batch_operation(Concurrency::streams::stringstreambuf& response_buffer, const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
+    web::http::http_request execute_batch_operation(const cloud_table& table, const table_batch_operation& batch_operation, table_payload_format payload_format, bool is_query, web::http::uri_builder& uri_builder, const std::chrono::seconds& timeout, operation_context context)
     {
         utility::string_t batch_boundary_name = core::generate_boundary_name(_XPLATSTR("batch"));
         utility::string_t changeset_boundary_name = core::generate_boundary_name(_XPLATSTR("changeset"));
         
         web::http::http_request request = table_base_request(web::http::methods::POST, uri_builder, timeout, context);
-        // Need to reset the response buffer before each batch operation is executed.
-        response_buffer.collection().resize(0);
-        response_buffer.seekpos(0, std::ios_base::out);
-        request.set_response_stream(Concurrency::streams::ostream(response_buffer));
 
         web::http::http_headers& request_headers = request.headers();
         request_headers.add(web::http::header_names::accept_charset, header_value_charset_utf8);

@@ -411,21 +411,21 @@ DAT(xml_user_delegation_key_expiry, _XPLATSTR("Expiry"))
 DAT(json_file_permission, _XPLATSTR("permission"))
 
 #define STR(x) #x
-#define VER(x) _XPLATSTR("Azure-Storage/7.3.1 (Native; Windows; MSC_VER " STR(x) ")")
+#define VER(x) _XPLATSTR("Azure-Storage/7.4.0 (Native; Windows; MSC_VER " STR(x) ")")
 #if defined(_WIN32)
 #if defined(_MSC_VER)
     #if _MSC_VER >= 1900
         DAT(header_value_user_agent, VER(_MSC_VER))
     #elif _MSC_VER >= 1800
-        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.3.1 (Native; Windows; MSC_VER 18XX)"))
+        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.4.0 (Native; Windows; MSC_VER 18XX)"))
     #else
-        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.3.1 (Native; Windows; MSC_VER < 1800)"))
+        DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.4.0 (Native; Windows; MSC_VER < 1800)"))
     #endif
 #else
-    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.3.1 (Native; Windows)"))
+    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.4.0 (Native; Windows)"))
 #endif
 #else
-    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.3.1 (Native)"))
+    DAT(header_value_user_agent, _XPLATSTR("Azure-Storage/7.4.0 (Native)"))
 #endif
 
 #endif // _CONSTANTS

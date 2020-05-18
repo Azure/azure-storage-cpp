@@ -1,6 +1,11 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v7.4.0
+- New feature: Premium File Share Properties.
+- Fixed a bug: crash in table batch operation.
+- Upgraded CPPRest to latest version 2.10.16.
+
 Changes in v7.3.1
 - Fixed a bug: RangeNotSatisfiable exception is mistakenly swallowed.
 - Fixed a bug: File length is not returned when listing files.

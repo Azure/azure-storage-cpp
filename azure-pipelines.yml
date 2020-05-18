@@ -6,7 +6,7 @@ pr:
 - dev
 
 variables:
-  cpp_rest_sdk_version: 2.10.15
+  cpp_rest_sdk_version: 2.10.16
 
 jobs:
 - job: build_test_linux

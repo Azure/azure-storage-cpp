@@ -74,20 +74,9 @@ namespace azure { namespace storage {
         /// Gets the storage account credentials for the service client.
         /// </summary>
         /// <returns>The storage account credentials for the service client.</returns>
-        const azure::storage::storage_credentials& credentials()
+        const azure::storage::storage_credentials& credentials() const
         {
-            pplx::extensibility::scoped_read_lock_t guard(m_mutex);
             return m_credentials;
-        }
-
-        /// <summary>
-        /// Sets the storage credentials to use for the service client.
-        /// </summary>
-        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
-        void set_storage_credentials(azure::storage::storage_credentials credentials)
-        {
-            pplx::extensibility::scoped_rw_lock_t guard(m_mutex);
-            m_credentials = std::move(credentials);
         }
 
         /// <summary>
@@ -161,7 +150,6 @@ namespace azure { namespace storage {
 
     private:
 
-        pplx::extensibility::reader_writer_lock_t m_mutex;
         storage_uri m_base_uri;
         azure::storage::storage_credentials m_credentials;
         azure::storage::authentication_scheme m_authentication_scheme;

@@ -212,14 +212,30 @@ namespace azure { namespace storage {
         {
         }
 
+        class account_key_credential
+        {
+        public:
+            account_key_credential(std::vector<uint8_t> account_key = std::vector<uint8_t>()) : m_account_key(std::move(account_key))
+            {
+            }
+
+        public:
+            std::vector<uint8_t> m_account_key;
+
+        private:
+            pplx::extensibility::reader_writer_lock_t m_mutex;
+
+            friend class storage_credentials;
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="azure::storage::storage_credentials" /> class with the specified account name and key value.
         /// </summary>
         /// <param name="account_name">A string containing the name of the storage account.</param>
         /// <param name="account_key">A string containing the Base64-encoded account access key.</param>
-        storage_credentials(utility::string_t account_name, const utility::string_t& account_key)
-            : m_account_name(std::move(account_name)), m_account_key(utility::conversions::from_base64(account_key))
+        storage_credentials(utility::string_t account_name, const utility::string_t& account_key) : m_account_name(std::move(account_name)), m_account_key_credential(std::make_shared<account_key_credential>())
         {
+            m_account_key_credential->m_account_key = std::move(utility::conversions::from_base64(account_key));
         }
 
         /// <summary>
@@ -227,9 +243,9 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="account_name">A string containing the name of the storage account.</param>
         /// <param name="account_key">An array of bytes that represent the account access key.</param>
-        storage_credentials(utility::string_t account_name, std::vector<uint8_t> account_key)
-            : m_account_name(std::move(account_name)), m_account_key(std::move(account_key))
+        storage_credentials(utility::string_t account_name, std::vector<uint8_t> account_key) : m_account_name(std::move(account_name)), m_account_key_credential(std::make_shared<account_key_credential>())
         {
+            m_account_key_credential->m_account_key = std::move(account_key);
         }
 
         class sas_credential
@@ -339,9 +355,10 @@ namespace azure { namespace storage {
                 m_sas_token = std::forward<T>(other).m_sas_token;
                 m_sas_token_with_api_version = std::forward<T>(other).m_sas_token_with_api_version;
                 m_account_name = std::forward<T>(other).m_account_name;
-                m_account_key = std::forward<T>(other).m_account_key;
+                std::atomic_store_explicit(&m_account_key_credential, std::atomic_load_explicit(&other.m_account_key_credential, std::memory_order_acquire), std::memory_order_release);
+                auto key_ptr = std::forward<T>(other).m_account_key_credential;
                 std::atomic_store_explicit(&m_bearer_token_credential, std::atomic_load_explicit(&other.m_bearer_token_credential, std::memory_order_acquire), std::memory_order_release);
-                auto ptr = std::forward<T>(other).m_bearer_token_credential;
+                auto token_ptr = std::forward<T>(other).m_bearer_token_credential;
             }
             return *this;
         }
@@ -387,7 +404,43 @@ namespace azure { namespace storage {
         /// <returns>An array of bytes that contains the key.</returns>
         const std::vector<uint8_t>& account_key() const
         {
-            return m_account_key;
+            auto account_key_ptr = std::atomic_load_explicit(&m_account_key_credential, std::memory_order_acquire);
+            pplx::extensibility::scoped_read_lock_t guard(account_key_ptr->m_mutex);
+            return account_key_ptr->m_account_key;
+        }
+
+        /// <summary>
+        /// Sets the accounts for the credentials.
+        /// </summary>
+        /// <param name="account_key">A string containing the Base64-encoded account access key.</param>
+        void set_account_key(const utility::string_t& account_key)
+        {
+            set_account_key(utility::conversions::from_base64(account_key));
+        }
+
+        /// <summary>
+        /// Sets the accounts for the credentials.
+        /// </summary>
+        /// <param name="account_key">An array of bytes that represent the account access key.</param>
+        void set_account_key(std::vector<uint8_t> account_key)
+        {
+            auto account_key_ptr = std::atomic_load_explicit(&m_account_key_credential, std::memory_order_acquire);
+            if (!account_key_ptr)
+            {
+                auto new_credential = std::make_shared<account_key_credential>();
+                new_credential->m_account_key = std::move(account_key);
+                /* Compares m_account_key_credential and account_key_ptr(nullptr).
+                 * If they are equivalent, assigns new_credential into m_account_key_credential and returns true.
+                 * If they are not equivalent, assigns m_account_key_credential into m_account_key and returns false.
+                 */
+                bool set = std::atomic_compare_exchange_strong_explicit(&m_account_key_credential, &account_key_ptr, new_credential, std::memory_order_release, std::memory_order_acquire);
+                if (set) {
+                    return;
+                }
+                account_key = std::move(new_credential->m_account_key);
+            }
+            pplx::extensibility::scoped_rw_lock_t guard(account_key_ptr->m_mutex);
+            account_key_ptr->m_account_key = std::move(account_key);
         }
 
         /// <summary>
@@ -432,7 +485,7 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are for anonymous access; otherwise, <c>false</c>.</returns>
         bool is_anonymous() const
         {
-            return m_sas_token.empty() && m_account_key.empty() && !is_bearer_token();
+            return m_sas_token.empty() && !is_account_key() && !is_bearer_token();
         }
 
         /// <summary>
@@ -441,7 +494,7 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are a shared access signature token; otherwise, <c>false</c>.</returns>
         bool is_sas() const
         {
-            return !m_sas_token.empty() && m_account_key.empty() && !is_bearer_token();
+            return !m_sas_token.empty() && !is_account_key() && !is_bearer_token();
         }
 
         /// <summary>
@@ -450,7 +503,7 @@ namespace azure { namespace storage {
         /// <returns><c>true</c> if the credentials are a shared key; otherwise, <c>false</c>.</returns>
         bool is_shared_key() const
         {
-            return m_sas_token.empty() && !m_account_key.empty() && !is_bearer_token();
+            return m_sas_token.empty() && is_account_key() && !is_bearer_token();
         }
 
         /// <summary>
@@ -467,14 +520,28 @@ namespace azure { namespace storage {
             return !token_ptr->m_bearer_token.empty();
         }
 
+        /// <summary>
+        /// Indicates whether the credentials are an account key.
+        /// </summary>
+        /// <returns><c>true</c> if the credentials are an account key; otherwise <c>false</c>.</returns>
+        bool is_account_key() const {
+            auto account_key_ptr = std::atomic_load_explicit(&m_account_key_credential, std::memory_order_acquire);
+            if (!account_key_ptr)
+            {
+                return false;
+            }
+            pplx::extensibility::scoped_read_lock_t guard(account_key_ptr->m_mutex);
+            return !account_key_ptr->m_account_key.empty();
+        }
+
     private:
 
         utility::string_t m_sas_token;
         utility::string_t m_sas_token_with_api_version;
         utility::string_t m_account_name;
-        std::vector<uint8_t> m_account_key;
         // We use std::atomic_{load/store/...} functions specialized for std::shared_ptr<T> to access this member, since std::atomic<std::shared_ptr<T>> is not available until C++20.
         // These become deprecated since C++20, but still compile.
+        std::shared_ptr<account_key_credential> m_account_key_credential;
         std::shared_ptr<bearer_token_credential> m_bearer_token_credential;
     };
 

@@ -1755,7 +1755,7 @@ namespace azure { namespace storage {
         /// Gets the maximum size of a blob in bytes that may be uploaded as a single blob.
         /// </summary>
         /// <returns>The maximum size of a blob, in bytes, that may be uploaded as a single blob,
-        /// ranging from between 1 and 256 MB inclusive.</returns>
+        /// ranging from between 1 and 5000 MB inclusive.</returns>
         utility::size64_t single_blob_upload_threshold_in_bytes() const
         {
             return m_single_blob_upload_threshold;
@@ -1765,10 +1765,10 @@ namespace azure { namespace storage {
         /// Sets the maximum size of a blob in bytes that may be uploaded as a single blob.
         /// </summary>
         /// <param name="value">The maximum size of a blob, in bytes, that may be uploaded as a single blob,
-        /// ranging from between 1 and 256 MB inclusive.</param>
+        /// ranging from between 1 and 5000 MB inclusive.</param>
         void set_single_blob_upload_threshold_in_bytes(utility::size64_t value)
         {
-            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, 256 * 1024 * 1024);
+            utility::assert_in_bounds<utility::size64_t>(_XPLATSTR("value"), value, 1 * 1024 * 1024, protocol::max_single_blob_upload_threshold);
             m_single_blob_upload_threshold = value;
         }
 

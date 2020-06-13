@@ -30,7 +30,7 @@ namespace azure { namespace storage { namespace protocol {
     const size_t max_append_block_size = 4 * 1024 * 1024;
     const size_t max_page_size = 4 * 1024 * 1024;
     const size_t max_range_size = 4 * 1024 * 1024;
-    const utility::size64_t max_single_blob_upload_threshold = 256 * 1024 * 1024;
+    const utility::size64_t max_single_blob_upload_threshold = 5000 * 1024 * 1024ULL;
     
     const size_t default_stream_write_size = 4 * 1024 * 1024;
     const size_t default_stream_read_size = 4 * 1024 * 1024;

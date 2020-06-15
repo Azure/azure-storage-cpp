@@ -487,7 +487,7 @@ SUITE(Core)
 
             CHECK_UTF8_EQUAL(token, creds.sas_token());
             CHECK(creds.account_name().empty());
-            CHECK(creds.account_key().empty());
+            CHECK(!creds.is_account_key());
             CHECK(!creds.is_anonymous());
             CHECK(creds.is_sas());
             CHECK(!creds.is_shared_key());
@@ -502,7 +502,7 @@ SUITE(Core)
 
             CHECK_UTF8_EQUAL(token, creds.sas_token());
             CHECK(creds.account_name().empty());
-            CHECK(creds.account_key().empty());
+            CHECK(!creds.is_account_key());
             CHECK(!creds.is_anonymous());
             CHECK(creds.is_sas());
             CHECK(!creds.is_shared_key());

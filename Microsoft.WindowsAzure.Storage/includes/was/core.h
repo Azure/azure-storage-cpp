@@ -233,9 +233,8 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="account_name">A string containing the name of the storage account.</param>
         /// <param name="account_key">A string containing the Base64-encoded account access key.</param>
-        storage_credentials(utility::string_t account_name, const utility::string_t& account_key) : m_account_name(std::move(account_name)), m_account_key_credential(std::make_shared<account_key_credential>())
+        storage_credentials(utility::string_t account_name, const utility::string_t& account_key) : m_account_name(std::move(account_name)), m_account_key_credential(std::make_shared<account_key_credential>(utility::conversions::from_base64(account_key)))
         {
-            m_account_key_credential->m_account_key = std::move(utility::conversions::from_base64(account_key));
         }
 
         /// <summary>
@@ -243,9 +242,8 @@ namespace azure { namespace storage {
         /// </summary>
         /// <param name="account_name">A string containing the name of the storage account.</param>
         /// <param name="account_key">An array of bytes that represent the account access key.</param>
-        storage_credentials(utility::string_t account_name, std::vector<uint8_t> account_key) : m_account_name(std::move(account_name)), m_account_key_credential(std::make_shared<account_key_credential>())
+        storage_credentials(utility::string_t account_name, std::vector<uint8_t> account_key) : m_account_name(std::move(account_name)), m_account_key_credential(std::make_shared<account_key_credential>(std::move(account_key)))
         {
-            m_account_key_credential->m_account_key = std::move(account_key);
         }
 
         class sas_credential
@@ -410,7 +408,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the accounts for the credentials.
+        /// Sets the account key for the credentials.
         /// </summary>
         /// <param name="account_key">A string containing the Base64-encoded account access key.</param>
         void set_account_key(const utility::string_t& account_key)
@@ -419,7 +417,7 @@ namespace azure { namespace storage {
         }
 
         /// <summary>
-        /// Sets the accounts for the credentials.
+        /// Sets the account key for the credentials.
         /// </summary>
         /// <param name="account_key">An array of bytes that represent the account access key.</param>
         void set_account_key(std::vector<uint8_t> account_key)

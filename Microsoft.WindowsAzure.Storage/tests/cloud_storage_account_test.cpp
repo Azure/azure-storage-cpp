@@ -42,7 +42,9 @@ void check_credentials_equal(const azure::storage::storage_credentials& a, const
     CHECK_EQUAL(a.is_sas(), b.is_sas());
     CHECK_EQUAL(a.is_shared_key(), b.is_shared_key());
     CHECK_UTF8_EQUAL(a.account_name(), b.account_name());
-    CHECK_UTF8_EQUAL(utility::conversions::to_base64(a.account_key()), utility::conversions::to_base64(b.account_key()));
+    if (a.is_shared_key() && b.is_shared_key()) {
+        CHECK_UTF8_EQUAL(utility::conversions::to_base64(a.account_key()), utility::conversions::to_base64(b.account_key()));
+    }
 }
 
 void check_account_equal(azure::storage::cloud_storage_account& a, azure::storage::cloud_storage_account& b)

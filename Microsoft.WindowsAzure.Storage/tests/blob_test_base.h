@@ -25,7 +25,7 @@
 #include "test_base.h"
 #include "was/blob.h"
 
-const utility::string_t dummy_md5(_XPLATSTR("MDAwMDAwMDA="));
+const utility::string_t dummy_md5(_XPLATSTR("MDAwMDAwMDAwMDAwMDAwMA=="));
 const uint64_t dummy_crc64_val(0x9588C743);
 const utility::string_t dummy_crc64(_XPLATSTR("Q8eIlQAAAAA="));
 

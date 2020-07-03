@@ -264,37 +264,6 @@ SUITE(Blob)
         m_blob.upload_block_list(committed_blocks, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
         uncommitted_blocks.clear();
 
-        options.set_use_transactional_md5(false);
-        options.set_use_transactional_crc64(false);
-        {
-            // upload a block of max_block_size
-            std::vector<uint8_t> big_buffer;
-            big_buffer.resize(azure::storage::protocol::max_block_size);
-            auto md5 = fill_buffer_and_get_md5(big_buffer);
-            auto stream = concurrency::streams::bytestream::open_istream(big_buffer);
-            auto block_id = get_block_id(block_id_counter++);
-            uncommitted_blocks.push_back(azure::storage::block_list_item(block_id));
-            m_blob.upload_block(block_id, stream, md5, azure::storage::access_condition(), options, m_context);
-            CHECK_UTF8_EQUAL(md5, md5_header);
-        }
-        {
-            // upload another block of max_block_size
-            std::vector<uint8_t> big_buffer;
-            big_buffer.resize(azure::storage::protocol::max_block_size);
-            auto crc64 = fill_buffer_and_get_crc64(big_buffer);
-            uint64_t crc64_val = azure::storage::crc64(big_buffer.data(), big_buffer.size());
-            auto stream = concurrency::streams::bytestream::open_istream(big_buffer);
-            auto block_id = get_block_id(block_id_counter++);
-            uncommitted_blocks.push_back(azure::storage::block_list_item(block_id));
-            m_blob.upload_block(block_id, stream, crc64_val, azure::storage::access_condition(), options, m_context);
-            CHECK_UTF8_EQUAL(crc64, crc64_header);
-        }
-
-        check_block_list_equal(committed_blocks, uncommitted_blocks);
-        std::copy(uncommitted_blocks.begin(), uncommitted_blocks.end(), std::back_inserter(committed_blocks));
-        m_blob.upload_block_list(committed_blocks, azure::storage::access_condition(), azure::storage::blob_request_options(), m_context);
-        uncommitted_blocks.clear();
-
         {
             options.set_use_transactional_md5(true);
             options.set_use_transactional_crc64(false);
@@ -310,32 +279,6 @@ SUITE(Blob)
             auto stream = concurrency::streams::bytestream::open_istream(buffer);
             CHECK_THROW(m_blob.upload_block(get_block_id(0), stream, dummy_crc64_val, azure::storage::access_condition(), options, m_context), azure::storage::storage_exception);
             CHECK_UTF8_EQUAL(dummy_crc64, crc64_header);
-        }
-
-        options.set_use_transactional_md5(false);
-        options.set_use_transactional_crc64(false);
-
-        // trying upload blocks bigger than max_block_size
-        {
-            buffer.resize(azure::storage::protocol::max_block_size + 1);
-            fill_buffer(buffer);
-
-            // seekable stream
-            auto stream = concurrency::streams::bytestream::open_istream(buffer);
-            CHECK_THROW(m_blob.upload_block(get_block_id(0), stream, utility::string_t(), azure::storage::access_condition(), options, m_context), std::invalid_argument);
-        }
-
-        {
-            buffer.resize(azure::storage::protocol::max_block_size * 2);
-            fill_buffer(buffer);
-
-            concurrency::streams::producer_consumer_buffer<uint8_t> pcbuffer;
-            pcbuffer.putn_nocopy(buffer.data(), azure::storage::protocol::max_block_size * 2);
-            pcbuffer.close(std::ios_base::out);
-
-            // non-seekable stream
-            auto stream = pcbuffer.create_istream();
-            CHECK_THROW(m_blob.upload_block(get_block_id(0), stream, utility::string_t(), azure::storage::access_condition(), options, m_context), std::invalid_argument);
         }
 
         check_block_list_equal(committed_blocks, uncommitted_blocks);
@@ -912,8 +855,8 @@ SUITE(Blob)
         buffer.resize(12 * 1024 * 1024);
 
         azure::storage::blob_request_options options;
-        CHECK_THROW(options.set_single_blob_upload_threshold_in_bytes(257 * 1024 * 1024), std::invalid_argument);
-        CHECK_THROW(options.set_stream_write_size_in_bytes(101 * 1024 * 1024), std::invalid_argument);
+        CHECK_THROW(options.set_single_blob_upload_threshold_in_bytes(5001 * 1024 * 1024ULL), std::invalid_argument);
+        CHECK_THROW(options.set_stream_write_size_in_bytes(4001 * 1024 * 1024ULL), std::invalid_argument);
 
         m_blob.upload_from_stream(concurrency::streams::bytestream::open_istream(buffer), azure::storage::access_condition(), options, m_context);
         CHECK_EQUAL(2U, m_context.request_results().size()); // CreateContainer + PutBlob

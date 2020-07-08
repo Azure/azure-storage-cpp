@@ -1,6 +1,12 @@
 Azure Storage Client Library for C++
 History of Changes
 
+Changes in v7.5.0
+- New feature: Blob Versioning.
+- New feature: Jumbo Put Block.
+- New feature: Jumbo Put Blob.
+- Service version upgraded to 2019-12-12.
+
 Changes in v7.4.0
 - New feature: Premium File Share Properties.
 - Fixed a bug: crash in table batch operation.

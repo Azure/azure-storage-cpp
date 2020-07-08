@@ -7,6 +7,7 @@ var searchData=
   ['access_5ftier_5fchange_5ftime',['access_tier_change_time',['../classazure_1_1storage_1_1cloud__blob__properties.html#aa60755f981fecf6546824fe3391163a5',1,'azure::storage::cloud_blob_properties']]],
   ['access_5ftier_5finferred',['access_tier_inferred',['../classazure_1_1storage_1_1cloud__blob__properties.html#a58204696ccfbdb189787097adf7e0627',1,'azure::storage::cloud_blob_properties']]],
   ['account_5fkey',['account_key',['../classazure_1_1storage_1_1storage__credentials.html#af000fa1b05a6b5c4c46279a15f9b5c69',1,'azure::storage::storage_credentials']]],
+  ['account_5fkey_5fcredential',['account_key_credential',['../classazure_1_1storage_1_1storage__credentials_1_1account__key__credential.html',1,'azure::storage::storage_credentials']]],
   ['account_5fkind',['account_kind',['../classazure_1_1storage_1_1account__properties.html#a9376e701fcbf8e7eec03a9c0ad255a5a',1,'azure::storage::account_properties']]],
   ['account_5fname',['account_name',['../classazure_1_1storage_1_1storage__credentials.html#af0012a886211adc7b16e832bd58d25cb',1,'azure::storage::storage_credentials']]],
   ['account_5fproperties',['account_properties',['../classazure_1_1storage_1_1account__properties.html',1,'azure::storage::account_properties'],['../classazure_1_1storage_1_1account__properties.html#a9a26a96de616559eb26dea90d335aede',1,'azure::storage::account_properties::account_properties()']]],
@@ -44,5 +45,5 @@ var searchData=
   ['attributes',['attributes',['../classazure_1_1storage_1_1cloud__file__directory__properties.html#adc5fadf6a9228b2520fd01a86cfc5d9c',1,'azure::storage::cloud_file_directory_properties::attributes()'],['../classazure_1_1storage_1_1cloud__file__properties.html#a3642f8bf2953aecbca636fccb29596b7',1,'azure::storage::cloud_file_properties::attributes()']]],
   ['authentication_5fhandler',['authentication_handler',['../classazure_1_1storage_1_1cloud__client.html#afb507589132db936405495e4bd972be5',1,'azure::storage::cloud_client']]],
   ['authentication_5fscheme',['authentication_scheme',['../classazure_1_1storage_1_1cloud__client.html#aae65b414fd609abea12d2d577ddec30a',1,'azure::storage::cloud_client']]],
-  ['azure_20storage_20client_20library_20for_20c_2b_2b_20_287_2e4_2e0_29',['Azure Storage Client Library for C++ (7.4.0)',['../index.html',1,'']]]
+  ['azure_20storage_20client_20library_20for_20c_2b_2b_20_287_2e5_2e0_29',['Azure Storage Client Library for C++ (7.5.0)',['../index.html',1,'']]]
 ];

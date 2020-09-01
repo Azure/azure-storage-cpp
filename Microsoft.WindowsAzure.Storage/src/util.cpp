@@ -334,8 +334,8 @@ namespace azure { namespace storage {  namespace core {
 
     utility::string_t str_trim_starting_trailing_whitespaces(const utility::string_t& str)
     {
-        auto non_space_begin = std::find_if(str.begin(), str.end(), std::not1(std::ptr_fun<int, int>(isspace)));
-        auto non_space_end = std::find_if(str.rbegin(), str.rend(), std::not1(std::ptr_fun<int, int>(isspace))).base();
+        auto non_space_begin = std::find_if(str.begin(), str.end(), [](char c) { return !std::isspace(c); });
+        auto non_space_end = std::find_if(str.rbegin(), str.rend(), [](char c) { return !std::isspace(c); }).base();
         return utility::string_t(non_space_begin, non_space_end);
     }
 

@@ -32,7 +32,9 @@
 
 namespace azure { namespace storage { namespace core {
 
+#ifdef _MSC_VER
 #pragma region Navigation Helpers
+#endif
 
     bool use_path_style(const storage_uri& uri);
     utility::string_t::size_type find_path_start(const web::http::uri& uri);
@@ -48,9 +50,11 @@ namespace azure { namespace storage { namespace core {
     bool parse_object_uri(const storage_uri& uri, utility::string_t& object_name);
     storage_uri get_service_client_uri(const storage_uri& uri);
 
+#ifdef _MSC_VER
 #pragma endregion
 
 #pragma region MIME Helpers
+#endif
 
     utility::string_t generate_boundary_name(const utility::string_t& prefix);
     void write_boundary(utility::string_t& body_text, const utility::string_t& boundary_name, bool is_closure = false);
@@ -59,9 +63,11 @@ namespace azure { namespace storage { namespace core {
     void write_request_headers(utility::string_t& body_text, const web::http::http_headers& headers);
     void write_request_payload(utility::string_t& body_text, const web::json::value& json_object);
 
+#ifdef _MSC_VER
 #pragma endregion
 
 #pragma region Common Utilities
+#endif
 
     utility::string_t make_query_parameter(const utility::string_t& parameter_name, const utility::string_t& parameter_value, bool do_encoding = true);
     utility::size64_t get_remaining_stream_length(concurrency::streams::istream stream);
@@ -115,7 +121,9 @@ namespace azure { namespace storage { namespace core {
         return make_query_parameter(parameter_name, convert_to_string(parameter_value), do_encoding);
     }
 
+#ifdef _MSC_VER
 #pragma endregion
+#endif
 
 #ifndef _WIN32
     class http_client_reusable

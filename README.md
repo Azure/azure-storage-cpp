@@ -441,7 +441,7 @@ The project is cloned to a folder called `azure-storage-cpp`. Always use the mas
 cd azure-storage-cpp/Microsoft.WIndowsAzure.Storage
 mkdir build.release
 cd build.release
-cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST
 make
 ```
 
@@ -451,7 +451,7 @@ make
 cd azure-storage-cpp/Microsoft.WindowsAzure.Storage
 mkdir build.release
 cd build.release
-CASABLANCA_DIR=<path to casablanca> cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=<path to openssl> -DGETTEXT_LIB_DIR=<path to gettext lib dir>
+CASABLANCA_DIR=<path to casablanca> cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_ROOT_DIR=<path to openssl> -DGETTEXT_LIB_DIR=<path to gettext lib dir>
 make
 ```
 

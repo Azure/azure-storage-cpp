@@ -40,10 +40,27 @@ namespace azure { namespace storage { namespace protocol {
         request.set_request_uri(request_uri);
     }
 
+    static utility::string_t hotfix_rfc1123_now()
+    {
+      char buf[30];
+      std::time_t t = std::time(nullptr);
+      std::tm* pm;
+#ifdef _WIN32
+      std::tm m;
+      pm = &m;
+      gmtime_s(pm, &t);
+#else
+      pm = std::gmtime(&t);
+#endif
+      size_t s = std::strftime(buf, 30, "%a, %d %b %Y %H:%M:%S GMT", pm);
+      return utility::conversions::to_string_t(std::string(buf, s));
+    }
+
     void shared_key_authentication_handler::sign_request(web::http::http_request& request, operation_context context) const
     {
         web::http::http_headers& headers = request.headers();
-        headers.add(ms_header_date, utility::datetime::utc_now().to_string());
+        // headers.add(ms_header_date, utility::datetime::utc_now().to_string());
+        headers.add(ms_header_date, hotfix_rfc1123_now());
 
         if (m_credentials.is_shared_key())
         {

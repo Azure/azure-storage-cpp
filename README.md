@@ -65,7 +65,7 @@ To build with source code, there are three ways to install dependencies:
     Because Casablanca does not release NuGet packages anywhere anymore, Starting from 5.1.0, this repository cannot be built with pre-built Casablanca NuGet packages. However, you can export your own version of Casablanca NuGet packages to install dependencies of this project:
     ```BatchFile
     C:\src\vcpkg> .\vcpkg install cpprestsdk
-    C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.16
+    C:\src\vcpkg> .\vcpkg export --nuget cpprestsdk --nuget-id=Casablanca --nuget-version=2.10.18
     ```
 
 - Manage dependencies by yourself
@@ -226,7 +226,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
-git checkout tags/v2.10.16 -b v2.10.16
+git checkout tags/v2.10.18 -b v2.10.18
 ```
 
 - Build the project in Release mode
@@ -334,7 +334,7 @@ git clone https://github.com/Microsoft/cpprestsdk.git
 - Checkout the version on which Azure Storage Client Library for C++ depends:
 ```bash
 cd cpprestsdk
-git checkout tags/v2.10.16 -b v2.10.16
+git checkout tags/v2.10.18 -b v2.10.18
 ```
 
 - Build the project in Release mode

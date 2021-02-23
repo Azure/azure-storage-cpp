@@ -131,7 +131,7 @@ The validated Casablanca version for each major or recent release on different p
 | 7.3.0                       | 2.10.15                        | 2.10.15                      |
 | 7.3.1                       | 2.10.15                        | 2.10.15                      |
 | 7.4.0                       | 2.10.16                        | 2.10.16                      |
-| 7.5.0                       | 2.10.17                        | 2.10.17                      |
+| 7.5.0                       | 2.10.18                        | 2.10.18                      |
 
 ## Code Samples
 

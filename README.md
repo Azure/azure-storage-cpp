@@ -1,4 +1,4 @@
-**We're working on the [next generation of storage cpp sdk](https://github.com/Azure/azure-sdk-for-cpp/tree/master/sdk/storage) and it will go GA soon. We encourage you to start evaluating the new sdk. This sdk will be deprecated and we do not recommend you use this one in new projects. We will continue to fix critical bugs and address security issues.**
+**We're working on the [next generation of storage cpp sdk](https://github.com/Azure/azure-sdk-for-cpp/tree/master/sdk/storage) and it will go GA soon. We encourage you to start evaluating the new sdk. This SDK will follow the deprecation guideline once the next generation SDK is GA..**
 
 # Azure Storage Client Library for C++ (7.5.0)
 

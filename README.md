@@ -1,3 +1,5 @@
+**azure-storage-cpp is in maintenance mode and will be deprecated soon in favor of [Track 2 Storage C++ SDK](https://github.com/Azure/azure-sdk-for-cpp/tree/master/sdk/storage) once the latter goes GA. We do not recommend its use in new projects. We will continue to fix critical bugs and address security issues.**
+
 # Azure Storage Client Library for C++ (7.5.0)
 
 The Azure Storage Client Library for C++ allows you to build applications against Microsoft Azure Storage. For an overview of Azure Storage, see [Introduction to Microsoft Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-introduction).

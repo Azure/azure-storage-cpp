@@ -1,4 +1,4 @@
-**We're working on the [next generation of Storage CPP SDK](https://github.com/Azure/azure-sdk-for-cpp/tree/master/sdk/storage). It is currently in public preview and we expect to make it generally available soon. We encourage you to start evaluating the new SDK . The package can be found [here](https://github.com/Azure/azure-sdk-for-cpp/releases)**
+**We're working on the [next generation of Storage CPP SDK](https://github.com/Azure/azure-sdk-for-cpp/tree/master/sdk/storage). It is currently in public preview and we expect to make it generally available soon. We encourage you to start evaluating the new SDK. The package can be found [here](https://github.com/Azure/azure-sdk-for-cpp/releases)**
 
 **This SDK will follow the deprecation guideline once the next generation SDK is GA.**
 

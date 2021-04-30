@@ -115,12 +115,6 @@ namespace azure { namespace storage { namespace protocol {
             splitted_query.erase(remove_param);
         }
 
-        auto signed_resource = splitted_query.find(protocol::uri_query_sas_resource);
-        if (require_signed_resource && signed_resource == splitted_query.end())
-        {
-            throw std::invalid_argument(protocol::error_missing_params_for_sas);
-        }
-
         web::http::uri_builder builder;
         for (auto iter = splitted_query.cbegin(); iter != splitted_query.cend(); ++iter)
         {

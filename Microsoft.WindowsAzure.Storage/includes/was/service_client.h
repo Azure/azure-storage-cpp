@@ -69,7 +69,16 @@ namespace azure { namespace storage {
         {
             return m_base_uri;
         }
-
+        
+        /// <summary>
+        /// Sets the storage credentials to use for the service client.
+        /// </summary>
+        /// <param name="credentials">The <see cref="azure::storage::storage_credentials" /> to use.</param>
+        void set_storage_credentials(azure::storage::storage_credentials credentials)
+        {
+            m_credentials = std::move(credentials);
+        }
+        
         /// <summary>
         /// Gets the storage account credentials for the service client.
         /// </summary>

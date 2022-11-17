@@ -22,11 +22,13 @@
 #include "wascore/resources.h"
 
 #ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <float.h>
 #include <windows.h>
 #include <rpc.h>
-#include <agents.h>
+#include "wascore/timer_handler.h"
 #else
 #include "pplx/threadpool.h"
 #include <chrono>
@@ -334,8 +336,8 @@ namespace azure { namespace storage {  namespace core {
 
     utility::string_t str_trim_starting_trailing_whitespaces(const utility::string_t& str)
     {
-        auto non_space_begin = std::find_if(str.begin(), str.end(), std::not1(std::ptr_fun<int, int>(isspace)));
-        auto non_space_end = std::find_if(str.rbegin(), str.rend(), std::not1(std::ptr_fun<int, int>(isspace))).base();
+        auto non_space_begin = std::find_if(str.begin(), str.end(), [](int c) {return !::isspace(c); });
+        auto non_space_end = std::find_if(str.rbegin(), str.rend(), [](int c) {return !::isspace(c); }).base();
         return utility::string_t(non_space_begin, non_space_end);
     }
 
@@ -356,14 +358,14 @@ namespace azure { namespace storage {  namespace core {
     public:
 #ifdef _WIN32
         delay_event(std::chrono::milliseconds timeout)
-            : m_callback(new concurrency::call<int>(std::function<void(int)>(std::bind(&delay_event::timer_fired, this, std::placeholders::_1)))), m_timer(static_cast<unsigned int>(timeout.count()), 0, m_callback, false),
+            : m_timer([](void* event) { reinterpret_cast<delay_event*>(event)->timer_fired(0); }, this),
             m_timeout(timeout)
         {
         }
 
         ~delay_event()
         {
-            delete m_callback;
+            m_timer.stop(true);
         }
 
         void start()
@@ -378,7 +380,7 @@ namespace azure { namespace storage {  namespace core {
             }
             else
             {
-                m_timer.start();
+                m_timer.start(static_cast<unsigned int>(m_timeout.count()), false);
             }
         }
 #else
@@ -400,8 +402,7 @@ namespace azure { namespace storage {  namespace core {
     private:
         pplx::task_completion_event<void> m_completion_event;
 #ifdef _WIN32
-        concurrency::call<int>* m_callback;
-        concurrency::timer<int> m_timer;
+        windows_timer m_timer;
         std::chrono::milliseconds m_timeout;
 #else
         boost::asio::deadline_timer m_timer;

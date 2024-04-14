@@ -17,9 +17,37 @@
 
 #include "stdafx.h"
 #include "wascore/timer_handler.h"
+#include <Threadpoollegacyapiset.h>
+
 
 namespace azure {    namespace storage {    namespace core {
 
+    windows_timer::windows_timer(TaskProc userFunc, _In_ void * context)
+        : m_userFunc(userFunc), m_userContext(context)
+    {
+    }
+
+    windows_timer::~windows_timer()
+    {
+    }
+
+    void windows_timer::start(unsigned int ms, bool repeat)
+    {
+        if (!CreateTimerQueueTimer(&m_hTimer, NULL, _TimerCallback, this, ms, repeat ? ms : 0, WT_EXECUTEDEFAULT))
+        {
+            throw std::bad_alloc();
+        }
+    }
+
+    void windows_timer::stop(bool waitForCallbacks)
+    {
+        while (!DeleteTimerQueueTimer(NULL, m_hTimer, waitForCallbacks ? INVALID_HANDLE_VALUE : NULL))
+        {
+            if (GetLastError() == ERROR_IO_PENDING)
+                break;
+        }
+    }
+    
     timer_handler::timer_handler(const pplx::cancellation_token& token) :
         m_cancellation_token(token), m_is_canceled_by_timeout(false), m_timer_started(false)
     {
@@ -71,7 +99,7 @@ namespace azure {    namespace storage {    namespace core {
 #ifndef _WIN32
             m_timer->cancel();
 #else
-            m_timer->stop();
+            m_timer->stop(true);
 #endif
             if (!m_tce._IsTriggered())
             {
@@ -113,11 +141,9 @@ namespace azure {    namespace storage {    namespace core {
     pplx::task<void> timer_handler::timeout_after(const std::chrono::milliseconds& time)
     {
         // Initialize the timer and connect the callback with completion event.
-        m_timer = std::make_shared<concurrency::timer<int>>(static_cast<unsigned int>(time.count()), 0);
-        std::weak_ptr<timer_handler> weak_this_pointer = shared_from_this();
-        auto callback = std::make_shared<concurrency::call<int>>([weak_this_pointer](int)
+        auto callback = [](LPVOID arg)
         {
-            auto this_pointer = weak_this_pointer.lock();
+            auto this_pointer = static_cast<timer_handler *> (arg);
             if (this_pointer)
             {
                 std::lock_guard<std::mutex> guard(this_pointer->m_mutex);
@@ -126,9 +152,9 @@ namespace azure {    namespace storage {    namespace core {
                     this_pointer->m_tce.set();
                 }
             }
-        });
-        m_timer->link_target(callback.get());  // When timer stops, tce will trigger cancellation.
-        m_timer->start();
+        };
+        m_timer = std::make_shared<windows_timer>(callback, this);
+        m_timer->start(static_cast<unsigned int>(time.count()), false);
 
         auto event_set = pplx::create_task(m_tce);
 

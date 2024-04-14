@@ -27,10 +27,40 @@
 #include <boost/asio/basic_waitable_timer.hpp>
 #include "pplx/threadpool.h"
 #else
-#include <agents.h>
+#include "wascore/basic_types.h"
 #endif
 
 namespace azure { namespace storage { namespace core {
+    
+    typedef void(__cdecl * TaskProc)(void *);
+
+    //
+    // Timer implementation
+    //
+    class windows_timer
+    {
+    public:
+        windows_timer(TaskProc userFunc, _In_ void * context);
+
+        ~windows_timer();
+
+        void start(unsigned int ms, bool repeat);
+
+        void stop(bool waitForCallbacks);
+
+    private:
+
+        static void CALLBACK _TimerCallback(PVOID context, BOOLEAN)
+        {
+            auto timer = static_cast<windows_timer *>(context);
+            timer->m_userFunc(timer->m_userContext);
+        }
+        HANDLE m_hTimer;
+
+        TaskProc m_userFunc;
+        void * m_userContext;
+    };
+
     /// <summary>
     /// Used for internal logic of timer handling, including timer creation, deletion and cancellation
     /// </summary>
@@ -80,7 +110,7 @@ namespace azure { namespace storage { namespace core {
 #ifndef _WIN32
         std::shared_ptr<boost::asio::basic_waitable_timer<std::chrono::steady_clock>> m_timer;
 #else
-        std::shared_ptr<concurrency::timer<int>> m_timer;
+        std::shared_ptr<windows_timer> m_timer;
 #endif
         std::atomic<bool> m_timer_started;
     };

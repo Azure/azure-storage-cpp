@@ -20,6 +20,8 @@
 
 #include "cpprest/details/basic_types.h"
 
+#define _NO_WASTORAGE_API
+
 #ifdef _NO_WASTORAGE_API
     #define WASTORAGE_API
 #else

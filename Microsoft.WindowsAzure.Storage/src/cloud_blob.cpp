@@ -636,7 +636,7 @@ namespace azure { namespace storage {
             {
                 throw storage_exception(protocol::error_md5_mismatch);
             }
-            if (!download_info->m_response_crc64.empty() && !descriptor.content_checksum().is_crc64() && download_info->m_response_crc64 != descriptor.content_checksum().crc64())
+            if (!download_info->m_response_crc64.empty() && descriptor.content_checksum().is_crc64() && download_info->m_response_crc64 != descriptor.content_checksum().crc64())
             {
                 throw storage_exception(protocol::error_crc64_mismatch);
             }

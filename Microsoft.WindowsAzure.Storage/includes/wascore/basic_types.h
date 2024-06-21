@@ -16,7 +16,9 @@
 // -----------------------------------------------------------------------------------------
 
 #pragma once
+#ifdef _MSC_VER
 #pragma warning(disable: 4634)
+#endif
 
 #include "cpprest/details/basic_types.h"
 

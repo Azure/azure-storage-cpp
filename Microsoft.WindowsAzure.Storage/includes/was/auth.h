@@ -37,7 +37,9 @@ namespace azure { namespace storage { namespace protocol {
     const utility::string_t auth_name_shared_key(_XPLATSTR("SharedKey"));
     const utility::string_t auth_name_shared_key_lite(_XPLATSTR("SharedKeyLite"));
 
+#ifdef _MSC_VER
 #pragma region Canonicalization
+#endif
 
     /// <summary>
     /// A helper class for constructing the canonicalization strings required to authenticate a request.
@@ -357,9 +359,11 @@ namespace azure { namespace storage { namespace protocol {
         }
     };
 
+#ifdef _MSC_VER
 #pragma endregion
 
 #pragma region Authentication Handlers
+#endif
 
     /// <summary>
     /// A helper class for signing a request for the desired authentication scheme.
@@ -466,9 +470,11 @@ namespace azure { namespace storage { namespace protocol {
         storage_credentials m_credentials;
     };
 
+#ifdef _MSC_VER
 #pragma endregion
 
 #pragma region Shared Access Signatures
+#endif
 
     utility::string_t get_account_sas_token(const utility::string_t& identifier, const account_shared_access_policy& policy, const storage_credentials& credentials);
     utility::string_t get_blob_sas_token(const utility::string_t& identifier, const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const utility::string_t& snapshot_time, const storage_credentials& credentials);
@@ -478,6 +484,8 @@ namespace azure { namespace storage { namespace protocol {
     utility::string_t get_blob_user_delegation_sas_token(const shared_access_policy& policy, const cloud_blob_shared_access_headers& headers, const utility::string_t& resource_type, const utility::string_t& resource, const utility::string_t& snapshot_time, const user_delegation_key& key);
     storage_credentials parse_query(const web::http::uri& uri, bool require_signed_resource);
 
+#ifdef _MSC_VER
 #pragma endregion
+#endif
 
 }}} // namespace azure::storage::protocol

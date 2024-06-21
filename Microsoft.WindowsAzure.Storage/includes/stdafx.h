@@ -24,8 +24,10 @@
 
 #include "targetver.h"
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4634 4635 4638 4251 4100 4503 4996)
+#endif
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -49,6 +51,8 @@
 #include "cpprest/filestream.h"
 #include "cpprest/producerconsumerstream.h"
 
+#ifdef _MSC_VER
 #pragma warning(pop)
 
 #pragma warning(disable: 4503)
+#endif

@@ -21,7 +21,9 @@
 
 namespace azure { namespace storage { namespace protocol {
 
+#ifdef _MSC_VER
 #pragma region storage_error_code_strings
+#endif
 
     // This section provides error code strings that are common to all storage services.
 
@@ -231,9 +233,11 @@ namespace azure { namespace storage { namespace protocol {
     /// </summary>
     const utility::string_t error_code_resource_type_mismatch(_XPLATSTR("ResourceTypeMismatch"));
 
+#ifdef _MSC_VER
 #pragma endregion
 
 #pragma region blob_error_code_strings
+#endif
 
     // This section provides error code strings that are specific to the Blob service.
 
@@ -427,9 +431,11 @@ namespace azure { namespace storage { namespace protocol {
     /// </summary>
     const utility::string_t error_code_copy_id_mismatch(_XPLATSTR("CopyIdMismatch"));
 
+#ifdef _MSC_VER
 #pragma endregion
 
 #pragma region table_error_code_strings
+#endif
 
     // This section provides error code strings that are specific to the Table service.
 
@@ -583,9 +589,11 @@ namespace azure { namespace storage { namespace protocol {
     /// </summary>
     const utility::string_t error_code_host_information_not_present(_XPLATSTR("HostInformationNotPresent"));
 
+#ifdef _MSC_VER
 #pragma endregion
 
 #pragma region queue_error_code_strings
+#endif
 
     // This section provides error code strings that are specific to the Queue service.
 
@@ -639,6 +647,8 @@ namespace azure { namespace storage { namespace protocol {
     /// </summary>
     const utility::string_t error_code_invalid_marker(_XPLATSTR("InvalidMarker"));
 
+#ifdef _MSC_VER
 #pragma endregion
+#endif
 
 }}} // namespace azure::storage::protocol

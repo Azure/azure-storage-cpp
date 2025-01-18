@@ -440,7 +440,7 @@ namespace azure { namespace storage {  namespace core {
     }
 
 #ifndef _WIN32
-    const boost::asio::io_service& http_client_reusable::s_service = crossplat::threadpool::shared_instance().service();
+    const boost::asio::io_context& http_client_reusable::s_service = crossplat::threadpool::shared_instance().service();
     std::map<utility::string_t, std::shared_ptr<web::http::client::http_client>> http_client_reusable::s_http_clients;
     std::mutex http_client_reusable::s_mutex;
 

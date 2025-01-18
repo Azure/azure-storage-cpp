@@ -71,7 +71,7 @@ namespace azure { namespace storage {
         throw std::invalid_argument(protocol::error_invalid_ip_address);
 #else
         boost::system::error_code error;
-        auto addr = boost::asio::ip::address::from_string(address, error);
+        auto addr = boost::asio::ip::make_address(address, error);
         if (error.value() == 0)
         {
             if (addr.is_v4())

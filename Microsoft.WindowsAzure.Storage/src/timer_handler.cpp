@@ -86,7 +86,7 @@ namespace azure {    namespace storage {    namespace core {
     pplx::task<void> timer_handler::timeout_after(const std::chrono::milliseconds& time)
     {
         m_timer = std::make_shared<boost::asio::basic_waitable_timer<std::chrono::steady_clock>>(crossplat::threadpool::shared_instance().service());
-        m_timer->expires_from_now(std::chrono::duration_cast<std::chrono::steady_clock::duration>(time));
+        m_timer->expires_after(std::chrono::duration_cast<std::chrono::steady_clock::duration>(time));
         std::weak_ptr<timer_handler> weak_this_pointer = shared_from_this();
         auto callback = [weak_this_pointer](const boost::system::error_code& ec)
         {
